@@ -33,9 +33,17 @@ const Auth = () => {
       if (isLogin) {
         const { error } = await signIn(email, password);
         if (error) {
+          // 더 구체적인 에러 메시지 처리
+          let errorMessage = error.message;
+          if (error.message.includes('Invalid login credentials')) {
+            errorMessage = '이메일 또는 비밀번호가 올바르지 않습니다.';
+          } else if (error.message.includes('Email not confirmed')) {
+            errorMessage = '이메일 확인이 필요합니다. 이메일을 확인해주세요.';
+          }
+          
           toast({
             title: "로그인 실패",
-            description: error.message,
+            description: errorMessage,
             variant: "destructive"
           });
         } else {
@@ -48,9 +56,14 @@ const Auth = () => {
       } else {
         const { error } = await signUp(email, password, name);
         if (error) {
+          let errorMessage = error.message;
+          if (error.message.includes('User already registered')) {
+            errorMessage = '이미 가입된 이메일입니다.';
+          }
+          
           toast({
             title: "회원가입 실패",
-            description: error.message,
+            description: errorMessage,
             variant: "destructive"
           });
         } else {
@@ -58,6 +71,9 @@ const Auth = () => {
             title: "회원가입 완료",
             description: "이메일을 확인하여 계정을 활성화해주세요."
           });
+          // 회원가입 후 로그인 페이지로 자동 전환
+          setIsLogin(true);
+          setPassword(''); // 비밀번호 필드 초기화
         }
       }
     } catch (error) {
@@ -126,6 +142,7 @@ const Auth = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
+                  minLength={6}
                 />
                 <button
                   type="button"
@@ -139,6 +156,11 @@ const Auth = () => {
                   )}
                 </button>
               </div>
+              {!isLogin && (
+                <p className="text-xs text-gray-500 mt-1">
+                  비밀번호는 최소 6자 이상이어야 합니다.
+                </p>
+              )}
             </div>
 
             <button
@@ -159,11 +181,21 @@ const Auth = () => {
 
           <div className="mt-6 text-center">
             <button
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => {
+                setIsLogin(!isLogin);
+                setPassword(''); // 모드 변경 시 비밀번호 초기화
+              }}
               className="text-blue-600 hover:text-blue-700 text-sm"
             >
               {isLogin ? '계정이 없으신가요? 회원가입' : '이미 계정이 있으신가요? 로그인'}
             </button>
+          </div>
+
+          {/* 테스트를 위한 안내 메시지 */}
+          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+            <p className="text-xs text-yellow-800">
+              <strong>개발 테스트용:</strong> Supabase 설정에서 "Confirm email" 옵션을 비활성화하면 이메일 확인 없이 바로 로그인할 수 있습니다.
+            </p>
           </div>
         </div>
       </div>
