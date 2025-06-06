@@ -4,6 +4,9 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { MessageCircle, Plus, Search, User, Calendar } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { useInquiries } from '@/hooks/useInquiries';
+import { Link } from 'react-router-dom';
 
 const QnA = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,56 +19,39 @@ const QnA = () => {
     content: ''
   });
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { inquiries, loading, createInquiry } = useInquiries();
 
-  const qnaItems = [
-    {
-      id: 1,
-      title: "RIN-COAT 시공 시 주의사항이 있나요?",
-      author: "김○○",
-      date: "2024-01-15",
-      views: 24,
-      isAnswered: true,
-      category: "시공"
-    },
-    {
-      id: 2,
-      title: "불연재 인증서 사본을 받을 수 있나요?",
-      author: "이○○",
-      date: "2024-01-12",
-      views: 18,
-      isAnswered: true,
-      category: "인증"
-    },
-    {
-      id: 3,
-      title: "RIN-COAT COLOR 색상 견본을 볼 수 있나요?",
-      author: "박○○",
-      date: "2024-01-10",
-      views: 31,
-      isAnswered: false,
-      category: "제품"
-    }
-  ];
-
-  const filteredItems = qnaItems.filter(item => 
+  const filteredItems = inquiries.filter(item => 
     item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.category.toLowerCase().includes(searchTerm.toLowerCase())
+    item.content.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "문의가 접수되었습니다",
-      description: "빠른 시일 내에 답변드리겠습니다.",
-    });
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      title: '',
-      content: ''
-    });
-    setShowForm(false);
+    
+    const { error } = await createInquiry(formData);
+    
+    if (error) {
+      toast({
+        title: "문의 접수 실패",
+        description: "다시 시도해주세요.",
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "문의가 접수되었습니다",
+        description: "빠른 시일 내에 답변드리겠습니다.",
+      });
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        title: '',
+        content: ''
+      });
+      setShowForm(false);
+    }
   };
 
   return (
@@ -81,6 +67,16 @@ const QnA = () => {
               린코리아 제품에 대한 궁금한 점이나 문의사항이 있으시면 
               언제든지 연락주세요.
             </p>
+            {!user && (
+              <div className="mt-6">
+                <Link 
+                  to="/auth"
+                  className="bg-white text-blue-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                >
+                  로그인하여 문의하기
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -175,48 +171,56 @@ const QnA = () => {
           )}
 
           {/* Q&A List */}
-          <div className="space-y-4">
-            {filteredItems.map((item) => (
-              <div key={item.id} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        item.isAnswered 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {item.isAnswered ? '답변완료' : '답변대기'}
-                      </span>
-                      <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
-                        {item.category}
-                      </span>
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
-                    <div className="flex items-center text-sm text-gray-500 space-x-4">
-                      <div className="flex items-center">
-                        <User className="w-4 h-4 mr-1" />
-                        {item.author}
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500">로딩 중...</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredItems.map((item) => (
+                <div key={item.id} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          item.status === 'answered'
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {item.status === 'answered' ? '답변완료' : '답변대기'}
+                        </span>
                       </div>
-                      <div className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-1" />
-                        {item.date}
-                      </div>
-                      <div className="flex items-center">
-                        <MessageCircle className="w-4 h-4 mr-1" />
-                        조회 {item.views}
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
+                      <p className="text-gray-600 mb-2">{item.content}</p>
+                      {item.admin_reply && (
+                        <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                          <p className="text-sm font-medium text-blue-900 mb-1">관리자 답변:</p>
+                          <p className="text-blue-800">{item.admin_reply}</p>
+                        </div>
+                      )}
+                      <div className="flex items-center text-sm text-gray-500 space-x-4 mt-3">
+                        <div className="flex items-center">
+                          <User className="w-4 h-4 mr-1" />
+                          {item.name}
+                        </div>
+                        <div className="flex items-center">
+                          <Calendar className="w-4 h-4 mr-1" />
+                          {new Date(item.created_at).toLocaleDateString('ko-KR')}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
-          {filteredItems.length === 0 && (
+          {!loading && filteredItems.length === 0 && (
             <div className="text-center py-12">
               <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">검색 결과가 없습니다.</p>
+              <p className="text-gray-500">
+                {searchTerm ? '검색 결과가 없습니다.' : '아직 문의사항이 없습니다.'}
+              </p>
             </div>
           )}
         </div>

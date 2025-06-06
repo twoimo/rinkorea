@@ -1,11 +1,16 @@
 
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, User, LogOut } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+  const { toast } = useToast();
 
   const navItems = [
     { name: '홈', path: '/' },
@@ -17,6 +22,23 @@ const Header = () => {
     { name: '공지사항', path: '/news' },
     { name: '연락처', path: '/contact' },
   ];
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast({
+        title: "로그아웃 실패",
+        description: "다시 시도해주세요.",
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "로그아웃 완료",
+        description: "안전하게 로그아웃되었습니다."
+      });
+      navigate('/');
+    }
+  };
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -47,6 +69,32 @@ const Header = () => {
             ))}
           </nav>
 
+          {/* User Menu */}
+          <div className="hidden lg:flex items-center space-x-4">
+            {user ? (
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center text-sm text-gray-700">
+                  <User className="w-4 h-4 mr-1" />
+                  환영합니다!
+                </div>
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center text-sm text-gray-700 hover:text-blue-900 transition-colors"
+                >
+                  <LogOut className="w-4 h-4 mr-1" />
+                  로그아웃
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/auth"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                로그인
+              </Link>
+            )}
+          </div>
+
           {/* Mobile menu button */}
           <button
             className="lg:hidden p-2"
@@ -71,6 +119,28 @@ const Header = () => {
                 {item.name}
               </Link>
             ))}
+            <div className="pt-4 border-t mt-4">
+              {user ? (
+                <button
+                  onClick={() => {
+                    handleSignOut();
+                    setIsMenuOpen(false);
+                  }}
+                  className="flex items-center text-sm text-gray-700 hover:text-blue-900 transition-colors"
+                >
+                  <LogOut className="w-4 h-4 mr-1" />
+                  로그아웃
+                </button>
+              ) : (
+                <Link
+                  to="/auth"
+                  className="block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors text-center"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  로그인
+                </Link>
+              )}
+            </div>
           </nav>
         )}
       </div>
