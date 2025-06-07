@@ -1,9 +1,8 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { ShoppingCart, Star, Filter } from 'lucide-react';
+import { ShoppingCart, Star } from 'lucide-react';
 
 const Shop = () => {
   const [sortBy, setSortBy] = useState('인기도순');
@@ -29,7 +28,8 @@ const Shop = () => {
       originalPrice: null,
       discount: null,
       rating: 5.0,
-      reviews: 2
+      reviews: 2,
+      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/10928441026'
     },
     {
       id: 2,
@@ -40,7 +40,8 @@ const Shop = () => {
       originalPrice: 360020,
       discount: 25,
       rating: 4.0,
-      reviews: 9
+      reviews: 9,
+      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/8968404085'
     },
     {
       id: 3,
@@ -51,7 +52,8 @@ const Shop = () => {
       originalPrice: 298000,
       discount: 90,
       rating: 5.0,
-      reviews: 9
+      reviews: 9,
+      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/8968396177'
     },
     {
       id: 4,
@@ -62,7 +64,8 @@ const Shop = () => {
       originalPrice: 49900,
       discount: 20,
       rating: 4.33,
-      reviews: 6
+      reviews: 6,
+      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/7828589330'
     },
     {
       id: 5,
@@ -73,7 +76,8 @@ const Shop = () => {
       originalPrice: null,
       discount: null,
       rating: 5.0,
-      reviews: 1
+      reviews: 1,
+      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/11624614214'
     },
     {
       id: 6,
@@ -84,7 +88,8 @@ const Shop = () => {
       originalPrice: 180000,
       discount: 11,
       rating: 4.5,
-      reviews: 3
+      reviews: 3,
+      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/9462441672'
     }
   ];
 
@@ -92,16 +97,20 @@ const Shop = () => {
     return new Intl.NumberFormat('ko-KR').format(price);
   };
 
+  const handleProductClick = (naverUrl: string) => {
+    window.open(naverUrl, '_blank');
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-16">
+      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 md:py-16">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <h1 className="text-4xl font-bold mb-4">린코리아 온라인 스토어</h1>
-            <p className="text-xl">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">린코리아 온라인 스토어</h1>
+            <p className="text-lg md:text-xl">
               고품질 세라믹 코팅제와 건설자재를 합리적인 가격에 만나보세요
             </p>
           </div>
@@ -109,11 +118,11 @@ const Shop = () => {
       </section>
 
       {/* Products Section */}
-      <section className="py-12">
+      <section className="py-8 md:py-12">
         <div className="container mx-auto px-4">
           {/* Header */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">전체상품</h2>
+          <div className="mb-6 md:mb-8">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">전체상품</h2>
             
             {/* Sort Options */}
             <div className="flex flex-wrap gap-2">
@@ -121,7 +130,7 @@ const Shop = () => {
                 <button
                   key={option}
                   onClick={() => setSortBy(option)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`px-3 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
                     sortBy === option
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -134,60 +143,70 @@ const Shop = () => {
           </div>
 
           {/* Products Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {products.map((product) => (
               <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="relative">
+                <div className="relative cursor-pointer" onClick={() => handleProductClick(product.naverUrl)}>
                   <img 
                     src={product.image} 
                     alt={product.name}
-                    className="w-full h-64 object-cover"
+                    className="w-full h-48 md:h-64 object-cover hover:scale-105 transition-transform"
                   />
                   {product.discount && (
-                    <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-sm font-bold">
+                    <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
                       {product.discount}% 할인
                     </div>
                   )}
                 </div>
                 
-                <div className="p-4">
-                  <h3 className="font-bold text-gray-900 mb-2 line-clamp-2">
+                <div className="p-3 md:p-4">
+                  <h3 className="font-bold text-gray-900 mb-2 text-sm md:text-base line-clamp-2">
                     {product.name}
                   </h3>
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                  <p className="text-xs md:text-sm text-gray-600 mb-3 line-clamp-2">
                     {product.description}
                   </p>
                   
                   <div className="mb-3">
                     {product.originalPrice && (
-                      <del className="text-sm text-gray-400 block">
+                      <del className="text-xs md:text-sm text-gray-400 block">
                         {formatPrice(product.originalPrice)}원
                       </del>
                     )}
                     <div className="flex items-center">
-                      <span className="text-xl font-bold text-gray-900">
+                      <span className="text-lg md:text-xl font-bold text-gray-900">
                         {formatPrice(product.price)}
                       </span>
                       <span className="text-gray-600 ml-1">원</span>
                     </div>
                   </div>
                   
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Star className="w-4 h-4 text-yellow-400 mr-1" />
+                  <div className="flex items-center justify-between mb-3 md:mb-4">
+                    <div className="flex items-center text-xs md:text-sm text-gray-600">
+                      <Star className="w-3 h-3 md:w-4 md:h-4 text-yellow-400 mr-1" />
                       <span className="font-medium">{product.rating}</span>
                       <span className="mx-1">·</span>
                       <span>리뷰 {product.reviews}</span>
                     </div>
                   </div>
                   
-                  <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center">
+                  <button 
+                    onClick={() => handleProductClick(product.naverUrl)}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center text-sm md:text-base"
+                  >
                     <ShoppingCart className="w-4 h-4 mr-2" />
                     구매하기
                   </button>
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Note about external links */}
+          <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+            <p className="text-sm text-blue-800 text-center">
+              ※ 제품 구매는 네이버 스마트스토어에서 진행됩니다.
+            </p>
           </div>
         </div>
       </section>

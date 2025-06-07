@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
@@ -39,6 +40,7 @@ const Header = () => {
       });
       navigate('/');
     }
+    setIsUserMenuOpen(false);
   };
 
   return (
@@ -70,28 +72,40 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* User Menu */}
+          {/* Desktop User Menu */}
           <div className="hidden lg:flex items-center space-x-4">
             {user ? (
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center text-sm text-gray-700">
-                  <User className="w-4 h-4 mr-1" />
-                  환영합니다!
-                </div>
-                <Link
-                  to="/profile"
-                  className="flex items-center text-sm text-gray-700 hover:text-blue-900 transition-colors"
-                >
-                  <Settings className="w-4 h-4 mr-1" />
-                  프로필 설정
-                </Link>
+              <div className="relative">
                 <button
-                  onClick={handleSignOut}
-                  className="flex items-center text-sm text-gray-700 hover:text-blue-900 transition-colors"
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center space-x-2 text-sm text-gray-700 hover:text-blue-900 transition-colors p-2 rounded-lg hover:bg-gray-50"
                 >
-                  <LogOut className="w-4 h-4 mr-1" />
-                  로그아웃
+                  <User className="w-5 h-5" />
+                  <span>메뉴</span>
                 </button>
+                
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm text-gray-600">환영합니다!</p>
+                    </div>
+                    <Link
+                      to="/profile"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      <Settings className="w-4 h-4 mr-3" />
+                      프로필 설정
+                    </Link>
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4 mr-3" />
+                      로그아웃
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <Link
@@ -119,8 +133,8 @@ const Header = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`block py-2 text-sm font-medium transition-colors hover:text-blue-900 ${
-                  location.pathname === item.path ? 'text-blue-900' : 'text-gray-700'
+                className={`block py-3 px-2 text-sm font-medium transition-colors hover:text-blue-900 hover:bg-gray-50 rounded ${
+                  location.pathname === item.path ? 'text-blue-900 bg-blue-50' : 'text-gray-700'
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -130,12 +144,15 @@ const Header = () => {
             <div className="pt-4 border-t mt-4">
               {user ? (
                 <div className="space-y-2">
+                  <div className="px-2 py-2 text-sm text-gray-600 font-medium">
+                    환영합니다!
+                  </div>
                   <Link
                     to="/profile"
-                    className="flex items-center text-sm text-gray-700 hover:text-blue-900 transition-colors"
+                    className="flex items-center px-2 py-3 text-sm text-gray-700 hover:text-blue-900 hover:bg-gray-50 rounded transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <Settings className="w-4 h-4 mr-1" />
+                    <Settings className="w-4 h-4 mr-3" />
                     프로필 설정
                   </Link>
                   <button
@@ -143,16 +160,16 @@ const Header = () => {
                       handleSignOut();
                       setIsMenuOpen(false);
                     }}
-                    className="flex items-center text-sm text-gray-700 hover:text-blue-900 transition-colors"
+                    className="w-full flex items-center px-2 py-3 text-sm text-gray-700 hover:text-blue-900 hover:bg-gray-50 rounded transition-colors"
                   >
-                    <LogOut className="w-4 h-4 mr-1" />
+                    <LogOut className="w-4 h-4 mr-3" />
                     로그아웃
                   </button>
                 </div>
               ) : (
                 <Link
                   to="/auth"
-                  className="block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors text-center"
+                  className="block bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg text-sm font-medium transition-colors text-center mx-2"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   로그인
@@ -162,6 +179,14 @@ const Header = () => {
           </nav>
         )}
       </div>
+
+      {/* Backdrop for user menu */}
+      {isUserMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-25 z-40 lg:hidden"
+          onClick={() => setIsUserMenuOpen(false)}
+        />
+      )}
     </header>
   );
 };
