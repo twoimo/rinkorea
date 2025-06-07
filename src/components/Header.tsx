@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, User, LogOut, ShoppingCart } from 'lucide-react';
+import { Menu, X, User, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -78,6 +78,13 @@ const Header = () => {
                   <User className="w-4 h-4 mr-1" />
                   환영합니다!
                 </div>
+                <Link
+                  to="/profile"
+                  className="flex items-center text-sm text-gray-700 hover:text-blue-900 transition-colors"
+                >
+                  <Settings className="w-4 h-4 mr-1" />
+                  프로필 설정
+                </Link>
                 <button
                   onClick={handleSignOut}
                   className="flex items-center text-sm text-gray-700 hover:text-blue-900 transition-colors"
@@ -122,16 +129,26 @@ const Header = () => {
             ))}
             <div className="pt-4 border-t mt-4">
               {user ? (
-                <button
-                  onClick={() => {
-                    handleSignOut();
-                    setIsMenuOpen(false);
-                  }}
-                  className="flex items-center text-sm text-gray-700 hover:text-blue-900 transition-colors"
-                >
-                  <LogOut className="w-4 h-4 mr-1" />
-                  로그아웃
-                </button>
+                <div className="space-y-2">
+                  <Link
+                    to="/profile"
+                    className="flex items-center text-sm text-gray-700 hover:text-blue-900 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Settings className="w-4 h-4 mr-1" />
+                    프로필 설정
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleSignOut();
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center text-sm text-gray-700 hover:text-blue-900 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4 mr-1" />
+                    로그아웃
+                  </button>
+                </div>
               ) : (
                 <Link
                   to="/auth"

@@ -32,6 +32,77 @@ const Certificates = () => {
     }
   ];
 
+  const patentImages = [
+    {
+      title: "특허등록증",
+      src: "https://rinfactory.cafe24.com/wp-content/uploads/2021/11/scan0025-scaled.jpg",
+      alt: "린코리아 특허등록증"
+    },
+    {
+      title: "상표등록증",
+      src: "http://rinkorea.com/wp-content/uploads/2021/11/RIN-COAT-%EC%83%81%ED%91%9C%EB%93%B1%EB%A1%9D%EC%A6%9D-scaled.jpg",
+      alt: "RIN-COAT 상표등록증"
+    },
+    {
+      title: "유통표준코드 회원증",
+      src: "https://rinfactory.cafe24.com/wp-content/uploads/2021/11/scan0024-scaled.jpg",
+      alt: "유통표준코드 회원증"
+    }
+  ];
+
+  const testReportImages = [
+    {
+      title: "시험성적서 1페이지",
+      src: "https://rinfactory.cafe24.com/wp-content/uploads/2021/11/린코리아-RIN-COAT-시험성적서.pdf_page_01.jpg",
+      alt: "린코리아 RIN-COAT 시험성적서 1페이지"
+    },
+    {
+      title: "시험성적서 2페이지",
+      src: "https://rinfactory.cafe24.com/wp-content/uploads/2021/11/린코리아-RIN-COAT-시험성적서.pdf_page_02.jpg",
+      alt: "린코리아 RIN-COAT 시험성적서 2페이지"
+    },
+    {
+      title: "시험성적서 3페이지",
+      src: "https://rinfactory.cafe24.com/wp-content/uploads/2021/11/린코리아-RIN-COAT-시험성적서.pdf_page_03.jpg",
+      alt: "린코리아 RIN-COAT 시험성적서 3페이지"
+    },
+    {
+      title: "시험성적서 4페이지",
+      src: "https://rinfactory.cafe24.com/wp-content/uploads/2021/11/린코리아-RIN-COAT-시험성적서.pdf_page_04.jpg",
+      alt: "린코리아 RIN-COAT 시험성적서 4페이지"
+    },
+    {
+      title: "시험성적서 5페이지",
+      src: "https://rinfactory.cafe24.com/wp-content/uploads/2021/11/린코리아-RIN-COAT-시험성적서.pdf_page_05.jpg",
+      alt: "린코리아 RIN-COAT 시험성적서 5페이지"
+    },
+    {
+      title: "시험성적서 6페이지",
+      src: "https://rinfactory.cafe24.com/wp-content/uploads/2021/11/린코리아-RIN-COAT-시험성적서.pdf_page_06.jpg",
+      alt: "린코리아 RIN-COAT 시험성적서 6페이지"
+    },
+    {
+      title: "시험성적서 7페이지",
+      src: "https://rinfactory.cafe24.com/wp-content/uploads/2021/11/린코리아-RIN-COAT-시험성적서.pdf_page_07.jpg",
+      alt: "린코리아 RIN-COAT 시험성적서 7페이지"
+    },
+    {
+      title: "시험성적서 8페이지",
+      src: "https://rinfactory.cafe24.com/wp-content/uploads/2021/11/린코리아-RIN-COAT-시험성적서.pdf_page_08.jpg",
+      alt: "린코리아 RIN-COAT 시험성적서 8페이지"
+    },
+    {
+      title: "시험성적서 9페이지",
+      src: "https://rinfactory.cafe24.com/wp-content/uploads/2021/11/린코리아-RIN-COAT-시험성적서.pdf_page_09.jpg",
+      alt: "린코리아 RIN-COAT 시험성적서 9페이지"
+    },
+    {
+      title: "시험성적서 10페이지",
+      src: "https://rinfactory.cafe24.com/wp-content/uploads/2021/11/린코리아-RIN-COAT-시험성적서.pdf_page_10.jpg",
+      alt: "린코리아 RIN-COAT 시험성적서 10페이지"
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -71,48 +142,58 @@ const Certificates = () => {
         </div>
       </section>
 
-      {/* Certificate Images */}
+      {/* Patents and Trademarks */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">인증서 및 특허</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">특허 및 상표 등록증</h2>
             <p className="text-xl text-gray-600">
-              린코리아 제품의 품질을 보증하는 공식 문서들
+              린코리아의 기술력과 브랜드를 보증하는 공식 문서들
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <img 
-                src="https://rinkorea.com/wp-content/uploads/2022/04/1-메인-17-80x80.jpg" 
-                alt="인증서" 
-                className="w-full h-64 object-cover rounded-lg mb-4"
-              />
-              <h3 className="text-lg font-bold text-gray-900 mb-2">특허증</h3>
-              <p className="text-gray-600">세라믹 코팅 기술 특허</p>
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <div className="w-full h-64 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
-                <FileText className="w-16 h-16 text-gray-400" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            {patentImages.map((image, index) => (
+              <div key={index} className="bg-white p-6 rounded-lg shadow-lg">
+                <img 
+                  src={image.src}
+                  alt={image.alt}
+                  className="w-full h-64 object-contain rounded-lg mb-4 border"
+                />
+                <h3 className="text-lg font-bold text-gray-900 mb-2">{image.title}</h3>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">시험성적서</h3>
-              <p className="text-gray-600">불연재 시험 결과</p>
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <div className="w-full h-64 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
-                <Award className="w-16 h-16 text-gray-400" />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Test Reports */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">RIN-COAT 시험성적서</h2>
+            <p className="text-xl text-gray-600">
+              공인시험기관에서 실시한 품질 시험 결과 전체 문서
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {testReportImages.map((image, index) => (
+              <div key={index} className="bg-white p-4 rounded-lg shadow-lg">
+                <img 
+                  src={image.src}
+                  alt={image.alt}
+                  className="w-full h-80 object-contain rounded-lg mb-4 border"
+                />
+                <h3 className="text-base font-bold text-gray-900 text-center">{image.title}</h3>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">품질인증서</h3>
-              <p className="text-gray-600">품질관리 시스템 인증</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Test Results Info */}
-      <section className="py-20">
+      <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="bg-blue-50 p-8 rounded-lg">
             <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">시험성적서 상세 정보</h2>

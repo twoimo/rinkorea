@@ -15,6 +15,7 @@ import News from "./pages/News";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import Shop from "./pages/Shop";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/shop" element={<Shop />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
