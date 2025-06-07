@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, User, LogOut } from 'lucide-react';
+import { Menu, X, User, LogOut, ShoppingCart } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -16,6 +16,7 @@ const Header = () => {
     { name: '홈', path: '/' },
     { name: '회사소개', path: '/about' },
     { name: '제품소개', path: '/products' },
+    { name: '온라인 스토어', path: '/shop' },
     { name: '시공사례', path: '/projects' },
     { name: '시험성적서/인증', path: '/certificates' },
     { name: '고객상담', path: '/qna' },

@@ -30,33 +30,42 @@ const Index = () => {
       
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-gray-900 to-gray-700 text-white">
-        <div className="absolute inset-0 bg-black opacity-50"></div>
         <div 
           className="relative min-h-screen bg-cover bg-center flex items-center"
           style={{
             backgroundImage: `url('https://rinkorea.com/wp-content/uploads/2024/08/JS-린코리아-홈페이지-01.png')`
           }}
         >
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl">
-              <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+          {/* Dark overlay for better text readability */}
+          <div className="absolute inset-0 bg-black opacity-60"></div>
+          
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-3xl bg-black bg-opacity-40 p-8 rounded-lg backdrop-blur-sm">
+              <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
                 린코리아,<br />
                 <span className="text-blue-400">세라믹 코팅의 모든 것</span>
               </h1>
-              <p className="text-xl md:text-2xl mb-8 text-gray-200">
+              <p className="text-xl md:text-2xl mb-8 text-gray-100 drop-shadow-md">
                 친환경 불연재(1액형) 신소재 세라믹 코팅제
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link 
                   to="/contact" 
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg"
                 >
                   제품 문의하기
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
                 <Link 
+                  to="/shop" 
+                  className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg"
+                >
+                  제품 구매하기
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
+                <Link 
                   to="/projects" 
-                  className="border border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center"
+                  className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg"
                 >
                   시공사례 보기
                   <ArrowRight className="ml-2 w-5 h-5" />

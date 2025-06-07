@@ -190,13 +190,6 @@ const Auth = () => {
               {isLogin ? '계정이 없으신가요? 회원가입' : '이미 계정이 있으신가요? 로그인'}
             </button>
           </div>
-
-          {/* 테스트를 위한 안내 메시지 */}
-          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-            <p className="text-xs text-yellow-800">
-              <strong>개발 테스트용:</strong> Supabase 설정에서 "Confirm email" 옵션을 비활성화하면 이메일 확인 없이 바로 로그인할 수 있습니다.
-            </p>
-          </div>
         </div>
       </div>
 
