@@ -1,10 +1,17 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import ImageModal from '../components/ImageModal';
 import { Award, FileText, Shield, CheckCircle } from 'lucide-react';
 
 const Certificates = () => {
+  const [selectedImage, setSelectedImage] = useState<{
+    src: string;
+    alt: string;
+    title: string;
+  } | null>(null);
+
   const certificates = [
     {
       title: "국토교통부 불연재 인증",
@@ -103,6 +110,10 @@ const Certificates = () => {
     }
   ];
 
+  const handleImageClick = (src: string, alt: string, title: string) => {
+    setSelectedImage({ src, alt, title });
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -154,13 +165,19 @@ const Certificates = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
             {patentImages.map((image, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg shadow-lg">
-                <img 
-                  src={image.src}
-                  alt={image.alt}
-                  className="w-full h-64 object-contain rounded-lg mb-4 border"
-                />
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{image.title}</h3>
+              <div key={index} className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                <div 
+                  className="cursor-pointer"
+                  onClick={() => handleImageClick(image.src, image.alt, image.title)}
+                >
+                  <img 
+                    src={image.src}
+                    alt={image.alt}
+                    className="w-full h-80 object-contain rounded-lg mb-4 border hover:border-blue-300 transition-colors"
+                  />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2 text-center">{image.title}</h3>
+                <p className="text-sm text-gray-500 text-center">클릭하여 확대보기</p>
               </div>
             ))}
           </div>
@@ -177,15 +194,21 @@ const Certificates = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {testReportImages.map((image, index) => (
-              <div key={index} className="bg-white p-4 rounded-lg shadow-lg">
-                <img 
-                  src={image.src}
-                  alt={image.alt}
-                  className="w-full h-80 object-contain rounded-lg mb-4 border"
-                />
-                <h3 className="text-base font-bold text-gray-900 text-center">{image.title}</h3>
+              <div key={index} className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                <div 
+                  className="cursor-pointer"
+                  onClick={() => handleImageClick(image.src, image.alt, image.title)}
+                >
+                  <img 
+                    src={image.src}
+                    alt={image.alt}
+                    className="w-full h-96 object-contain rounded-lg mb-4 border hover:border-blue-300 transition-colors"
+                  />
+                </div>
+                <h3 className="text-base font-bold text-gray-900 text-center mb-1">{image.title}</h3>
+                <p className="text-xs text-gray-500 text-center">클릭하여 확대보기</p>
               </div>
             ))}
           </div>
@@ -230,6 +253,15 @@ const Certificates = () => {
           </div>
         </div>
       </section>
+
+      {/* Image Modal */}
+      <ImageModal
+        isOpen={selectedImage !== null}
+        onClose={() => setSelectedImage(null)}
+        imageSrc={selectedImage?.src || ''}
+        imageAlt={selectedImage?.alt || ''}
+        imageTitle={selectedImage?.title || ''}
+      />
 
       <Footer />
     </div>
