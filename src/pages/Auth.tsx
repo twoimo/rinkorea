@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +13,7 @@ const Auth = () => {
   const [name, setName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -40,7 +39,7 @@ const Auth = () => {
           } else if (error.message.includes('Email not confirmed')) {
             errorMessage = '이메일 확인이 필요합니다. 이메일을 확인해주세요.';
           }
-          
+
           toast({
             title: "로그인 실패",
             description: errorMessage,
@@ -60,7 +59,7 @@ const Auth = () => {
           if (error.message.includes('User already registered')) {
             errorMessage = '이미 가입된 이메일입니다.';
           }
-          
+
           toast({
             title: "회원가입 실패",
             description: errorMessage,
@@ -90,7 +89,7 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       <div className="flex items-center justify-center py-20">
         <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
           <div className="text-center mb-8">
@@ -143,6 +142,7 @@ const Auth = () => {
                   className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                   minLength={6}
+                  autoComplete={isLogin ? "current-password" : "new-password"}
                 />
                 <button
                   type="button"
