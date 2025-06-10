@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Calendar, ArrowLeft, User } from 'lucide-react';
 
@@ -24,7 +23,7 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ news, onBack }) => {
           <ArrowLeft className="w-4 h-4 mr-2" />
           목록으로 돌아가기
         </button>
-        
+
         <div className="mb-6">
           <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium mb-4 inline-block">
             공지사항
@@ -41,7 +40,7 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ news, onBack }) => {
             </div>
           </div>
         </div>
-        
+
         <div className="prose max-w-none">
           <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
             {news.content}

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -35,18 +34,18 @@ const QnA = () => {
 
   const filteredItems = inquiries.filter(item => {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.content.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = selectedStatus === '전체' || 
-                         (selectedStatus === '답변완료' && item.status === 'answered') ||
-                         (selectedStatus === '답변대기' && item.status === 'pending');
+      item.content.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = selectedStatus === '전체' ||
+      (selectedStatus === '답변완료' && item.status === 'answered') ||
+      (selectedStatus === '답변대기' && item.status === 'pending');
     return matchesSearch && matchesStatus;
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const { error } = await createInquiry(formData);
-    
+
     if (error) {
       toast({
         title: "문의 접수 실패",
@@ -150,7 +149,7 @@ const QnA = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 text-white py-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
@@ -163,12 +162,12 @@ const QnA = () => {
               고객상담 및 문의
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed">
-              린코리아 제품에 대한 궁금한 점이나 문의사항이 있으시면 
+              린코리아 제품에 대한 궁금한 점이나 문의사항이 있으시면
               언제든지 연락주세요.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               {!user ? (
-                <Link 
+                <Link
                   to="/auth"
                   className="inline-flex items-center bg-white text-blue-900 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
@@ -247,7 +246,7 @@ const QnA = () => {
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
               </div>
-              
+
               {/* Status Filter */}
               <div className="relative">
                 <select
@@ -284,7 +283,7 @@ const QnA = () => {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900">새 문의 작성</h3>
               </div>
-              
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -294,7 +293,7 @@ const QnA = () => {
                     <input
                       type="text"
                       value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       placeholder="이름을 입력하세요"
                       required
@@ -307,25 +306,25 @@ const QnA = () => {
                     <input
                       type="email"
                       value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       placeholder="이메일을 입력하세요"
                       required
                     />
                   </div>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">연락처</label>
                   <input
                     type="tel"
                     value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     placeholder="연락처를 입력하세요"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     제목 <span className="text-red-500">*</span>
@@ -333,27 +332,27 @@ const QnA = () => {
                   <input
                     type="text"
                     value={formData.title}
-                    onChange={(e) => setFormData({...formData, title: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     placeholder="문의 제목을 입력하세요"
                     required
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     문의 내용 <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     value={formData.content}
-                    onChange={(e) => setFormData({...formData, content: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                     rows={6}
                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
                     placeholder="문의하실 내용을 자세히 입력해주세요"
                     required
                   />
                 </div>
-                
+
                 <div className="flex gap-4 pt-4">
                   <button
                     type="submit"
@@ -386,11 +385,10 @@ const QnA = () => {
                 <div key={item.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${
-                        item.status === 'answered'
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${item.status === 'answered'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                        }`}>
                         {item.status === 'answered' ? (
                           <>
                             <CheckCircle className="w-3 h-3" />
@@ -435,10 +433,10 @@ const QnA = () => {
                       </AdminOnly>
                     </div>
                   </div>
-                  
+
                   <h3 className="text-lg font-semibold text-gray-900 mb-3">{item.title}</h3>
-                  <p className="text-gray-600 mb-4 leading-relaxed">{item.content}</p>
-                  
+                  <p className="text-gray-600 mb-4 leading-relaxed whitespace-pre-wrap">{item.content}</p>
+
                   {/* 관리자 답변 */}
                   {item.admin_reply && (
                     <div className="mt-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
@@ -468,7 +466,7 @@ const QnA = () => {
                           </div>
                         </AdminOnly>
                       </div>
-                      <p className="text-blue-800 leading-relaxed">{item.admin_reply}</p>
+                      <p className="text-blue-800 leading-relaxed whitespace-pre-wrap">{item.admin_reply}</p>
                     </div>
                   )}
 
@@ -522,8 +520,8 @@ const QnA = () => {
                 {searchTerm || selectedStatus !== '전체' ? '검색 결과가 없습니다' : '아직 문의사항이 없습니다'}
               </h3>
               <p className="text-gray-500 mb-6">
-                {searchTerm || selectedStatus !== '전체' 
-                  ? '다른 검색어나 필터를 시도해보세요' 
+                {searchTerm || selectedStatus !== '전체'
+                  ? '다른 검색어나 필터를 시도해보세요'
                   : '첫 번째 문의를 남겨주세요'
                 }
               </p>
