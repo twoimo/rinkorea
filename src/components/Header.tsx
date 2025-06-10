@@ -77,17 +77,34 @@ const Header = () => {
           {/* Desktop User Menu */}
           <div className="hidden lg:flex items-center space-x-4">
             {user ? (
-              isAdmin ? (
-                <div className="inline-flex items-center px-4 py-2 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold transition-colors ${isAdmin ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`}
+                >
                   <User className="w-5 h-5 mr-2" />
-                  관리자 계정
-                </div>
-              ) : (
-                <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
-                  <User className="w-5 h-5 mr-2" />
-                  {profile?.name || '사용자'}
-                </div>
-              )
+                  {isAdmin ? '관리자 계정' : (profile?.name || '사용자')}
+                </button>
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    <Link
+                      to="/profile"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      <Settings className="w-4 h-4 mr-3" />
+                      프로필 설정
+                    </Link>
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4 mr-3" />
+                      로그아웃
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <Link
                 to="/auth"

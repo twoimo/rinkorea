@@ -76,8 +76,37 @@ const QnA = () => {
     checkReplies();
   }, [inquiries]);
 
+  // 전화번호 유효성 검사 함수
+  const validatePhone = (value: string) => {
+    return /^0\d{1,2}-\d{3,4}-\d{4}$/.test(value);
+  };
+  const [phoneError, setPhoneError] = useState('');
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/[^0-9]/g, '');
+    if (value.length <= 2) {
+      // 지역번호
+    } else if (value.length <= 3) {
+      value = value.replace(/(\d{2,3})/, '$1');
+    } else if (value.length <= 7) {
+      value = value.replace(/(\d{2,3})(\d{3,4})/, '$1-$2');
+    } else {
+      value = value.replace(/(\d{2,3})(\d{3,4})(\d{4})/, '$1-$2-$3');
+    }
+    setFormData(prev => ({ ...prev, phone: value }));
+    if (value && !validatePhone(value)) {
+      setPhoneError('연락처 형식이 올바르지 않습니다. 예: 010-1234-5678');
+    } else {
+      setPhoneError('');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (formData.phone && !validatePhone(formData.phone)) {
+      setPhoneError('연락처 형식이 올바르지 않습니다. 예: 010-1234-5678');
+      return;
+    }
 
     const { error } = await createInquiry(formData);
 
@@ -354,10 +383,11 @@ const QnA = () => {
                   <input
                     type="tel"
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    onChange={handlePhoneChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${phoneError ? 'border-red-500' : 'border-gray-200'}`}
                     placeholder="연락처를 입력하세요"
                   />
+                  {phoneError && <p className="text-xs text-red-500 mt-1">{phoneError}</p>}
                 </div>
 
                 <div>

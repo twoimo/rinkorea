@@ -22,6 +22,33 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  // 전화번호 유효성 검사 함수
+  const validatePhone = (value: string) => {
+    // 010-1234-5678, 02-123-4567 등 다양한 국내 전화번호 패턴 허용
+    return /^0\d{1,2}-\d{3,4}-\d{4}$/.test(value);
+  };
+  const [phoneError, setPhoneError] = useState('');
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/[^0-9]/g, '');
+    // 01012345678 -> 010-1234-5678, 021234567 -> 02-123-4567
+    if (value.length <= 2) {
+      // 지역번호
+    } else if (value.length <= 3) {
+      value = value.replace(/(\d{2,3})/, '$1');
+    } else if (value.length <= 7) {
+      value = value.replace(/(\d{2,3})(\d{3,4})/, '$1-$2');
+    } else {
+      value = value.replace(/(\d{2,3})(\d{3,4})(\d{4})/, '$1-$2-$3');
+    }
+    setPhone(value);
+    if (value && !validatePhone(value)) {
+      setPhoneError('전화번호 형식이 올바르지 않습니다. 예: 010-1234-5678');
+    } else {
+      setPhoneError('');
+    }
+  };
+
   // profile이 변경될 때마다 state 동기화
   React.useEffect(() => {
     setName(profile?.name || '');
@@ -30,6 +57,11 @@ const Profile = () => {
   }, [profile]);
 
   const handleSaveProfile = async () => {
+    if (phone && !validatePhone(phone)) {
+      setPhoneError('전화번호 형식이 올바르지 않습니다. 예: 010-1234-5678');
+      setSaving(false);
+      return;
+    }
     setSaving(true);
     try {
       const { error } = await updateProfile({ name, company, phone });
@@ -199,10 +231,11 @@ const Profile = () => {
                 <input
                   type="tel"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={handlePhoneChange}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${phoneError ? 'border-red-500' : 'border-gray-300'}`}
                   placeholder="전화번호를 입력하세요"
                 />
+                {phoneError && <p className="text-xs text-red-500 mt-1">{phoneError}</p>}
               </div>
 
               {/* 저장 버튼 */}
