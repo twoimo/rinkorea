@@ -53,7 +53,7 @@ const Header = () => {
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center">
             <OptimizedImage
-              src="/images/린코리아-홈페이지-로고-블랙.png"
+              src="/images/rin-korea-logo-black.png"
               alt="린코리아 로고"
               className="h-10 w-auto"
               loadingClassName="bg-white"

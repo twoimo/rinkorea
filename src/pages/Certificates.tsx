@@ -41,17 +41,17 @@ const Certificates = () => {
   const patentImages = [
     {
       title: "특허등록증",
-      src: "/images/scan0025-scaled.jpg",
+      src: "/images/scan-0025.jpg",
       alt: "린코리아 특허등록증"
     },
     {
       title: "상표등록증",
-      src: "/images/RIN-COAT-scaled.jpg",
+      src: "/images/rin-coat.jpg",
       alt: "RIN-COAT 상표등록증"
     },
     {
       title: "유통표준코드 회원증",
-      src: "/images/scan0024-scaled.jpg",
+      src: "/images/scan-0024.jpg",
       alt: "유통표준코드 회원증"
     }
   ];
@@ -59,52 +59,52 @@ const Certificates = () => {
   const testReportImages = [
     {
       title: "시험성적서 1페이지",
-      src: "/images/린코리아-RIN-COAT-시험성적서.pdf_page_01.jpg",
+      src: "/images/rin-coat-test-report-page-01.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 1페이지"
     },
     {
       title: "시험성적서 2페이지",
-      src: "/images/린코리아-RIN-COAT-시험성적서.pdf_page_02.jpg",
+      src: "/images/rin-coat-test-report-page-02.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 2페이지"
     },
     {
       title: "시험성적서 3페이지",
-      src: "/images/린코리아-RIN-COAT-시험성적서.pdf_page_03.jpg",
+      src: "/images/rin-coat-test-report-page-03.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 3페이지"
     },
     {
       title: "시험성적서 4페이지",
-      src: "/images/린코리아-RIN-COAT-시험성적서.pdf_page_04.jpg",
+      src: "/images/rin-coat-test-report-page-04.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 4페이지"
     },
     {
       title: "시험성적서 5페이지",
-      src: "/images/린코리아-RIN-COAT-시험성적서.pdf_page_05.jpg",
+      src: "/images/rin-coat-test-report-page-05.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 5페이지"
     },
     {
       title: "시험성적서 6페이지",
-      src: "/images/린코리아-RIN-COAT-시험성적서.pdf_page_06.jpg",
+      src: "/images/rin-coat-test-report-page-06.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 6페이지"
     },
     {
       title: "시험성적서 7페이지",
-      src: "/images/린코리아-RIN-COAT-시험성적서.pdf_page_07.jpg",
+      src: "/images/rin-coat-test-report-page-07.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 7페이지"
     },
     {
       title: "시험성적서 8페이지",
-      src: "/images/린코리아-RIN-COAT-시험성적서.pdf_page_08.jpg",
+      src: "/images/rin-coat-test-report-page-08.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 8페이지"
     },
     {
       title: "시험성적서 9페이지",
-      src: "/images/린코리아-RIN-COAT-시험성적서.pdf_page_09.jpg",
+      src: "/images/rin-coat-test-report-page-09.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 9페이지"
     },
     {
       title: "시험성적서 10페이지",
-      src: "/images/린코리아-RIN-COAT-시험성적서.pdf_page_10.jpg",
+      src: "/images/rin-coat-test-report-page-10.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 10페이지"
     }
   ];

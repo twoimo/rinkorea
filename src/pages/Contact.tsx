@@ -75,7 +75,7 @@ const Contact = () => {
                   className="text-gray-600 hover:text-gray-900"
                 >
                   <OptimizedImage
-                    src="/images/instagram.png"
+                    src="/images/instagram-icon.png"
                     alt="Instagram"
                     className="h-6 w-6"
                     loadingClassName="bg-white"
@@ -89,7 +89,7 @@ const Contact = () => {
                   className="text-gray-600 hover:text-gray-900"
                 >
                   <OptimizedImage
-                    src="/images/블로그-로고-고화질.png"
+                    src="/images/blog-logo-hq.png"
                     alt="Naver Blog"
                     className="h-6 w-6"
                     loadingClassName="bg-white"
