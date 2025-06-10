@@ -9,7 +9,8 @@ import Footer from '@/components/Footer';
 const MB = 1024 * 1024;
 
 const AdminDangerZone = () => {
-    const { isAdmin } = useUserRole();
+    // 모든 Hook은 컴포넌트 최상단에서 선언
+    const { isAdmin, loading: roleLoading } = useUserRole();
     const { user } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
@@ -39,10 +40,12 @@ const AdminDangerZone = () => {
         fetchBackupSize();
     }, []);
 
-    if (!isAdmin) {
-        navigate('/');
-        return null;
-    }
+    // 권한 체크 및 리다이렉트
+    useEffect(() => {
+        if (!roleLoading && !isAdmin) navigate('/');
+    }, [isAdmin, roleLoading, navigate]);
+    if (roleLoading) return null;
+    if (!isAdmin) return null;
 
     // 모달 열기
     const openModal = (message: string, action: () => void) => {
@@ -57,8 +60,14 @@ const AdminDangerZone = () => {
         setLoading(true);
         setResult('');
         try {
-            await supabase.from('replies').delete().neq('id', '');
-            await supabase.from('inquiries').delete().neq('id', '');
+            // replies 전체 삭제
+            const { data: replies } = await supabase.from('replies').select('id');
+            const replyIds = replies?.map(r => r.id) || [];
+            if (replyIds.length > 0) await supabase.from('replies').delete().in('id', replyIds);
+            // inquiries 전체 삭제
+            const { data: inquiries } = await supabase.from('inquiries').select('id');
+            const inquiryIds = inquiries?.map(i => i.id) || [];
+            if (inquiryIds.length > 0) await supabase.from('inquiries').delete().in('id', inquiryIds);
             setResult('고객상담 게시판이 초기화되었습니다.');
         } catch (e) {
             setResult('오류: ' + (e.message || e));
@@ -72,7 +81,9 @@ const AdminDangerZone = () => {
         setLoading(true);
         setResult('');
         try {
-            await supabase.from('news').delete().neq('id', '');
+            const { data: news } = await supabase.from('news').select('id');
+            const newsIds = news?.map(n => n.id) || [];
+            if (newsIds.length > 0) await supabase.from('news').delete().in('id', newsIds);
             setResult('공지사항 게시판이 초기화되었습니다.');
         } catch (e) {
             setResult('오류: ' + (e.message || e));
@@ -139,15 +150,21 @@ const AdminDangerZone = () => {
             const data = JSON.parse(text);
             // 순서: news -> inquiries -> replies (관계상)
             if (Array.isArray(data.news)) {
-                await supabase.from('news').delete().neq('id', '');
+                const { data: newsRows } = await supabase.from('news').select('id');
+                const newsIds = newsRows?.map(n => n.id) || [];
+                if (newsIds.length > 0) await supabase.from('news').delete().in('id', newsIds);
                 for (const n of data.news) await supabase.from('news').insert(n);
             }
             if (Array.isArray(data.inquiries)) {
-                await supabase.from('inquiries').delete().neq('id', '');
+                const { data: inquiryRows } = await supabase.from('inquiries').select('id');
+                const inquiryIds = inquiryRows?.map(i => i.id) || [];
+                if (inquiryIds.length > 0) await supabase.from('inquiries').delete().in('id', inquiryIds);
                 for (const i of data.inquiries) await supabase.from('inquiries').insert(i);
             }
             if (Array.isArray(data.replies)) {
-                await supabase.from('replies').delete().neq('id', '');
+                const { data: replyRows } = await supabase.from('replies').select('id');
+                const replyIds = replyRows?.map(r => r.id) || [];
+                if (replyIds.length > 0) await supabase.from('replies').delete().in('id', replyIds);
                 for (const r of data.replies) await supabase.from('replies').insert(r);
             }
             setResult('데이터가 성공적으로 복원되었습니다.');
