@@ -163,13 +163,13 @@ const Shop = () => {
                 {products.map((product) => (
                   <div
                     key={product.id}
-                    className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
+                    className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col h-[500px]"
                   >
-                    <div className="relative h-64 overflow-hidden">
+                    <div className="relative aspect-square w-full overflow-hidden">
                       <img
                         src={product.image}
                         alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
                       />
                       {product.discount && (
                         <div className="absolute top-4 left-4">
@@ -187,7 +187,7 @@ const Shop = () => {
                       )}
                     </div>
 
-                    <div className="p-6">
+                    <div className="p-6 flex flex-col flex-grow">
                       <div className="mb-3">
                         <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
                           {product.name}
@@ -213,7 +213,7 @@ const Shop = () => {
                         )}
                       </div>
 
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between mt-auto">
                         <div className="flex flex-col">
                           {product.originalPrice && (
                             <del className="text-sm text-gray-400">
