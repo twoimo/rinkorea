@@ -5,6 +5,7 @@ import { ShoppingCart, Star, Info, ChevronDown, Plus, Edit, Trash2, X, EyeOff, E
 import { supabase } from '../integrations/supabase/client';
 import { useUserRole } from '../hooks/useUserRole';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { useTranslation } from 'react-i18next';
 
 interface Product {
   id: string;
@@ -48,15 +49,17 @@ const Shop = () => {
     { value: 4, label: '4 x 4' },
   ];
 
+  const { t } = useTranslation();
+
   const sortOptions = [
-    { value: 'popularity', label: '인기도순' },
-    { value: 'newest', label: '최신등록순' },
-    { value: 'priceAsc', label: '낮은 가격순' },
-    { value: 'priceDesc', label: '높은 가격순' },
-    { value: 'discount', label: '할인율순' },
-    { value: 'sales', label: '누적 판매순' },
-    { value: 'reviews', label: '리뷰 많은순' },
-    { value: 'rating', label: '평점 높은순' },
+    { value: 'popularity', label: t('shop.popularity') || '인기도순' },
+    { value: 'newest', label: t('shop.newest') || '최신등록순' },
+    { value: 'priceAsc', label: t('shop.priceAsc') || '낮은 가격순' },
+    { value: 'priceDesc', label: t('shop.priceDesc') || '높은 가격순' },
+    { value: 'discount', label: t('shop.discount') || '할인율순' },
+    { value: 'sales', label: t('shop.sales') || '누적 판매순' },
+    { value: 'reviews', label: t('shop.reviews') || '리뷰 많은순' },
+    { value: 'rating', label: t('shop.rating') || '평점 높은순' },
   ];
 
   // 숨김 상품 목록 불러오기 함수 (컴포넌트 상단에 선언)
@@ -350,17 +353,16 @@ const Shop = () => {
       <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <h1 className="text-5xl font-bold mb-6">온라인 스토어</h1>
+            <h1 className="text-5xl font-bold mb-6">{t('app.title')}</h1>
             <p className="text-xl max-w-2xl mx-auto">
-              린코리아의 최고 품질 제품을 만나보세요. <br />
-              안전하고 친환경적인 건설재료를 온라인에서 편리하게 구매하세요.
+              {t('app.description')}
             </p>
             {isAdmin && (
               <button
                 className="mt-8 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 mx-auto"
                 onClick={() => openForm()}
               >
-                <Plus className="w-5 h-5" /> 상품 추가
+                <Plus className="w-5 h-5" /> {t('shop.add_product')}
               </button>
             )}
           </div>
@@ -476,10 +478,10 @@ const Shop = () => {
                         disabled={isSoldOut}
                       >
                         {isSoldOut ? (
-                          <>품절</>
+                          <>{t('shop.sold_out')}</>
                         ) : (
                           <>
-                            제품 구매하기
+                            {t('shop.buy')}
                             <ShoppingCart className="w-4 h-4 ml-1" />
                           </>
                         )}

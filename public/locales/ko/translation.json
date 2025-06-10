@@ -1,0 +1,31 @@
+{
+    "app": {
+        "title": "린코리아 온라인 스토어",
+        "description": "최고 품질의 건설재료를 온라인에서 만나보세요."
+    },
+    "nav": {
+        "home": "홈",
+        "shop": "스토어",
+        "qna": "고객문의",
+        "about": "회사소개",
+        "contact": "문의하기",
+        "login": "로그인",
+        "logout": "로그아웃",
+        "profile": "프로필"
+    },
+    "shop": {
+        "add_product": "상품 추가",
+        "edit_product": "상품 수정",
+        "delete_product": "상품 삭제",
+        "hide": "숨기기",
+        "unhide": "노출 해제",
+        "sold_out": "품절",
+        "buy": "제품 구매하기"
+    },
+    "lang": {
+        "ko": "한국어",
+        "en": "영어",
+        "zh": "중국어",
+        "id": "인도네시아어"
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "app": {
+        "title": "Toko Online RINKOREA",
+        "description": "Temukan bahan konstruksi berkualitas terbaik secara online."
+    },
+    "nav": {
+        "home": "Beranda",
+        "shop": "Toko",
+        "qna": "Konsultasi",
+        "about": "Tentang Kami",
+        "contact": "Kontak",
+        "login": "Masuk",
+        "logout": "Keluar",
+        "profile": "Profil"
+    },
+    "shop": {
+        "add_product": "Tambah Produk",
+        "edit_product": "Edit Produk",
+        "delete_product": "Hapus Produk",
+        "hide": "Sembunyikan",
+        "unhide": "Tampilkan",
+        "sold_out": "Habis",
+        "buy": "Beli Sekarang"
+    },
+    "lang": {
+        "ko": "Korea",
+        "en": "Inggris",
+        "zh": "Cina",
+        "id": "Indonesia"
+    }
+}

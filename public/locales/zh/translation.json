@@ -1,0 +1,31 @@
+{
+    "app": {
+        "title": "RINKOREA 在线商店",
+        "description": "在线发现最优质的建筑材料。"
+    },
+    "nav": {
+        "home": "首页",
+        "shop": "商店",
+        "qna": "客户咨询",
+        "about": "关于我们",
+        "contact": "联系我们",
+        "login": "登录",
+        "logout": "登出",
+        "profile": "个人资料"
+    },
+    "shop": {
+        "add_product": "添加商品",
+        "edit_product": "编辑商品",
+        "delete_product": "删除商品",
+        "hide": "隐藏",
+        "unhide": "取消隐藏",
+        "sold_out": "售罄",
+        "buy": "立即购买"
+    },
+    "lang": {
+        "ko": "韩语",
+        "en": "英语",
+        "zh": "中文",
+        "id": "印尼语"
+    }
+}

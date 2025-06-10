@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useProfile } from '@/hooks/useProfile';
+import { useTranslation } from 'react-i18next';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,6 +16,7 @@ const Header = () => {
   const { toast } = useToast();
   const { isAdmin } = useUserRole();
   const { profile } = useProfile();
+  const { i18n, t } = useTranslation();
 
   const navItems = [
     { name: '홈', path: '/' },
@@ -26,6 +28,13 @@ const Header = () => {
     { name: '고객상담', path: '/qna' },
     { name: '공지사항', path: '/news' },
     { name: '연락처', path: '/contact' },
+  ];
+
+  const languages = [
+    { code: 'ko', label: t('lang.ko') },
+    { code: 'en', label: t('lang.en') },
+    { code: 'zh', label: t('lang.zh') },
+    { code: 'id', label: t('lang.id') },
   ];
 
   const handleSignOut = async () => {
@@ -123,6 +132,24 @@ const Header = () => {
                 로그인
               </Link>
             )}
+            <div className="relative">
+              <button className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-sm font-semibold border border-gray-300 flex items-center gap-1">
+                {languages.find(l => l.code === i18n.language)?.label || '언어'}
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+              </button>
+              <div className="absolute right-0 mt-2 w-32 bg-white border rounded shadow z-50">
+                {languages.map(lang => (
+                  <button
+                    key={lang.code}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-blue-50 ${i18n.language === lang.code ? 'font-bold text-blue-600' : ''}`}
+                    onClick={() => i18n.changeLanguage(lang.code)}
+                    disabled={i18n.language === lang.code}
+                  >
+                    {lang.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Mobile menu button */}
