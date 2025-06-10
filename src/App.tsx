@@ -27,20 +27,22 @@ const App = () => (
       <Sonner />
       <AuthProvider>
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/certificates" element={<Certificates />} />
-            <Route path="/qna" element={<QnA />} />
-            <Route path="/news" element={<News />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <div className="min-h-screen flex flex-col">
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/projects" element={<Projects />} />
+              <Route path="/certificates" element={<Certificates />} />
+              <Route path="/qna" element={<QnA />} />
+              <Route path="/news" element={<News />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
         </BrowserRouter>
       </AuthProvider>
     </TooltipProvider>
