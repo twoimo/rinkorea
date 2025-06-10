@@ -131,8 +131,8 @@ const Shop = () => {
                   key={option}
                   onClick={() => setSortBy(option)}
                   className={`px-3 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${sortBy === option
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                 >
                   {option}
