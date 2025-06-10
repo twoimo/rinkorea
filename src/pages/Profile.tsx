@@ -62,35 +62,78 @@ const Profile = () => {
     setPhone(profile?.phone || '');
   }, [profile]);
 
-  const handleSaveProfile = async () => {
-    if (phone && !validatePhone(phone)) {
-      setPhoneError('전화번호 형식이 올바르지 않습니다. 예: 010-1234-5678');
-      setSaving(false);
-      return;
-    }
-    setSaving(true);
-    try {
+  // 변경 감지
+  const isProfileChanged =
+    name !== (profile?.name || '') ||
+    company !== (profile?.company || '') ||
+    phone !== (profile?.phone || '');
+  const isPasswordChanged = newPassword.length > 0 || confirmPassword.length > 0 || currentPassword.length > 0;
+  const isAnyChanged = isProfileChanged || isPasswordChanged;
+  const [savingAll, setSavingAll] = useState(false);
+
+  const handleSaveAll = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess('');
+    let profileOk = true;
+    let passwordOk = true;
+    setSavingAll(true);
+    // 프로필 저장
+    if (isProfileChanged) {
+      if (phone && !validatePhone(phone)) {
+        setPhoneError('전화번호 형식이 올바르지 않습니다. 예: 010-1234-5678');
+        setSavingAll(false);
+        return;
+      }
       const { error } = await updateProfile({ name, company, phone });
       if (error) {
-        toast({
-          title: "프로필 업데이트 실패",
-          description: "다시 시도해주세요.",
-          variant: "destructive"
-        });
+        toast({ title: '프로필 업데이트 실패', description: '다시 시도해주세요.', variant: 'destructive' });
+        profileOk = false;
       } else {
-        toast({
-          title: "프로필 업데이트 완료",
-          description: "프로필이 성공적으로 저장되었습니다."
-        });
+        toast({ title: '프로필 업데이트 완료', description: '프로필이 성공적으로 저장되었습니다.' });
       }
-    } catch (error) {
-      toast({
-        title: "오류 발생",
-        description: "다시 시도해주세요.",
-        variant: "destructive"
+    }
+    // 비밀번호 변경
+    if (isPasswordChanged) {
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        setPasswordError('모든 항목을 입력해주세요.');
+        setSavingAll(false);
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        setPasswordError('새 비밀번호가 일치하지 않습니다.');
+        setSavingAll(false);
+        return;
+      }
+      if (newPassword.length < 8) {
+        setPasswordError('비밀번호는 8자 이상이어야 합니다.');
+        setSavingAll(false);
+        return;
+      }
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword
       });
-    } finally {
-      setSaving(false);
+      if (signInError) {
+        setPasswordError('현재 비밀번호가 올바르지 않습니다.');
+        setSavingAll(false);
+        return;
+      }
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) {
+        setPasswordError('비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
+        passwordOk = false;
+      } else {
+        setPasswordSuccess('비밀번호가 성공적으로 변경되었습니다.');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      }
+    }
+    setSavingAll(false);
+    if (profileOk && passwordOk) {
+      // 모든 변경 성공 시 폼 리셋
+      setPhoneError('');
     }
   };
 
@@ -127,45 +170,6 @@ const Profile = () => {
         variant: "destructive"
       });
     }
-  };
-
-  const handleChangePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setPasswordError('');
-    setPasswordSuccess('');
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      setPasswordError('모든 항목을 입력해주세요.');
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setPasswordError('새 비밀번호가 일치하지 않습니다.');
-      return;
-    }
-    if (newPassword.length < 8) {
-      setPasswordError('비밀번호는 8자 이상이어야 합니다.');
-      return;
-    }
-    setChangingPassword(true);
-    // Supabase: re-authenticate & update password
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: user.email,
-      password: currentPassword
-    });
-    if (signInError) {
-      setPasswordError('현재 비밀번호가 올바르지 않습니다.');
-      setChangingPassword(false);
-      return;
-    }
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) {
-      setPasswordError('비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
-    } else {
-      setPasswordSuccess('비밀번호가 성공적으로 변경되었습니다.');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-    }
-    setChangingPassword(false);
   };
 
   if (!user) {
@@ -208,147 +212,128 @@ const Profile = () => {
             </div>
 
             <div className="space-y-6">
-              {/* 안내문구 */}
-              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded mb-4 text-yellow-800 text-sm">
-                <strong>비밀번호 찾기 기능이 없습니다.</strong><br />
-                비밀번호를 변경하실 때는 반드시 기억해 주세요. 분실 시 복구가 불가능합니다.
-              </div>
-              {/* 이메일 (읽기 전용) */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Mail className="w-4 h-4 inline mr-2" />
-                  이메일
-                </label>
-                <input
-                  type="email"
-                  value={user.email || ''}
-                  readOnly
-                  className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-500 cursor-not-allowed"
-                />
-                <p className="text-xs text-gray-500 mt-1">이메일은 변경할 수 없습니다.</p>
-              </div>
-
-              {/* 사용자 역할 (읽기 전용) */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Shield className="w-4 h-4 inline mr-2" />
-                  계정 유형
-                </label>
-                <input
-                  type="text"
-                  value={role === 'admin' ? '관리자' : '일반 사용자'}
-                  readOnly
-                  className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-500 cursor-not-allowed"
-                />
-              </div>
-
-              {/* 이름 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <User className="w-4 h-4 inline mr-2" />
-                  이름
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="이름을 입력하세요"
-                />
-              </div>
-
-              {/* 회사명 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Building className="w-4 h-4 inline mr-2" />
-                  회사명
-                </label>
-                <input
-                  type="text"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="회사명을 입력하세요"
-                />
-              </div>
-
-              {/* 전화번호 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Phone className="w-4 h-4 inline mr-2" />
-                  전화번호
-                </label>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={handlePhoneChange}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${phoneError ? 'border-red-500' : 'border-gray-300'}`}
-                  placeholder="전화번호를 입력하세요"
-                />
-                {phoneError && <p className="text-xs text-red-500 mt-1">{phoneError}</p>}
-              </div>
-
-              {/* 비밀번호 변경 */}
-              <div className="border-t pt-8 mt-8">
-                <h2 className="text-lg font-bold mb-4 flex items-center"><span className="mr-2">비밀번호 변경</span></h2>
-                <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">현재 비밀번호</label>
-                    <input
-                      type="password"
-                      value={currentPassword}
-                      onChange={e => setCurrentPassword(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="현재 비밀번호 입력"
-                    />
+              <form onSubmit={handleSaveAll} className="space-y-6">
+                {/* 안내문구 */}
+                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded mb-4 text-yellow-800 text-sm">
+                  <strong>비밀번호 찾기 기능이 없습니다.</strong><br />
+                  비밀번호를 변경하실 때는 반드시 기억해 주세요. 분실 시 복구가 불가능합니다.
+                </div>
+                {/* 이메일 (읽기 전용) */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Mail className="w-4 h-4 inline mr-2" />
+                    이메일
+                  </label>
+                  <input
+                    type="email"
+                    value={user.email || ''}
+                    readOnly
+                    className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-500 cursor-not-allowed"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">이메일은 변경할 수 없습니다.</p>
+                </div>
+                {/* 사용자 역할 (읽기 전용) */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Shield className="w-4 h-4 inline mr-2" />
+                    계정 유형
+                  </label>
+                  <input
+                    type="text"
+                    value={role === 'admin' ? '관리자' : '일반 사용자'}
+                    readOnly
+                    className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-500 cursor-not-allowed"
+                  />
+                </div>
+                {/* 이름 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <User className="w-4 h-4 inline mr-2" />
+                    이름
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="이름을 입력하세요"
+                  />
+                </div>
+                {/* 회사명 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Building className="w-4 h-4 inline mr-2" />
+                    회사명
+                  </label>
+                  <input
+                    type="text"
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="회사명을 입력하세요"
+                  />
+                </div>
+                {/* 전화번호 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Phone className="w-4 h-4 inline mr-2" />
+                    전화번호
+                  </label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={handlePhoneChange}
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${phoneError ? 'border-red-500' : 'border-gray-300'}`}
+                    placeholder="전화번호를 입력하세요"
+                  />
+                  {phoneError && <p className="text-xs text-red-500 mt-1">{phoneError}</p>}
+                </div>
+                {/* 비밀번호 변경 */}
+                <div className="border-t pt-8 mt-8">
+                  <h2 className="text-lg font-bold mb-4 flex items-center"><span className="mr-2">비밀번호 변경</span></h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">현재 비밀번호</label>
+                      <input
+                        type="password"
+                        value={currentPassword}
+                        onChange={e => setCurrentPassword(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="현재 비밀번호 입력"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">새 비밀번호</label>
+                      <input
+                        type="password"
+                        value={newPassword}
+                        onChange={e => setNewPassword(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="새 비밀번호 입력 (8자 이상)"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">새 비밀번호 확인</label>
+                      <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={e => setConfirmPassword(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="새 비밀번호 재입력"
+                      />
+                    </div>
+                    {passwordError && <p className="text-xs text-red-500">{passwordError}</p>}
+                    {passwordSuccess && <p className="text-xs text-green-600">{passwordSuccess}</p>}
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">새 비밀번호</label>
-                    <input
-                      type="password"
-                      value={newPassword}
-                      onChange={e => setNewPassword(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="새 비밀번호 입력 (8자 이상)"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">새 비밀번호 확인</label>
-                    <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={e => setConfirmPassword(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="새 비밀번호 재입력"
-                    />
-                  </div>
-                  {passwordError && <p className="text-xs text-red-500">{passwordError}</p>}
-                  {passwordSuccess && <p className="text-xs text-green-600">{passwordSuccess}</p>}
-                  <button
-                    type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200"
-                    disabled={changingPassword}
-                  >
-                    {changingPassword ? '변경 중...' : '비밀번호 변경'}
-                  </button>
-                </form>
-              </div>
-
-              {/* 저장 버튼 */}
-              <button
-                onClick={handleSaveProfile}
-                disabled={saving}
-                className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 flex items-center justify-center"
-              >
-                {saving ? (
-                  "저장 중..."
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    프로필 저장
-                  </>
-                )}
-              </button>
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-md font-semibold transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center disabled:opacity-50"
+                  disabled={savingAll || !isAnyChanged}
+                >
+                  {savingAll ? '저장 중...' : '변경사항 저장'}
+                </button>
+              </form>
 
               {/* 구분선 */}
               <hr className="my-8" />
