@@ -45,7 +45,7 @@ const Certificates = () => {
       alt: "린코리아 특허등록증"
     },
     {
-      title: "네, supabase가 문제 없도록 작업해주세요.증",
+      title: "상표등록증",
       src: "/images/RIN-COAT-scaled.jpg",
       alt: "RIN-COAT 상표등록증"
     },
