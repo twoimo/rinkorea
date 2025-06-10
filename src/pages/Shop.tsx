@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { ShoppingCart, Star, Info } from 'lucide-react';
+import { ShoppingCart, Star, Info, ChevronDown } from 'lucide-react';
 
 interface Product {
   id: number;
@@ -16,21 +16,64 @@ interface Product {
   naverUrl: string;
   isNew?: boolean;
   stock?: number;
+  sales?: number;
+  createdAt?: string;
 }
 
 const Shop = () => {
-  const [sortBy, setSortBy] = useState('인기도순');
+  const [sortBy, setSortBy] = useState<string>('popularity');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const sortOptions = [
-    '인기도순',
-    '최신등록순',
-    '낮은 가격순',
-    '높은 가격순',
-    '할인율순',
-    '누적 판매순',
-    '리뷰 많은순',
-    '평점 높은순'
+    { value: 'popularity', label: '인기도순' },
+    { value: 'newest', label: '최신등록순' },
+    { value: 'priceAsc', label: '낮은 가격순' },
+    { value: 'priceDesc', label: '높은 가격순' },
+    { value: 'discount', label: '할인율순' },
+    { value: 'sales', label: '누적 판매순' },
+    { value: 'reviews', label: '리뷰 많은순' },
+    { value: 'rating', label: '평점 높은순' },
   ];
+
+  const handleSort = (value: string) => {
+    setSortBy(value);
+    setIsDropdownOpen(false);
+  };
+
+  const getSortedProducts = () => {
+    const sortedProducts = [...products];
+
+    switch (sortBy) {
+      case 'newest':
+        return sortedProducts.sort((a, b) =>
+          new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
+        );
+      case 'priceAsc':
+        return sortedProducts.sort((a, b) => a.price - b.price);
+      case 'priceDesc':
+        return sortedProducts.sort((a, b) => b.price - a.price);
+      case 'discount':
+        return sortedProducts.sort((a, b) =>
+          (b.discount || 0) - (a.discount || 0)
+        );
+      case 'sales':
+        return sortedProducts.sort((a, b) =>
+          (b.sales || 0) - (a.sales || 0)
+        );
+      case 'reviews':
+        return sortedProducts.sort((a, b) => b.reviews - a.reviews);
+      case 'rating':
+        return sortedProducts.sort((a, b) => b.rating - a.rating);
+      case 'popularity':
+      default:
+        // 인기도는 판매량, 리뷰 수, 평점을 종합적으로 고려
+        return sortedProducts.sort((a, b) => {
+          const scoreA = (a.sales || 0) * 0.4 + a.reviews * 0.3 + a.rating * 0.3;
+          const scoreB = (b.sales || 0) * 0.4 + b.reviews * 0.3 + b.rating * 0.3;
+          return scoreB - scoreA;
+        });
+    }
+  };
 
   const products = [
     {
@@ -43,7 +86,11 @@ const Shop = () => {
       discount: 25,
       rating: 4.0,
       reviews: 9,
-      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/8968404085'
+      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/8968404085',
+      sales: 150,
+      createdAt: '2023-10-18',
+      isNew: false,
+      stock: 50
     },
     {
       id: 2,
@@ -55,7 +102,11 @@ const Shop = () => {
       discount: 11,
       rating: 4.5,
       reviews: 3,
-      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/9462441672'
+      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/9462441672',
+      sales: 80,
+      createdAt: '2024-02-14',
+      isNew: true,
+      stock: 30
     },
     {
       id: 3,
@@ -67,7 +118,11 @@ const Shop = () => {
       discount: 20,
       rating: 4.33,
       reviews: 6,
-      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/7828589330'
+      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/7828589330',
+      sales: 120,
+      createdAt: '2024-01-15',
+      isNew: false,
+      stock: 25
     },
     {
       id: 4,
@@ -79,7 +134,11 @@ const Shop = () => {
       discount: null,
       rating: 5.0,
       reviews: 1,
-      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/11624614214'
+      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/11624614214',
+      sales: 200,
+      createdAt: '2024-02-01',
+      isNew: true,
+      stock: 40
     },
     {
       id: 5,
@@ -91,7 +150,11 @@ const Shop = () => {
       discount: null,
       rating: 5.0,
       reviews: 2,
-      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/10928441026'
+      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/10928441026',
+      sales: 90,
+      createdAt: '2024-01-20',
+      isNew: false,
+      stock: 60
     },
     {
       id: 6,
@@ -103,164 +166,147 @@ const Shop = () => {
       discount: 90,
       rating: 5.0,
       reviews: 9,
-      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/8968396177'
+      naverUrl: 'https://smartstore.naver.com/rinkorea_shop/products/8968396177',
+      sales: 180,
+      createdAt: '2023-12-15',
+      isNew: false,
+      stock: 45
     },
   ];
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('ko-KR').format(price);
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
-  const handleProductClick = (naverUrl: string) => {
-    window.open(naverUrl, '_blank');
+  const handleProductClick = (url: string) => {
+    window.open(url, '_blank');
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <h1 className="text-5xl font-bold mb-6">온라인 스토어</h1>
-            <p className="text-xl max-w-2xl mx-auto">
-              린코리아의 우수한 품질의 제품을 <br />
-              온라인에서 편리하게 구매하세요.
-            </p>
+      <section className="relative h-[400px] bg-blue-600">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-800 opacity-90"></div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center text-white">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">온라인 스토어</h1>
+            <p className="text-xl md:text-2xl">린코리아의 최고 품질 제품을 만나보세요</p>
           </div>
         </div>
       </section>
 
-      {/* Products Section */}
-      <section className="py-8 md:py-12">
+      {/* Products Grid */}
+      <section className="py-12">
         <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="mb-6 md:mb-8">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">전체상품</h2>
+          {/* Sort Dropdown */}
+          <div className="mb-8 flex justify-end">
+            <div className="relative">
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex items-center space-x-2 bg-white px-4 py-2 rounded-lg border border-gray-200 hover:border-blue-500 transition-colors"
+              >
+                <span>{sortOptions.find(opt => opt.value === sortBy)?.label}</span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
 
-            {/* Sort Options */}
-            <div className="flex flex-wrap gap-2">
-              {sortOptions.map((option) => (
-                <button
-                  key={option}
-                  onClick={() => setSortBy(option)}
-                  className={`px-3 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${sortBy === option
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                >
-                  {option}
-                </button>
-              ))}
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                  {sortOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => handleSort(option.value)}
+                      className={`w-full text-left px-4 py-2 hover:bg-gray-50 ${sortBy === option.value ? 'text-blue-600 font-medium' : 'text-gray-700'
+                        }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Products Grid */}
-          <section className="py-20">
-            <div className="container mx-auto px-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {products.map((product) => (
-                  <div
-                    key={product.id}
-                    className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col h-[500px]"
-                  >
-                    <div className="relative aspect-square w-full overflow-hidden">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                      />
-                      {product.discount && (
-                        <div className="absolute top-4 left-4">
-                          <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                            {product.discount}% OFF
-                          </span>
-                        </div>
-                      )}
-                      {product.isNew && (
-                        <div className="absolute top-4 right-4">
-                          <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                            NEW
-                          </span>
-                        </div>
-                      )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {getSortedProducts().map((product) => (
+              <div
+                key={product.id}
+                className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col h-[500px]"
+              >
+                <div className="relative aspect-square w-full overflow-hidden">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                  />
+                  {product.discount && (
+                    <div className="absolute top-4 left-4">
+                      <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        {product.discount}% OFF
+                      </span>
                     </div>
-
-                    <div className="p-6 flex flex-col flex-grow">
-                      <div className="mb-3">
-                        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                          {product.name}
-                        </h3>
-                        <p className="text-gray-600 text-sm line-clamp-2 mb-3">
-                          {product.description}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center space-x-2">
-                          <div className="flex items-center">
-                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                            <span className="ml-1 text-sm font-medium text-gray-900">{product.rating}</span>
-                          </div>
-                          <span className="text-gray-300">|</span>
-                          <span className="text-sm text-gray-600">{product.reviews} 리뷰</span>
-                        </div>
-                        {product.stock && (
-                          <span className="text-sm font-medium text-green-600">
-                            재고: {product.stock}개
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="flex items-center justify-between mt-auto">
-                        <div className="flex flex-col">
-                          {product.originalPrice && (
-                            <del className="text-sm text-gray-400">
-                              {formatPrice(product.originalPrice)}원
-                            </del>
-                          )}
-                          <span className="text-xl font-bold text-blue-600">
-                            {formatPrice(product.price)}원
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => handleProductClick(product.naverUrl)}
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 hover:scale-105"
-                        >
-                          <ShoppingCart className="w-4 h-4" />
-                          <span>구매하기</span>
-                        </button>
-                      </div>
+                  )}
+                  {product.isNew && (
+                    <div className="absolute top-4 right-4">
+                      <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        NEW
+                      </span>
                     </div>
+                  )}
+                </div>
+
+                <div className="p-6 flex flex-col flex-grow">
+                  <div className="mb-3">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                      {product.name}
+                    </h3>
+                    <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+                      {product.description}
+                    </p>
                   </div>
-                ))}
-              </div>
-            </div>
-          </section>
 
-          {/* Note about external links */}
-          <div className="bg-blue-50 border-t border-blue-100">
-            <div className="container mx-auto px-4 py-8">
-              <div className="flex items-center justify-center text-blue-600 text-sm">
-                <Info className="w-4 h-4 mr-2" />
-                <p>
-                  상품 구매는 네이버 스토어를 통해 진행됩니다.
-                  <a
-                    href="https://smartstore.naver.com/rinkorea"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline ml-1 hover:text-blue-700"
-                  >
-                    스토어 바로가기
-                  </a>
-                </p>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-2">
+                      <div className="flex items-center">
+                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                        <span className="ml-1 text-sm font-medium text-gray-900">{product.rating}</span>
+                      </div>
+                      <span className="text-gray-300">|</span>
+                      <span className="text-sm text-gray-600">{product.reviews} 리뷰</span>
+                    </div>
+                    {product.stock && (
+                      <span className="text-sm font-medium text-green-600">
+                        재고: {product.stock}개
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between mt-auto">
+                    <div className="flex flex-col">
+                      {product.originalPrice && (
+                        <del className="text-sm text-gray-400">
+                          {formatPrice(product.originalPrice)}원
+                        </del>
+                      )}
+                      <span className="text-xl font-bold text-blue-600">
+                        {formatPrice(product.price)}원
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => handleProductClick(product.naverUrl)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 hover:scale-105"
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                      <span>구매하기</span>
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
-
       <Footer />
     </div>
   );
