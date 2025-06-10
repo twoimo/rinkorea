@@ -79,6 +79,8 @@ const News = () => {
             <NewsDetail
               news={selectedNewsItem}
               onBack={() => setSelectedNews(null)}
+              onDelete={handleDeleteNews}
+              onUpdate={refetch}
             />
           </div>
         </section>
