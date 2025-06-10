@@ -163,7 +163,7 @@ const Index = () => {
 
           {/* 관리자만 유튜브 링크 수정 UI 노출 */}
           {isAdmin && (
-            <div className="absolute top-4 right-4 z-20 bg-white bg-opacity-95 p-6 rounded-xl shadow-xl flex flex-col gap-3 max-w-md border border-blue-200 w-full sm:w-auto">
+            <div className="absolute top-4 right-4 z-20 bg-white bg-opacity-50 p-6 rounded-xl shadow-xl flex flex-col gap-3 max-w-md border border-blue-200 w-full sm:w-auto">
               <div className="mb-1 font-bold text-blue-700 flex items-center gap-2">
                 <Loader2 className="w-5 h-5 animate-spin" style={{ display: loading ? 'inline' : 'none' }} />
                 메인 유튜브 영상 링크 수정
