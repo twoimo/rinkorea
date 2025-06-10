@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import { ArrowRight, Shield, Leaf, Award, Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { supabase } from '../integrations/supabase/client';
 import { useUserRole } from '../hooks/useUserRole';
+import { OptimizedImage } from '@/components/ui/image';
 
 const Index = () => {
   const { isAdmin } = useUserRole();
@@ -266,12 +267,13 @@ const Index = () => {
             </div>
             <div className="flex justify-center items-center">
               <div className="relative w-full max-w-lg aspect-video rounded-2xl overflow-hidden shadow-2xl border-4 border-blue-100">
-                <img
-                  src="/images/1-메인-18.jpg"
+                <OptimizedImage
+                  src={`${process.env.PUBLIC_URL}/images/1-메인-18.jpg`}
                   alt="린코리아 제품"
                   className="w-full h-full object-cover rounded-2xl"
+                  loadingClassName="bg-blue-50"
+                  errorClassName="bg-blue-50"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/10 to-transparent"></div>
               </div>
             </div>
           </div>

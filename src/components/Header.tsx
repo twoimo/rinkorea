@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useProfile } from '@/hooks/useProfile';
+import { OptimizedImage } from '@/components/ui/image';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -51,10 +52,12 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center">
-            <img
-              src="/images/린코리아-홈페이지-로고-블랙.png"
+            <OptimizedImage
+              src={`${process.env.PUBLIC_URL}/images/린코리아-홈페이지-로고-블랙.png`}
               alt="린코리아 로고"
               className="h-10 w-auto"
+              loadingClassName="bg-white"
+              errorClassName="bg-white"
             />
           </Link>
 

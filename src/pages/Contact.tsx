@@ -1,7 +1,9 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { MapPin, Phone, Mail } from 'lucide-react';
+import { OptimizedImage } from '@/components/ui/image';
 
 const Contact = () => {
   return (
@@ -67,27 +69,31 @@ const Contact = () => {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">소셜 미디어</h3>
               <div className="flex space-x-4">
                 <a
-                  href="https://www.instagram.com/rinkorea_kr/"
+                  href="https://www.instagram.com/rinkorea_official"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center w-12 h-12 bg-pink-100 hover:bg-pink-200 rounded-lg transition-colors"
+                  className="text-gray-600 hover:text-gray-900"
                 >
-                  <img
-                    src="/images/instagram.png"
+                  <OptimizedImage
+                    src={`${process.env.PUBLIC_URL}/images/instagram.png`}
                     alt="Instagram"
-                    className="w-6 h-6"
+                    className="h-6 w-6"
+                    loadingClassName="bg-white"
+                    errorClassName="bg-white"
                   />
                 </a>
                 <a
                   href="https://blog.naver.com/rinkorea"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center w-12 h-12 bg-green-100 hover:bg-green-200 rounded-lg transition-colors"
+                  className="text-gray-600 hover:text-gray-900"
                 >
-                  <img
-                    src="/images/naver.png"
+                  <OptimizedImage
+                    src={`${process.env.PUBLIC_URL}/images/블로그-로고-고화질.png`}
                     alt="Naver Blog"
-                    className="w-6 h-6"
+                    className="h-6 w-6"
+                    loadingClassName="bg-white"
+                    errorClassName="bg-white"
                   />
                 </a>
               </div>
