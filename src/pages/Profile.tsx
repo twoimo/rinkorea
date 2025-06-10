@@ -213,11 +213,6 @@ const Profile = () => {
 
             <div className="space-y-6">
               <form onSubmit={handleSaveAll} className="space-y-6">
-                {/* 안내문구 */}
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded mb-4 text-yellow-800 text-sm">
-                  <strong>비밀번호 찾기 기능이 없습니다.</strong><br />
-                  비밀번호를 변경하실 때는 반드시 기억해 주세요. 분실 시 복구가 불가능합니다.
-                </div>
                 {/* 이메일 (읽기 전용) */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -291,6 +286,10 @@ const Profile = () => {
                 {/* 비밀번호 변경 */}
                 <div className="border-t pt-8 mt-8">
                   <h2 className="text-lg font-bold mb-4 flex items-center"><span className="mr-2">비밀번호 변경</span></h2>
+                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded mb-6 text-yellow-800 text-sm">
+                    <strong>비밀번호 찾기 기능이 없습니다.</strong><br />
+                    비밀번호를 변경하실 때는 반드시 기억해 주세요. 분실 시 복구가 불가능합니다.
+                  </div>
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">현재 비밀번호</label>
