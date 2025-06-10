@@ -151,21 +151,14 @@ const QnA = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 text-white py-16 relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="mb-6">
-              <MessageCircle className="w-16 h-16 mx-auto mb-4 text-blue-200" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-              고객상담 및 문의
-            </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed">
-              린코리아 제품에 대한 궁금한 점이나 문의사항이 있으시면
-              언제든지 연락주세요.
+      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <h1 className="text-5xl font-bold mb-6">고객상담 및 문의</h1>
+            <p className="text-xl max-w-2xl mx-auto">
+              린코리아 제품에 대한 문의사항이 있으시면 언제든지 연락주세요.<br />
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
               {!user ? (
                 <Link
                   to="/auth"

@@ -117,14 +117,14 @@ const Certificates = () => {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
         <div className="container mx-auto px-4">
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-6">시험성적서/인증</h1>
             <p className="text-xl max-w-2xl mx-auto">
-              린코리아 제품의 우수한 품질과 안전성을 증명하는 
+              린코리아 제품의 우수한 품질과 안전성을 증명하는 <br />
               각종 인증서와 시험성적서를 확인하세요.
             </p>
           </div>
@@ -162,15 +162,15 @@ const Certificates = () => {
               린코리아의 기술력과 브랜드를 보증하는 공식 문서들
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
             {patentImages.map((image, index) => (
               <div key={index} className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-                <div 
+                <div
                   className="cursor-pointer"
                   onClick={() => handleImageClick(image.src, image.alt, image.title)}
                 >
-                  <img 
+                  <img
                     src={image.src}
                     alt={image.alt}
                     className="w-full h-80 object-contain rounded-lg mb-4 border hover:border-blue-300 transition-colors"
@@ -193,15 +193,15 @@ const Certificates = () => {
               공인시험기관에서 실시한 품질 시험 결과 전체 문서
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {testReportImages.map((image, index) => (
               <div key={index} className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-                <div 
+                <div
                   className="cursor-pointer"
                   onClick={() => handleImageClick(image.src, image.alt, image.title)}
                 >
-                  <img 
+                  <img
                     src={image.src}
                     alt={image.alt}
                     className="w-full h-96 object-contain rounded-lg mb-4 border hover:border-blue-300 transition-colors"
@@ -241,9 +241,9 @@ const Certificates = () => {
               </div>
             </div>
             <div className="text-center mt-8">
-              <a 
-                href="https://rinkorea.com/시험성적서/" 
-                target="_blank" 
+              <a
+                href="https://rinkorea.com/시험성적서/"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
               >

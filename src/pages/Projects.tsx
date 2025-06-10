@@ -38,14 +38,14 @@ const Projects = () => {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
         <div className="container mx-auto px-4">
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-6">시공사례</h1>
             <p className="text-xl max-w-2xl mx-auto">
-              린코리아의 세라믹 코팅제가 적용된 다양한 프로젝트를 통해 
+              린코리아의 세라믹 코팅제가 적용된 다양한 프로젝트를 통해 <br />
               우수한 품질과 성능을 확인하세요.
             </p>
           </div>
@@ -59,13 +59,13 @@ const Projects = () => {
             {projects.map((project, index) => (
               <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                 <div className="relative h-64 overflow-hidden">
-                  <img 
-                    src={project.image} 
+                  <img
+                    src={project.image}
                     alt={project.title}
                     className="w-full h-full object-cover transition-transform hover:scale-105"
                   />
                   <div className="absolute top-4 right-4">
-                    <a 
+                    <a
                       href={project.url}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -75,27 +75,27 @@ const Projects = () => {
                     </a>
                   </div>
                 </div>
-                
+
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-3">{project.title}</h3>
-                  
+
                   <div className="flex items-center text-gray-600 mb-2">
                     <MapPin className="w-4 h-4 mr-2" />
                     <span className="text-sm">{project.location}</span>
                   </div>
-                  
+
                   <div className="flex items-center text-gray-600 mb-4">
                     <Calendar className="w-4 h-4 mr-2" />
                     <span className="text-sm">{project.date}</span>
                   </div>
-                  
+
                   <p className="text-gray-600 mb-4">{project.description}</p>
-                  
+
                   <div className="space-y-2">
                     <h4 className="font-semibold text-gray-900">적용 특징:</h4>
                     <div className="flex flex-wrap gap-2">
                       {project.features.map((feature, featureIndex) => (
-                        <span 
+                        <span
                           key={featureIndex}
                           className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium"
                         >
@@ -120,7 +120,7 @@ const Projects = () => {
               다양한 분야에서 인정받는 린코리아의 기술력
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="text-4xl font-bold text-blue-600 mb-2">50+</div>

@@ -100,14 +100,13 @@ const News = () => {
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-6">공지사항</h1>
             <p className="text-xl max-w-2xl mx-auto">
-              린코리아의 최신 소식과 중요한 공지사항을
-              확인하세요.
+              린코리아의 최신 소식과 중요한 공지사항을 확인하세요.
             </p>
             <AdminOnly>
               <div className="mt-8">
                 <button
                   onClick={() => setShowForm(true)}
-                  className="inline-flex items-center bg-white text-blue-900 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="inline-flex items-center bg-white text-blue-900 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <Plus className="w-5 h-5 mr-2" />
                   새 공지사항 작성

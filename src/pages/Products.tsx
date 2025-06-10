@@ -32,14 +32,14 @@ const Products = () => {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
         <div className="container mx-auto px-4">
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-6">제품소개</h1>
             <p className="text-xl max-w-2xl mx-auto">
-              린코리아의 혁신적인 세라믹 코팅제 제품군을 만나보세요. 
+              린코리아의 혁신적인 세라믹 코팅제 제품군을 만나보세요. <br />
               최고 품질의 불연재로 안전한 건설환경을 만들어갑니다.
             </p>
           </div>
@@ -53,8 +53,8 @@ const Products = () => {
             {products.map((product, index) => (
               <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                 <div className="relative h-64 overflow-hidden">
-                  <img 
-                    src={product.image} 
+                  <img
+                    src={product.image}
                     alt={product.name}
                     className="w-full h-full object-cover transition-transform hover:scale-105"
                   />
@@ -92,7 +92,7 @@ const Products = () => {
               린코리아 세라믹 코팅제가 선택받는 이유
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
               <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
@@ -101,7 +101,7 @@ const Products = () => {
               <h3 className="text-lg font-bold text-gray-900 mb-2">불연재 인증</h3>
               <p className="text-gray-600">국토교통부 불연재 인증을 받은 안전한 제품</p>
             </div>
-            
+
             <div className="text-center">
               <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <Zap className="w-8 h-8 text-yellow-600" />
@@ -109,7 +109,7 @@ const Products = () => {
               <h3 className="text-lg font-bold text-gray-900 mb-2">간편한 시공</h3>
               <p className="text-gray-600">1액형으로 혼합 없이 간편하게 시공 가능</p>
             </div>
-            
+
             <div className="text-center">
               <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <Star className="w-8 h-8 text-green-600" />
@@ -117,7 +117,7 @@ const Products = () => {
               <h3 className="text-lg font-bold text-gray-900 mb-2">우수한 품질</h3>
               <p className="text-gray-600">엄격한 품질관리를 통한 일정한 품질 보장</p>
             </div>
-            
+
             <div className="text-center">
               <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <Palette className="w-8 h-8 text-purple-600" />
