@@ -171,7 +171,6 @@ const Index = () => {
                 <Loader2 className="w-5 h-5 animate-spin" style={{ display: loading ? 'inline' : 'none' }} />
                 메인 유튜브 영상 링크 수정
               </div>
-              <p className="text-xs text-gray-800 mb-1 drop-shadow">유튜브 영상 주소를 붙여넣으면 자동으로 embed 주소로 변환됩니다.<br />예: <span className="font-mono">https://www.youtube.com/watch?v=xxxx</span> 또는 <span className="font-mono">https://youtu.be/xxxx</span></p>
               <input
                 type="text"
                 className="border px-2 py-2 rounded w-full text-sm focus:ring-2 focus:ring-blue-400 bg-white bg-opacity-90 drop-shadow"
@@ -181,8 +180,7 @@ const Index = () => {
                 disabled={loading}
               />
               <div className="text-xs text-blue-800 mt-1 mb-2 font-mono break-all drop-shadow">
-                변환된 embed 주소:<br />
-                <span>{embedPreview}</span>
+                변환된 embed 주소: <span>{embedPreview}</span>
               </div>
               <button
                 onClick={handleSaveYoutubeLink}
