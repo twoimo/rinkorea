@@ -2,6 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Stagewise Toolbar Styles */
+.stagewise-toolbar-wrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 9999;
+  isolation: isolate;
+}
+
+.app-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure gradients work properly */
+.bg-gradient-to-r {
+  background-image: linear-gradient(to right, var(--tw-gradient-stops));
+}
+
+.from-blue-900 {
+  --tw-gradient-from: #1e3a8a;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(30, 58, 138, 0));
+}
+
+.to-blue-700 {
+  --tw-gradient-to: #1d4ed8;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
