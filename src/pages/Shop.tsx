@@ -41,6 +41,7 @@ const Shop = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
+  const [hiddenProductIds, setHiddenProductIds] = useState<string[]>([]);
   const gridOptions = [
     { value: 2, label: '2 x 2' },
     { value: 3, label: '3 x 3' },
@@ -57,6 +58,16 @@ const Shop = () => {
     { value: 'reviews', label: '리뷰 많은순' },
     { value: 'rating', label: '평점 높은순' },
   ];
+
+  // 숨김 상품 목록 불러오기 함수 (컴포넌트 상단에 선언)
+  const fetchHiddenProducts = async () => {
+    const { data, error } = await (supabase as unknown as SupabaseClient)
+      .from('product_hidden')
+      .select('product_id');
+    if (!error && data) {
+      setHiddenProductIds(data.map((h: { product_id: string }) => h.product_id));
+    }
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -86,6 +97,26 @@ const Shop = () => {
       setGridLoading(false);
     };
     fetchGrid();
+  }, []);
+
+  useEffect(() => {
+    fetchHiddenProducts();
+  }, []);
+
+  useEffect(() => {
+    const fetchAll = async () => {
+      setLoading(true);
+      await fetchHiddenProducts();
+      const { data, error } = await (supabase as unknown as SupabaseClient)
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (!error && data) {
+        setProducts(data);
+      }
+      setLoading(false);
+    };
+    fetchAll();
   }, []);
 
   const handleSort = (value: string) => {
@@ -272,32 +303,43 @@ const Shop = () => {
     } else {
       setFormValues(v => ({ ...v, discount: 0 }));
     }
-     
+
   }, [formValues.price, formValues.original_price]);
 
-  // 제품 숨기기/해제
-  const handleToggleActive = async (product: Product) => {
+  // 숨김/해제 핸들러
+  const handleToggleHide = async (product: Product) => {
     setFormLoading(true);
     setFormError(null);
     setFormSuccess(null);
     try {
-      const result = await (supabase as unknown as SupabaseClient)
-        .from('products')
-        .update({ is_active: !product.is_active, updated_at: new Date().toISOString() })
-        .eq('id', product.id);
-      if (result.error) {
-        setFormError(result.error.message);
+      if (hiddenProductIds.includes(product.id)) {
+        // 숨김 해제
+        const { error } = await (supabase as unknown as SupabaseClient)
+          .from('product_hidden')
+          .delete()
+          .eq('product_id', product.id);
+        if (error) setFormError(error.message);
+        else setFormSuccess('노출되었습니다.');
       } else {
-        setFormSuccess(product.is_active ? '숨김 처리되었습니다.' : '노출되었습니다.');
-        await refreshProducts();
-        setTimeout(() => {
-          setFormSuccess(null);
-        }, 700);
+        // 숨기기
+        const { error } = await (supabase as unknown as SupabaseClient)
+          .from('product_hidden')
+          .upsert({ product_id: product.id });
+        if (error) setFormError(error.message);
+        else setFormSuccess('숨김 처리되었습니다.');
       }
+      await fetchHiddenProducts();
+      setTimeout(() => setFormSuccess(null), 700);
     } catch (e) {
       setFormError(e instanceof Error ? e.message : String(e));
     }
     setFormLoading(false);
+  };
+
+  // 상품 목록 필터링
+  const getVisibleProducts = () => {
+    if (isAdmin) return getSortedProducts();
+    return getSortedProducts().filter(p => !hiddenProductIds.includes(p.id));
   };
 
   return (
@@ -366,9 +408,9 @@ const Shop = () => {
           </div>
 
           <div className={`grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-${gridCols} lg:grid-cols-${gridCols}`}>
-            {(isAdmin ? getSortedProducts() : getSortedProducts().filter(p => p.is_active)).map((product) => {
+            {(isAdmin ? getVisibleProducts() : getVisibleProducts()).map((product) => {
               const isSoldOut = !product.stock_quantity || product.stock_quantity <= 0;
-              const isHidden = !product.is_active;
+              const isHidden = hiddenProductIds.includes(product.id);
               return (
                 <div key={product.id} className="bg-white rounded-xl shadow-lg p-6 flex flex-col group relative">
                   {/* 뱃지 영역 */}
@@ -450,7 +492,7 @@ const Shop = () => {
                     <div className="absolute top-3 right-3 flex gap-2 z-10">
                       <button
                         className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        onClick={() => handleToggleActive(product)}
+                        onClick={() => handleToggleHide(product)}
                         title={isHidden ? '노출 해제' : '숨기기'}
                         disabled={formLoading}
                       >
