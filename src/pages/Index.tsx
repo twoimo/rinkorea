@@ -39,7 +39,7 @@ const Index = () => {
                 height: '56.25vw', // 16:9 비율
                 minHeight: '100vh',
                 minWidth: '177.78vh', // 16/9 * 100vh
-                transform: 'translate(-50%, -50%)',
+                transform: 'translate(-50%, -45%) scale(1.0)',
                 objectFit: 'cover',
                 pointerEvents: 'none'
               }}
