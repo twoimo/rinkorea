@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -104,14 +103,15 @@ const Shop = () => {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      
+
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 md:py-16">
+      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">린코리아 온라인 스토어</h1>
-            <p className="text-lg md:text-xl">
-              고품질 세라믹 코팅제와 건설자재를 합리적인 가격에 만나보세요
+            <h1 className="text-5xl font-bold mb-6">온라인 스토어</h1>
+            <p className="text-xl max-w-2xl mx-auto">
+              린코리아의 우수한 품질의 제품을 <br />
+              온라인에서 편리하게 구매하세요.
             </p>
           </div>
         </div>
@@ -123,18 +123,17 @@ const Shop = () => {
           {/* Header */}
           <div className="mb-6 md:mb-8">
             <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">전체상품</h2>
-            
+
             {/* Sort Options */}
             <div className="flex flex-wrap gap-2">
               {sortOptions.map((option) => (
                 <button
                   key={option}
                   onClick={() => setSortBy(option)}
-                  className={`px-3 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                    sortBy === option
+                  className={`px-3 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${sortBy === option
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   {option}
                 </button>
@@ -147,8 +146,8 @@ const Shop = () => {
             {products.map((product) => (
               <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                 <div className="relative cursor-pointer" onClick={() => handleProductClick(product.naverUrl)}>
-                  <img 
-                    src={product.image} 
+                  <img
+                    src={product.image}
                     alt={product.name}
                     className="w-full h-48 md:h-64 object-cover hover:scale-105 transition-transform"
                   />
@@ -158,7 +157,7 @@ const Shop = () => {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="p-3 md:p-4">
                   <h3 className="font-bold text-gray-900 mb-2 text-sm md:text-base line-clamp-2">
                     {product.name}
@@ -166,7 +165,7 @@ const Shop = () => {
                   <p className="text-xs md:text-sm text-gray-600 mb-3 line-clamp-2">
                     {product.description}
                   </p>
-                  
+
                   <div className="mb-3">
                     {product.originalPrice && (
                       <del className="text-xs md:text-sm text-gray-400 block">
@@ -180,7 +179,7 @@ const Shop = () => {
                       <span className="text-gray-600 ml-1">원</span>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center justify-between mb-3 md:mb-4">
                     <div className="flex items-center text-xs md:text-sm text-gray-600">
                       <Star className="w-3 h-3 md:w-4 md:h-4 text-yellow-400 mr-1" />
@@ -189,8 +188,8 @@ const Shop = () => {
                       <span>리뷰 {product.reviews}</span>
                     </div>
                   </div>
-                  
-                  <button 
+
+                  <button
                     onClick={() => handleProductClick(product.naverUrl)}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center text-sm md:text-base"
                   >
