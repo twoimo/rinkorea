@@ -22,7 +22,6 @@ interface Product {
 
 const Shop = () => {
   const [sortBy, setSortBy] = useState<string>('popularity');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const sortOptions = [
     { value: 'popularity', label: '인기도순' },
@@ -37,7 +36,6 @@ const Shop = () => {
 
   const handleSort = (value: string) => {
     setSortBy(value);
-    setIsDropdownOpen(false);
   };
 
   const getSortedProducts = () => {
@@ -200,31 +198,21 @@ const Shop = () => {
       {/* Products Grid */}
       <section className="py-12">
         <div className="container mx-auto px-4">
-          {/* Sort Dropdown */}
-          <div className="mb-8 flex justify-end">
-            <div className="relative">
-              <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center space-x-2 bg-white px-4 py-2 rounded-lg border border-gray-200 hover:border-blue-500 transition-colors"
-              >
-                <span>{sortOptions.find(opt => opt.value === sortBy)?.label}</span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                  {sortOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => handleSort(option.value)}
-                      className={`w-full text-left px-4 py-2 hover:bg-gray-50 ${sortBy === option.value ? 'text-blue-600 font-medium' : 'text-gray-700'
-                        }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              )}
+          {/* Sort Options */}
+          <div className="mb-8">
+            <div className="flex flex-wrap gap-2">
+              {sortOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => handleSort(option.value)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${sortBy === option.value
+                      ? 'bg-blue-600 text-white shadow-md'
+                      : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                    }`}
+                >
+                  {option.label}
+                </button>
+              ))}
             </div>
           </div>
 
