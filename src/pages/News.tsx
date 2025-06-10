@@ -18,26 +18,26 @@ const News = () => {
   const [editingNews, setEditingNews] = useState<string | null>(null);
 
   // 기본 더미 데이터 (실제 데이터가 없을 때)
-  const defaultNews = [
-    {
-      id: '1',
-      title: "건설기계사업부 신설 안내",
-      content: "린코리아가 2024년 건설기계사업부를 신설하여 사업 영역을 확장합니다.",
-      created_at: "2024-01-20",
-      published: true,
-      author_id: null
-    },
-    {
-      id: '2',
-      title: "RIN-COAT 신제품 출시",
-      content: "향상된 성능의 RIN-COAT 신제품이 출시되었습니다. 기존 제품 대비 30% 향상된 내구성을 제공합니다.",
-      created_at: "2024-01-15",
-      published: true,
-      author_id: null
-    }
-  ];
+  // const defaultNews = [
+  //   {
+  //     id: '1',
+  //     title: "건설기계사업부 신설 안내",
+  //     content: "린코리아가 2024년 건설기계사업부를 신설하여 사업 영역을 확장합니다.",
+  //     created_at: "2024-01-20",
+  //     published: true,
+  //     author_id: null
+  //   },
+  //   {
+  //     id: '2',
+  //     title: "RIN-COAT 신제품 출시",
+  //     content: "향상된 성능의 RIN-COAT 신제품이 출시되었습니다. 기존 제품 대비 30% 향상된 내구성을 제공합니다.",
+  //     created_at: "2024-01-15",
+  //     published: true,
+  //     author_id: null
+  //   }
+  // ];
 
-  const displayNews = news.length > 0 ? news : defaultNews;
+  const displayNews = news;
   const selectedNewsItem = selectedNews ? displayNews.find(item => item.id === selectedNews) : null;
   const editingNewsItem = editingNews ? displayNews.find(item => item.id === editingNews) : null;
 

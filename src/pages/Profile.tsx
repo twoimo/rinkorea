@@ -299,6 +299,7 @@ const Profile = () => {
                         onChange={e => setCurrentPassword(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="현재 비밀번호 입력"
+                        autoComplete="current-password"
                       />
                     </div>
                     <div>
@@ -309,6 +310,7 @@ const Profile = () => {
                         onChange={e => setNewPassword(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="새 비밀번호 입력 (8자 이상)"
+                        autoComplete="new-password"
                       />
                     </div>
                     <div>
@@ -319,6 +321,7 @@ const Profile = () => {
                         onChange={e => setConfirmPassword(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="새 비밀번호 재입력"
+                        autoComplete="new-password"
                       />
                     </div>
                     {passwordError && <p className="text-xs text-red-500">{passwordError}</p>}
