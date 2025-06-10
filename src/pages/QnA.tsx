@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import AdminOnly from '../components/AdminOnly';
-import { MessageCircle, Plus, Search, User, Calendar, CheckCircle, Clock, ChevronDown, Reply, Trash2, Send, Edit, X } from 'lucide-react';
+import { MessageCircle, Plus, Search, User, Calendar, CheckCircle, Clock, ChevronDown, Reply, Trash2, Send, Edit, X, Lock } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useInquiries } from '@/hooks/useInquiries';
@@ -10,6 +10,10 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { Link } from 'react-router-dom';
 
 const QnA = () => {
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const { inquiries, loading, createInquiry, updateInquiry, deleteInquiry } = useInquiries();
+  const { isAdmin } = useUserRole();
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('전체');
@@ -18,16 +22,13 @@ const QnA = () => {
   const [editingReply, setEditingReply] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
+    name: user?.user_metadata?.name || '',
+    email: user?.email || '',
+    phone: user?.user_metadata?.phone || '',
     title: '',
-    content: ''
+    content: '',
+    is_private: false
   });
-  const { toast } = useToast();
-  const { user } = useAuth();
-  const { inquiries, loading, createInquiry, updateInquiry, deleteInquiry } = useInquiries();
-  const { isAdmin } = useUserRole();
 
   const categories = ['전체', '제품문의', '시공문의', '기술지원', '기타'];
   const statusFilter = ['전체', '답변대기', '답변완료'];
@@ -40,6 +41,15 @@ const QnA = () => {
       (selectedStatus === '답변대기' && item.status === 'pending');
     return matchesSearch && matchesStatus;
   });
+
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      name: user?.user_metadata?.name || '',
+      email: user?.email || '',
+      phone: user?.user_metadata?.phone || ''
+    }));
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +72,8 @@ const QnA = () => {
         email: '',
         phone: '',
         title: '',
-        content: ''
+        content: '',
+        is_private: false
       });
       setShowForm(false);
     }
@@ -346,6 +357,16 @@ const QnA = () => {
                   />
                 </div>
 
+                <label className="flex items-center mt-4">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_private}
+                    onChange={e => setFormData(prev => ({ ...prev, is_private: e.target.checked }))}
+                    className="mr-2"
+                  />
+                  비밀글로 등록 (관리자/작성자만 열람)
+                </label>
+
                 <div className="flex gap-4 pt-4">
                   <button
                     type="submit"
@@ -374,137 +395,83 @@ const QnA = () => {
             </div>
           ) : filteredItems.length > 0 ? (
             <div className="space-y-4">
-              {filteredItems.map((item) => (
-                <div key={item.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${item.status === 'answered'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                        {item.status === 'answered' ? (
-                          <>
-                            <CheckCircle className="w-3 h-3" />
-                            답변완료
-                          </>
-                        ) : (
-                          <>
-                            <Clock className="w-3 h-3" />
-                            답변대기
-                          </>
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center text-sm text-gray-500 gap-4">
-                        <div className="flex items-center gap-1">
-                          <User className="w-4 h-4" />
-                          {item.name}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          {new Date(item.created_at).toLocaleDateString('ko-KR')}
-                        </div>
+              {filteredItems.map((item) => {
+                const canView = !item.is_private || isAdmin || (user && user.id === item.user_id);
+                return (
+                  <div key={item.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${item.status === 'answered'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                          {item.status === 'answered' ? (
+                            <>
+                              <CheckCircle className="w-3 h-3" />
+                              답변완료
+                            </>
+                          ) : (
+                            <>
+                              <Clock className="w-3 h-3" />
+                              답변대기
+                            </>
+                          )}
+                        </span>
                       </div>
-                      <AdminOnly>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => setReplyingTo(replyingTo === item.id ? null : item.id)}
-                            className="text-blue-600 hover:text-blue-700 p-1"
-                            title="답변하기"
-                          >
-                            <Reply className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(item.id)}
-                            className="text-red-600 hover:text-red-700 p-1"
-                            title="삭제하기"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </AdminOnly>
-                    </div>
-                  </div>
-
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">{item.title}</h3>
-                  <p className="text-gray-600 mb-4 leading-relaxed whitespace-pre-wrap">{item.content}</p>
-
-                  {/* 관리자 답변 */}
-                  {item.admin_reply && (
-                    <div className="mt-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center">
-                          <div className="bg-blue-100 p-1 rounded mr-2">
-                            <User className="w-4 h-4 text-blue-600" />
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center text-sm text-gray-500 gap-4">
+                          <div className="flex items-center gap-1">
+                            <User className="w-4 h-4" />
+                            {item.name}
                           </div>
-                          <p className="text-sm font-medium text-blue-900">관리자 답변</p>
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-4 h-4" />
+                            {new Date(item.created_at).toLocaleDateString('ko-KR')}
+                          </div>
                         </div>
                         <AdminOnly>
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => handleEditReply(item.id, item.admin_reply)}
+                              onClick={() => setReplyingTo(replyingTo === item.id ? null : item.id)}
                               className="text-blue-600 hover:text-blue-700 p-1"
-                              title="답변 수정"
+                              title="답변하기"
                             >
-                              <Edit className="w-3 h-3" />
+                              <Reply className="w-4 h-4" />
                             </button>
                             <button
-                              onClick={() => handleDeleteReply(item.id)}
+                              onClick={() => handleDelete(item.id)}
                               className="text-red-600 hover:text-red-700 p-1"
-                              title="답변 삭제"
+                              title="삭제하기"
                             >
-                              <Trash2 className="w-3 h-3" />
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </AdminOnly>
                       </div>
-                      <p className="text-blue-800 leading-relaxed whitespace-pre-wrap">{item.admin_reply}</p>
                     </div>
-                  )}
 
-                  {/* 관리자 답변 입력/수정 폼 */}
-                  <AdminOnly>
-                    {(replyingTo === item.id || editingReply === item.id) && (
-                      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                        <div className="flex items-center mb-3">
-                          {editingReply === item.id ? (
-                            <Edit className="w-4 h-4 text-gray-600 mr-2" />
-                          ) : (
-                            <Reply className="w-4 h-4 text-gray-600 mr-2" />
-                          )}
-                          <span className="text-sm font-medium text-gray-700">
-                            {editingReply === item.id ? '답변 수정' : '관리자 답변 작성'}
-                          </span>
-                        </div>
-                        <textarea
-                          value={replyText}
-                          onChange={(e) => setReplyText(e.target.value)}
-                          placeholder="답변을 입력하세요..."
-                          className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                          rows={4}
-                        />
-                        <div className="flex gap-2 mt-3">
-                          <button
-                            onClick={() => handleReply(item.id)}
-                            disabled={!replyText.trim()}
-                            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center"
-                          >
-                            <Send className="w-3 h-3 mr-1" />
-                            {editingReply === item.id ? '수정 완료' : '답변 등록'}
-                          </button>
-                          <button
-                            onClick={cancelEdit}
-                            className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium"
-                          >
-                            취소
-                          </button>
-                        </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                      {item.is_private && <Lock className="w-4 h-4 text-gray-400 mr-1" />} {item.title}
+                    </h3>
+                    {canView ? (
+                      <>
+                        <p className="text-gray-600 mb-4 leading-relaxed whitespace-pre-wrap">{item.content}</p>
+                        <RepliesSection inquiryId={item.id} canView={canView} isAdmin={isAdmin} />
+                      </>
+                    ) : (
+                      <div className="text-gray-400 italic flex items-center"><Lock className="w-4 h-4 mr-1" /> 비밀글입니다</div>
+                    )}
+
+                    {/* 본인글 수정/삭제 버튼 */}
+                    {user && user.id === item.user_id && (
+                      <div className="flex gap-2 mt-2">
+                        <button className="text-blue-600 hover:underline">수정</button>
+                        <button onClick={() => handleDelete(item.id)} className="text-red-600 hover:underline">삭제</button>
                       </div>
                     )}
-                  </AdminOnly>
-                </div>
-              ))}
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-100 text-center">
@@ -536,5 +503,66 @@ const QnA = () => {
     </div>
   );
 };
+
+function RepliesSection({ inquiryId, canView, isAdmin }) {
+  const { getReplies, createReply, updateReply, deleteReply } = useInquiries();
+  const [replies, setReplies] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [replyText, setReplyText] = React.useState('');
+  const [editingId, setEditingId] = React.useState(null);
+  React.useEffect(() => {
+    if (canView) {
+      setLoading(true);
+      getReplies(inquiryId).then(setReplies).finally(() => setLoading(false));
+    }
+  }, [inquiryId, canView]);
+  if (!canView) return null;
+  return (
+    <div className="mt-6">
+      {loading ? <div className="text-gray-400">답변 불러오는 중...</div> : (
+        <>
+          {replies.length === 0 && <div className="text-gray-400">아직 답변이 없습니다.</div>}
+          {replies.map(reply => (
+            <div key={reply.id} className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400 mb-2 flex justify-between items-start">
+              <div>
+                <div className="flex items-center mb-1">
+                  <User className="w-4 h-4 text-blue-600 mr-1" />
+                  <span className="text-sm font-medium text-blue-900">관리자 답변</span>
+                  <span className="ml-2 text-xs text-gray-400">{new Date(reply.created_at).toLocaleString('ko-KR')}</span>
+                </div>
+                <div className="text-blue-800 leading-relaxed whitespace-pre-wrap">
+                  {editingId === reply.id ? (
+                    <textarea value={replyText} onChange={e => setReplyText(e.target.value)} className="w-full p-2 rounded border" rows={3} />
+                  ) : reply.content}
+                </div>
+              </div>
+              {isAdmin && (
+                <div className="flex flex-col gap-1 ml-2">
+                  {editingId === reply.id ? (
+                    <>
+                      <button onClick={async () => { await updateReply(reply.id, replyText); setEditingId(null); setReplyText(''); setReplies(await getReplies(inquiryId)); }} className="text-blue-600 text-xs">저장</button>
+                      <button onClick={() => { setEditingId(null); setReplyText(''); }} className="text-gray-400 text-xs">취소</button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => { setEditingId(reply.id); setReplyText(reply.content); }} className="text-blue-600 text-xs">수정</button>
+                      <button onClick={async () => { await deleteReply(reply.id); setReplies(await getReplies(inquiryId)); }} className="text-red-600 text-xs">삭제</button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+          {isAdmin && (
+            <div className="mt-2 flex gap-2">
+              <textarea value={replyText} onChange={e => setReplyText(e.target.value)} className="w-full p-2 rounded border" rows={3} placeholder="답변을 입력하세요..." />
+              <button onClick={async () => { if (!replyText.trim()) return; await createReply(inquiryId, replyText); setReplyText(''); setReplies(await getReplies(inquiryId)); }} className="bg-blue-600 text-white px-4 py-2 rounded">등록</button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
 
 export default QnA;
