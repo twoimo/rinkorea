@@ -18,17 +18,36 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
 }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [hasError, setHasError] = useState(false);
+    const [useFallback, setUseFallback] = useState(false);
+
+    // Convert src to WebP path
+    const getWebPSrc = (originalSrc: string) => {
+        if (!originalSrc) return '';
+        const path = originalSrc.split('/');
+        const filename = path.pop()?.split('.')[0];
+        path.push('optimized', `${filename}.webp`);
+        return path.join('/');
+    };
 
     const handleLoad = () => {
         setIsLoading(false);
     };
 
     const handleError = () => {
+        if (!useFallback) {
+            // Try original format if WebP fails
+            setUseFallback(true);
+            return;
+        }
         setIsLoading(false);
         setHasError(true);
     };
 
-    const imageSrc = hasError ? fallbackSrc : src;
+    const imageSrc = hasError
+        ? fallbackSrc
+        : useFallback
+            ? src
+            : getWebPSrc(src);
 
     return (
         <div className={`relative ${className}`}>
