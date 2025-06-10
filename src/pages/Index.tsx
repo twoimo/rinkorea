@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { ArrowRight, Shield, Leaf, Award } from 'lucide-react';
+import { supabase } from '../integrations/supabase/client';
+import { useUserRole } from '../hooks/useUserRole';
 
 const Index = () => {
+  const { isAdmin } = useUserRole();
+  const [youtubeLink, setYoutubeLink] = useState('https://www.youtube.com/embed/W6ACoEMN3-0?autoplay=1&mute=1&controls=0&loop=1&playlist=W6ACoEMN3-0&showinfo=0&rel=0&modestbranding=1');
+  const [editLink, setEditLink] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState('');
+
   const features = [
     {
       icon: <Shield className="w-12 h-12 text-blue-900" />,
@@ -22,6 +30,68 @@ const Index = () => {
       description: "다양한 시험성적서와 인증으로 검증된 품질"
     }
   ];
+
+  // 유튜브 링크 불러오기
+  const loadYoutubeLink = async () => {
+    try {
+      const { data, error } = await (supabase as any)
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'youtube_link')
+        .single();
+      if (!error && data?.value) {
+        setYoutubeLink(data.value);
+        setEditLink(data.value);
+      }
+    } catch (e) {
+      // 기본값 유지
+    }
+  };
+
+  useEffect(() => {
+    loadYoutubeLink();
+  }, []);
+
+  // 유튜브 주소를 embed 주소로 변환
+  const toEmbedUrl = (url: string) => {
+    // 이미 embed 주소면 그대로 반환
+    if (url.includes('/embed/')) return url;
+    // watch?v= 형태
+    const watchMatch = url.match(/(?:youtube\.com\/watch\?v=)([\w-]+)/);
+    if (watchMatch) {
+      const id = watchMatch[1];
+      return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&showinfo=0&rel=0&modestbranding=1`;
+    }
+    // youtu.be 형태
+    const shortMatch = url.match(/youtu\.be\/([\w-]+)/);
+    if (shortMatch) {
+      const id = shortMatch[1];
+      return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&showinfo=0&rel=0&modestbranding=1`;
+    }
+    // 기타: 그대로 반환
+    return url;
+  };
+
+  // 유튜브 링크 저장
+  const handleSaveYoutubeLink = async () => {
+    setLoading(true);
+    setResult('');
+    try {
+      const embedUrl = toEmbedUrl(editLink);
+      const { error } = await (supabase as any)
+        .from('site_settings')
+        .upsert({ key: 'youtube_link', value: embedUrl, updated_at: new Date().toISOString() });
+      if (error) {
+        setResult('오류: ' + error.message);
+      } else {
+        setYoutubeLink(embedUrl);
+        setResult('유튜브 링크가 저장되었습니다.');
+      }
+    } catch (e) {
+      setResult('오류: ' + (e.message || e));
+    }
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -43,7 +113,7 @@ const Index = () => {
                 objectFit: 'cover',
                 pointerEvents: 'none'
               }}
-              src="https://www.youtube.com/embed/W6ACoEMN3-0?autoplay=1&mute=1&controls=0&loop=1&playlist=W6ACoEMN3-0&showinfo=0&rel=0&modestbranding=1"
+              src={youtubeLink}
               title="RIN-COAT Introduction"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -91,6 +161,28 @@ const Index = () => {
               </div>
             </div>
           </div>
+
+          {/* 관리자만 유튜브 링크 수정 UI 노출 */}
+          {isAdmin && (
+            <div className="absolute top-4 right-4 z-20 bg-white bg-opacity-90 p-4 rounded shadow flex flex-col gap-2 max-w-md">
+              <label className="font-semibold text-sm mb-1">유튜브 링크 수정 (embed 주소)</label>
+              <input
+                type="text"
+                className="border px-2 py-1 rounded w-full"
+                value={editLink}
+                onChange={e => setEditLink(e.target.value)}
+                placeholder="유튜브 embed 링크 입력"
+              />
+              <button
+                onClick={handleSaveYoutubeLink}
+                disabled={loading}
+                className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50 mt-1"
+              >
+                {loading ? '저장 중...' : '저장'}
+              </button>
+              {result && <div className="text-xs text-green-700 mt-1">{result}</div>}
+            </div>
+          )}
         </div>
       </section>
 
