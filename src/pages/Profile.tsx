@@ -2,15 +2,18 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
+import { useUserRole } from '@/hooks/useUserRole';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { User, Mail, Building, Phone, Save, Trash2, AlertTriangle } from 'lucide-react';
+import { User, Mail, Building, Phone, Save, Trash2, AlertTriangle, Shield } from 'lucide-react';
 
 const Profile = () => {
   const { user, signOut } = useAuth();
   const { profile, loading, updateProfile } = useProfile();
+  const { role, isAdmin, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -49,6 +52,16 @@ const Profile = () => {
 
   const handleDeleteAccount = async () => {
     try {
+      // 먼저 관련 데이터를 삭제 (프로필은 CASCADE로 자동 삭제됨)
+      if (user) {
+        // 사용자 역할 데이터 삭제
+        await supabase
+          .from('user_roles')
+          .delete()
+          .eq('user_id', user.id);
+      }
+
+      // 계정 로그아웃
       const { error } = await signOut();
       if (error) {
         toast({
@@ -59,7 +72,7 @@ const Profile = () => {
       } else {
         toast({
           title: "계정 탈퇴 완료",
-          description: "계정이 성공적으로 탈퇴되었습니다."
+          description: "계정이 성공적으로 탈퇴되었습니다. Supabase 대시보드에서 사용자를 완전히 삭제해주세요."
         });
         navigate('/');
       }
@@ -77,7 +90,7 @@ const Profile = () => {
     return null;
   }
 
-  if (loading) {
+  if (loading || roleLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
@@ -102,6 +115,13 @@ const Profile = () => {
               </div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">프로필 설정</h1>
               <p className="text-gray-600">회원 정보를 수정하거나 계정을 관리하세요</p>
+              
+              {isAdmin && (
+                <div className="mt-4 inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
+                  <Shield className="w-4 h-4 mr-1" />
+                  관리자 계정
+                </div>
+              )}
             </div>
 
             <div className="space-y-6">
@@ -118,6 +138,20 @@ const Profile = () => {
                   className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-500 cursor-not-allowed"
                 />
                 <p className="text-xs text-gray-500 mt-1">이메일은 변경할 수 없습니다.</p>
+              </div>
+
+              {/* 사용자 역할 (읽기 전용) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <Shield className="w-4 h-4 inline mr-2" />
+                  계정 유형
+                </label>
+                <input
+                  type="text"
+                  value={role === 'admin' ? '관리자' : '일반 사용자'}
+                  readOnly
+                  className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-500 cursor-not-allowed"
+                />
               </div>
 
               {/* 이름 */}
@@ -192,6 +226,11 @@ const Profile = () => {
                 </div>
                 <p className="text-red-700 mb-4">
                   계정을 탈퇴하면 모든 데이터가 영구적으로 삭제되며 복구할 수 없습니다.
+                  {isAdmin && (
+                    <span className="block mt-2 font-medium">
+                      ⚠️ 관리자 계정은 탈퇴 후 Supabase 대시보드에서 완전히 삭제해야 합니다.
+                    </span>
+                  )}
                 </p>
                 
                 {!showDeleteConfirm ? (

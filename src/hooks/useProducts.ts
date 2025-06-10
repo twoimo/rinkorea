@@ -3,40 +3,41 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
-interface Inquiry {
+interface Product {
   id: string;
-  user_id: string | null;
   name: string;
-  email: string;
-  phone: string | null;
-  title: string;
-  content: string;
-  status: string;
-  admin_reply: string | null;
+  description: string | null;
+  price: number | null;
+  image_url: string | null;
+  category: string | null;
+  stock_quantity: number | null;
+  is_active: boolean | null;
   created_at: string;
   updated_at: string;
+  created_by: string | null;
 }
 
-export const useInquiries = () => {
-  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+export const useProducts = () => {
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
   useEffect(() => {
-    fetchInquiries();
-  }, [user]);
+    fetchProducts();
+  }, []);
 
-  const fetchInquiries = async () => {
+  const fetchProducts = async () => {
     try {
       const { data, error } = await supabase
-        .from('inquiries')
+        .from('products')
         .select('*')
+        .eq('is_active', true)
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching inquiries:', error);
+        console.error('Error fetching products:', error);
       } else {
-        setInquiries(data || []);
+        setProducts(data || []);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -45,19 +46,20 @@ export const useInquiries = () => {
     }
   };
 
-  const createInquiry = async (inquiry: {
+  const createProduct = async (product: {
     name: string;
-    email: string;
-    phone?: string;
-    title: string;
-    content: string;
+    description?: string;
+    price?: number;
+    image_url?: string;
+    category?: string;
+    stock_quantity?: number;
   }) => {
     try {
       const { data, error } = await supabase
-        .from('inquiries')
+        .from('products')
         .insert({
-          ...inquiry,
-          user_id: user?.id || null
+          ...product,
+          created_by: user?.id
         })
         .select()
         .single();
@@ -66,20 +68,17 @@ export const useInquiries = () => {
         return { error };
       }
 
-      setInquiries(prev => [data, ...prev]);
+      setProducts(prev => [data, ...prev]);
       return { data };
     } catch (error) {
       return { error };
     }
   };
 
-  const updateInquiry = async (id: string, updates: {
-    status?: string;
-    admin_reply?: string;
-  }) => {
+  const updateProduct = async (id: string, updates: Partial<Product>) => {
     try {
       const { data, error } = await supabase
-        .from('inquiries')
+        .from('products')
         .update({
           ...updates,
           updated_at: new Date().toISOString()
@@ -92,8 +91,8 @@ export const useInquiries = () => {
         return { error };
       }
 
-      setInquiries(prev => prev.map(inquiry => 
-        inquiry.id === id ? data : inquiry
+      setProducts(prev => prev.map(product => 
+        product.id === id ? data : product
       ));
       return { data };
     } catch (error) {
@@ -101,18 +100,18 @@ export const useInquiries = () => {
     }
   };
 
-  const deleteInquiry = async (id: string) => {
+  const deleteProduct = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('inquiries')
-        .delete()
+        .from('products')
+        .update({ is_active: false })
         .eq('id', id);
 
       if (error) {
         return { error };
       }
 
-      setInquiries(prev => prev.filter(inquiry => inquiry.id !== id));
+      setProducts(prev => prev.filter(product => product.id !== id));
       return { success: true };
     } catch (error) {
       return { error };
@@ -120,11 +119,11 @@ export const useInquiries = () => {
   };
 
   return {
-    inquiries,
+    products,
     loading,
-    createInquiry,
-    updateInquiry,
-    deleteInquiry,
-    refetch: fetchInquiries
+    createProduct,
+    updateProduct,
+    deleteProduct,
+    refetch: fetchProducts
   };
 };

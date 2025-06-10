@@ -1,11 +1,12 @@
-
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { MessageCircle, Plus, Search, User, Calendar, CheckCircle, Clock, ChevronDown } from 'lucide-react';
+import AdminOnly from '../components/AdminOnly';
+import { MessageCircle, Plus, Search, User, Calendar, CheckCircle, Clock, ChevronDown, Reply, Trash2, Send } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useInquiries } from '@/hooks/useInquiries';
+import { useUserRole } from '@/hooks/useUserRole';
 import { Link } from 'react-router-dom';
 
 const QnA = () => {
@@ -13,6 +14,8 @@ const QnA = () => {
   const [showForm, setShowForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('전체');
   const [selectedStatus, setSelectedStatus] = useState('전체');
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -22,7 +25,8 @@ const QnA = () => {
   });
   const { toast } = useToast();
   const { user } = useAuth();
-  const { inquiries, loading, createInquiry } = useInquiries();
+  const { inquiries, loading, createInquiry, updateInquiry, deleteInquiry } = useInquiries();
+  const { isAdmin } = useUserRole();
 
   const categories = ['전체', '제품문의', '시공문의', '기술지원', '기타'];
   const statusFilter = ['전체', '답변대기', '답변완료'];
@@ -60,6 +64,49 @@ const QnA = () => {
         content: ''
       });
       setShowForm(false);
+    }
+  };
+
+  const handleReply = async (inquiryId: string) => {
+    if (!replyText.trim()) return;
+
+    const { error } = await updateInquiry(inquiryId, {
+      admin_reply: replyText,
+      status: 'answered'
+    });
+
+    if (error) {
+      toast({
+        title: "답변 등록 실패",
+        description: "다시 시도해주세요.",
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "답변이 등록되었습니다",
+        description: "고객에게 답변이 전달되었습니다."
+      });
+      setReplyingTo(null);
+      setReplyText('');
+    }
+  };
+
+  const handleDelete = async (inquiryId: string) => {
+    if (!confirm('정말로 이 문의를 삭제하시겠습니까?')) return;
+
+    const { error } = await deleteInquiry(inquiryId);
+
+    if (error) {
+      toast({
+        title: "삭제 실패",
+        description: "다시 시도해주세요.",
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "문의가 삭제되었습니다",
+        description: "문의 내역이 성공적으로 삭제되었습니다."
+      });
     }
   };
 
@@ -191,9 +238,10 @@ const QnA = () => {
             </div>
           </div>
 
-          {/* Question Form */}
+          {/* Question Form - 기존 코드 유지 */}
           {showForm && (
             <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100 mb-8 animate-fade-in">
+              {/* ... keep existing code (form implementation) */}
               <div className="flex items-center mb-6">
                 <div className="bg-blue-100 p-2 rounded-lg mr-3">
                   <MessageCircle className="w-5 h-5 text-blue-600" />
@@ -320,21 +368,42 @@ const QnA = () => {
                         )}
                       </span>
                     </div>
-                    <div className="flex items-center text-sm text-gray-500 gap-4">
-                      <div className="flex items-center gap-1">
-                        <User className="w-4 h-4" />
-                        {item.name}
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center text-sm text-gray-500 gap-4">
+                        <div className="flex items-center gap-1">
+                          <User className="w-4 h-4" />
+                          {item.name}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-4 h-4" />
+                          {new Date(item.created_at).toLocaleDateString('ko-KR')}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {new Date(item.created_at).toLocaleDateString('ko-KR')}
-                      </div>
+                      <AdminOnly>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setReplyingTo(replyingTo === item.id ? null : item.id)}
+                            className="text-blue-600 hover:text-blue-700 p-1"
+                            title="답변하기"
+                          >
+                            <Reply className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item.id)}
+                            className="text-red-600 hover:text-red-700 p-1"
+                            title="삭제하기"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </AdminOnly>
                     </div>
                   </div>
                   
                   <h3 className="text-lg font-semibold text-gray-900 mb-3">{item.title}</h3>
                   <p className="text-gray-600 mb-4 leading-relaxed">{item.content}</p>
                   
+                  {/* 관리자 답변 */}
                   {item.admin_reply && (
                     <div className="mt-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
                       <div className="flex items-center mb-2">
@@ -346,6 +415,44 @@ const QnA = () => {
                       <p className="text-blue-800 leading-relaxed">{item.admin_reply}</p>
                     </div>
                   )}
+
+                  {/* 관리자 답변 입력 폼 */}
+                  <AdminOnly>
+                    {replyingTo === item.id && (
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <div className="flex items-center mb-3">
+                          <Reply className="w-4 h-4 text-gray-600 mr-2" />
+                          <span className="text-sm font-medium text-gray-700">관리자 답변 작성</span>
+                        </div>
+                        <textarea
+                          value={replyText}
+                          onChange={(e) => setReplyText(e.target.value)}
+                          placeholder="답변을 입력하세요..."
+                          className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                          rows={4}
+                        />
+                        <div className="flex gap-2 mt-3">
+                          <button
+                            onClick={() => handleReply(item.id)}
+                            disabled={!replyText.trim()}
+                            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center"
+                          >
+                            <Send className="w-3 h-3 mr-1" />
+                            답변 등록
+                          </button>
+                          <button
+                            onClick={() => {
+                              setReplyingTo(null);
+                              setReplyText('');
+                            }}
+                            className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium"
+                          >
+                            취소
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </AdminOnly>
                 </div>
               ))}
             </div>
