@@ -166,6 +166,12 @@ const QnA = () => {
     setReplyText('');
   };
 
+  // 이름 모자이크 처리 함수 추가
+  const maskName = (name: string) => {
+    if (!name || isAdmin) return name;
+    return name.charAt(0) + '*'.repeat(name.length - 1);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
@@ -410,7 +416,8 @@ const QnA = () => {
                 const canShowContent = canView && !!user;
                 return (
                   <div key={item.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
-                    <div className="mb-2">
+                    <div className="flex items-center justify-between mb-4">
+                      {/* 상태 뱃지 */}
                       <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${item.status === 'answered'
                         ? 'bg-green-100 text-green-800'
                         : 'bg-yellow-100 text-yellow-800'
@@ -425,19 +432,25 @@ const QnA = () => {
                           </>
                         )}
                       </span>
-                    </div>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1" />
+
+                      {/* 사용자 정보 */}
                       <div className="flex items-center gap-4">
                         <div className="flex items-center text-sm text-gray-500 gap-3">
                           <div className="flex items-center gap-1">
                             <User className="w-4 h-4" />
-                            {item.name}
+                            {maskName(item.name)}
                           </div>
-                          {isAdmin && item.phone && (
-                            <div className="flex items-center gap-1">
-                              <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">{item.phone}</span>
-                            </div>
+                          {isAdmin && (
+                            <>
+                              <div className="flex items-center gap-1">
+                                <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">{item.email}</span>
+                              </div>
+                              {item.phone && (
+                                <div className="flex items-center gap-1">
+                                  <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">{item.phone}</span>
+                                </div>
+                              )}
+                            </>
                           )}
                           <div className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
