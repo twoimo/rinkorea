@@ -163,28 +163,28 @@ const Index = () => {
 
           {/* 관리자만 유튜브 링크 수정 UI 노출 */}
           {isAdmin && (
-            <div className="absolute top-4 right-4 z-20 bg-white bg-opacity-50 p-6 rounded-xl shadow-xl flex flex-col gap-3 max-w-md border border-blue-200 w-full sm:w-auto">
-              <div className="mb-1 font-bold text-blue-700 flex items-center gap-2">
+            <div className="absolute top-4 right-4 z-20 bg-white bg-opacity-50 backdrop-blur-md p-6 rounded-xl shadow-xl flex flex-col gap-3 max-w-md border border-blue-200 w-full sm:w-auto">
+              <div className="mb-1 font-bold text-blue-900 flex items-center gap-2 drop-shadow">
                 <Loader2 className="w-5 h-5 animate-spin" style={{ display: loading ? 'inline' : 'none' }} />
                 메인 유튜브 영상 링크 수정
               </div>
-              <p className="text-xs text-gray-600 mb-1">유튜브 영상 주소를 붙여넣으면 자동으로 embed 주소로 변환됩니다.<br />예: <span className="font-mono">https://www.youtube.com/watch?v=xxxx</span> 또는 <span className="font-mono">https://youtu.be/xxxx</span></p>
+              <p className="text-xs text-gray-800 mb-1 drop-shadow">유튜브 영상 주소를 붙여넣으면 자동으로 embed 주소로 변환됩니다.<br />예: <span className="font-mono">https://www.youtube.com/watch?v=xxxx</span> 또는 <span className="font-mono">https://youtu.be/xxxx</span></p>
               <input
                 type="text"
-                className="border px-2 py-2 rounded w-full text-sm focus:ring-2 focus:ring-blue-400"
+                className="border px-2 py-2 rounded w-full text-sm focus:ring-2 focus:ring-blue-400 bg-white bg-opacity-90 drop-shadow"
                 value={editLink}
                 onChange={e => setEditLink(e.target.value)}
                 placeholder="유튜브 영상 주소 입력"
                 disabled={loading}
               />
-              <div className="text-xs text-gray-500 mt-1 mb-2">
+              <div className="text-xs text-blue-800 mt-1 mb-2 font-mono break-all drop-shadow">
                 변환된 embed 주소:<br />
-                <span className="font-mono break-all text-blue-700">{embedPreview}</span>
+                <span>{embedPreview}</span>
               </div>
               <button
                 onClick={handleSaveYoutubeLink}
                 disabled={loading || !editLink}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded disabled:opacity-50 transition-colors font-semibold"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded disabled:opacity-50 transition-colors font-semibold drop-shadow"
               >
                 {loading ? (<span className="flex items-center gap-2 justify-center"><Loader2 className="w-4 h-4 animate-spin" /> 저장 중...</span>) : '저장'}
               </button>
@@ -194,8 +194,6 @@ const Index = () => {
                   {result.replace(/^\w+:/, '')}
                 </div>
               )}
-              <hr className="my-2 border-blue-100" />
-              <div className="text-[11px] text-gray-400">관리자에게만 보입니다</div>
             </div>
           )}
         </div>
