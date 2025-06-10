@@ -18,6 +18,7 @@ import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import Shop from "./pages/Shop";
 import Profile from "./pages/Profile";
+import AdminDangerZone from "./pages/AdminDangerZone";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -70,6 +71,7 @@ const App = () => (
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/admin/danger" element={<AdminDangerZone />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
