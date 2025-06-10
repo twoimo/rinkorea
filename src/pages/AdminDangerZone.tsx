@@ -75,6 +75,28 @@ const AdminDangerZone = () => {
         setLoading(false);
     };
 
+    // 모든 문의글 비밀글 처리
+    const handleMakeAllPrivate = async () => {
+        if (confirmQnA !== 'private') return setResult('"private"를 입력해야 비밀글 처리가 됩니다.');
+        setLoading(true);
+        setResult('');
+        try {
+            const { error } = await supabase
+                .from('inquiries')
+                .update({ is_private: true })
+                .eq('is_private', false);
+
+            if (error) {
+                setResult('오류: ' + error.message);
+            } else {
+                setResult('모든 문의글이 비밀글 처리되었습니다.');
+            }
+        } catch (e) {
+            setResult('오류: ' + (e.message || e));
+        }
+        setLoading(false);
+    };
+
     // 공지사항 초기화
     const handleResetNews = async () => {
         if (confirmNews !== 'news') return setResult('"news"를 입력해야 삭제됩니다.');
@@ -191,6 +213,13 @@ const AdminDangerZone = () => {
             <div className="container mx-auto px-4 py-20 max-w-2xl">
                 <h1 className="text-2xl font-bold mb-8 text-red-700">관리자 위험구역 (Danger Zone)</h1>
                 <div className="space-y-8">
+                    {/* 고객상담 비밀글 처리 */}
+                    <div className="bg-white p-6 rounded shadow border border-yellow-200">
+                        <h2 className="text-lg font-bold text-yellow-700 mb-2">고객상담 게시판 비밀글 처리</h2>
+                        <p className="mb-2 text-sm text-gray-700">모든 공개 문의글을 비밀글로 변경합니다.</p>
+                        <input type="text" className="border px-2 py-1 rounded mr-2" placeholder='"private" 입력' value={confirmQnA} onChange={e => setConfirmQnA(e.target.value)} />
+                        <button onClick={() => openModal('정말로 모든 문의글을 비밀글 처리하시겠습니까?', handleMakeAllPrivate)} disabled={loading} className="bg-yellow-600 text-white px-4 py-2 rounded disabled:opacity-50">비밀글 처리</button>
+                    </div>
                     {/* 고객상담 초기화 */}
                     <div className="bg-white p-6 rounded shadow border border-red-200">
                         <h2 className="text-lg font-bold text-red-700 mb-2">고객상담 게시판 초기화</h2>
@@ -225,8 +254,13 @@ const AdminDangerZone = () => {
                                 <span className="text-xs text-red-600 font-bold">{backupWarning}</span>
                             )}
                             <label className="block mt-4 text-sm font-medium text-gray-700">백업 파일 가져오기(복원)</label>
-                            <input ref={fileInputRef} type="file" accept="application/json" onChange={handleImport} disabled={importing} className="block" />
-                            {importing && <span className="text-xs text-blue-600">복원 중입니다...</span>}
+                            <div className="flex flex-col gap-2">
+                                <label className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700 transition-colors text-center disabled:opacity-50">
+                                    파일 선택
+                                    <input ref={fileInputRef} type="file" accept="application/json" onChange={handleImport} disabled={importing} className="hidden" />
+                                </label>
+                                {importing && <span className="text-xs text-blue-600">복원 중입니다...</span>}
+                            </div>
                         </div>
                     </div>
                     {/* 결과 안내 */}
