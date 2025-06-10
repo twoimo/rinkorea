@@ -39,7 +39,7 @@ const Index = () => {
                 height: '56.25vw', // 16:9 비율
                 minHeight: '100vh',
                 minWidth: '177.78vh', // 16/9 * 100vh
-                transform: 'translate(-50%, -45%) scale(1.0)',
+                transform: 'translate(-50%, -50%) scale(1.11)',
                 objectFit: 'cover',
                 pointerEvents: 'none'
               }}
@@ -95,7 +95,7 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20">
+      <section className="py-20 bg-gradient-to-b from-gray-50 via-white to-blue-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
@@ -105,15 +105,19 @@ const Index = () => {
               최고 품질의 세라믹 코팅제로 안전하고 친환경적인 건설환경을 만들어갑니다
             </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {features.map((feature, index) => (
-              <div key={index} className="bg-white p-8 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow">
-                <div className="flex justify-center mb-4">
-                  {feature.icon}
+              <div
+                key={index}
+                className="bg-white p-10 rounded-2xl shadow-xl border border-gray-100 text-center hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group"
+              >
+                <div className="flex justify-center mb-6">
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-300 group-hover:scale-110 transition-transform shadow-lg">
+                    {feature.icon}
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-blue-700 transition-colors">{feature.title}</h3>
+                <p className="text-gray-600 text-lg leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -121,44 +125,47 @@ const Index = () => {
       </section>
 
       {/* Company Overview */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">
+              <h2 className="text-4xl font-bold text-gray-900 mb-8">
                 신뢰할 수 있는 파트너
               </h2>
-              <p className="text-lg text-gray-600 mb-6">
+              <p className="text-lg text-gray-600 mb-8">
                 린코리아는 건설재료사업부와 2024년 신설된 건설기계사업부를 통해
                 종합적인 건설 솔루션을 제공합니다.
               </p>
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mr-3"></div>
+              <div className="space-y-5 mb-8">
+                <div className="flex items-center bg-blue-50 rounded-lg p-4 shadow-sm">
+                  <span className="w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded-full mr-4 font-bold">1</span>
                   <span className="text-gray-700">인천광역시 서구 백범로 707 (주안국가산업단지)</span>
                 </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mr-3"></div>
+                <div className="flex items-center bg-blue-50 rounded-lg p-4 shadow-sm">
+                  <span className="w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded-full mr-4 font-bold">2</span>
                   <span className="text-gray-700">사업자등록번호: 747-42-00526</span>
                 </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mr-3"></div>
+                <div className="flex items-center bg-blue-50 rounded-lg p-4 shadow-sm">
+                  <span className="w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded-full mr-4 font-bold">3</span>
                   <span className="text-gray-700">건설재료사업부 / 건설기계사업부</span>
                 </div>
               </div>
               <Link
                 to="/about"
-                className="inline-block mt-8 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                className="inline-block mt-4 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 회사소개 자세히 보기
               </Link>
             </div>
-            <div>
-              <img
-                src="https://rinkorea.com/wp-content/uploads/2022/04/1-메인-18.jpg"
-                alt="린코리아 제품"
-                className="rounded-lg shadow-lg w-full"
-              />
+            <div className="flex justify-center items-center">
+              <div className="relative w-full max-w-lg aspect-video rounded-2xl overflow-hidden shadow-2xl border-4 border-blue-100">
+                <img
+                  src="https://rinkorea.com/wp-content/uploads/2022/04/1-메인-18.jpg"
+                  alt="린코리아 제품"
+                  className="w-full h-full object-cover rounded-2xl"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/10 to-transparent"></div>
+              </div>
             </div>
           </div>
         </div>
