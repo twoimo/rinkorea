@@ -9,7 +9,7 @@ const Footer = () => {
           {/* Company Info */}
           <div>
             <img
-              src="https://rinkorea.com/wp-content/uploads/2021/11/린코리아-홈페이지-로고-블랙.png"
+              src="/images/린코리아-홈페이지-로고-블랙.png"
               alt="린코리아 로고"
               className="h-10 w-auto mb-4 filter invert"
             />
@@ -44,7 +44,7 @@ const Footer = () => {
                 className="hover:opacity-75 transition-opacity"
               >
                 <img
-                  src="https://rinkorea.com/wp-content/uploads/2021/11/instagram.png"
+                  src="/images/instagram.png"
                   alt="Instagram"
                   className="w-8 h-8"
                 />
@@ -56,7 +56,7 @@ const Footer = () => {
                 className="hover:opacity-75 transition-opacity"
               >
                 <img
-                  src="https://rinkorea.com/wp-content/uploads/2021/11/블로그-로고-고화질.png"
+                  src="/images/블로그-로고-고화질.png"
                   alt="Naver Blog"
                   className="w-8 h-8"
                 />

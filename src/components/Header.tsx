@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, LogOut, Settings } from 'lucide-react';
@@ -48,9 +47,9 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center">
-            <img 
-              src="https://rinkorea.com/wp-content/uploads/2021/11/린코리아-홈페이지-로고-블랙.png" 
-              alt="린코리아 로고" 
+            <img
+              src="/images/린코리아-홈페이지-로고-블랙.png"
+              alt="린코리아 로고"
               className="h-10 w-auto"
             />
           </Link>
@@ -61,11 +60,10 @@ const Header = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`text-sm font-medium transition-colors hover:text-blue-900 ${
-                  location.pathname === item.path 
-                    ? 'text-blue-900 border-b-2 border-blue-900' 
-                    : 'text-gray-700'
-                }`}
+                className={`text-sm font-medium transition-colors hover:text-blue-900 ${location.pathname === item.path
+                  ? 'text-blue-900 border-b-2 border-blue-900'
+                  : 'text-gray-700'
+                  }`}
               >
                 {item.name}
               </Link>
@@ -83,7 +81,7 @@ const Header = () => {
                   <User className="w-5 h-5" />
                   <span>메뉴</span>
                 </button>
-                
+
                 {isUserMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                     <div className="px-4 py-2 border-b border-gray-100">
@@ -133,9 +131,8 @@ const Header = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`block py-3 px-2 text-sm font-medium transition-colors hover:text-blue-900 hover:bg-gray-50 rounded ${
-                  location.pathname === item.path ? 'text-blue-900 bg-blue-50' : 'text-gray-700'
-                }`}
+                className={`block py-3 px-2 text-sm font-medium transition-colors hover:text-blue-900 hover:bg-gray-50 rounded ${location.pathname === item.path ? 'text-blue-900 bg-blue-50' : 'text-gray-700'
+                  }`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.name}
@@ -182,7 +179,7 @@ const Header = () => {
 
       {/* Backdrop for user menu */}
       {isUserMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-25 z-40 lg:hidden"
           onClick={() => setIsUserMenuOpen(false)}
         />

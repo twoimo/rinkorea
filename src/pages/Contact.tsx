@@ -73,7 +73,7 @@ const Contact = () => {
                   className="flex items-center justify-center w-12 h-12 bg-pink-100 hover:bg-pink-200 rounded-lg transition-colors"
                 >
                   <img
-                    src="https://rinkorea.com/wp-content/uploads/2021/11/instagram.png"
+                    src="/images/instagram.png"
                     alt="Instagram"
                     className="w-6 h-6"
                   />
@@ -85,7 +85,7 @@ const Contact = () => {
                   className="flex items-center justify-center w-12 h-12 bg-green-100 hover:bg-green-200 rounded-lg transition-colors"
                 >
                   <img
-                    src="https://rinkorea.com/wp-content/uploads/2021/11/naver.png"
+                    src="/images/naver.png"
                     alt="Naver Blog"
                     className="w-6 h-6"
                   />
