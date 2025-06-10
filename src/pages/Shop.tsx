@@ -346,182 +346,186 @@ const Shop = () => {
     <div className="min-h-screen bg-gray-50">
       <Header />
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <h1 className="text-5xl font-bold mb-6">온라인 스토어</h1>
-            <p className="text-xl max-w-2xl mx-auto">
-              린코리아의 최고 품질 제품을 만나보세요. <br />
-              안전하고 친환경적인 건설재료를 온라인에서 편리하게 구매하세요.
-            </p>
-            {isAdmin && (
-              <button
-                className="mt-8 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 mx-auto"
-                onClick={() => openForm()}
-              >
-                <Plus className="w-5 h-5" /> 상품 추가
-              </button>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Products Grid */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex flex-wrap gap-2">
-              {sortOptions.map(opt => (
+      <main>
+        {/* Hero Section */}
+        <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
+          <div className="container mx-auto px-4">
+            <div className="text-center">
+              <h1 className="text-5xl font-bold mb-6">온라인 스토어</h1>
+              <p className="text-xl max-w-2xl mx-auto">
+                안전하고 친환경적인 건설재료를 온라인에서 편리하게 구매하세요.
+              </p>
+              {isAdmin && (
                 <button
-                  key={opt.value}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${sortBy === opt.value ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'}`}
-                  onClick={() => handleSort(opt.value)}
+                  className="mt-8 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 mx-auto"
+                  onClick={() => openForm()}
+                  aria-label="상품 추가"
                 >
-                  {opt.label}
+                  <Plus className="w-5 h-5" /> 상품 추가
                 </button>
-              ))}
+              )}
             </div>
-            {isAdmin && (
-              <div className="flex items-center gap-2 ml-auto">
-                <label className="text-sm font-medium text-gray-700">그리드:</label>
-                <select
-                  className="border rounded px-2 py-1 text-sm"
-                  value={pendingGridCols}
-                  onChange={e => setPendingGridCols(Number(e.target.value))}
-                  disabled={gridLoading}
-                >
-                  {gridOptions.map(opt => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-                <button
-                  className="px-3 py-1 rounded bg-blue-600 text-white text-xs font-semibold disabled:opacity-50"
-                  onClick={handleGridApply}
-                  disabled={gridLoading || pendingGridCols === gridCols}
-                >
-                  {gridLoading ? '적용 중...' : '적용'}
-                </button>
-                {gridLoading && <span className="ml-2 text-xs text-blue-600">저장 중...</span>}
-              </div>
-            )}
           </div>
-
-          <div className={`grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-${gridCols} lg:grid-cols-${gridCols}`}>
-            {(isAdmin ? getVisibleProducts() : getVisibleProducts()).map((product) => {
-              const isSoldOut = !product.stock_quantity || product.stock_quantity <= 0;
-              const isHidden = hiddenProductIds.includes(product.id);
-              return (
-                <div key={product.id} className="bg-white rounded-xl shadow-lg p-6 flex flex-col group relative">
-                  {/* 뱃지 영역 */}
-                  <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
-                    {product.discount && (
-                      <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow">-{product.discount}%</span>
-                    )}
-                    {product.is_best && (
-                      <span className="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow">BEST</span>
-                    )}
-                    {product.is_new && (
-                      <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow">NEW</span>
-                    )}
-                  </div>
-                  <div className="relative aspect-square w-full overflow-hidden">
-                    <img
-                      src={product.image_url}
-                      alt={product.name}
-                      className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-
-                  <div className="p-6 flex flex-col flex-grow">
-                    <div className="mb-3">
-                      <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                        {product.name}
-                      </h3>
-                      <p className="text-gray-600 text-sm line-clamp-2 mb-3">
-                        {product.description}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-2">
-                        <div className="flex items-center">
-                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                          <span className="ml-1 text-sm font-medium text-gray-900">{product.rating}</span>
-                        </div>
-                        <span className="text-gray-300">|</span>
-                        <span className="text-sm text-gray-600">{product.reviews} 리뷰</span>
-                      </div>
-                      {product.stock_quantity && (
-                        <span className="text-sm font-medium text-green-600">
-                          재고: {product.stock_quantity}개
-                        </span>
+        </section>
+        {/* Products Grid */}
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex flex-wrap gap-2">
+                {sortOptions.map(opt => (
+                  <button
+                    key={opt.value}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${sortBy === opt.value ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'}`}
+                    onClick={() => handleSort(opt.value)}
+                    aria-label={opt.label}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              {isAdmin && (
+                <div className="flex items-center gap-2 ml-auto">
+                  <label className="text-sm font-medium text-gray-700">그리드:</label>
+                  <select
+                    className="border rounded px-2 py-1 text-sm"
+                    value={pendingGridCols}
+                    onChange={e => setPendingGridCols(Number(e.target.value))}
+                    disabled={gridLoading}
+                    aria-label="그리드 설정"
+                  >
+                    {gridOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                  <button
+                    className="px-3 py-1 rounded bg-blue-600 text-white text-xs font-semibold disabled:opacity-50"
+                    onClick={handleGridApply}
+                    disabled={gridLoading || pendingGridCols === gridCols}
+                    aria-label="그리드 적용"
+                  >
+                    {gridLoading ? '적용 중...' : '적용'}
+                  </button>
+                  {gridLoading && <span className="ml-2 text-xs text-blue-600">저장 중...</span>}
+                </div>
+              )}
+            </div>
+            <div className={`grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-${gridCols} lg:grid-cols-${gridCols}`}>
+              {(isAdmin ? getVisibleProducts() : getVisibleProducts()).map((product) => {
+                const isSoldOut = !product.stock_quantity || product.stock_quantity <= 0;
+                const isHidden = hiddenProductIds.includes(product.id);
+                return (
+                  <div key={product.id} className="bg-white rounded-xl shadow-lg p-6 flex flex-col group relative">
+                    {/* 뱃지 영역 */}
+                    <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+                      {product.discount && (
+                        <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow">-{product.discount}%</span>
+                      )}
+                      {product.is_best && (
+                        <span className="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow">BEST</span>
+                      )}
+                      {product.is_new && (
+                        <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow">NEW</span>
                       )}
                     </div>
-
-                    <div className="flex items-center justify-between mt-auto">
-                      <div className="flex flex-col">
-                        {product.original_price && (
-                          <del className="text-sm text-gray-400">
-                            {formatPrice(product.original_price)}원
-                          </del>
-                        )}
-                        <span className="text-xl font-bold text-blue-600">
-                          {formatPrice(product.price)}원
-                        </span>
+                    <div className="relative aspect-square w-full overflow-hidden">
+                      <img
+                        src={product.image_url}
+                        alt={product.name}
+                        className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="p-6 flex flex-col flex-grow">
+                      <div className="mb-3">
+                        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                          {product.name}
+                        </h3>
+                        <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+                          {product.description}
+                        </p>
                       </div>
-                      <button
-                        onClick={() => handleProductClick(product.naver_url || '')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 hover:scale-105 ${isSoldOut ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
-                        disabled={isSoldOut}
-                      >
-                        {isSoldOut ? (
-                          <>품절</>
-                        ) : (
-                          <>
-                            제품 구매하기
-                            <ShoppingCart className="w-4 h-4 ml-1" />
-                          </>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-2">
+                          <div className="flex items-center">
+                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                            <span className="ml-1 text-sm font-medium text-gray-900">{product.rating}</span>
+                          </div>
+                          <span className="text-gray-300">|</span>
+                          <span className="text-sm text-gray-600">{product.reviews} 리뷰</span>
+                        </div>
+                        {product.stock_quantity && (
+                          <span className="text-sm font-medium text-green-600">
+                            재고: {product.stock_quantity}개
+                          </span>
                         )}
-                      </button>
+                      </div>
+                      <div className="flex items-center justify-between mt-auto">
+                        <div className="flex flex-col">
+                          {product.original_price && (
+                            <del className="text-sm text-gray-400">
+                              {formatPrice(product.original_price)}원
+                            </del>
+                          )}
+                          <span className="text-xl font-bold text-blue-600">
+                            {formatPrice(product.price)}원
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => handleProductClick(product.naver_url || '')}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 hover:scale-105 ${isSoldOut ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+                          disabled={isSoldOut}
+                          aria-label={isSoldOut ? '품절' : '제품 구매하기'}
+                        >
+                          {isSoldOut ? (
+                            <>품절</>
+                          ) : (
+                            <>
+                              제품 구매하기
+                              <ShoppingCart className="w-4 h-4 ml-1" />
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
+                    {/* 관리자만 수정/삭제/숨기기 버튼 노출 */}
+                    {isAdmin && (
+                      <div className="absolute top-3 right-3 flex gap-2 z-10">
+                        <button
+                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          onClick={() => handleToggleHide(product)}
+                          title={isHidden ? '노출 해제' : '숨기기'}
+                          disabled={formLoading}
+                          aria-label={isHidden ? '노출 해제' : '숨기기'}
+                        >
+                          {isHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                        </button>
+                        <button
+                          className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow"
+                          onClick={() => openForm(product)}
+                          title="수정"
+                          disabled={formLoading}
+                          aria-label="수정"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-2 shadow"
+                          onClick={() => openDeleteConfirm(product)}
+                          title="삭제"
+                          disabled={formLoading}
+                          aria-label="삭제"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
-
-                  {/* 관리자만 수정/삭제/숨기기 버튼 노출 */}
-                  {isAdmin && (
-                    <div className="absolute top-3 right-3 flex gap-2 z-10">
-                      <button
-                        className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        onClick={() => handleToggleHide(product)}
-                        title={isHidden ? '노출 해제' : '숨기기'}
-                        disabled={formLoading}
-                      >
-                        {isHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                      </button>
-                      <button
-                        className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow"
-                        onClick={() => openForm(product)}
-                        title="수정"
-                        disabled={formLoading}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-2 shadow"
-                        onClick={() => openDeleteConfirm(product)}
-                        title="삭제"
-                        disabled={formLoading}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
 
       {/* 상품 추가/수정 모달 폼 */}
       {showForm && (

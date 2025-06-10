@@ -193,200 +193,114 @@ const Profile = () => {
     <div className="min-h-screen bg-gray-50">
       <Header />
 
-      <div className="container mx-auto px-4 py-20">
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-                <User className="w-8 h-8 text-blue-600" />
+      <main>
+        <section className="container mx-auto px-4 py-20">
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-lg shadow-lg p-8">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+                  <User className="w-10 h-10 text-blue-600" aria-hidden="true" />
+                </div>
+                <h2 className="text-3xl font-bold mb-2">내 프로필</h2>
+                <p className="text-gray-500">회원정보를 확인하고 수정할 수 있습니다.</p>
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">프로필 설정</h1>
-              <p className="text-gray-600">회원 정보를 수정하거나 계정을 관리하세요</p>
-
-              {isAdmin && (
-                <div className="mt-4 inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
-                  <Shield className="w-4 h-4 mr-1" />
-                  관리자 계정
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-6">
               <form onSubmit={handleSaveAll} className="space-y-6">
-                {/* 이메일 (읽기 전용) */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Mail className="w-4 h-4 inline mr-2" />
-                    이메일
-                  </label>
+                  <label className="block text-sm font-medium mb-1" htmlFor="name">이름</label>
                   <input
-                    type="email"
-                    value={user.email || ''}
-                    readOnly
-                    className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-500 cursor-not-allowed"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">이메일은 변경할 수 없습니다.</p>
-                </div>
-                {/* 사용자 역할 (읽기 전용) */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Shield className="w-4 h-4 inline mr-2" />
-                    계정 유형
-                  </label>
-                  <input
+                    id="name"
                     type="text"
-                    value={role === 'admin' ? '관리자' : '일반 사용자'}
-                    readOnly
-                    className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-500 cursor-not-allowed"
-                  />
-                </div>
-                {/* 이름 */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <User className="w-4 h-4 inline mr-2" />
-                    이름
-                  </label>
-                  <input
-                    type="text"
+                    className="w-full border px-3 py-2 rounded"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="이름을 입력하세요"
+                    onChange={e => setName(e.target.value)}
+                    autoComplete="name"
+                    aria-label="이름"
                   />
                 </div>
-                {/* 회사명 */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Building className="w-4 h-4 inline mr-2" />
-                    회사명
-                  </label>
+                  <label className="block text-sm font-medium mb-1" htmlFor="company">회사명</label>
                   <input
+                    id="company"
                     type="text"
+                    className="w-full border px-3 py-2 rounded"
                     value={company}
-                    onChange={(e) => setCompany(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="회사명을 입력하세요"
+                    onChange={e => setCompany(e.target.value)}
+                    autoComplete="organization"
+                    aria-label="회사명"
                   />
                 </div>
-                {/* 전화번호 */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Phone className="w-4 h-4 inline mr-2" />
-                    전화번호
-                  </label>
+                  <label className="block text-sm font-medium mb-1" htmlFor="phone">연락처</label>
                   <input
-                    type="tel"
+                    id="phone"
+                    type="text"
+                    className="w-full border px-3 py-2 rounded"
                     value={phone}
                     onChange={handlePhoneChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${phoneError ? 'border-red-500' : 'border-gray-300'}`}
-                    placeholder="전화번호를 입력하세요"
+                    autoComplete="tel"
+                    aria-label="연락처"
                   />
-                  {phoneError && <p className="text-xs text-red-500 mt-1">{phoneError}</p>}
+                  {phoneError && <div className="text-xs text-red-600 mt-1">{phoneError}</div>}
                 </div>
-                {/* 비밀번호 변경 */}
-                <div className="border-t pt-8 mt-8">
-                  <h2 className="text-lg font-bold mb-4 flex items-center"><span className="mr-2">비밀번호 변경</span></h2>
-                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded mb-6 text-yellow-800 text-sm">
-                    <strong>비밀번호 찾기 기능이 없습니다.</strong><br />
-                    비밀번호를 변경하실 때는 반드시 기억해 주세요. 분실 시 복구가 불가능합니다.
+                <div className="border-t pt-6 mt-6">
+                  <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-blue-600" aria-hidden="true" /> 비밀번호 변경
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <input
+                      type="password"
+                      className="border px-3 py-2 rounded"
+                      value={currentPassword}
+                      onChange={e => setCurrentPassword(e.target.value)}
+                      placeholder="현재 비밀번호"
+                      autoComplete="current-password"
+                      aria-label="현재 비밀번호"
+                    />
+                    <input
+                      type="password"
+                      className="border px-3 py-2 rounded"
+                      value={newPassword}
+                      onChange={e => setNewPassword(e.target.value)}
+                      placeholder="새 비밀번호"
+                      autoComplete="new-password"
+                      aria-label="새 비밀번호"
+                    />
+                    <input
+                      type="password"
+                      className="border px-3 py-2 rounded"
+                      value={confirmPassword}
+                      onChange={e => setConfirmPassword(e.target.value)}
+                      placeholder="새 비밀번호 확인"
+                      autoComplete="new-password"
+                      aria-label="새 비밀번호 확인"
+                    />
                   </div>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">현재 비밀번호</label>
-                      <input
-                        type="password"
-                        value={currentPassword}
-                        onChange={e => setCurrentPassword(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="현재 비밀번호 입력"
-                        autoComplete="current-password"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">새 비밀번호</label>
-                      <input
-                        type="password"
-                        value={newPassword}
-                        onChange={e => setNewPassword(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="새 비밀번호 입력 (8자 이상)"
-                        autoComplete="new-password"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">새 비밀번호 확인</label>
-                      <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={e => setConfirmPassword(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="새 비밀번호 재입력"
-                        autoComplete="new-password"
-                      />
-                    </div>
-                    {passwordError && <p className="text-xs text-red-500">{passwordError}</p>}
-                    {passwordSuccess && <p className="text-xs text-green-600">{passwordSuccess}</p>}
-                  </div>
+                  {passwordError && <div className="text-xs text-red-600 mt-1">{passwordError}</div>}
+                  {passwordSuccess && <div className="text-xs text-green-700 mt-1">{passwordSuccess}</div>}
                 </div>
-                <button
-                  type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-md font-semibold transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center disabled:opacity-50"
-                  disabled={savingAll || !isAnyChanged}
-                >
-                  {savingAll ? '저장 중...' : '변경사항 저장'}
-                </button>
-              </form>
-
-              {/* 구분선 */}
-              <hr className="my-8" />
-
-              {/* 계정 탈퇴 섹션 */}
-              <div className="bg-red-50 p-6 rounded-lg">
-                <div className="flex items-center mb-4">
-                  <AlertTriangle className="w-5 h-5 text-red-600 mr-2" />
-                  <h3 className="text-lg font-semibold text-red-900">위험 구역</h3>
-                </div>
-                <p className="text-red-700 mb-4">
-                  계정을 탈퇴하면 모든 데이터가 영구적으로 삭제되며 복구할 수 없습니다.
-                  {isAdmin && (
-                    <span className="block mt-2 font-medium">
-                      ⚠️ 관리자 계정은 탈퇴 후 Supabase 대시보드에서 완전히 삭제해야 합니다.
-                    </span>
-                  )}
-                </p>
-
-                {!showDeleteConfirm ? (
+                <div className="flex flex-col sm:flex-row gap-4 mt-8">
                   <button
-                    onClick={() => setShowDeleteConfirm(true)}
-                    className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 flex items-center"
+                    type="submit"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50"
+                    disabled={savingAll || (!isProfileChanged && !isPasswordChanged)}
+                    aria-label="저장"
                   >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    계정 탈퇴
+                    <Save className="w-5 h-5 mr-2 inline" aria-hidden="true" /> 저장
                   </button>
-                ) : (
-                  <div className="space-y-3">
-                    <p className="text-red-800 font-medium">정말로 계정을 탈퇴하시겠습니까?</p>
-                    <div className="flex space-x-3">
-                      <button
-                        onClick={handleDeleteAccount}
-                        className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-                      >
-                        네, 탈퇴합니다
-                      </button>
-                      <button
-                        onClick={() => setShowDeleteConfirm(false)}
-                        className="bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
-                      >
-                        취소
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+                  <button
+                    type="button"
+                    className="bg-red-100 hover:bg-red-200 text-red-700 px-6 py-3 rounded-lg font-semibold transition-colors"
+                    onClick={() => setShowDeleteConfirm(true)}
+                    aria-label="계정 탈퇴"
+                  >
+                    <Trash2 className="w-5 h-5 mr-2 inline" aria-hidden="true" /> 계정 탈퇴
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
 
       <Footer />
     </div>
