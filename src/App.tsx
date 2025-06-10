@@ -24,9 +24,25 @@ const queryClient = new QueryClient();
 
 const ToolbarPortal = () => {
   if (typeof window === 'undefined') return null;
+
+  // 개발 모드에서만 툴바를 표시
+  const isDev = import.meta.env.DEV;
+  if (!isDev) return null;
+
+  // 디버그 정보 출력
+  console.log('Stagewise Toolbar Debug:', {
+    isDev,
+    window: typeof window,
+    plugins: [ReactPlugin]
+  });
+
   return createPortal(
-    <div className="stagewise-toolbar-wrapper">
-      <StagewiseToolbar config={{ plugins: [ReactPlugin] }} />
+    <div className="stagewise-toolbar-wrapper" style={{ position: 'fixed', top: 0, right: 0, zIndex: 9999 }}>
+      <StagewiseToolbar
+        config={{
+          plugins: [ReactPlugin]
+        }}
+      />
     </div>,
     document.body
   );

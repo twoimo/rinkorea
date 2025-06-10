@@ -1,17 +1,16 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-white mt-auto">
+    <footer className="bg-gray-900 text-white mt-auto w-full">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Company Info */}
           <div>
-            <img 
-              src="https://rinkorea.com/wp-content/uploads/2021/11/린코리아-홈페이지-로고-블랙.png" 
-              alt="린코리아 로고" 
+            <img
+              src="https://rinkorea.com/wp-content/uploads/2021/11/린코리아-홈페이지-로고-블랙.png"
+              alt="린코리아 로고"
               className="h-10 w-auto mb-4 filter invert"
             />
             <h3 className="text-lg font-bold mb-4">린코리아</h3>
@@ -38,27 +37,27 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-bold mb-4">소셜 미디어</h3>
             <div className="flex space-x-4">
-              <a 
-                href="https://www.instagram.com/rinkorea_kr/" 
-                target="_blank" 
+              <a
+                href="https://www.instagram.com/rinkorea_kr/"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="hover:opacity-75 transition-opacity"
               >
-                <img 
-                  src="https://rinkorea.com/wp-content/uploads/2021/11/instagram.png" 
-                  alt="Instagram" 
+                <img
+                  src="https://rinkorea.com/wp-content/uploads/2021/11/instagram.png"
+                  alt="Instagram"
                   className="w-8 h-8"
                 />
               </a>
-              <a 
-                href="https://blog.naver.com/rinkorea" 
-                target="_blank" 
+              <a
+                href="https://blog.naver.com/rinkorea"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="hover:opacity-75 transition-opacity"
               >
-                <img 
-                  src="https://rinkorea.com/wp-content/uploads/2021/11/블로그-로고-고화질.png" 
-                  alt="Naver Blog" 
+                <img
+                  src="https://rinkorea.com/wp-content/uploads/2021/11/블로그-로고-고화질.png"
+                  alt="Naver Blog"
                   className="w-8 h-8"
                 />
               </a>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -29,7 +28,7 @@ const News = () => {
       author_id: null
     },
     {
-      id: '2', 
+      id: '2',
       title: "RIN-COAT 신제품 출시",
       content: "향상된 성능의 RIN-COAT 신제품이 출시되었습니다. 기존 제품 대비 30% 향상된 내구성을 제공합니다.",
       created_at: "2024-01-15",
@@ -52,7 +51,7 @@ const News = () => {
 
   const handleUpdateNews = async (newsData: { title: string; content: string; published: boolean }) => {
     if (!editingNews) return;
-    
+
     const result = await updateNews(editingNews, newsData);
     if (!result.error) {
       setEditingNews(null);
@@ -62,7 +61,7 @@ const News = () => {
 
   const handleDeleteNews = async (newsId: string) => {
     if (!confirm('정말로 이 공지사항을 삭제하시겠습니까?')) return;
-    
+
     const result = await deleteNews(newsId);
     if (!result.error) {
       refetch();
@@ -74,12 +73,12 @@ const News = () => {
     return (
       <div className="min-h-screen bg-white">
         <Header />
-        
+
         <section className="py-20">
           <div className="container mx-auto px-4 max-w-4xl">
-            <NewsDetail 
-              news={selectedNewsItem} 
-              onBack={() => setSelectedNews(null)} 
+            <NewsDetail
+              news={selectedNewsItem}
+              onBack={() => setSelectedNews(null)}
             />
           </div>
         </section>
@@ -90,16 +89,16 @@ const News = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
         <div className="container mx-auto px-4">
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-6">공지사항</h1>
             <p className="text-xl max-w-2xl mx-auto">
-              린코리아의 최신 소식과 중요한 공지사항을 
+              린코리아의 최신 소식과 중요한 공지사항을
               확인하세요.
             </p>
             <AdminOnly>
@@ -152,18 +151,18 @@ const News = () => {
                         </div>
                       </AdminOnly>
                     </div>
-                    
-                    <h2 
+
+                    <h2
                       className="text-2xl font-bold text-gray-900 mb-3 hover:text-blue-600 transition-colors cursor-pointer"
                       onClick={() => setSelectedNews(newsItem.id)}
                     >
                       {newsItem.title}
                     </h2>
-                    
+
                     <p className="text-gray-600 mb-4 line-clamp-2">
                       {newsItem.content}
                     </p>
-                    
+
                     <div className="flex items-center justify-between">
                       <div className="flex items-center text-sm text-gray-500 space-x-4">
                         <div className="flex items-center">
@@ -171,8 +170,8 @@ const News = () => {
                           {new Date(newsItem.created_at).toLocaleDateString('ko-KR')}
                         </div>
                       </div>
-                      
-                      <button 
+
+                      <button
                         onClick={() => setSelectedNews(newsItem.id)}
                         className="text-blue-600 hover:text-blue-700 font-medium flex items-center transition-colors"
                       >
