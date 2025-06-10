@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
@@ -27,49 +26,68 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      
+
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-gray-900 to-gray-700 text-white">
-        <div 
-          className="relative min-h-screen bg-cover bg-center flex items-center"
-          style={{
-            backgroundImage: `url('https://rinkorea.com/wp-content/uploads/2024/08/JS-린코리아-홈페이지-01.png')`
-          }}
-        >
+      <section className="relative">
+        <div className="relative w-full h-screen overflow-hidden">
+          {/* YouTube Video Background */}
+          <div className="absolute inset-0 w-full h-full overflow-hidden">
+            <iframe
+              className="absolute top-1/2 left-1/2"
+              style={{
+                width: '100vw',
+                height: '56.25vw', // 16:9 비율
+                minHeight: '100vh',
+                minWidth: '177.78vh', // 16/9 * 100vh
+                transform: 'translate(-50%, -50%)',
+                objectFit: 'cover',
+                pointerEvents: 'none'
+              }}
+              src="https://www.youtube.com/embed/W6ACoEMN3-0?autoplay=1&mute=1&controls=0&loop=1&playlist=W6ACoEMN3-0&showinfo=0&rel=0&modestbranding=1"
+              title="RIN-COAT Introduction"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+
           {/* Dark overlay for better text readability */}
-          <div className="absolute inset-0 bg-black opacity-60"></div>
-          
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-3xl bg-black bg-opacity-40 p-8 rounded-lg backdrop-blur-sm">
-              <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
-                린코리아,<br />
-                <span className="text-blue-400">세라믹 코팅의 모든 것</span>
-              </h1>
-              <p className="text-xl md:text-2xl mb-8 text-gray-100 drop-shadow-md">
-                친환경 불연재(1액형) 신소재 세라믹 코팅제
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link 
-                  to="/contact" 
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg"
-                >
-                  제품 문의하기
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-                <Link 
-                  to="/shop" 
-                  className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg"
-                >
-                  제품 구매하기
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-                <Link 
-                  to="/projects" 
-                  className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg"
-                >
-                  시공사례 보기
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+          <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+
+          {/* Content */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="container mx-auto px-4">
+              <div className="max-w-3xl bg-black bg-opacity-40 p-8 rounded-lg backdrop-blur-sm">
+                <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
+                  린코리아,<br />
+                  <span className="text-blue-400">세라믹 코팅의 모든 것</span>
+                </h1>
+                <p className="text-xl md:text-2xl mb-8 text-gray-100 drop-shadow-md">
+                  친환경 불연재(1액형) 신소재 세라믹 코팅제
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link
+                    to="/contact"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg"
+                  >
+                    제품 문의하기
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Link>
+                  <Link
+                    to="/shop"
+                    className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg"
+                  >
+                    제품 구매하기
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Link>
+                  <Link
+                    to="/projects"
+                    className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg"
+                  >
+                    시공사례 보기
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -77,7 +95,7 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
@@ -87,7 +105,7 @@ const Index = () => {
               최고 품질의 세라믹 코팅제로 안전하고 친환경적인 건설환경을 만들어갑니다
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <div key={index} className="bg-white p-8 rounded-lg shadow-lg text-center hover:shadow-xl transition-shadow">
@@ -103,7 +121,7 @@ const Index = () => {
       </section>
 
       {/* Company Overview */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -111,7 +129,7 @@ const Index = () => {
                 신뢰할 수 있는 파트너
               </h2>
               <p className="text-lg text-gray-600 mb-6">
-                린코리아는 건설재료사업부와 2024년 신설된 건설기계사업부를 통해 
+                린코리아는 건설재료사업부와 2024년 신설된 건설기계사업부를 통해
                 종합적인 건설 솔루션을 제공합니다.
               </p>
               <div className="space-y-4">
@@ -128,17 +146,17 @@ const Index = () => {
                   <span className="text-gray-700">건설재료사업부 / 건설기계사업부</span>
                 </div>
               </div>
-              <Link 
-                to="/about" 
+              <Link
+                to="/about"
                 className="inline-block mt-8 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
               >
                 회사소개 자세히 보기
               </Link>
             </div>
-            <div className="lg:order-first">
-              <img 
-                src="https://rinkorea.com/wp-content/uploads/2022/04/1-메인-18.jpg" 
-                alt="린코리아 제품" 
+            <div>
+              <img
+                src="https://rinkorea.com/wp-content/uploads/2022/04/1-메인-18.jpg"
+                alt="린코리아 제품"
                 className="rounded-lg shadow-lg w-full"
               />
             </div>
