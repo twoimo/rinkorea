@@ -245,7 +245,7 @@ const QnA = () => {
                 <div className="ml-4">
                   <p className="text-sm text-gray-600">답변 완료</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {inquiries.filter(item => item.status === 'answered').length}
+                    {Object.values(inquiryReplies).filter(hasReplies => hasReplies).length}
                   </p>
                 </div>
               </div>
@@ -258,7 +258,7 @@ const QnA = () => {
                 <div className="ml-4">
                   <p className="text-sm text-gray-600">답변 대기</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {inquiries.filter(item => item.status === 'pending').length}
+                    {Object.values(inquiryReplies).filter(hasReplies => !hasReplies).length}
                   </p>
                 </div>
               </div>
