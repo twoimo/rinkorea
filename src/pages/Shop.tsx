@@ -185,12 +185,14 @@ const Shop = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative h-[400px] bg-blue-600">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-800 opacity-90"></div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">온라인 스토어</h1>
-            <p className="text-xl md:text-2xl">린코리아의 최고 품질 제품을 만나보세요</p>
+      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <h1 className="text-5xl font-bold mb-6">온라인 스토어</h1>
+            <p className="text-xl max-w-2xl mx-auto">
+              린코리아의 최고 품질 제품을 만나보세요. <br />
+              안전하고 친환경적인 건설재료를 온라인에서 편리하게 구매하세요.
+            </p>
           </div>
         </div>
       </section>
