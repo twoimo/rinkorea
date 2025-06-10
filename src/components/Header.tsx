@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useUserRole } from '@/hooks/useUserRole';
+import { useProfile } from '@/hooks/useProfile';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,6 +13,8 @@ const Header = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { toast } = useToast();
+  const { isAdmin } = useUserRole();
+  const { profile } = useProfile();
 
   const navItems = [
     { name: '홈', path: '/' },
@@ -73,38 +77,17 @@ const Header = () => {
           {/* Desktop User Menu */}
           <div className="hidden lg:flex items-center space-x-4">
             {user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center space-x-2 text-sm text-gray-700 hover:text-blue-900 transition-colors p-2 rounded-lg hover:bg-gray-50"
-                >
-                  <User className="w-5 h-5" />
-                  <span>메뉴</span>
-                </button>
-
-                {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                    <div className="px-4 py-2 border-b border-gray-100">
-                      <p className="text-sm text-gray-600">환영합니다!</p>
-                    </div>
-                    <Link
-                      to="/profile"
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    >
-                      <Settings className="w-4 h-4 mr-3" />
-                      프로필 설정
-                    </Link>
-                    <button
-                      onClick={handleSignOut}
-                      className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                      <LogOut className="w-4 h-4 mr-3" />
-                      로그아웃
-                    </button>
-                  </div>
-                )}
-              </div>
+              isAdmin ? (
+                <div className="inline-flex items-center px-4 py-2 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
+                  <User className="w-5 h-5 mr-2" />
+                  관리자 계정
+                </div>
+              ) : (
+                <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
+                  <User className="w-5 h-5 mr-2" />
+                  {profile?.name || '사용자'}
+                </div>
+              )
             ) : (
               <Link
                 to="/auth"

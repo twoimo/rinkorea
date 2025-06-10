@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useInquiries } from '@/hooks/useInquiries';
 import { useUserRole } from '@/hooks/useUserRole';
 import { Link } from 'react-router-dom';
+import { useProfile } from '@/hooks/useProfile';
 
 const QnA = () => {
   const { toast } = useToast();
@@ -39,6 +40,7 @@ const QnA = () => {
     is_private: false
   });
   const [inquiryReplies, setInquiryReplies] = useState<Record<string, boolean>>({});
+  const { profile } = useProfile();
 
   const categories = ['전체', '제품문의', '시공문의', '기술지원', '기타'];
   const statusFilter = ['전체', '답변대기', '답변완료'];
@@ -57,9 +59,9 @@ const QnA = () => {
       ...prev,
       name: user?.user_metadata?.name || '',
       email: user?.email || '',
-      phone: user?.user_metadata?.phone || ''
+      phone: profile?.phone || user?.user_metadata?.phone || ''
     }));
-  }, [user]);
+  }, [user, profile]);
 
   // 답변 상태 확인
   useEffect(() => {

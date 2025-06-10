@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
@@ -22,6 +21,13 @@ const Profile = () => {
   const [phone, setPhone] = useState(profile?.phone || '');
   const [saving, setSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // profile이 변경될 때마다 state 동기화
+  React.useEffect(() => {
+    setName(profile?.name || '');
+    setCompany(profile?.company || '');
+    setPhone(profile?.phone || '');
+  }, [profile]);
 
   const handleSaveProfile = async () => {
     setSaving(true);
@@ -105,7 +111,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       <div className="container mx-auto px-4 py-20">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg p-8">
@@ -115,7 +121,7 @@ const Profile = () => {
               </div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">프로필 설정</h1>
               <p className="text-gray-600">회원 정보를 수정하거나 계정을 관리하세요</p>
-              
+
               {isAdmin && (
                 <div className="mt-4 inline-flex items-center px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
                   <Shield className="w-4 h-4 mr-1" />
@@ -232,7 +238,7 @@ const Profile = () => {
                     </span>
                   )}
                 </p>
-                
+
                 {!showDeleteConfirm ? (
                   <button
                     onClick={() => setShowDeleteConfirm(true)}
