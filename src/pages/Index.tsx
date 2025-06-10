@@ -124,9 +124,10 @@ const Index = () => {
           <div className="absolute inset-0 bg-black bg-opacity-60"></div>
 
           {/* Content */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="container mx-auto px-4">
-              <div className="max-w-3xl bg-black bg-opacity-40 p-8 rounded-lg backdrop-blur-sm">
+          <div className="absolute inset-0 flex items-center">
+            {/* 왼쪽 절반 */}
+            <div className="w-full md:w-1/2 h-full flex items-center pl-8">
+              <div className="bg-black bg-opacity-40 p-8 rounded-lg backdrop-blur-sm w-full max-w-[480px] md:max-w-[540px] xl:max-w-[700px] text-left">
                 <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
                   린코리아,<br />
                   <span className="text-blue-400">세라믹 코팅의 모든 것</span>
@@ -159,6 +160,8 @@ const Index = () => {
                 </div>
               </div>
             </div>
+            {/* 오른쪽 절반은 비워둠 */}
+            <div className="hidden md:block w-1/2"></div>
           </div>
 
           {/* 관리자만 유튜브 링크 수정 UI 노출 */}
