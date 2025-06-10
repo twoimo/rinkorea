@@ -20,7 +20,6 @@ import Shop from "./pages/Shop";
 import Profile from "./pages/Profile";
 import AdminDangerZone from "./pages/AdminDangerZone";
 import NotFound from "./pages/NotFound";
-import './i18n';
 
 const queryClient = new QueryClient();
 
