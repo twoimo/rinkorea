@@ -14,7 +14,9 @@ const AdminDangerZone = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState('');
-    const [confirm, setConfirm] = useState('');
+    const [confirmQnA, setConfirmQnA] = useState('');
+    const [confirmNews, setConfirmNews] = useState('');
+    const [confirmUsers, setConfirmUsers] = useState('');
     const [modal, setModal] = useState<{ open: boolean; action: null | (() => void); message: string }>({ open: false, action: null, message: '' });
     const [backupSize, setBackupSize] = useState<number | null>(null);
     const [importing, setImporting] = useState(false);
@@ -51,7 +53,7 @@ const AdminDangerZone = () => {
 
     // 고객상담(문의/답변) 초기화
     const handleResetQnA = async () => {
-        if (confirm !== 'qna') return setResult('"qna"를 입력해야 삭제됩니다.');
+        if (confirmQnA !== 'qna') return setResult('"qna"를 입력해야 삭제됩니다.');
         setLoading(true);
         setResult('');
         try {
@@ -66,7 +68,7 @@ const AdminDangerZone = () => {
 
     // 공지사항 초기화
     const handleResetNews = async () => {
-        if (confirm !== 'news') return setResult('"news"를 입력해야 삭제됩니다.');
+        if (confirmNews !== 'news') return setResult('"news"를 입력해야 삭제됩니다.');
         setLoading(true);
         setResult('');
         try {
@@ -80,7 +82,7 @@ const AdminDangerZone = () => {
 
     // 관리자 제외 사용자 계정 삭제
     const handleDeleteUsers = async () => {
-        if (confirm !== 'users') return setResult('"users"를 입력해야 삭제됩니다.');
+        if (confirmUsers !== 'users') return setResult('"users"를 입력해야 삭제됩니다.');
         setLoading(true);
         setResult('');
         try {
@@ -111,10 +113,13 @@ const AdminDangerZone = () => {
             const json = JSON.stringify({ inquiries: inq.data, replies: rep.data, news: news.data }, null, 2);
             const blob = new Blob([json], { type: 'application/json' });
             setBackupSize(blob.size);
+            const now = new Date();
+            const pad = (n: number) => n.toString().padStart(2, '0');
+            const fileName = `rinkorea-backup-${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}.json`;
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'rinkorea-backup.json';
+            a.download = fileName;
             a.click();
             setResult('데이터가 내보내기 되었습니다.');
         } catch (e) {
@@ -157,6 +162,11 @@ const AdminDangerZone = () => {
     const backupWarning = backupSize && backupSize > 400 * MB
         ? '⚠️ 데이터 용량이 400MB를 초과했습니다. Supabase 무료 플랜(500MB) 임박! 백업을 강력히 권장합니다.'
         : '';
+    const backupSizeText = backupSize !== null
+        ? backupSize > MB
+            ? `${(backupSize / MB).toFixed(2)} MB`
+            : `${(backupSize / 1024).toFixed(2)} KB`
+        : '';
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -168,21 +178,21 @@ const AdminDangerZone = () => {
                     <div className="bg-white p-6 rounded shadow border border-red-200">
                         <h2 className="text-lg font-bold text-red-700 mb-2">고객상담 게시판 초기화</h2>
                         <p className="mb-2 text-sm text-gray-700">모든 문의글과 답변이 영구 삭제됩니다. 복구 불가!</p>
-                        <input type="text" className="border px-2 py-1 rounded mr-2" placeholder='"qna" 입력' value={confirm} onChange={e => setConfirm(e.target.value)} />
+                        <input type="text" className="border px-2 py-1 rounded mr-2" placeholder='"qna" 입력' value={confirmQnA} onChange={e => setConfirmQnA(e.target.value)} />
                         <button onClick={() => openModal('정말로 고객상담 게시판을 초기화하시겠습니까?', handleResetQnA)} disabled={loading} className="bg-red-600 text-white px-4 py-2 rounded disabled:opacity-50">초기화</button>
                     </div>
                     {/* 공지사항 초기화 */}
                     <div className="bg-white p-6 rounded shadow border border-red-200">
                         <h2 className="text-lg font-bold text-red-700 mb-2">공지사항 게시판 초기화</h2>
                         <p className="mb-2 text-sm text-gray-700">모든 공지사항이 영구 삭제됩니다. 복구 불가!</p>
-                        <input type="text" className="border px-2 py-1 rounded mr-2" placeholder='"news" 입력' value={confirm} onChange={e => setConfirm(e.target.value)} />
+                        <input type="text" className="border px-2 py-1 rounded mr-2" placeholder='"news" 입력' value={confirmNews} onChange={e => setConfirmNews(e.target.value)} />
                         <button onClick={() => openModal('정말로 공지사항 게시판을 초기화하시겠습니까?', handleResetNews)} disabled={loading} className="bg-red-600 text-white px-4 py-2 rounded disabled:opacity-50">초기화</button>
                     </div>
                     {/* 사용자 계정 삭제 */}
                     <div className="bg-white p-6 rounded shadow border border-red-200">
                         <h2 className="text-lg font-bold text-red-700 mb-2">관리자 제외 사용자 계정 전체 삭제</h2>
                         <p className="mb-2 text-sm text-gray-700">관리자 계정을 제외한 모든 사용자 계정이 영구 삭제됩니다. 복구 불가!</p>
-                        <input type="text" className="border px-2 py-1 rounded mr-2" placeholder='"users" 입력' value={confirm} onChange={e => setConfirm(e.target.value)} />
+                        <input type="text" className="border px-2 py-1 rounded mr-2" placeholder='"users" 입력' value={confirmUsers} onChange={e => setConfirmUsers(e.target.value)} />
                         <button onClick={() => openModal('정말로 모든 사용자 계정을 삭제하시겠습니까?', handleDeleteUsers)} disabled={loading} className="bg-red-600 text-white px-4 py-2 rounded disabled:opacity-50">전체 삭제</button>
                     </div>
                     {/* 데이터 백업/복원 */}
@@ -192,7 +202,7 @@ const AdminDangerZone = () => {
                         <div className="flex flex-col gap-2 mb-2">
                             <button onClick={handleExport} disabled={loading} className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50">내보내기</button>
                             {backupSize !== null && (
-                                <span className="text-xs text-gray-600">백업 파일 크기: {(backupSize / MB).toFixed(2)} MB</span>
+                                <span className="text-xs text-gray-600">백업 파일 크기: {backupSizeText}</span>
                             )}
                             {backupWarning && (
                                 <span className="text-xs text-red-600 font-bold">{backupWarning}</span>
