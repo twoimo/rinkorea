@@ -23,10 +23,9 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     // Convert src to WebP path
     const getWebPSrc = (originalSrc: string) => {
         if (!originalSrc) return '';
-        const path = originalSrc.split('/');
-        const filename = path.pop()?.split('.')[0];
-        path.push('optimized', `${filename}.webp`);
-        return path.join('/');
+        const parts = originalSrc.split('/');
+        const filename = parts.pop()?.split('.')[0];
+        return `/images/optimized/${filename}.webp`;
     };
 
     const handleLoad = () => {

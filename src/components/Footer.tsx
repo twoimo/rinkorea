@@ -11,7 +11,7 @@ const Footer = () => {
           <div>
             <div className="flex items-center">
               <OptimizedImage
-                src={`${process.env.PUBLIC_URL}/images/린코리아-홈페이지-로고-블랙.png`}
+                src="/images/린코리아-홈페이지-로고-블랙.png"
                 alt="린코리아 로고"
                 className="h-8 w-auto filter invert"
                 loadingClassName="bg-gray-800"
@@ -49,7 +49,7 @@ const Footer = () => {
                 className="text-gray-600 hover:text-gray-900"
               >
                 <OptimizedImage
-                  src={`${process.env.PUBLIC_URL}/images/instagram.png`}
+                  src="/images/instagram.png"
                   alt="Instagram"
                   className="h-6 w-6"
                   loadingClassName="bg-gray-800"
@@ -63,7 +63,7 @@ const Footer = () => {
                 className="text-gray-600 hover:text-gray-900"
               >
                 <OptimizedImage
-                  src={`${process.env.PUBLIC_URL}/images/블로그-로고-고화질.png`}
+                  src="/images/블로그-로고-고화질.png"
                   alt="Naver Blog"
                   className="h-6 w-6"
                   loadingClassName="bg-gray-800"

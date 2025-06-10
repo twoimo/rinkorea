@@ -75,7 +75,7 @@ const Contact = () => {
                   className="text-gray-600 hover:text-gray-900"
                 >
                   <OptimizedImage
-                    src={`${process.env.PUBLIC_URL}/images/instagram.png`}
+                    src="/images/instagram.png"
                     alt="Instagram"
                     className="h-6 w-6"
                     loadingClassName="bg-white"
@@ -89,7 +89,7 @@ const Contact = () => {
                   className="text-gray-600 hover:text-gray-900"
                 >
                   <OptimizedImage
-                    src={`${process.env.PUBLIC_URL}/images/블로그-로고-고화질.png`}
+                    src="/images/블로그-로고-고화질.png"
                     alt="Naver Blog"
                     className="h-6 w-6"
                     loadingClassName="bg-white"

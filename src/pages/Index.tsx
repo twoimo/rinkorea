@@ -268,7 +268,7 @@ const Index = () => {
             <div className="flex justify-center items-center">
               <div className="relative w-full max-w-lg aspect-video rounded-2xl overflow-hidden shadow-2xl border-4 border-blue-100">
                 <OptimizedImage
-                  src={`${process.env.PUBLIC_URL}/images/1-메인-18.jpg`}
+                  src="/images/1-메인-18.jpg"
                   alt="린코리아 제품"
                   className="w-full h-full object-cover rounded-2xl"
                   loadingClassName="bg-blue-50"
