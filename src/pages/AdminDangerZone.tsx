@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 const MB = 1024 * 1024;
 
@@ -22,8 +23,6 @@ const AdminDangerZone = () => {
     const [confirmProduct, setConfirmProduct] = useState('');
     const [confirmOrder, setConfirmOrder] = useState('');
     const [confirmUser, setConfirmUser] = useState('');
-    const [confirmYoutube, setConfirmYoutube] = useState('');
-    const [youtubeLink, setYoutubeLink] = useState('');
     const [modal, setModal] = useState<{ open: boolean; action: null | (() => void); message: string }>({ open: false, action: null, message: '' });
     const [backupSize, setBackupSize] = useState<number | null>(null);
     const [importing, setImporting] = useState(false);
@@ -50,8 +49,6 @@ const AdminDangerZone = () => {
     useEffect(() => {
         if (!roleLoading && !isAdmin) navigate('/');
     }, [isAdmin, roleLoading, navigate]);
-    if (roleLoading) return null;
-    if (!isAdmin) return null;
 
     // 모달 열기
     const openModal = (message: string, action: () => void) => {
@@ -203,53 +200,6 @@ const AdminDangerZone = () => {
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
-    // 유튜브 링크 수정
-    const handleUpdateYoutubeLink = async () => {
-        if (confirmYoutube !== 'youtube') return setResult('"youtube"를 입력해야 수정됩니다.');
-        setLoading(true);
-        setResult('');
-        try {
-            const { error } = await supabase
-                .from('site_settings')
-                .upsert({
-                    key: 'youtube_link',
-                    value: youtubeLink,
-                    updated_at: new Date().toISOString()
-                });
-
-            if (error) {
-                setResult('오류: ' + error.message);
-            } else {
-                setResult('유튜브 링크가 수정되었습니다.');
-                setYoutubeLink('');
-                setConfirmYoutube('');
-            }
-        } catch (e) {
-            setResult('오류: ' + (e.message || e));
-        }
-        setLoading(false);
-    };
-
-    // 유튜브 링크 불러오기
-    const loadYoutubeLink = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('site_settings')
-                .select('value')
-                .eq('key', 'youtube_link')
-                .single();
-
-            if (error) throw error;
-            if (data) setYoutubeLink(data.value);
-        } catch (e) {
-            console.error('유튜브 링크 로드 실패:', e);
-        }
-    };
-
-    useEffect(() => {
-        loadYoutubeLink();
-    }, []);
-
     // Danger 안내 메시지
     const backupWarning = backupSize && backupSize > 400 * MB
         ? '⚠️ 데이터 용량이 400MB를 초과했습니다. Supabase 무료 플랜(500MB) 임박! 백업을 강력히 권장합니다.'
@@ -260,6 +210,7 @@ const AdminDangerZone = () => {
             : `${(backupSize / 1024).toFixed(2)} KB`
         : '';
 
+    if (roleLoading || !isAdmin) return null;
     return (
         <div className="min-h-screen bg-gray-50">
             <Header />
@@ -285,37 +236,7 @@ const AdminDangerZone = () => {
                         <h2 className="text-lg font-bold text-red-700 mb-2">공지사항 초기화</h2>
                         <p className="mb-2 text-sm text-gray-700">모든 공지사항이 영구 삭제됩니다. 복구 불가!</p>
                         <input type="text" className="border px-2 py-1 rounded mr-2" placeholder='"notice" 입력' value={confirmNotice} onChange={e => setConfirmNotice(e.target.value)} />
-                        <button onClick={() => openModal('정말로 공지사항을 초기화하시겠습니까?', handleResetNotice)} disabled={loading} className="bg-red-600 text-white px-4 py-2 rounded disabled:opacity-50">초기화</button>
-                    </div>
-                    {/* 유튜브 링크 수정 */}
-                    <div className="bg-white p-6 rounded shadow border border-blue-200">
-                        <h2 className="text-lg font-bold text-blue-700 mb-2">메인 페이지 유튜브 링크 수정</h2>
-                        <p className="mb-2 text-sm text-gray-700">메인 페이지에 표시되는 유튜브 링크를 수정합니다.</p>
-                        <div className="flex flex-col gap-2">
-                            <input
-                                type="text"
-                                className="border px-2 py-1 rounded w-full"
-                                placeholder="유튜브 링크 입력"
-                                value={youtubeLink}
-                                onChange={e => setYoutubeLink(e.target.value)}
-                            />
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    className="border px-2 py-1 rounded"
-                                    placeholder='"youtube" 입력'
-                                    value={confirmYoutube}
-                                    onChange={e => setConfirmYoutube(e.target.value)}
-                                />
-                                <button
-                                    onClick={() => openModal('정말로 유튜브 링크를 수정하시겠습니까?', handleUpdateYoutubeLink)}
-                                    disabled={loading}
-                                    className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
-                                >
-                                    수정
-                                </button>
-                            </div>
-                        </div>
+                        <button onClick={() => openModal('정말로 공지사항을 초기화하시겠습니까?', handleResetNews)} disabled={loading} className="bg-red-600 text-white px-4 py-2 rounded disabled:opacity-50">초기화</button>
                     </div>
                     {/* 사용자 계정 삭제 */}
                     <div className="bg-white p-6 rounded shadow border border-red-200">

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { ShoppingCart, Star, Info, ChevronDown, Plus, Edit, Trash2, X } from 'lucide-react';
+import { ShoppingCart, Star, Info, ChevronDown, Plus, Edit, Trash2, X, EyeOff, Eye } from 'lucide-react';
 import { supabase } from '../integrations/supabase/client';
 import { useUserRole } from '../hooks/useUserRole';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 interface Product {
   id: string;
@@ -21,6 +22,7 @@ interface Product {
   stock_quantity?: number;
   sales?: number;
   created_at?: string;
+  is_active?: boolean;
 }
 
 const Shop = () => {
@@ -36,6 +38,9 @@ const Shop = () => {
   const [gridCols, setGridCols] = useState<number>(3);
   const [pendingGridCols, setPendingGridCols] = useState<number>(3);
   const [gridLoading, setGridLoading] = useState(true);
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [formSuccess, setFormSuccess] = useState<string | null>(null);
   const gridOptions = [
     { value: 2, label: '2 x 2' },
     { value: 3, label: '3 x 3' },
@@ -56,7 +61,7 @@ const Shop = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
-      const { data, error } = await (supabase as any)
+      const { data, error } = await (supabase as unknown as SupabaseClient)
         .from('products')
         .select('*')
         .eq('is_active', true)
@@ -69,7 +74,7 @@ const Shop = () => {
     fetchProducts();
     const fetchGrid = async () => {
       setGridLoading(true);
-      const { data, error } = await (supabase as any)
+      const { data, error } = await (supabase as unknown as SupabaseClient)
         .from('site_settings')
         .select('value')
         .eq('key', 'shop_grid_cols')
@@ -157,10 +162,142 @@ const Shop = () => {
   const handleGridApply = async () => {
     setGridCols(pendingGridCols);
     setGridLoading(true);
-    await (supabase as any)
+    await (supabase as unknown as SupabaseClient)
       .from('site_settings')
       .upsert({ key: 'shop_grid_cols', value: String(pendingGridCols), updated_at: new Date().toISOString() }, { onConflict: 'key' });
     setGridLoading(false);
+  };
+
+  // 상품 목록 새로고침 함수
+  const refreshProducts = async () => {
+    setLoading(true);
+    const { data, error } = await (supabase as unknown as SupabaseClient)
+      .from('products')
+      .select('*')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+    if (!error && data) {
+      setProducts(data);
+    }
+    setLoading(false);
+  };
+
+  // 상품 저장(추가/수정)
+  const handleFormSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormLoading(true);
+    setFormError(null);
+    setFormSuccess(null);
+    try {
+      const payload = {
+        ...formValues,
+        price: Number(formValues.price) || 0,
+        original_price: formValues.original_price ? Number(formValues.original_price) : null,
+        discount: formValues.discount ? Number(formValues.discount) : null,
+        rating: formValues.rating ? Number(formValues.rating) : null,
+        reviews: formValues.reviews ? Number(formValues.reviews) : null,
+        stock_quantity: formValues.stock_quantity ? Number(formValues.stock_quantity) : null,
+        is_new: !!formValues.is_new,
+        is_best: !!formValues.is_best,
+        updated_at: new Date().toISOString(),
+      };
+      let result;
+      if (editingProduct) {
+        // 수정
+        result = await (supabase as unknown as SupabaseClient)
+          .from('products')
+          .update(payload)
+          .eq('id', editingProduct.id);
+      } else {
+        // 추가
+        result = await (supabase as unknown as SupabaseClient)
+          .from('products')
+          .insert([{ ...payload, created_at: new Date().toISOString(), is_active: true }]);
+      }
+      if (result.error) {
+        setFormError(result.error.message);
+      } else {
+        setFormSuccess('저장되었습니다.');
+        await refreshProducts();
+        setTimeout(() => {
+          setShowForm(false);
+          setEditingProduct(null);
+          setFormValues({});
+          setFormSuccess(null);
+        }, 700);
+      }
+    } catch (e) {
+      setFormError(e instanceof Error ? e.message : String(e));
+    }
+    setFormLoading(false);
+  };
+
+  // 상품 삭제
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setFormLoading(true);
+    setFormError(null);
+    setFormSuccess(null);
+    try {
+      const result = await (supabase as unknown as SupabaseClient)
+        .from('products')
+        .delete()
+        .eq('id', deleteTarget.id);
+      if (result.error) {
+        setFormError(result.error.message);
+      } else {
+        setFormSuccess('삭제되었습니다.');
+        await refreshProducts();
+        setTimeout(() => {
+          setShowDeleteConfirm(false);
+          setDeleteTarget(null);
+          setFormSuccess(null);
+        }, 700);
+      }
+    } catch (e) {
+      setFormError(e instanceof Error ? e.message : String(e));
+    }
+    setFormLoading(false);
+  };
+
+  // 할인율 자동 계산
+  useEffect(() => {
+    if (formValues.original_price && formValues.price && formValues.original_price > 0) {
+      const discount = Math.round((1 - (Number(formValues.price) / Number(formValues.original_price))) * 100);
+      if (!isNaN(discount) && discount > 0) {
+        setFormValues(v => ({ ...v, discount }));
+      } else {
+        setFormValues(v => ({ ...v, discount: 0 }));
+      }
+    } else {
+      setFormValues(v => ({ ...v, discount: 0 }));
+    }
+     
+  }, [formValues.price, formValues.original_price]);
+
+  // 제품 숨기기/해제
+  const handleToggleActive = async (product: Product) => {
+    setFormLoading(true);
+    setFormError(null);
+    setFormSuccess(null);
+    try {
+      const result = await (supabase as unknown as SupabaseClient)
+        .from('products')
+        .update({ is_active: !product.is_active, updated_at: new Date().toISOString() })
+        .eq('id', product.id);
+      if (result.error) {
+        setFormError(result.error.message);
+      } else {
+        setFormSuccess(product.is_active ? '숨김 처리되었습니다.' : '노출되었습니다.');
+        await refreshProducts();
+        setTimeout(() => {
+          setFormSuccess(null);
+        }, 700);
+      }
+    } catch (e) {
+      setFormError(e instanceof Error ? e.message : String(e));
+    }
+    setFormLoading(false);
   };
 
   return (
@@ -229,109 +366,128 @@ const Shop = () => {
           </div>
 
           <div className={`grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-${gridCols} lg:grid-cols-${gridCols}`}>
-            {getSortedProducts().map((product) => (
-              <div key={product.id} className="bg-white rounded-xl shadow-lg p-6 flex flex-col group relative">
-                <div className="relative aspect-square w-full overflow-hidden">
-                  <img
-                    src={product.image_url}
-                    alt={product.name}
-                    className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                  />
-                  {product.discount && (
-                    <div className="absolute top-4 left-4">
-                      <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                        {product.discount}% OFF
-                      </span>
-                    </div>
-                  )}
-                  {product.is_new && (
-                    <div className="absolute top-4 right-4">
-                      <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                        NEW
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-6 flex flex-col flex-grow">
-                  <div className="mb-3">
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                      {product.name}
-                    </h3>
-                    <p className="text-gray-600 text-sm line-clamp-2 mb-3">
-                      {product.description}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-2">
-                      <div className="flex items-center">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="ml-1 text-sm font-medium text-gray-900">{product.rating}</span>
-                      </div>
-                      <span className="text-gray-300">|</span>
-                      <span className="text-sm text-gray-600">{product.reviews} 리뷰</span>
-                    </div>
-                    {product.stock_quantity && (
-                      <span className="text-sm font-medium text-green-600">
-                        재고: {product.stock_quantity}개
-                      </span>
+            {(isAdmin ? getSortedProducts() : getSortedProducts().filter(p => p.is_active)).map((product) => {
+              const isSoldOut = !product.stock_quantity || product.stock_quantity <= 0;
+              const isHidden = !product.is_active;
+              return (
+                <div key={product.id} className="bg-white rounded-xl shadow-lg p-6 flex flex-col group relative">
+                  {/* 뱃지 영역 */}
+                  <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+                    {product.discount && (
+                      <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow">-{product.discount}%</span>
+                    )}
+                    {product.is_best && (
+                      <span className="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow">BEST</span>
+                    )}
+                    {product.is_new && (
+                      <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow">NEW</span>
                     )}
                   </div>
+                  <div className="relative aspect-square w-full overflow-hidden">
+                    <img
+                      src={product.image_url}
+                      alt={product.name}
+                      className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </div>
 
-                  <div className="flex items-center justify-between mt-auto">
-                    <div className="flex flex-col">
-                      {product.original_price && (
-                        <del className="text-sm text-gray-400">
-                          {formatPrice(product.original_price)}원
-                        </del>
-                      )}
-                      <span className="text-xl font-bold text-blue-600">
-                        {formatPrice(product.price)}원
-                      </span>
+                  <div className="p-6 flex flex-col flex-grow">
+                    <div className="mb-3">
+                      <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                        {product.name}
+                      </h3>
+                      <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+                        {product.description}
+                      </p>
                     </div>
-                    <button
-                      onClick={() => handleProductClick(product.naver_url || '')}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 hover:scale-105"
-                    >
-                      <ShoppingCart className="w-4 h-4" />
-                      <span>구매하기</span>
-                    </button>
-                  </div>
-                </div>
 
-                {/* 관리자만 수정/삭제 버튼 노출 */}
-                {isAdmin && (
-                  <div className="absolute top-3 right-3 flex gap-2 z-10">
-                    <button
-                      className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow"
-                      onClick={() => openForm(product)}
-                      title="수정"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button
-                      className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-2 shadow"
-                      onClick={() => openDeleteConfirm(product)}
-                      title="삭제"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-2">
+                        <div className="flex items-center">
+                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                          <span className="ml-1 text-sm font-medium text-gray-900">{product.rating}</span>
+                        </div>
+                        <span className="text-gray-300">|</span>
+                        <span className="text-sm text-gray-600">{product.reviews} 리뷰</span>
+                      </div>
+                      {product.stock_quantity && (
+                        <span className="text-sm font-medium text-green-600">
+                          재고: {product.stock_quantity}개
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between mt-auto">
+                      <div className="flex flex-col">
+                        {product.original_price && (
+                          <del className="text-sm text-gray-400">
+                            {formatPrice(product.original_price)}원
+                          </del>
+                        )}
+                        <span className="text-xl font-bold text-blue-600">
+                          {formatPrice(product.price)}원
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleProductClick(product.naver_url || '')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 hover:scale-105 ${isSoldOut ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+                        disabled={isSoldOut}
+                      >
+                        {isSoldOut ? (
+                          <>품절</>
+                        ) : (
+                          <>
+                            제품 구매하기
+                            <ShoppingCart className="w-4 h-4 ml-1" />
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
-                )}
-              </div>
-            ))}
+
+                  {/* 관리자만 수정/삭제/숨기기 버튼 노출 */}
+                  {isAdmin && (
+                    <div className="absolute top-3 right-3 flex gap-2 z-10">
+                      <button
+                        className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        onClick={() => handleToggleActive(product)}
+                        title={isHidden ? '노출 해제' : '숨기기'}
+                        disabled={formLoading}
+                      >
+                        {isHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                      </button>
+                      <button
+                        className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow"
+                        onClick={() => openForm(product)}
+                        title="수정"
+                        disabled={formLoading}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-2 shadow"
+                        onClick={() => openDeleteConfirm(product)}
+                        title="삭제"
+                        disabled={formLoading}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* 상품 추가/수정 모달 폼 (UI만, 실제 저장은 이후 단계) */}
+      {/* 상품 추가/수정 모달 폼 */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full relative">
             <button className="absolute top-4 right-4 text-gray-400 hover:text-gray-700" onClick={closeForm}><X className="w-6 h-6" /></button>
             <h2 className="text-2xl font-bold mb-4">{editingProduct ? '상품 수정' : '상품 추가'}</h2>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleFormSave}>
               <div>
                 <label className="block text-sm font-medium mb-1">상품명</label>
                 <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.name || ''} onChange={e => setFormValues(v => ({ ...v, name: e.target.value }))} />
@@ -357,7 +513,7 @@ const Shop = () => {
               <div className="flex gap-2">
                 <div className="flex-1">
                   <label className="block text-sm font-medium mb-1">할인율(%)</label>
-                  <input type="number" className="w-full border px-3 py-2 rounded" value={formValues.discount || ''} onChange={e => setFormValues(v => ({ ...v, discount: Number(e.target.value) }))} />
+                  <input type="number" className="w-full border px-3 py-2 rounded bg-gray-100" value={formValues.discount || ''} readOnly tabIndex={-1} />
                 </div>
                 <div className="flex-1">
                   <label className="block text-sm font-medium mb-1">재고</label>
@@ -386,26 +542,29 @@ const Shop = () => {
                   <input type="checkbox" checked={!!formValues.is_best} onChange={e => setFormValues(v => ({ ...v, is_best: e.target.checked }))} /> 베스트
                 </label>
               </div>
-              {/* 저장 버튼은 이후 단계에서 구현 */}
               <div className="flex justify-end gap-2 mt-6">
-                <button type="button" className="px-4 py-2 rounded bg-gray-200 text-gray-700" onClick={closeForm}>취소</button>
-                <button type="button" className="px-4 py-2 rounded bg-blue-600 text-white font-semibold">저장</button>
+                <button type="button" className="px-4 py-2 rounded bg-gray-200 text-gray-700" onClick={closeForm} disabled={formLoading}>취소</button>
+                <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white font-semibold disabled:opacity-50" disabled={formLoading}>{formLoading ? '저장 중...' : '저장'}</button>
               </div>
+              {formError && <div className="mt-2 text-sm text-red-600">{formError}</div>}
+              {formSuccess && <div className="mt-2 text-sm text-green-700">{formSuccess}</div>}
             </form>
           </div>
         </div>
       )}
 
-      {/* 삭제 확인 모달 (UI만, 실제 삭제는 이후 단계) */}
+      {/* 삭제 확인 모달 */}
       {showDeleteConfirm && deleteTarget && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-8 max-w-xs w-full text-center">
             <div className="text-lg font-bold text-red-700 mb-4">상품 삭제</div>
             <div className="mb-6 text-gray-800">정말로 <b>{deleteTarget.name}</b> 상품을 삭제하시겠습니까?</div>
             <div className="flex gap-4 justify-center">
-              <button onClick={closeDeleteConfirm} className="bg-gray-300 text-gray-700 px-4 py-2 rounded">취소</button>
-              <button className="bg-red-600 text-white px-4 py-2 rounded">삭제</button>
+              <button onClick={closeDeleteConfirm} className="bg-gray-300 text-gray-700 px-4 py-2 rounded" disabled={formLoading}>취소</button>
+              <button className="bg-red-600 text-white px-4 py-2 rounded disabled:opacity-50" onClick={handleDelete} disabled={formLoading}>{formLoading ? '삭제 중...' : '삭제'}</button>
             </div>
+            {formError && <div className="mt-4 text-sm text-red-600">{formError}</div>}
+            {formSuccess && <div className="mt-4 text-sm text-green-700">{formSuccess}</div>}
           </div>
         </div>
       )}
