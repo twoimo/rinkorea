@@ -101,7 +101,7 @@ const Index = () => {
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
               린코리아만의 특별함
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-1xl mx-auto">
               최고 품질의 세라믹 코팅제로 안전하고 친환경적인 건설환경을 만들어갑니다
             </p>
           </div>
