@@ -206,8 +206,8 @@ const Shop = () => {
                   key={option.value}
                   onClick={() => handleSort(option.value)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${sortBy === option.value
-                      ? 'bg-blue-600 text-white shadow-md'
-                      : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
                     }`}
                 >
                   {option.label}
