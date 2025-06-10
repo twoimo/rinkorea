@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import AdminOnly from '../components/AdminOnly';
-import { MessageCircle, Plus, Search, User, Calendar, CheckCircle, Clock, ChevronDown, Reply, Trash2, Send } from 'lucide-react';
+import { MessageCircle, Plus, Search, User, Calendar, CheckCircle, Clock, ChevronDown, Reply, Trash2, Send, Edit, X } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useInquiries } from '@/hooks/useInquiries';
@@ -15,6 +16,7 @@ const QnA = () => {
   const [selectedCategory, setSelectedCategory] = useState('전체');
   const [selectedStatus, setSelectedStatus] = useState('전체');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [editingReply, setEditingReply] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
   const [formData, setFormData] = useState({
     name: '',
@@ -87,7 +89,36 @@ const QnA = () => {
         description: "고객에게 답변이 전달되었습니다."
       });
       setReplyingTo(null);
+      setEditingReply(null);
       setReplyText('');
+    }
+  };
+
+  const handleEditReply = (inquiryId: string, currentReply: string) => {
+    setEditingReply(inquiryId);
+    setReplyText(currentReply);
+    setReplyingTo(null);
+  };
+
+  const handleDeleteReply = async (inquiryId: string) => {
+    if (!confirm('답변을 삭제하시겠습니까?')) return;
+
+    const { error } = await updateInquiry(inquiryId, {
+      admin_reply: null,
+      status: 'pending'
+    });
+
+    if (error) {
+      toast({
+        title: "답변 삭제 실패",
+        description: "다시 시도해주세요.",
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "답변이 삭제되었습니다",
+        description: "답변이 성공적으로 삭제되었습니다."
+      });
     }
   };
 
@@ -108,6 +139,12 @@ const QnA = () => {
         description: "문의 내역이 성공적으로 삭제되었습니다."
       });
     }
+  };
+
+  const cancelEdit = () => {
+    setEditingReply(null);
+    setReplyingTo(null);
+    setReplyText('');
   };
 
   return (
@@ -238,10 +275,9 @@ const QnA = () => {
             </div>
           </div>
 
-          {/* Question Form - 기존 코드 유지 */}
+          {/* Question Form */}
           {showForm && (
             <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100 mb-8 animate-fade-in">
-              {/* ... keep existing code (form implementation) */}
               <div className="flex items-center mb-6">
                 <div className="bg-blue-100 p-2 rounded-lg mr-3">
                   <MessageCircle className="w-5 h-5 text-blue-600" />
@@ -406,23 +442,49 @@ const QnA = () => {
                   {/* 관리자 답변 */}
                   {item.admin_reply && (
                     <div className="mt-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-                      <div className="flex items-center mb-2">
-                        <div className="bg-blue-100 p-1 rounded mr-2">
-                          <User className="w-4 h-4 text-blue-600" />
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center">
+                          <div className="bg-blue-100 p-1 rounded mr-2">
+                            <User className="w-4 h-4 text-blue-600" />
+                          </div>
+                          <p className="text-sm font-medium text-blue-900">관리자 답변</p>
                         </div>
-                        <p className="text-sm font-medium text-blue-900">관리자 답변</p>
+                        <AdminOnly>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleEditReply(item.id, item.admin_reply)}
+                              className="text-blue-600 hover:text-blue-700 p-1"
+                              title="답변 수정"
+                            >
+                              <Edit className="w-3 h-3" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteReply(item.id)}
+                              className="text-red-600 hover:text-red-700 p-1"
+                              title="답변 삭제"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </AdminOnly>
                       </div>
                       <p className="text-blue-800 leading-relaxed">{item.admin_reply}</p>
                     </div>
                   )}
 
-                  {/* 관리자 답변 입력 폼 */}
+                  {/* 관리자 답변 입력/수정 폼 */}
                   <AdminOnly>
-                    {replyingTo === item.id && (
+                    {(replyingTo === item.id || editingReply === item.id) && (
                       <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                         <div className="flex items-center mb-3">
-                          <Reply className="w-4 h-4 text-gray-600 mr-2" />
-                          <span className="text-sm font-medium text-gray-700">관리자 답변 작성</span>
+                          {editingReply === item.id ? (
+                            <Edit className="w-4 h-4 text-gray-600 mr-2" />
+                          ) : (
+                            <Reply className="w-4 h-4 text-gray-600 mr-2" />
+                          )}
+                          <span className="text-sm font-medium text-gray-700">
+                            {editingReply === item.id ? '답변 수정' : '관리자 답변 작성'}
+                          </span>
                         </div>
                         <textarea
                           value={replyText}
@@ -438,13 +500,10 @@ const QnA = () => {
                             className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center"
                           >
                             <Send className="w-3 h-3 mr-1" />
-                            답변 등록
+                            {editingReply === item.id ? '수정 완료' : '답변 등록'}
                           </button>
                           <button
-                            onClick={() => {
-                              setReplyingTo(null);
-                              setReplyText('');
-                            }}
+                            onClick={cancelEdit}
                             className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium"
                           >
                             취소
