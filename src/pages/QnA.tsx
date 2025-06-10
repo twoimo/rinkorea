@@ -29,6 +29,15 @@ const QnA = () => {
     content: '',
     is_private: false
   });
+  const [editingInquiryId, setEditingInquiryId] = useState<string | null>(null);
+  const [editFormData, setEditFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    title: '',
+    content: '',
+    is_private: false
+  });
 
   const categories = ['전체', '제품문의', '시공문의', '기술지원', '기타'];
   const statusFilter = ['전체', '답변대기', '답변완료'];
@@ -396,78 +405,87 @@ const QnA = () => {
           ) : filteredItems.length > 0 ? (
             <div className="space-y-4">
               {filteredItems.map((item) => {
-                const canView = !item.is_private || isAdmin || (user && user.id === item.user_id);
+                const isOwner = user && user.id === item.user_id;
+                const canView = !item.is_private || isAdmin || isOwner;
+                const canShowContent = canView && !!user;
                 return (
                   <div key={item.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
+                    <div className="mb-2">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${item.status === 'answered'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                        {item.status === 'answered' ? (
+                          <>
+                            <CheckCircle className="w-3 h-3" /> 답변완료
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="w-3 h-3" /> 답변대기
+                          </>
+                        )}
+                      </span>
+                    </div>
                     <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${item.status === 'answered'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                          {item.status === 'answered' ? (
-                            <>
-                              <CheckCircle className="w-3 h-3" />
-                              답변완료
-                            </>
-                          ) : (
-                            <>
-                              <Clock className="w-3 h-3" />
-                              답변대기
-                            </>
-                          )}
-                        </span>
-                      </div>
+                      <div className="flex-1" />
                       <div className="flex items-center gap-4">
-                        <div className="flex items-center text-sm text-gray-500 gap-4">
+                        <div className="flex items-center text-sm text-gray-500 gap-3">
                           <div className="flex items-center gap-1">
                             <User className="w-4 h-4" />
                             {item.name}
                           </div>
+                          {isAdmin && item.phone && (
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">{item.phone}</span>
+                            </div>
+                          )}
                           <div className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
                             {new Date(item.created_at).toLocaleDateString('ko-KR')}
                           </div>
                         </div>
-                        <AdminOnly>
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => setReplyingTo(replyingTo === item.id ? null : item.id)}
-                              className="text-blue-600 hover:text-blue-700 p-1"
-                              title="답변하기"
-                            >
-                              <Reply className="w-4 h-4" />
+                        {(isAdmin || isOwner) && (
+                          <>
+                            <button onClick={() => {
+                              setEditingInquiryId(item.id);
+                              setEditFormData({
+                                name: item.name,
+                                email: item.email,
+                                phone: item.phone || '',
+                                title: item.title,
+                                content: item.content,
+                                is_private: item.is_private || false
+                              });
+                            }} className="text-blue-600 hover:text-blue-700 p-1" title="수정">
+                              <Edit className="w-4 h-4" />
                             </button>
-                            <button
-                              onClick={() => handleDelete(item.id)}
-                              className="text-red-600 hover:text-red-700 p-1"
-                              title="삭제하기"
-                            >
+                            <button onClick={() => handleDelete(item.id)} className="text-red-600 hover:text-red-700 p-1" title="삭제">
                               <Trash2 className="w-4 h-4" />
                             </button>
-                          </div>
-                        </AdminOnly>
+                          </>
+                        )}
                       </div>
                     </div>
-
                     <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                      {item.is_private && <Lock className="w-4 h-4 text-gray-400 mr-1" />} {item.title}
+                      {item.is_private && <Lock className="w-4 h-4 text-gray-400 mr-1" />} {editingInquiryId === item.id ? (
+                        <input value={editFormData.title} onChange={e => setEditFormData(f => ({ ...f, title: e.target.value }))} className="border rounded px-2 py-1 w-full" />
+                      ) : item.title}
                     </h3>
-                    {canView ? (
+                    {editingInquiryId === item.id ? (
+                      <>
+                        <textarea value={editFormData.content} onChange={e => setEditFormData(f => ({ ...f, content: e.target.value }))} className="border rounded px-2 py-1 w-full mb-2" rows={4} />
+                        <div className="flex gap-2 mb-2">
+                          <button onClick={async () => { await updateInquiry(item.id, { title: editFormData.title, content: editFormData.content }); setEditingInquiryId(null); }} className="bg-blue-600 text-white px-4 py-1 rounded">저장</button>
+                          <button onClick={() => setEditingInquiryId(null)} className="bg-gray-200 text-gray-700 px-4 py-1 rounded">취소</button>
+                        </div>
+                      </>
+                    ) : canShowContent ? (
                       <>
                         <p className="text-gray-600 mb-4 leading-relaxed whitespace-pre-wrap">{item.content}</p>
-                        <RepliesSection inquiryId={item.id} canView={canView} isAdmin={isAdmin} />
+                        <RepliesSection inquiryId={item.id} canView={canShowContent} isAdmin={isAdmin} />
                       </>
                     ) : (
                       <div className="text-gray-400 italic flex items-center"><Lock className="w-4 h-4 mr-1" /> 비밀글입니다</div>
-                    )}
-
-                    {/* 본인글 수정/삭제 버튼 */}
-                    {user && user.id === item.user_id && (
-                      <div className="flex gap-2 mt-2">
-                        <button className="text-blue-600 hover:underline">수정</button>
-                        <button onClick={() => handleDelete(item.id)} className="text-red-600 hover:underline">삭제</button>
-                      </div>
                     )}
                   </div>
                 );
