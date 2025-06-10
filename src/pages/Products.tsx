@@ -7,21 +7,21 @@ const Products = () => {
   const products = [
     {
       name: "RIN-COAT",
-      image: '/images/1-메인-18.jpg',
+      image: '/images/main-18.jpg',
       icon: <Shield className="w-8 h-8 text-blue-600" />,
       description: "기본형 세라믹 코팅제로 우수한 불연성능과 내구성을 제공합니다.",
       features: ["불연재 인증", "우수한 내구성", "간편한 시공", "친환경 소재"]
     },
     {
       name: "RIN-COAT COLOR",
-      image: '/images/1-메인-8.jpg',
+      image: '/images/main-8.jpg',
       icon: <Palette className="w-8 h-8 text-green-600" />,
       description: "다양한 색상을 적용할 수 있는 컬러형 세라믹 코팅제입니다.",
       features: ["다양한 색상", "미적 효과", "불연 성능", "장기 내구성"]
     },
     {
       name: "RIN-HARD PLUS",
-      image: '/images/1-메인-11.jpg',
+      image: '/images/main-11.jpg',
       icon: <Star className="w-8 h-8 text-yellow-600" />,
       description: "강화된 성능의 프리미엄 세라믹 코팅제로 최고의 품질을 제공합니다.",
       features: ["프리미엄 품질", "향상된 강도", "특수 용도", "고성능 불연재"]
