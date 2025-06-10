@@ -85,6 +85,9 @@ export const useInquiries = () => {
   const updateInquiry = async (id: string, updates: {
     status?: string;
     admin_reply?: string;
+    name?: string;
+    email?: string;
+    phone?: string;
     title?: string;
     content?: string;
     is_private?: boolean;

@@ -38,6 +38,7 @@ const QnA = () => {
     content: '',
     is_private: false
   });
+  const [inquiryReplies, setInquiryReplies] = useState<Record<string, boolean>>({});
 
   const categories = ['전체', '제품문의', '시공문의', '기술지원', '기타'];
   const statusFilter = ['전체', '답변대기', '답변완료'];
@@ -59,6 +60,19 @@ const QnA = () => {
       phone: user?.user_metadata?.phone || ''
     }));
   }, [user]);
+
+  // 답변 상태 확인
+  useEffect(() => {
+    const checkReplies = async () => {
+      const repliesMap: Record<string, boolean> = {};
+      for (const inquiry of inquiries) {
+        const replies = await getReplies(inquiry.id);
+        repliesMap[inquiry.id] = replies.length > 0;
+      }
+      setInquiryReplies(repliesMap);
+    };
+    checkReplies();
+  }, [inquiries]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -418,11 +432,11 @@ const QnA = () => {
                   <div key={item.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
                     <div className="flex items-center justify-between mb-4">
                       {/* 상태 뱃지 */}
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${item.status === 'answered'
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${inquiryReplies[item.id]
                         ? 'bg-green-100 text-green-800'
                         : 'bg-yellow-100 text-yellow-800'
                         }`}>
-                        {item.status === 'answered' ? (
+                        {inquiryReplies[item.id] ? (
                           <>
                             <CheckCircle className="w-3 h-3" /> 답변완료
                           </>
