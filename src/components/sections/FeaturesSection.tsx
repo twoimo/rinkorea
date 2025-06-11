@@ -66,11 +66,8 @@ const FeaturesSection = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Section Header */}
         <div className="text-center mb-12 sm:mb-16 max-w-3xl mx-auto">
-          <div className="inline-block bg-red-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4 sm:mb-6 tracking-wider">
-            RIN-COAT 특징
-          </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-4 sm:mb-6 leading-tight">
-            린코리아만의 
+            린코리아만의
             <span className="text-red-600"> 특별함</span>
           </h2>
           <p className="text-lg sm:text-xl text-gray-600 leading-relaxed px-4">
@@ -104,14 +101,6 @@ const FeaturesSection = () => {
               <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity duration-300`} />
             </div>
           ))}
-        </div>
-
-        {/* Bottom CTA */}
-        <div className="text-center mt-12 sm:mt-16">
-          <div className="inline-flex items-center gap-2 bg-gray-100 px-4 sm:px-6 py-3 rounded-full text-gray-700 text-sm sm:text-base">
-            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
-            <span className="font-semibold">국토교통부 인증 완료</span>
-          </div>
         </div>
       </div>
     </section>

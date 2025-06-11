@@ -36,19 +36,14 @@ const CompanyOverview = () => {
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 sm:gap-16 items-center max-w-7xl mx-auto">
-          
+
           {/* Content */}
           <div className="order-2 lg:order-1">
-            <div className="inline-block bg-red-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4 sm:mb-6 tracking-wider">
-              COMPANY
-            </div>
-            
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-4 sm:mb-6 leading-tight">
               신뢰할 수 있는
-              <br />
-              <span className="text-red-600">파트너</span>
+              <span className="text-red-600"> 파트너</span>
             </h2>
-            
+
             <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 leading-relaxed">
               린코리아는 건설재료사업부와 2024년 신설된 건설기계사업부를 통해
               종합적인 건설 솔루션을 제공합니다.
@@ -105,7 +100,7 @@ const CompanyOverview = () => {
                   loadingClassName="bg-gray-100"
                   errorClassName="bg-gray-100"
                 />
-                
+
                 {/* Overlay Content */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 text-white">
@@ -123,7 +118,7 @@ const CompanyOverview = () => {
                   <span className="text-xs sm:text-sm font-semibold text-gray-900">인증 완료</span>
                 </div>
               </div>
-              
+
               <div className="absolute -bottom-4 sm:-bottom-6 -right-4 sm:-right-6 bg-white rounded-xl p-3 sm:p-4 shadow-xl border border-gray-100">
                 <div className="text-center">
                   <div className="text-lg sm:text-2xl font-bold text-red-600">10+</div>
