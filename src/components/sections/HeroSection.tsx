@@ -12,7 +12,6 @@ const HeroSection = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
 
-  // 유튜브 링크 불러오기
   const loadYoutubeLink = async () => {
     try {
       const { data, error } = await (supabase as SupabaseClient)
@@ -33,7 +32,6 @@ const HeroSection = () => {
     loadYoutubeLink();
   }, []);
 
-  // 유튜브 주소를 embed 주소로 변환
   const toEmbedUrl = (url: string) => {
     if (url.includes('/embed/')) return url;
     const watchMatch = url.match(/(?:youtube\.com\/watch\?v=)([\w-]+)/);
@@ -49,10 +47,8 @@ const HeroSection = () => {
     return url;
   };
 
-  // 실시간 변환된 embed 주소
   const embedPreview = toEmbedUrl(editLink);
 
-  // 유튜브 링크 저장
   const handleSaveYoutubeLink = async () => {
     setLoading(true);
     setResult('');
@@ -101,48 +97,48 @@ const HeroSection = () => {
 
       {/* Content Container */}
       <div className="relative z-10 h-screen flex items-center">
-        <div className="container mx-auto px-6 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl">
             {/* Patent & Trademark Info */}
-            <div className="mb-8 space-y-2">
-              <div className="inline-block bg-yellow-400 text-black px-4 py-2 rounded-full text-sm font-bold tracking-wider shadow-lg">
+            <div className="mb-6 sm:mb-8 space-y-2 sm:space-y-0 sm:space-x-4 flex flex-col sm:flex-row">
+              <div className="inline-block bg-yellow-400 text-black px-3 py-2 sm:px-4 rounded-full text-xs sm:text-sm font-bold tracking-wider shadow-lg">
                 특허 제 10-2312833 호
               </div>
-              <div className="inline-block bg-yellow-400 text-black px-4 py-2 rounded-full text-sm font-bold tracking-wider shadow-lg ml-4">
+              <div className="inline-block bg-yellow-400 text-black px-3 py-2 sm:px-4 rounded-full text-xs sm:text-sm font-bold tracking-wider shadow-lg">
                 상표 제 40-1678504 호
               </div>
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black mb-8 leading-tight">
-              <span className="text-white drop-shadow-2xl">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-6 sm:mb-8 leading-tight">
+              <span className="text-white drop-shadow-2xl block">
                 친환경 불연재(1액형)
               </span>
-              <div className="h-4"></div>
-              <span className="text-blue-400 drop-shadow-2xl">
+              <div className="h-2 sm:h-4"></div>
+              <span className="text-blue-400 drop-shadow-2xl block">
                 신소재 세라믹 코팅제
               </span>
             </h1>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-12">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-12">
               <Link
                 to="/contact"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 sm:px-8 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg touch-manipulation text-base sm:text-lg"
               >
                 제품 문의하기
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 to="/shop"
-                className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg"
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-4 sm:px-8 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg touch-manipulation text-base sm:text-lg"
               >
                 제품 구매하기
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 to="/projects"
-                className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg"
+                className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-6 py-4 sm:px-8 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg touch-manipulation text-base sm:text-lg"
               >
                 시공사례 보기
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -154,14 +150,14 @@ const HeroSection = () => {
 
       {/* Admin Controls */}
       {isAdmin && (
-        <div className="absolute top-4 right-4 z-20 bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-xl max-w-md border">
-          <div className="mb-3 font-bold text-gray-900 flex items-center gap-2">
-            <Loader2 className="w-5 h-5 animate-spin" style={{ display: loading ? 'inline' : 'none' }} />
+        <div className="absolute top-4 right-4 z-20 bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-xl shadow-xl max-w-xs sm:max-w-md border">
+          <div className="mb-3 font-bold text-gray-900 flex items-center gap-2 text-sm sm:text-base">
+            <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" style={{ display: loading ? 'inline' : 'none' }} />
             메인 유튜브 영상 링크 수정
           </div>
           <input
             type="text"
-            className="border border-gray-300 px-3 py-2 rounded-lg w-full text-sm focus:ring-2 focus:ring-blue-400 mb-2"
+            className="border border-gray-300 px-3 py-2 rounded-lg w-full text-xs sm:text-sm focus:ring-2 focus:ring-blue-400 mb-2"
             value={editLink}
             onChange={e => setEditLink(e.target.value)}
             placeholder="유튜브 영상 주소 입력"
@@ -173,7 +169,7 @@ const HeroSection = () => {
           <button
             onClick={handleSaveYoutubeLink}
             disabled={loading || !editLink}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg disabled:opacity-50 transition-colors font-semibold"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg disabled:opacity-50 transition-colors font-semibold text-sm touch-manipulation"
           >
             {loading ? (<span className="flex items-center gap-2 justify-center"><Loader2 className="w-4 h-4 animate-spin" /> 저장 중...</span>) : '저장'}
           </button>
