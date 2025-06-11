@@ -98,7 +98,7 @@ const HeroSection = () => {
       </div>
 
       {/* Enhanced Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-blue-900/60"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/80 via-sky-900/60 to-red-800/70"></div>
 
       {/* Content Container */}
       <div className="relative z-10 h-screen flex items-center">
@@ -106,10 +106,10 @@ const HeroSection = () => {
           <div className="max-w-4xl">
             {/* Patent & Trademark Info */}
             <div className="mb-8 space-y-2">
-              <div className="inline-block bg-yellow-400 text-black px-4 py-2 rounded-full text-sm font-bold tracking-wider shadow-lg">
+              <div className="inline-block bg-red-600 text-white px-4 py-2 rounded-full text-sm font-bold tracking-wider shadow-lg">
                 특허 제 10-2312833 호
               </div>
-              <div className="inline-block bg-yellow-400 text-black px-4 py-2 rounded-full text-sm font-bold tracking-wider shadow-lg ml-4">
+              <div className="inline-block bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold tracking-wider shadow-lg ml-4">
                 상표 제 40-1678504 호
               </div>
             </div>
@@ -120,14 +120,14 @@ const HeroSection = () => {
                 친환경 불연재(1액형)
               </span>
               <br />
-              <span className="text-yellow-400 drop-shadow-2xl">
+              <span className="text-sky-400 drop-shadow-2xl">
                 신소재 세라믹 코팅제
               </span>
             </h1>
 
             {/* Product Name */}
             <div className="mb-8">
-              <span className="text-2xl md:text-3xl font-bold text-red-500 bg-white px-6 py-3 rounded-lg shadow-xl">
+              <span className="text-2xl md:text-3xl font-bold text-red-600 bg-white px-6 py-3 rounded-lg shadow-xl">
                 RIN-COAT
               </span>
             </div>
@@ -136,14 +136,14 @@ const HeroSection = () => {
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <Link
                 to="/contact"
-                className="group bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center shadow-2xl hover:shadow-orange-500/25 hover:scale-105"
+                className="group bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center shadow-2xl hover:shadow-red-500/25 hover:scale-105"
               >
                 제품 문의하기
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 to="/projects"
-                className="group bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/30 hover:border-white/50 px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center shadow-2xl hover:scale-105"
+                className="group bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center shadow-2xl hover:scale-105"
               >
                 시공사례 보기
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -152,16 +152,16 @@ const HeroSection = () => {
 
             {/* Key Features */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-3xl">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                <div className="text-yellow-400 font-bold text-sm mb-1">국토교통부 인증</div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-red-300/30">
+                <div className="text-red-400 font-bold text-sm mb-1">국토교통부 인증</div>
                 <div className="text-white text-xs">불연재 인증 완료</div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-green-300/30">
                 <div className="text-green-400 font-bold text-sm mb-1">친환경 소재</div>
                 <div className="text-white text-xs">1액형 신소재</div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                <div className="text-blue-400 font-bold text-sm mb-1">검증된 품질</div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-sky-300/30">
+                <div className="text-sky-400 font-bold text-sm mb-1">검증된 품질</div>
                 <div className="text-white text-xs">시험성적서 완비</div>
               </div>
             </div>
@@ -171,14 +171,14 @@ const HeroSection = () => {
 
       {/* Admin Controls */}
       {isAdmin && (
-        <div className="absolute top-4 right-4 z-20 bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-xl max-w-md border">
-          <div className="mb-3 font-bold text-gray-900 flex items-center gap-2">
+        <div className="absolute top-4 right-4 z-20 bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-xl max-w-md border border-blue-200">
+          <div className="mb-3 font-bold text-blue-900 flex items-center gap-2">
             <Loader2 className="w-5 h-5 animate-spin" style={{ display: loading ? 'inline' : 'none' }} />
             메인 유튜브 영상 링크 수정
           </div>
           <input
             type="text"
-            className="border border-gray-300 px-3 py-2 rounded-lg w-full text-sm focus:ring-2 focus:ring-blue-400 mb-2"
+            className="border border-blue-300 px-3 py-2 rounded-lg w-full text-sm focus:ring-2 focus:ring-blue-400 mb-2"
             value={editLink}
             onChange={e => setEditLink(e.target.value)}
             placeholder="유튜브 영상 주소 입력"

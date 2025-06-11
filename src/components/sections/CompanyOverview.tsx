@@ -22,7 +22,7 @@ const CompanyOverview = () => {
       icon: <Building2 className="w-6 h-6" />,
       label: "사업부문",
       value: "건설재료사업부 / 건설기계사업부",
-      color: "text-orange-600"
+      color: "text-red-600"
     }
   ];
 
@@ -30,8 +30,10 @@ const CompanyOverview = () => {
     <section className="py-20 bg-white relative">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 right-10 w-32 h-32 bg-blue-100 rounded-full opacity-50" />
+        <div className="absolute top-20 right-10 w-32 h-32 bg-sky-100 rounded-full opacity-50" />
         <div className="absolute bottom-20 left-10 w-24 h-24 bg-red-100 rounded-full opacity-50" />
+        <div className="absolute top-40 left-20 w-16 h-16 bg-green-100 rounded-full opacity-30" />
+        <div className="absolute bottom-40 right-20 w-20 h-20 bg-blue-100 rounded-full opacity-40" />
       </div>
 
       <div className="container mx-auto px-6 lg:px-8 relative">
@@ -59,7 +61,7 @@ const CompanyOverview = () => {
               {companyInfo.map((info, index) => (
                 <div
                   key={index}
-                  className="group bg-gray-50 hover:bg-white rounded-xl p-5 transition-all duration-300 border border-gray-100 hover:border-gray-200 hover:shadow-lg"
+                  className="group bg-gray-50 hover:bg-white rounded-xl p-5 transition-all duration-300 border border-gray-100 hover:border-blue-200 hover:shadow-lg"
                 >
                   <div className="flex items-start gap-4">
                     <div className={`${info.color} bg-white rounded-lg p-2 shadow-sm group-hover:scale-110 transition-transform`}>
@@ -85,7 +87,7 @@ const CompanyOverview = () => {
               </Link>
               <Link
                 to="/contact"
-                className="group bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-200 hover:border-gray-300 px-8 py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center hover:scale-105"
+                className="group bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center hover:scale-105"
               >
                 <Phone className="mr-2 w-5 h-5" />
                 연락하기
@@ -107,7 +109,7 @@ const CompanyOverview = () => {
                 />
                 
                 {/* Overlay Content */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-transparent to-transparent" />
                 <div className="absolute bottom-6 left-6 text-white">
                   <div className="bg-red-600 px-3 py-1 rounded text-sm font-bold mb-2 inline-block">
                     RIN-COAT
@@ -117,14 +119,14 @@ const CompanyOverview = () => {
               </div>
 
               {/* Floating Elements */}
-              <div className="absolute -top-6 -left-6 bg-white rounded-xl p-4 shadow-xl border border-gray-100">
+              <div className="absolute -top-6 -left-6 bg-white rounded-xl p-4 shadow-xl border border-green-200">
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
                   <span className="text-sm font-semibold text-gray-900">인증 완료</span>
                 </div>
               </div>
               
-              <div className="absolute -bottom-6 -right-6 bg-white rounded-xl p-4 shadow-xl border border-gray-100">
+              <div className="absolute -bottom-6 -right-6 bg-white rounded-xl p-4 shadow-xl border border-blue-200">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-red-600">10+</div>
                   <div className="text-xs text-gray-600">Years Experience</div>
