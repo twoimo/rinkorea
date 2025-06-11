@@ -130,10 +130,10 @@ const Index = () => {
             <div className="w-full md:w-1/2 h-full flex items-center pl-8">
               <div className="bg-black bg-opacity-40 p-8 rounded-lg backdrop-blur-sm w-full max-w-[480px] md:max-w-[540px] xl:max-w-[700px] text-left">
                 <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
-                  <span className="text-blue-400">세라믹 코팅의 모든 것</span>
+                  <span className="text-blue-400">친환경 불연재(1액형) 신소재 세라믹 코팅제</span>
                 </h1>
                 <p className="text-xl md:text-2xl mb-8 text-gray-100 drop-shadow-md">
-                  친환경 불연재(1액형) 신소재 세라믹 코팅제
+                  특허 제 10-2312833 호 / 상표 제 40-1678504 호
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link
