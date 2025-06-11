@@ -118,8 +118,8 @@ const HeroSection = () => {
               <span className="text-white drop-shadow-2xl">
                 친환경 불연재(1액형)
               </span>
-              <br />
-              <span className="text-blue-400 drop-shadow-xl">
+              <div className="h-4"></div>
+              <span className="text-blue-400 drop-shadow-2xl">
                 신소재 세라믹 코팅제
               </span>
             </h1>
