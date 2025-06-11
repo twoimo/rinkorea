@@ -94,36 +94,15 @@ const CompanyOverview = () => {
               {/* Main Image Container */}
               <div className="relative rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-700">
                 <OptimizedImage
-                  src="/images/1-메인-18.jpg"
+                  src="/images/company_intro.jpg"
                   alt="린코리아 제품"
-                  className="w-full h-64 sm:h-80 lg:h-[500px] object-cover"
+                  className="w-full h-auto object-contain"
                   loadingClassName="bg-gray-100"
                   errorClassName="bg-gray-100"
                 />
 
                 {/* Overlay Content */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 text-white">
-                  <div className="bg-red-600 px-2 py-1 sm:px-3 rounded text-xs sm:text-sm font-bold mb-2 inline-block">
-                    RIN-COAT
-                  </div>
-                  <div className="text-sm sm:text-lg font-bold">신소재 세라믹 코팅제</div>
-                </div>
-              </div>
-
-              {/* Floating Elements */}
-              <div className="absolute -top-4 sm:-top-6 -left-4 sm:-left-6 bg-white rounded-xl p-3 sm:p-4 shadow-xl border border-gray-100">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full animate-pulse" />
-                  <span className="text-xs sm:text-sm font-semibold text-gray-900">인증 완료</span>
-                </div>
-              </div>
-
-              <div className="absolute -bottom-4 sm:-bottom-6 -right-4 sm:-right-6 bg-white rounded-xl p-3 sm:p-4 shadow-xl border border-gray-100">
-                <div className="text-center">
-                  <div className="text-lg sm:text-2xl font-bold text-red-600">10+</div>
-                  <div className="text-xs text-gray-600">Years Experience</div>
-                </div>
               </div>
             </div>
           </div>
