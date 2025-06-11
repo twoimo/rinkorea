@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Loader2, CheckCircle, XCircle } from 'lucide-react';
@@ -120,50 +119,34 @@ const HeroSection = () => {
                 친환경 불연재(1액형)
               </span>
               <br />
-              <span className="text-yellow-400 drop-shadow-2xl">
+              <span className="text-blue-400 drop-shadow-xl">
                 신소재 세라믹 코팅제
               </span>
             </h1>
-
-            {/* Product Name */}
-            <div className="mb-8">
-              <span className="text-2xl md:text-3xl font-bold text-red-500 bg-white px-6 py-3 rounded-lg shadow-xl">
-                RIN-COAT
-              </span>
-            </div>
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <Link
                 to="/contact"
-                className="group bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center shadow-2xl hover:shadow-orange-500/25 hover:scale-105"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg"
               >
                 제품 문의하기
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
+                to="/shop"
+                className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg"
+              >
+                제품 구매하기
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link
                 to="/projects"
-                className="group bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/30 hover:border-white/50 px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center shadow-2xl hover:scale-105"
+                className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg"
               >
                 시공사례 보기
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-            </div>
-
-            {/* Key Features */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-3xl">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                <div className="text-yellow-400 font-bold text-sm mb-1">국토교통부 인증</div>
-                <div className="text-white text-xs">불연재 인증 완료</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                <div className="text-green-400 font-bold text-sm mb-1">친환경 소재</div>
-                <div className="text-white text-xs">1액형 신소재</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                <div className="text-blue-400 font-bold text-sm mb-1">검증된 품질</div>
-                <div className="text-white text-xs">시험성적서 완비</div>
-              </div>
             </div>
           </div>
         </div>
