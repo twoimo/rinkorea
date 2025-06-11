@@ -2,7 +2,6 @@ import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Building, Users, Target, Award, MapPin, Phone, Mail, Calendar, CheckCircle } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 const About = () => {
   return (
@@ -10,33 +9,22 @@ const About = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-24">
+      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center"
-          >
-            <h1 className="text-6xl font-bold mb-8">회사소개</h1>
-            <p className="text-xl max-w-3xl mx-auto leading-relaxed">
+          <div className="text-center">
+            <h1 className="text-5xl font-bold mb-6">회사소개</h1>
+            <p className="text-xl max-w-2xl mx-auto">
               세라믹 코팅 전문 기업 린코리아는 혁신적인 기술과 품질로 <br />
               건설업계의 새로운 기준을 제시합니다.
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Company Introduction */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="max-w-4xl mx-auto text-center mb-16"
-          >
+          <div className="max-w-4xl mx-auto text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-6">린코리아 소개</h2>
             <p className="text-lg text-gray-600 leading-relaxed mb-8">
               린코리아는 2010년 설립 이후, 건설재료와 건설기계 분야에서 혁신적인 솔루션을 제공하는 전문 기업으로 성장해왔습니다.
@@ -59,35 +47,23 @@ const About = () => {
                 <p className="text-gray-600">신뢰, 혁신, 지속가능성</p>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Business Divisions */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
+          <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-6">사업 영역</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               린코리아는 건설재료와 건설기계 두 가지 핵심 사업을 통해
               건설업계의 발전을 이끌어가고 있습니다.
             </p>
-          </motion.div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="bg-white p-10 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-            >
+            <div className="bg-white p-10 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
               <div className="flex items-center mb-8">
                 <div className="bg-blue-50 p-4 rounded-lg mr-6">
                   <Building className="w-12 h-12 text-blue-600" />
@@ -119,15 +95,9 @@ const About = () => {
                   발수제/에폭시 등 전문 제조
                 </li>
               </ul>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="bg-white p-10 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-            >
+            <div className="bg-white p-10 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
               <div className="flex items-center mb-8">
                 <div className="bg-green-50 p-4 rounded-lg mr-6">
                   <Users className="w-12 h-12 text-green-600" />
@@ -159,7 +129,7 @@ const About = () => {
                   합리적인 가격 정책 및 체계적 관리
                 </li>
               </ul>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -167,13 +137,7 @@ const About = () => {
       {/* Contact Information */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="max-w-4xl mx-auto text-center"
-          >
+          <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-4xl font-bold text-gray-900 mb-12">오시는 길</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="flex flex-col items-center">
@@ -192,7 +156,7 @@ const About = () => {
                 <p className="text-gray-600">2019@rinkorea.com</p>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
