@@ -1,4 +1,3 @@
-
 -- 프로필 테이블 생성
 CREATE TABLE public.profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -180,3 +179,36 @@ CREATE POLICY "Only admins can update products"
 CREATE POLICY "Only admins can delete products"
   ON public.products FOR DELETE
   USING (public.has_role(auth.uid(), 'admin'));
+
+-- 사용자 삭제 함수
+CREATE OR REPLACE FUNCTION public.delete_user(_user_id UUID)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  -- 사용자 관련 데이터 삭제
+  DELETE FROM public.profiles WHERE id = _user_id;
+  DELETE FROM public.user_roles WHERE user_id = _user_id;
+  -- auth.users는 CASCADE로 자동 삭제됨
+END;
+$$;
+
+-- 사용자 계정 삭제 함수
+CREATE OR REPLACE FUNCTION public.delete_user_account()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  -- 현재 로그인한 사용자의 ID 가져오기
+  DECLARE
+    _user_id UUID := auth.uid();
+  BEGIN
+    -- 사용자 삭제 함수 호출
+    PERFORM public.delete_user(_user_id);
+  END;
+END;
+$$;
