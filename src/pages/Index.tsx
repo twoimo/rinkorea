@@ -6,6 +6,7 @@ import { ArrowRight, Shield, Leaf, Award, Loader2, CheckCircle, XCircle } from '
 import { supabase } from '../integrations/supabase/client';
 import { useUserRole } from '../hooks/useUserRole';
 import { OptimizedImage } from '@/components/ui/image';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 const Index = () => {
   const { isAdmin } = useUserRole();
@@ -35,7 +36,7 @@ const Index = () => {
   // 유튜브 링크 불러오기
   const loadYoutubeLink = async () => {
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await (supabase as SupabaseClient)
         .from('site_settings')
         .select('value')
         .eq('key', 'youtube_link')
@@ -78,7 +79,7 @@ const Index = () => {
     setResult('');
     try {
       const embedUrl = toEmbedUrl(editLink);
-      const { error } = await (supabase as any)
+      const { error } = await (supabase as SupabaseClient)
         .from('site_settings')
         .upsert({ key: 'youtube_link', value: embedUrl, updated_at: new Date().toISOString() }, { onConflict: 'key' });
       if (error) {
