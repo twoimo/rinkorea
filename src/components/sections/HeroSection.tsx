@@ -104,12 +104,14 @@ const HeroSection = () => {
         <div className="container mx-auto px-6 lg:px-8">
           <div className="max-w-4xl">
             {/* Patent & Trademark Info */}
-            <div className="mb-8 space-y-2">
-              <div className="inline-block bg-yellow-400 text-black px-4 py-2 rounded-full text-sm font-bold tracking-wider shadow-lg">
-                특허 제 10-2312833 호
-              </div>
-              <div className="inline-block bg-yellow-400 text-black px-4 py-2 rounded-full text-sm font-bold tracking-wider shadow-lg ml-4">
-                상표 제 40-1678504 호
+            <div className="mb-8">
+              <div className="flex flex-wrap gap-3 sm:gap-4">
+                <div className="bg-yellow-400 text-black px-3 py-2 rounded-full text-sm font-bold tracking-wider shadow-lg text-left w-fit">
+                  특허 제10-2312833호
+                </div>
+                <div className="bg-yellow-400 text-black px-3 py-2 rounded-full text-sm font-bold tracking-wider shadow-lg text-left w-fit">
+                  상표 제40-1678504호
+                </div>
               </div>
             </div>
 
