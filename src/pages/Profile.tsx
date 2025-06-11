@@ -139,34 +139,35 @@ const Profile = () => {
 
   const handleDeleteAccount = async () => {
     try {
-      // 먼저 관련 데이터를 삭제 (프로필은 CASCADE로 자동 삭제됨)
-      if (user) {
-        // 사용자 역할 데이터 삭제
-        await supabase
-          .from('user_roles')
-          .delete()
-          .eq('user_id', user.id);
+      if (!user) return;
+
+      // 1. 데이터베이스 함수를 사용하여 계정 삭제
+      const { error: deleteError } = await supabase
+        .rpc('delete_user_account');
+
+      if (deleteError) {
+        console.error('계정 삭제 실패:', deleteError);
+        throw deleteError;
       }
 
-      // 계정 로그아웃
-      const { error } = await signOut();
-      if (error) {
-        toast({
-          title: "계정 탈퇴 실패",
-          description: "다시 시도해주세요.",
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "계정 탈퇴 완료",
-          description: "계정이 성공적으로 탈퇴되었습니다. Supabase 대시보드에서 사용자를 완전히 삭제해주세요."
-        });
-        navigate('/');
+      // 2. 로컬에서 로그아웃
+      const { error: signOutError } = await signOut();
+      if (signOutError) {
+        console.error('로그아웃 실패:', signOutError);
+        throw signOutError;
       }
-    } catch (error) {
+
       toast({
-        title: "오류 발생",
-        description: "다시 시도해주세요.",
+        title: "계정 탈퇴 완료",
+        description: "계정이 성공적으로 삭제되었습니다."
+      });
+
+      navigate('/');
+    } catch (error) {
+      console.error('계정 탈퇴 중 오류 발생:', error);
+      toast({
+        title: "계정 탈퇴 실패",
+        description: error instanceof Error ? error.message : "다시 시도해주세요.",
         variant: "destructive"
       });
     }
