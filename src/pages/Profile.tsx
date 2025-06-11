@@ -201,7 +201,7 @@ const Profile = () => {
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
                   <User className="w-10 h-10 text-blue-600" aria-hidden="true" />
                 </div>
-                <h2 className="text-3xl font-bold mb-2">내 프로필</h2>
+                <h2 className="text-3xl font-bold mb-2">프로필 설정</h2>
                 <p className="text-gray-500">회원정보를 확인하고 수정할 수 있습니다.</p>
               </div>
               <form onSubmit={handleSaveAll} className="space-y-6">
@@ -215,6 +215,18 @@ const Profile = () => {
                     onChange={e => setName(e.target.value)}
                     autoComplete="name"
                     aria-label="이름"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1" htmlFor="email">이메일</label>
+                  <input
+                    id="email"
+                    type="email"
+                    className="w-full border px-3 py-2 rounded bg-gray-50"
+                    value={user.email}
+                    readOnly
+                    disabled
+                    aria-label="이메일"
                   />
                 </div>
                 <div>
@@ -246,10 +258,10 @@ const Profile = () => {
                   <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
                     <Shield className="w-5 h-5 text-blue-600" aria-hidden="true" /> 비밀번호 변경
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-4">
                     <input
                       type="password"
-                      className="border px-3 py-2 rounded"
+                      className="w-full border px-3 py-2 rounded"
                       value={currentPassword}
                       onChange={e => setCurrentPassword(e.target.value)}
                       placeholder="현재 비밀번호"
@@ -258,7 +270,7 @@ const Profile = () => {
                     />
                     <input
                       type="password"
-                      className="border px-3 py-2 rounded"
+                      className="w-full border px-3 py-2 rounded"
                       value={newPassword}
                       onChange={e => setNewPassword(e.target.value)}
                       placeholder="새 비밀번호"
@@ -267,7 +279,7 @@ const Profile = () => {
                     />
                     <input
                       type="password"
-                      className="border px-3 py-2 rounded"
+                      className="w-full border px-3 py-2 rounded"
                       value={confirmPassword}
                       onChange={e => setConfirmPassword(e.target.value)}
                       placeholder="새 비밀번호 확인"
@@ -277,6 +289,10 @@ const Profile = () => {
                   </div>
                   {passwordError && <div className="text-xs text-red-600 mt-1">{passwordError}</div>}
                   {passwordSuccess && <div className="text-xs text-green-700 mt-1">{passwordSuccess}</div>}
+                  <div className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                    <AlertTriangle className="w-4 h-4" />
+                    비밀번호를 잊어버리면 복구할 수 없으니 안전한 곳에 보관해주세요.
+                  </div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 mt-8">
                   <button

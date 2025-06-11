@@ -1,140 +1,198 @@
-
 import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { Building, Users, Target, Award } from 'lucide-react';
+import { Building, Users, Target, Award, MapPin, Phone, Mail, Calendar, CheckCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const About = () => {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
+      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-24">
         <div className="container mx-auto px-4">
-          <div className="text-center">
-            <h1 className="text-5xl font-bold mb-6">회사소개</h1>
-            <p className="text-xl max-w-2xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center"
+          >
+            <h1 className="text-6xl font-bold mb-8">회사소개</h1>
+            <p className="text-xl max-w-3xl mx-auto leading-relaxed">
               세라믹 코팅 전문 기업 린코리아는 혁신적인 기술과 품질로 <br />
               건설업계의 새로운 기준을 제시합니다.
             </p>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Company Info */}
-      <section className="py-20">
+      {/* Company Introduction */}
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">린코리아 소개</h2>
-              <p className="text-lg text-gray-600 mb-6">
-                린코리아는 친환경 불연재(1액형) 신소재 세라믹 코팅제를 전문으로 하는
-                건설재료 제조업체입니다. 최고 품질의 제품과 서비스로 고객의 신뢰를 얻고 있습니다.
-              </p>
-              <div className="bg-gray-50 p-6 rounded-lg">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">회사 정보</h3>
-                <div className="space-y-3">
-                  <div className="flex">
-                    <span className="font-semibold text-gray-700 w-32">주소:</span>
-                    <span className="text-gray-600">인천광역시 서구 백범로 707 (주안국가산업단지)</span>
-                  </div>
-                  <div className="flex">
-                    <span className="font-semibold text-gray-700 w-32">사업자등록번호:</span>
-                    <span className="text-gray-600">747-42-00526</span>
-                  </div>
-                  <div className="flex">
-                    <span className="font-semibold text-gray-700 w-32">설립:</span>
-                    <span className="text-gray-600">2021년</span>
-                  </div>
-                </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="max-w-4xl mx-auto text-center mb-16"
+          >
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">린코리아 소개</h2>
+            <p className="text-lg text-gray-600 leading-relaxed mb-8">
+              린코리아는 2010년 설립 이후, 건설재료와 건설기계 분야에서 혁신적인 솔루션을 제공하는 전문 기업으로 성장해왔습니다.
+              최고의 품질과 기술력으로 고객의 성공을 위한 최적의 파트너가 되겠습니다.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+              <div className="bg-blue-50 p-6 rounded-xl">
+                <Target className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-900 mb-2">비전</h3>
+                <p className="text-gray-600">건설업계의 혁신을 선도하는 글로벌 기업</p>
+              </div>
+              <div className="bg-green-50 p-6 rounded-xl">
+                <Award className="w-12 h-12 text-green-600 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-900 mb-2">미션</h3>
+                <p className="text-gray-600">최고의 품질과 기술로 고객 가치 창출</p>
+              </div>
+              <div className="bg-purple-50 p-6 rounded-xl">
+                <CheckCircle className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-900 mb-2">핵심가치</h3>
+                <p className="text-gray-600">신뢰, 혁신, 지속가능성</p>
               </div>
             </div>
-            <div>
-              <img
-                src="https://images.unsplash.com/photo-1487958449943-2429e8be8625"
-                alt="린코리아 사옥"
-                className="rounded-lg shadow-lg w-full"
-              />
-            </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Business Divisions */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">사업부문</h2>
-            <p className="text-xl text-gray-600">
-              다양한 사업 영역을 통해 종합적인 건설 솔루션을 제공합니다
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">사업 영역</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              린코리아는 건설재료와 건설기계 두 가지 핵심 사업을 통해
+              건설업계의 발전을 이끌어가고 있습니다.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <div className="flex items-center mb-6">
-                <Building className="w-12 h-12 text-blue-600 mr-4" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="bg-white p-10 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+            >
+              <div className="flex items-center mb-8">
+                <div className="bg-blue-50 p-4 rounded-lg mr-6">
+                  <Building className="w-12 h-12 text-blue-600" />
+                </div>
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900">건설재료사업부</h3>
-                  <p className="text-gray-600">핵심 사업 영역</p>
+                  <p className="text-blue-600 font-medium">핵심 사업 영역</p>
                 </div>
               </div>
-              <p className="text-gray-600 mb-4">
-                세라믹 코팅제를 중심으로 한 건설재료 제조 및 공급을 담당하는
-                린코리아의 핵심 사업부입니다.
+              <p className="text-gray-600 mb-6 leading-relaxed">
+                콘크리트 표면마감 1액형 세라믹코팅제(불연재), 방열도료, 특수목적코팅제 등
+                최고 품질의 제품을 생산하는 린코리아의 핵심 사업부입니다.
               </p>
-              <ul className="space-y-2 text-gray-600">
-                <li>• RIN-COAT 시리즈 제품 개발 및 제조</li>
-                <li>• 불연재 세라믹 코팅제 전문</li>
-                <li>• 친환경 건설자재 솔루션</li>
+              <ul className="space-y-3 text-gray-600">
+                <li className="flex items-center">
+                  <span className="w-2 h-2 bg-blue-600 rounded-full mr-3"></span>
+                  콘크리트 표면 강화제/코팅제(실러)
+                </li>
+                <li className="flex items-center">
+                  <span className="w-2 h-2 bg-blue-600 rounded-full mr-3"></span>
+                  특수시멘트/구체방수제(방청)
+                </li>
+                <li className="flex items-center">
+                  <span className="w-2 h-2 bg-blue-600 rounded-full mr-3"></span>
+                  탄성도막방수제/침투식 교면방수제
+                </li>
+                <li className="flex items-center">
+                  <span className="w-2 h-2 bg-blue-600 rounded-full mr-3"></span>
+                  발수제/에폭시 등 전문 제조
+                </li>
               </ul>
-            </div>
+            </motion.div>
 
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <div className="flex items-center mb-6">
-                <Users className="w-12 h-12 text-green-600 mr-4" />
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="bg-white p-10 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+            >
+              <div className="flex items-center mb-8">
+                <div className="bg-green-50 p-4 rounded-lg mr-6">
+                  <Users className="w-12 h-12 text-green-600" />
+                </div>
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900">건설기계사업부</h3>
-                  <p className="text-gray-600">2024년 신설</p>
+                  <p className="text-green-600 font-medium">Shanghai JS Floor Systems 공식 파트너</p>
                 </div>
               </div>
-              <p className="text-gray-600 mb-4">
-                2024년 신설된 사업부로, 건설기계 분야로의 사업 확장을 통해
-                더욱 다양한 건설 솔루션을 제공합니다.
+              <p className="text-gray-600 mb-6 leading-relaxed">
+                Shanghai JS Floor Systems의 공식 파트너사로서 한국 공식 판매업체 및 서비스센터를 운영하고 있습니다.
+                세계적인 공사 현장에서 사용되는 콘크리트 연삭기 및 연마기 시장의 선두주자입니다.
               </p>
-              <ul className="space-y-2 text-gray-600">
-                <li>• 건설기계 장비 공급</li>
-                <li>• 기술 지원 서비스</li>
-                <li>• 통합 건설 솔루션 제공</li>
+              <ul className="space-y-3 text-gray-600">
+                <li className="flex items-center">
+                  <span className="w-2 h-2 bg-green-600 rounded-full mr-3"></span>
+                  건설기계 장비 및 부품 공급
+                </li>
+                <li className="flex items-center">
+                  <span className="w-2 h-2 bg-green-600 rounded-full mr-3"></span>
+                  공식 서비스센터 운영 (A/S 지원)
+                </li>
+                <li className="flex items-center">
+                  <span className="w-2 h-2 bg-green-600 rounded-full mr-3"></span>
+                  기술 지원 및 컨설팅
+                </li>
+                <li className="flex items-center">
+                  <span className="w-2 h-2 bg-green-600 rounded-full mr-3"></span>
+                  합리적인 가격 정책 및 체계적 관리
+                </li>
               </ul>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Mission & Vision */}
-      <section className="py-20">
+      {/* Contact Information */}
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="text-center">
-              <Target className="w-16 h-16 text-blue-600 mx-auto mb-6" />
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">미션</h3>
-              <p className="text-gray-600">
-                친환경적이고 안전한 건설재료를 통해 더 나은 건설환경을 만들어가며,
-                고객에게 최고의 품질과 서비스를 제공합니다.
-              </p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="max-w-4xl mx-auto text-center"
+          >
+            <h2 className="text-4xl font-bold text-gray-900 mb-12">오시는 길</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="flex flex-col items-center">
+                <MapPin className="w-8 h-8 text-blue-600 mb-4" />
+                <h3 className="text-lg font-semibold mb-2">주소</h3>
+                <p className="text-gray-600">인천광역시 서구 백범로 707 (주안국가산업단지)</p>
+              </div>
+              <div className="flex flex-col items-center">
+                <Phone className="w-8 h-8 text-blue-600 mb-4" />
+                <h3 className="text-lg font-semibold mb-2">전화</h3>
+                <p className="text-gray-600">032-123-4567</p>
+              </div>
+              <div className="flex flex-col items-center">
+                <Mail className="w-8 h-8 text-blue-600 mb-4" />
+                <h3 className="text-lg font-semibold mb-2">이메일</h3>
+                <p className="text-gray-600">2019@rinkorea.com</p>
+              </div>
             </div>
-
-            <div className="text-center">
-              <Award className="w-16 h-16 text-green-600 mx-auto mb-6" />
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">비전</h3>
-              <p className="text-gray-600">
-                세라믹 코팅 분야의 선도기업으로서 지속적인 혁신과 기술 개발을 통해
-                국내외 건설업계에서 신뢰받는 기업이 되겠습니다.
-              </p>
-            </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
