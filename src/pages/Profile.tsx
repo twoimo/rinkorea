@@ -294,29 +294,71 @@ const Profile = () => {
                     비밀번호를 잊어버리면 복구할 수 없으니 안전한 곳에 보관해주세요.
                   </div>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                <div className="flex justify-end mt-8">
                   <button
                     type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50"
                     disabled={savingAll || (!isProfileChanged && !isPasswordChanged)}
                     aria-label="저장"
                   >
                     <Save className="w-5 h-5 mr-2 inline" aria-hidden="true" /> 저장
                   </button>
-                  <button
-                    type="button"
-                    className="bg-red-100 hover:bg-red-200 text-red-700 px-6 py-3 rounded-lg font-semibold transition-colors"
-                    onClick={() => setShowDeleteConfirm(true)}
-                    aria-label="계정 탈퇴"
-                  >
-                    <Trash2 className="w-5 h-5 mr-2 inline" aria-hidden="true" /> 계정 탈퇴
-                  </button>
                 </div>
               </form>
+
+              {/* 계정 탈퇴 섹션 */}
+              <div className="border-t mt-12 pt-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <Trash2 className="w-5 h-5 text-red-600" />
+                  <h3 className="text-lg font-bold text-red-600">계정 탈퇴</h3>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  계정을 탈퇴하면 모든 데이터가 영구적으로 삭제되며 복구할 수 없습니다.
+                </p>
+                <button
+                  type="button"
+                  className="w-full bg-red-100 hover:bg-red-200 text-red-700 px-6 py-3 rounded-lg font-semibold transition-colors"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  aria-label="계정 탈퇴"
+                >
+                  <Trash2 className="w-5 h-5 mr-2 inline" aria-hidden="true" /> 계정 탈퇴
+                </button>
+              </div>
             </div>
           </div>
         </section>
       </main>
+
+      {/* 계정 탈퇴 확인 모달 */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <div className="flex items-center gap-2 mb-4">
+              <AlertTriangle className="w-6 h-6 text-red-600" />
+              <h3 className="text-xl font-bold">계정 탈퇴 확인</h3>
+            </div>
+            <p className="text-gray-600 mb-6">
+              정말로 계정을 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없으며, 모든 데이터가 영구적으로 삭제됩니다.
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                type="button"
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+                onClick={handleDeleteAccount}
+              >
+                계정 탈퇴
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
