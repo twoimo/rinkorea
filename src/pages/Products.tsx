@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ImageModal from '../components/ImageModal';
-import { Shield, Palette, Star, Zap, Building2, Wrench, Youtube, FileText, Eye, Award } from 'lucide-react';
+import { Shield, Palette, Star, Zap, Building2, Wrench, Youtube, FileText, Eye, Award, Droplets, TreePine, Truck, Settings, MapPin } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/image';
 
 const Products = () => {
@@ -26,103 +26,135 @@ const Products = () => {
   const materials = [
     {
       name: "RIN-COAT",
-      subtitle: "신소재 불연재 무기질 세라믹 코팅제 (1액형)",
+      subtitle: "침투형 실란(Silane) 계열 콘크리트 보호용 특수 코팅제",
+      slogan: "친환경 고성능 콘크리트 보호 솔루션",
       image: '/lovable-uploads/9365c776-c5da-4c08-84fd-965295599d20.png',
       detailImage: '/lovable-uploads/d93839c8-4ba0-4830-ac20-3507e982608a.png',
       marketingImage: '/lovable-uploads/74b74c16-ca85-4199-a1ea-39868e640e57.png',
       processImage: '/lovable-uploads/3a8b47a5-c515-4652-8b0c-c03fb9a06c40.png',
       icon: <Shield className="w-8 h-8 text-blue-600" />,
-      description: "국토교통부 불연재 인증을 받은 친환경 1액형 세라믹 코팅제로, 우수한 불연성능과 내구성을 제공합니다.",
+      description: "콘크리트 구조물의 성능 저하 및 노후화를 방지하는 침투형 실란(Silane) 계열 특수 코팅제입니다. 염소 이온 침투 억제를 통한 철근 부식 방지 및 구조물 내구성을 증진시킵니다.",
+      protectionFeatures: [
+        "염화물 침투 방지",
+        "탄산화 억제",
+        "동결융해 저항성",
+        "화학적 침식 방지"
+      ],
       features: [
-        "불연재 인증 (특허 제 10-2312833호, 상표 제 40-1678504호)",
-        "1액형으로 간편한 시공",
-        "친환경 무기질 소재",
-        "우수한 내구성과 내화성능",
-        "다양한 바닥재 적용 가능"
+        "우수한 침투력과 접착력",
+        "무색 투명하여 외관을 해치지 않음",
+        "염소 이온 침투 억제로 철근 부식 방지",
+        "동결융해 및 화학적 침해 저항성 향상",
+        "간편한 시공 및 유지보수 비용 절감",
+        "친환경 인증 (녹색기술, GR, 환경표지)",
+        "콘크리트 구조물 수명 연장"
+      ],
+      applications: [
+        "교량 및 고가도로",
+        "터널 구조물",
+        "항만 및 해안 시설",
+        "지하주차장",
+        "아파트 외벽",
+        "옥상 슬래브",
+        "산업시설 바닥",
+        "기타 콘크리트 구조물"
+      ],
+      testResults: [
+        "염소이온 침투 저항성 시험 통과",
+        "동결융해 저항성 시험 우수",
+        "쇼어 경도 시험 합격",
+        "부착강도 시험 우수",
+        "내구성 시험 통과"
       ],
       specifications: {
-        "제품명": "RIN-COAT 세라믹 코팅제",
-        "용량": "18kg",
-        "적용면적": "약 30-40㎡ (1회 도포 기준)",
-        "건조시간": "24시간",
-        "보관방법": "서늘하고 건조한 곳"
+        "제품 유형": "침투형 실란(Silane) 계열",
+        "적용 방식": "무색 투명 코팅",
+        "주요 기능": "방수, 내구성 강화, 염해·탄산화 방지",
+        "환경 인증": "녹색기술, GR, 환경표지 인증",
+        "적용 온도": "5°C ~ 35°C",
+        "건조 시간": "24시간 (완전 경화)",
+        "기대 효과": "구조물 수명 연장, 유지관리 비용 절감"
       },
-      certifications: ["국토교통부 불연재 인증", "KC 안전인증", "친환경 인증"]
+      certifications: ["녹색기술 인증", "GR(Good Recycled) 인증", "환경표지 인증", "친환경 건설자재"]
     }
   ];
 
   const machinery = [
     {
       name: "950GT",
-      subtitle: "Planetary Remote Control Floor Grinder",
+      subtitle: "스파이더 리프트 (Spider Lift) / 고소작업대",
+      category: "크롤러형 고소작업대",
       image: '/lovable-uploads/1952f9ba-da64-4acd-a2d9-68435e80c8f3.png',
       videoUrl: 'https://www.youtube.com/watch?v=ubJawtaailA',
       icon: <Building2 className="w-8 h-8 text-blue-600" />,
-      description: "강력한 연마력을 통해 고품질 바닥 마감을 경험해보세요. 최신 서보 모터가 적용된 모델로 정밀한 제어가 가능한 모델입니다.",
+      description: "컴팩트한 사이즈로 협소한 공간 진입이 용이하며, 자동 레벨링 기능으로 안전성을 확보한 고소작업대입니다. 좁은 공간 및 험지에서도 작업 가능한 강력한 성능을 제공합니다.",
       features: [
-        "무선 리모콘 제어",
-        "최신형 고속 기어박스 적용",
-        "완벽한 보조휠 통해 편리한 구역 이동",
-        "Best Seller 제품"
+        "컴팩트한 사이즈로 협소한 공간 진입 용이",
+        "자동 레벨링 기능으로 안전성 확보",
+        "좁은 공간 및 험지 작업 가능",
+        "크롤러(궤도) 방식으로 안정성 우수",
+        "리모콘 조작 가능",
+        "강력한 성능과 내구성"
       ],
       specifications: {
-        "Weight(KG)": "760 / 790",
-        "Size(MM)": "2870*950*1350",
-        "Motor(HP)": "30",
-        "Voltage(V)": "380",
-        "Current(Max)(A)": "47",
-        "Disc speed(RPM)": "0-1800",
-        "Inverter(HP)": "30",
-        "Grinding disc qty": "360mm*4",
-        "Grinding pad qty": "24",
-        "Grinding width(MM)": "950",
-        "Dust port": "2inches*1"
-      }
+        "최대 작업 높이": "9.5m",
+        "최대 작업 반경": "4.7m",
+        "플랫폼 최대 적재 하중": "200kg",
+        "장비 중량": "1,380kg",
+        "구동 방식": "크롤러(궤도형)",
+        "조작 방식": "리모콘 + 직접 조작",
+        "적용 분야": "건물 유지보수, 외벽 작업, 나무 관리"
+      },
+      isBestSeller: true
     },
     {
       name: "850GT",
-      subtitle: "Planetary Remote Control Floor Grinder",
+      subtitle: "스파이더 리프트 (Spider Lift) / 고소작업대",
+      category: "크롤러형 고소작업대",
       image: '/lovable-uploads/5240ceaa-87d8-403c-892e-976017a8b77e.png',
       videoUrl: 'https://www.youtube.com/watch?v=CtO1nh1gu04',
       icon: <Building2 className="w-8 h-8 text-green-600" />,
-      description: "강력한 연마력을 통해 고품질 바닥 마감을 경험해보세요. 최신 서보 모터가 적용된 모델로 정밀한 제어가 가능한 모델입니다.",
+      description: "950GT보다 약간 작은 모델로, 역시 좁은 공간에서의 작업에 특화되었습니다. 뛰어난 기동성과 안정성을 겸비한 중형 고소작업대입니다.",
       features: [
-        "무선 리모콘 제어",
-        "최신형 고속 기어박스 적용",
-        "완벽한 보조휠 통해 편리한 구역 이동"
+        "중형 사이즈로 다양한 현장 적용",
+        "950GT 대비 경량화된 설계",
+        "좁은 공간 작업 특화",
+        "자동 레벨링 시스템",
+        "크롤러 방식의 안정된 이동",
+        "효율적인 연료 소비"
       ],
       specifications: {
-        "Weight(KG)": "580 / 610",
-        "Size(MM)": "2100*820*1100",
-        "Motor(HP)": "25",
-        "Voltage(V)": "380",
-        "Current(Max)(A)": "37",
-        "Disc speed(RPM)": "0-1800",
-        "Inverter(HP)": "25",
-        "Grinding disc qty": "320mm*4",
-        "Grinding pad qty": "24",
-        "Grinding width(MM)": "820",
-        "Dust port": "2inches*1"
+        "최대 작업 높이": "8.5m",
+        "최대 작업 반경": "4.7m",
+        "플랫폼 최대 적재 하중": "200kg",
+        "장비 중량": "1,280kg",
+        "구동 방식": "크롤러(궤도형)",
+        "조작 방식": "리모콘 + 직접 조작",
+        "적용 분야": "중소형 건물 작업, 실내 작업"
       }
     },
     {
       name: "Falcon",
-      subtitle: "Floor Surface Treatment System Equipment",
+      subtitle: "스파이더 리프트 (Spider Lift) / 다목적 고소작업대",
+      category: "소형 다목적 고소작업대",
       image: '/lovable-uploads/af78a9bb-6ad6-4e78-bc7a-8ad799467cf6.png',
       videoUrl: 'https://www.youtube.com/watch?v=UIg2SfTHnGw&t=2s',
       icon: <Wrench className="w-8 h-8 text-yellow-600" />,
-      description: "승차식 대형 연마기로 넓은 면적의 바닥 작업에 최적화된 고성능 장비입니다.",
+      description: "좁고 복잡한 환경에서 높은 곳에 접근하여 작업하는데 특화된 소형 다목적 고소작업대입니다. 도시 환경과 소규모 건설현장에 최적화되어 빠른 작업 전환이 가능합니다.",
       features: [
-        "승차식 대형 연마기",
-        "넓은 면적 작업 최적화",
-        "고성능 연마 시스템",
-        "효율적인 작업 속도"
+        "소형 경량 설계로 이동성 우수",
+        "복잡한 환경에서의 높은 접근성",
+        "빠른 작업 전환 가능",
+        "도시형 환경 및 소규모 현장 최적화",
+        "다목적 활용 가능",
+        "간편한 조작과 유지보수"
       ],
       specifications: {
-        "Type": "승차식 연마기",
-        "적용 면적": "대형 공간",
-        "작업 효율": "고속 연마",
-        "조작 방식": "승차식 조작"
+        "Type": "소형 다목적 스파이더 리프트",
+        "적용 환경": "도시형 환경, 소규모 현장, 실내",
+        "작업 특성": "빠른 작업 전환, 고효율",
+        "구동 방식": "크롤러 또는 바퀴형",
+        "특화 분야": "건물 유지보수, 간판 작업, 조경"
       }
     }
   ];
@@ -178,7 +210,7 @@ const Products = () => {
             <div className="space-y-16">
               <div className="text-center mb-12">
                 <h2 className="text-4xl font-bold text-gray-900 mb-4">건설재료사업부</h2>
-                <p className="text-xl text-gray-600">친환경 불연재 세라믹 코팅제</p>
+                <p className="text-xl text-gray-600">콘크리트 구조물 보호 전문 솔루션</p>
               </div>
 
               {materials.map((product, index) => (
@@ -189,7 +221,8 @@ const Products = () => {
                       {product.icon}
                       <div>
                         <h3 className="text-3xl font-bold">{product.name}</h3>
-                        <p className="text-red-100">{product.subtitle}</p>
+                        <p className="text-red-100 mb-2">{product.subtitle}</p>
+                        <p className="text-lg font-medium text-yellow-200">{product.slogan}</p>
                       </div>
                     </div>
                     <p className="text-lg leading-relaxed">{product.description}</p>
@@ -219,7 +252,17 @@ const Products = () => {
                       </div>
 
                       <div className="space-y-6">
-                        <h4 className="text-xl font-bold text-gray-900">주요 특징</h4>
+                        <h4 className="text-xl font-bold text-gray-900">보호 기능</h4>
+                        <div className="grid grid-cols-2 gap-4">
+                          {product.protectionFeatures.map((feature, featureIndex) => (
+                            <div key={featureIndex} className="bg-blue-50 rounded-lg p-4 text-center">
+                              <Shield className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+                              <span className="text-sm font-medium text-gray-800">{feature}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <h4 className="text-xl font-bold text-gray-900 mt-6">주요 특징</h4>
                         <ul className="space-y-3">
                           {product.features.map((feature, featureIndex) => (
                             <li key={featureIndex} className="flex items-start space-x-3">
@@ -228,21 +271,38 @@ const Products = () => {
                             </li>
                           ))}
                         </ul>
+                      </div>
+                    </div>
 
-                        <div className="bg-gray-50 rounded-lg p-6 mt-6">
-                          <h5 className="font-semibold text-gray-900 mb-3 flex items-center">
-                            <Award className="w-5 h-5 mr-2 text-red-600" />
-                            인증 현황
-                          </h5>
-                          <div className="space-y-2">
-                            {product.certifications.map((cert, certIndex) => (
-                              <div key={certIndex} className="flex items-center space-x-2">
-                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                <span className="text-sm text-gray-700">{cert}</span>
-                              </div>
-                            ))}
+                    {/* Applications Section */}
+                    <div className="mb-12">
+                      <h4 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                        <MapPin className="w-6 h-6 mr-2 text-red-600" />
+                        적용 분야
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {product.applications.map((application, appIndex) => (
+                          <div key={appIndex} className="bg-blue-50 rounded-lg p-4 flex items-center space-x-3 hover:bg-blue-100 transition-colors">
+                            <Building2 className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                            <span className="text-gray-800 font-medium text-sm">{application}</span>
                           </div>
-                        </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Test Results */}
+                    <div className="mb-12">
+                      <h4 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                        <Award className="w-6 h-6 mr-2 text-red-600" />
+                        시험 성과
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {product.testResults.map((result, resultIndex) => (
+                          <div key={resultIndex} className="bg-green-50 rounded-lg p-4 flex items-center space-x-3">
+                            <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0"></div>
+                            <span className="text-gray-800 font-medium text-sm">{result}</span>
+                          </div>
+                        ))}
                       </div>
                     </div>
 
@@ -295,19 +355,36 @@ const Products = () => {
                       </div>
                     </div>
 
-                    {/* Specifications */}
-                    <div className="bg-gray-50 rounded-xl p-8">
-                      <h4 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                        <FileText className="w-6 h-6 mr-2 text-red-600" />
-                        제품 사양
-                      </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {Object.entries(product.specifications).map(([key, value], specIndex) => (
-                          <div key={specIndex} className="flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0">
-                            <span className="font-medium text-gray-700">{key}</span>
-                            <span className="text-gray-900">{value}</span>
-                          </div>
-                        ))}
+                    {/* Specifications and Certifications */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      <div className="bg-gray-50 rounded-xl p-8">
+                        <h4 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                          <FileText className="w-6 h-6 mr-2 text-red-600" />
+                          제품 사양
+                        </h4>
+                        <div className="space-y-4">
+                          {Object.entries(product.specifications).map(([key, value], specIndex) => (
+                            <div key={specIndex} className="flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0">
+                              <span className="font-medium text-gray-700">{key}</span>
+                              <span className="text-gray-900">{value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="bg-green-50 rounded-xl p-8">
+                        <h4 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                          <Award className="w-6 h-6 mr-2 text-green-600" />
+                          인증 현황
+                        </h4>
+                        <div className="space-y-4">
+                          {product.certifications.map((cert, certIndex) => (
+                            <div key={certIndex} className="flex items-center space-x-3 p-3 bg-white rounded-lg">
+                              <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0"></div>
+                              <span className="text-gray-800 font-medium">{cert}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -320,7 +397,10 @@ const Products = () => {
             <div className="space-y-16">
               <div className="text-center mb-12">
                 <h2 className="text-4xl font-bold text-gray-900 mb-4">건설기계사업부</h2>
-                <p className="text-xl text-gray-600">JS FLOOR SYSTEMS 한국 공식 판매업체 & 서비스센터</p>
+                <p className="text-xl text-gray-600 mb-4">JS FLOOR SYSTEMS 한국 공식 판매업체 & 서비스센터</p>
+                <div className="inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">
+                  "세상과 사람을 연결하는 기술" - JS 린코리아
+                </div>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -338,11 +418,14 @@ const Products = () => {
                       <div className="absolute top-4 right-4 bg-white p-3 rounded-full shadow-lg">
                         {machine.icon}
                       </div>
-                      {machine.name === '950GT' && (
+                      {machine.isBestSeller && (
                         <div className="absolute top-4 left-4">
                           <span className="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow">Best Seller</span>
                         </div>
                       )}
+                      <div className="absolute bottom-4 left-4 bg-black bg-opacity-75 text-white px-3 py-1 rounded-full text-sm">
+                        {machine.category}
+                      </div>
                     </div>
 
                     {/* Machine Content */}
@@ -353,7 +436,10 @@ const Products = () => {
 
                       {/* Features */}
                       <div className="mb-6">
-                        <h4 className="font-semibold text-gray-900 mb-3">주요 특징:</h4>
+                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                          <Settings className="w-4 h-4 mr-2" />
+                          주요 특징
+                        </h4>
                         <ul className="space-y-2">
                           {machine.features.map((feature, featureIndex) => (
                             <li key={featureIndex} className="flex items-center text-gray-600 text-sm">
@@ -366,14 +452,22 @@ const Products = () => {
 
                       {/* Specifications Preview */}
                       <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                        <h4 className="font-semibold text-gray-900 mb-3">주요 사양:</h4>
-                        <div className="grid grid-cols-2 gap-2 text-sm">
+                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                          <FileText className="w-4 h-4 mr-2" />
+                          주요 사양
+                        </h4>
+                        <div className="space-y-2 text-sm">
                           {Object.entries(machine.specifications).slice(0, 4).map(([key, value], specIndex) => (
-                            <div key={specIndex} className="flex justify-between">
+                            <div key={specIndex} className="flex justify-between items-center">
                               <span className="text-gray-600">{key}:</span>
                               <span className="text-gray-900 font-medium">{value}</span>
                             </div>
                           ))}
+                          {Object.keys(machine.specifications).length > 4 && (
+                            <div className="text-center pt-2 border-t border-gray-200">
+                              <span className="text-xs text-gray-500">+ 더 많은 사양 정보</span>
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -399,7 +493,7 @@ const Products = () => {
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">JS FLOOR SYSTEMS 공식 파트너</h3>
                 <p className="text-gray-700 mb-6 leading-relaxed">
                   린코리아는 JS FLOOR SYSTEMS의 한국 공식 판매업체이자 서비스센터로서,<br />
-                  최고 품질의 바닥 연마 장비와 전문적인 기술 지원을 제공합니다.
+                  스파이더 리프트(Spider Lift) 고소작업대와 전문적인 기술 지원을 제공합니다.
                 </p>
                 <div className="flex justify-center space-x-8 text-sm text-gray-600">
                   <div className="flex items-center space-x-2">
@@ -414,6 +508,10 @@ const Products = () => {
                     <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                     <span>기술 지원</span>
                   </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <span>A/S 서비스</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -427,7 +525,7 @@ const Products = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">린코리아의 장점</h2>
             <p className="text-xl text-gray-600">
-              {selectedCategory === 'materials' ? '세라믹 코팅제가 선택받는 이유' : '건설기계가 선택받는 이유'}
+              {selectedCategory === 'materials' ? 'RIN-COAT가 선택받는 이유' : '스파이더 리프트가 선택받는 이유'}
             </p>
           </div>
 
@@ -438,29 +536,29 @@ const Products = () => {
                   <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <Shield className="w-8 h-8 text-blue-600" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">불연재 인증</h3>
-                  <p className="text-gray-600">국토교통부 불연재 인증을 받은 안전한 제품</p>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">다중 보호 기능</h3>
+                  <p className="text-gray-600">염해, 탄산화, 동결융해, 화학적 침식 종합 방지</p>
                 </div>
                 <div className="text-center">
                   <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <Zap className="w-8 h-8 text-yellow-600" />
+                    <Droplets className="w-8 h-8 text-blue-600" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">간편한 시공</h3>
-                  <p className="text-gray-600">1액형으로 혼합 없이 간편하게 시공 가능</p>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">투명 적용</h3>
+                  <p className="text-gray-600">무색 투명하여 구조물 외관을 전혀 해치지 않음</p>
                 </div>
                 <div className="text-center">
                   <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <Star className="w-8 h-8 text-green-600" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">우수한 품질</h3>
-                  <p className="text-gray-600">엄격한 품질관리를 통한 일정한 품질 보장</p>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">우수한 침투력</h3>
+                  <p className="text-gray-600">실란계 특수 성분으로 깊이 침투하여 지속적 보호</p>
                 </div>
                 <div className="text-center">
                   <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <Palette className="w-8 h-8 text-purple-600" />
+                    <TreePine className="w-8 h-8 text-green-600" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">친환경 소재</h3>
-                  <p className="text-gray-600">환경을 생각하는 친환경 무기질 소재</p>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">친환경 인증</h3>
+                  <p className="text-gray-600">녹색기술, GR, 환경표지 등 다중 친환경 인증</p>
                 </div>
               </>
             ) : (
@@ -476,22 +574,22 @@ const Products = () => {
                   <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <Wrench className="w-8 h-8 text-yellow-600" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">전문 서비스</h3>
-                  <p className="text-gray-600">전문적인 A/S 및 기술 지원 서비스</p>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">협소 공간 특화</h3>
+                  <p className="text-gray-600">좁은 공간과 험지에서도 작업 가능한 스파이더 설계</p>
                 </div>
                 <div className="text-center">
                   <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <Star className="w-8 h-8 text-green-600" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">검증된 품질</h3>
-                  <p className="text-gray-600">해외에서 검증된 고품질 장비</p>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">안전성 보장</h3>
+                  <p className="text-gray-600">자동 레벨링과 크롤러 방식으로 안정성 극대화</p>
                 </div>
                 <div className="text-center">
                   <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <Zap className="w-8 h-8 text-purple-600" />
+                    <Settings className="w-8 h-8 text-purple-600" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">효율적 작업</h3>
-                  <p className="text-gray-600">뛰어난 성능으로 작업 효율성 극대화</p>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">리모콘 제어</h3>
+                  <p className="text-gray-600">원격 조작으로 작업자 안전성과 편의성 제공</p>
                 </div>
               </>
             )}
