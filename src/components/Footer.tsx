@@ -9,15 +9,6 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
-            <div className="flex items-center">
-              <OptimizedImage
-                src="/images/rin-korea-logo-black.png"
-                alt="린코리아 로고"
-                className="h-10 w-auto filter invert hover:opacity-80 transition-opacity"
-                loadingClassName="bg-gray-800"
-                errorClassName="bg-gray-800"
-              />
-            </div>
             <div className="space-y-2">
               <p className="text-gray-300 flex items-center">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -112,7 +112,7 @@ const Products = () => {
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">제품의 장점</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">린코리아 제품의 장점</h2>
             <p className="text-xl text-gray-600">
               린코리아 세라믹 코팅제가 선택받는 이유
             </p>
