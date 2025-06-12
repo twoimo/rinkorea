@@ -6,7 +6,7 @@ const FeaturesSection = () => {
     {
       icon: <Shield className="w-6 h-6 sm:w-8 sm:h-8" />,
       title: "불연재 인증",
-      description: "불연재 인증을 받은 안전한 순수 무기질 세라믹 코팅제",
+      description: "안전한 순수 무기질 세라믹 코팅제",
       color: "from-blue-500 to-blue-600",
       bgColor: "bg-blue-50",
       textColor: "text-blue-600"

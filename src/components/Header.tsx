@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, LogOut, Settings, AlertTriangle } from 'lucide-react';
@@ -22,6 +21,7 @@ const Header = () => {
     { name: '홈', path: '/' },
     { name: '회사소개', path: '/about' },
     { name: '제품소개', path: '/products' },
+    { name: '기계소개', path: '/equipment' },
     { name: '온라인 스토어', path: '/shop' },
     { name: '시공사례', path: '/projects' },
     { name: '시험성적서/인증', path: '/certificates' },
@@ -48,6 +48,12 @@ const Header = () => {
     setIsUserMenuOpen(false);
   };
 
+  const handleNavigation = (path: string) => {
+    window.scrollTo(0, 0);
+    navigate(path);
+    setIsMenuOpen(false);
+  };
+
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -68,6 +74,7 @@ const Header = () => {
               <Link
                 key={item.name}
                 to={item.path}
+                onClick={() => handleNavigation(item.path)}
                 className={`text-sm font-medium transition-colors hover:text-blue-900 whitespace-nowrap ${location.pathname === item.path
                   ? 'text-blue-900 border-b-2 border-blue-900'
                   : 'text-gray-700'
@@ -149,14 +156,14 @@ const Header = () => {
                 <Link
                   key={item.name}
                   to={item.path}
+                  onClick={() => handleNavigation(item.path)}
                   className={`block py-4 px-4 text-base font-medium transition-colors hover:text-blue-900 hover:bg-blue-50 rounded-lg mx-2 touch-manipulation ${location.pathname === item.path ? 'text-blue-900 bg-blue-50 font-semibold' : 'text-gray-700'
                     }`}
-                  onClick={() => setIsMenuOpen(false)}
                 >
                   {item.name}
                 </Link>
               ))}
-              
+
               {/* Mobile User Section */}
               <div className="pt-4 border-t mt-4 mx-2">
                 {user ? (

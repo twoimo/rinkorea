@@ -10,6 +10,7 @@ import { createPortal } from "react-dom";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Products from "./pages/Products";
+import Equipment from "./pages/Equipment";
 import Projects from "./pages/Projects";
 import Certificates from "./pages/Certificates";
 import QnA from "./pages/QnA";
@@ -63,6 +64,7 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/products" element={<Products />} />
+                <Route path="/equipment" element={<Equipment />} />
                 <Route path="/projects" element={<Projects />} />
                 <Route path="/certificates" element={<Certificates />} />
                 <Route path="/qna" element={<QnA />} />
