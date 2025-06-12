@@ -14,7 +14,7 @@ const About = () => {
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-6">회사소개</h1>
             <p className="text-xl max-w-2xl mx-auto">
-              세라믹 코팅 전문 기업 린코리아는 혁신적인 기술과 품질로 <br />
+              건설재료 제조 전문 기업 린코리아는 혁신적인 기술과 품질로 <br />
               건설업계의 새로운 기준을 제시합니다.
             </p>
           </div>
@@ -27,7 +27,7 @@ const About = () => {
           <div className="max-w-4xl mx-auto text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-6">린코리아 소개</h2>
             <p className="text-lg text-gray-600 leading-relaxed mb-8">
-              린코리아는 2010년 설립 이후, 건설재료와 건설기계 분야에서 혁신적인 솔루션을 제공하는 전문 기업으로 성장해왔습니다.
+              린코리아는 건설재료와 건설기계 분야에서 혁신적인 솔루션을 제공하는 전문 기업으로 성장해왔습니다
               최고의 품질과 기술력으로 고객의 성공을 위한 최적의 파트너가 되겠습니다.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
