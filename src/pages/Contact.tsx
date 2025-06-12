@@ -70,7 +70,7 @@ const Contact = () => {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">소셜 미디어</h3>
               <div className="flex space-x-4">
                 <a
-                  href="https://www.instagram.com/rinkorea_official"
+                  href="https://www.instagram.com/rinkorea_kr"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-600 hover:text-gray-900"
