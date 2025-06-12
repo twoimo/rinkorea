@@ -63,47 +63,47 @@ const Certificates = () => {
       alt: "린코리아 RIN-COAT 시험성적서 1페이지"
     },
     {
-      title: "시험성적서 2페이지",
+      title: "불연재 인증",
       src: "/images/rin-coat-test-report-page-02.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 2페이지"
     },
     {
-      title: "시험성적서 3페이지",
+      title: "불연재 인증",
       src: "/images/rin-coat-test-report-page-03.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 3페이지"
     },
     {
-      title: "시험성적서 4페이지",
+      title: "불연재 인증",
       src: "/images/rin-coat-test-report-page-04.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 4페이지"
     },
     {
-      title: "시험성적서 5페이지",
+      title: "불연재 인증",
       src: "/images/rin-coat-test-report-page-05.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 5페이지"
     },
     {
-      title: "시험성적서 6페이지",
+      title: "불연재 인증",
       src: "/images/rin-coat-test-report-page-06.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 6페이지"
     },
     {
-      title: "시험성적서 7페이지",
+      title: "불연재 인증",
       src: "/images/rin-coat-test-report-page-07.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 7페이지"
     },
     {
-      title: "시험성적서 8페이지",
+      title: "불연재 인증",
       src: "/images/rin-coat-test-report-page-08.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 8페이지"
     },
     {
-      title: "시험성적서 9페이지",
+      title: "불연재 인증",
       src: "/images/rin-coat-test-report-page-09.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 9페이지"
     },
     {
-      title: "시험성적서 10페이지",
+      title: "불연재 인증",
       src: "/images/rin-coat-test-report-page-10.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 10페이지"
     }
