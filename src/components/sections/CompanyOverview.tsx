@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, FileText, Building2, ArrowRight, Phone, Mail } from 'lucide-react';
@@ -9,7 +8,10 @@ const CompanyOverview = () => {
     {
       icon: <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />,
       label: "본사 위치",
-      value: "인천광역시 서구 백범로 707 (주안국가산업단지)",
+      value: <>
+        인천광역시 서구 백범로 707 (주안국가산업단지)<br />
+        천안 테크노파크 산업단지 입주예정 (2026~)
+      </>,
       color: "text-blue-600"
     },
     {
@@ -73,6 +75,7 @@ const CompanyOverview = () => {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Link
                 to="/about"
+                onClick={() => window.scrollTo(0, 0)}
                 className="group bg-red-600 hover:bg-red-700 text-white px-6 py-4 sm:px-8 rounded-xl font-bold transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-red-500/25 hover:scale-105 touch-manipulation text-sm sm:text-base"
               >
                 회사소개 자세히 보기
@@ -80,6 +83,7 @@ const CompanyOverview = () => {
               </Link>
               <Link
                 to="/contact"
+                onClick={() => window.scrollTo(0, 0)}
                 className="group bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-200 hover:border-gray-300 px-6 py-4 sm:px-8 rounded-xl font-bold transition-all duration-300 flex items-center justify-center hover:scale-105 touch-manipulation text-sm sm:text-base"
               >
                 <Phone className="mr-2 w-4 h-4 sm:w-5 sm:h-5" />

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Shield, Leaf, Award, CheckCircle, Factory, Zap } from 'lucide-react';
 
@@ -7,15 +6,15 @@ const FeaturesSection = () => {
     {
       icon: <Shield className="w-6 h-6 sm:w-8 sm:h-8" />,
       title: "불연재 인증",
-      description: "국토교통부 불연재 인증을 받은 안전한 세라믹 코팅제",
+      description: "불연재 인증을 받은 안전한 순수 무기질 세라믹 코팅제",
       color: "from-blue-500 to-blue-600",
       bgColor: "bg-blue-50",
       textColor: "text-blue-600"
     },
     {
       icon: <Leaf className="w-6 h-6 sm:w-8 sm:h-8" />,
-      title: "친환경 소재",
-      description: "환경을 생각하는 친환경 1액형 신소재 세라믹 코팅",
+      title: "친환경 마감 공법",
+      description: "환경을 생각하는 친환경적인 1액형 신소재 세라믹 코팅마감",
       color: "from-green-500 to-green-600",
       bgColor: "bg-green-50",
       textColor: "text-green-600"
@@ -23,7 +22,7 @@ const FeaturesSection = () => {
     {
       icon: <Award className="w-6 h-6 sm:w-8 sm:h-8" />,
       title: "우수한 품질",
-      description: "다양한 시험성적서와 인증으로 검증된 품질",
+      description: "다양한 시험성적서와 인증, 1000여 곳 이상의 현장 적용을 통해 검증된 품질",
       color: "from-orange-500 to-orange-600",
       bgColor: "bg-orange-50",
       textColor: "text-orange-600"
@@ -38,8 +37,8 @@ const FeaturesSection = () => {
     },
     {
       icon: <Zap className="w-6 h-6 sm:w-8 sm:h-8" />,
-      title: "빠른 시공",
-      description: "1액형으로 간편하고 신속한 시공 가능",
+      title: "공기 단축",
+      description: "콘크리트 폴리싱의 단계를 획기적으로 단축시켜 간편하고 신속한 시공 가능",
       color: "from-yellow-500 to-yellow-600",
       bgColor: "bg-yellow-50",
       textColor: "text-yellow-600"
