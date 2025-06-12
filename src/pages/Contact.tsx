@@ -97,6 +97,20 @@ const Contact = () => {
                     errorClassName="bg-white"
                   />
                 </a>
+                <a
+                  href="https://www.youtube.com/@rinkorea"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  <OptimizedImage
+                    src="/images/youtube-icon.png"
+                    alt="YouTube"
+                    className="h-6 w-6"
+                    loadingClassName="bg-white"
+                    errorClassName="bg-white"
+                  />
+                </a>
               </div>
             </div>
           </div>
