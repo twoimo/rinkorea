@@ -13,10 +13,10 @@ const Certificates = () => {
 
   const certificates = [
     {
-      title: "국토교통부 불연재 인증",
+      title: "불연재 인증",
       type: "인증서",
       icon: <Shield className="w-8 h-8 text-blue-600" />,
-      description: "국토교통부에서 발급한 공식 불연재 인증서로 제품의 안전성을 보증합니다."
+      description: "불연재 인증을 받은 안전한 순수 무기질 세라믹 코팅제입니다"
     },
     {
       title: "품질시험성적서",
@@ -28,13 +28,13 @@ const Certificates = () => {
       title: "특허 등록증",
       type: "특허",
       icon: <Award className="w-8 h-8 text-yellow-600" />,
-      description: "세라믹 코팅 기술에 대한 특허 등록으로 기술력을 인정받았습니다."
+      description: "1액형 세라믹 제조기술에 대한 특허 등록으로 기술력을 인정받았습니다."
     },
     {
-      title: "환경친화성 인증",
-      type: "환경인증",
+      title: "대체예정",
+      type: "대체예정",
       icon: <CheckCircle className="w-8 h-8 text-purple-600" />,
-      description: "친환경 제품으로서의 품질과 안전성을 공식적으로 인정받았습니다."
+      description: "대체예정"
     }
   ];
 
@@ -210,45 +210,6 @@ const Certificates = () => {
                 <p className="text-xs text-gray-500 text-center">클릭하여 확대보기</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Test Results Info */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="bg-blue-50 p-8 rounded-lg">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">시험성적서 상세 정보</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">불연재 시험</h3>
-                <ul className="space-y-2 text-gray-600">
-                  <li>• 시험기관: 한국건설생활환경시험연구원</li>
-                  <li>• 시험방법: KS F 2271</li>
-                  <li>• 등급: 불연재료 1급</li>
-                  <li>• 유효기간: 2027년까지</li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">환경성 시험</h3>
-                <ul className="space-y-2 text-gray-600">
-                  <li>• 시험기관: 한국환경공단</li>
-                  <li>• VOC 방출량: 기준치 이하</li>
-                  <li>• 중금속 함량: 검출되지 않음</li>
-                  <li>• 친환경 인증 취득</li>
-                </ul>
-              </div>
-            </div>
-            <div className="text-center mt-8">
-              <a
-                href="https://rinkorea.com/시험성적서/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
-              >
-                시험성적서 상세보기
-              </a>
-            </div>
           </div>
         </div>
       </section>

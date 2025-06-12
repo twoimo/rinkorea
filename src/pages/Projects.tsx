@@ -123,7 +123,7 @@ const Projects = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">50+</div>
+              <div className="text-4xl font-bold text-blue-600 mb-2">1000+</div>
               <div className="text-gray-600">완료된 프로젝트</div>
             </div>
             <div className="text-center">
@@ -131,7 +131,7 @@ const Projects = () => {
               <div className="text-gray-600">고객 만족도</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-purple-600 mb-2">3</div>
+              <div className="text-4xl font-bold text-purple-600 mb-2">12+</div>
               <div className="text-gray-600">주요 제품군</div>
             </div>
           </div>
