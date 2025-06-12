@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -184,15 +183,17 @@ const Products = () => {
               {materials.map((product, index) => (
                 <div key={index} className="bg-white rounded-2xl shadow-2xl overflow-hidden">
                   {/* Product Header */}
-                  <div className="bg-gradient-to-r from-red-600 to-red-700 text-white p-8">
-                    <div className="flex items-center space-x-4 mb-4">
-                      {product.icon}
+                  <div className="bg-gradient-to-r from-red-600 to-red-700 text-white p-8 shadow-lg">
+                    <div className="flex items-center space-x-4 mb-6">
+                      <div className="bg-white bg-opacity-20 rounded-full p-3">
+                        {product.icon}
+                      </div>
                       <div>
-                        <h3 className="text-3xl font-bold">{product.name}</h3>
-                        <p className="text-red-100">{product.subtitle}</p>
+                        <h3 className="text-4xl font-black mb-2 tracking-tight drop-shadow-lg">{product.name}</h3>
+                        <p className="text-red-50 text-lg font-semibold leading-relaxed drop-shadow-md">{product.subtitle}</p>
                       </div>
                     </div>
-                    <p className="text-lg leading-relaxed">{product.description}</p>
+                    <p className="text-xl leading-relaxed font-medium text-white drop-shadow-md">{product.description}</p>
                   </div>
 
                   {/* Product Content */}
