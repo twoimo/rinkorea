@@ -108,6 +108,20 @@ const Footer = () => {
                   errorClassName="bg-gray-800"
                 />
               </a>
+              <a
+                href="https://www.youtube.com/@rinkorea"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-white transition-colors transform hover:scale-110"
+              >
+                <OptimizedImage
+                  src="/images/youtube-icon.png"
+                  alt="YouTube"
+                  className="h-8 w-8"
+                  loadingClassName="bg-gray-800"
+                  errorClassName="bg-gray-800"
+                />
+              </a>
             </div>
           </div>
         </div>

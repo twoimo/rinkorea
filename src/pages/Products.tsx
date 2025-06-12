@@ -124,7 +124,7 @@ const Products = () => {
                 <Shield className="w-8 h-8 text-blue-600" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">불연재 인증</h3>
-              <p className="text-gray-600">불연재 인증을 받은 안전한 순수 무기질 세라믹 코팅제</p>
+              <p className="text-gray-600">안전한 순수 무기질 세라믹 코팅제</p>
             </div>
 
             <div className="text-center">
@@ -132,7 +132,7 @@ const Products = () => {
                 <Zap className="w-8 h-8 text-yellow-600" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">간편한 시공</h3>
-              <p className="text-gray-600">1액형으로 혼합 없이 간편하게 시공 가능</p>
+              <p className="text-gray-600">1액형으로 간편하게 시공 가능</p>
             </div>
 
             <div className="text-center">
