@@ -11,7 +11,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     src,
     alt,
     className = '',
-    fallbackSrc = '/images/placeholder.png',
+    fallbackSrc = '/images/optimized/rin-korea-logo-black.webp',
     loadingClassName = '',
     errorClassName = '',
     ...props

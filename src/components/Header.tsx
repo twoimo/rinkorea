@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, LogOut, Settings, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -6,16 +6,35 @@ import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useProfile } from '@/hooks/useProfile';
 import { OptimizedImage } from '@/components/ui/image';
+import { cn } from '@/lib/utils';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const { isAdmin } = useUserRole();
   const { profile } = useProfile();
+
+  const isHomePage = location.pathname === '/';
+  const shouldBeTransparent = isHomePage && !isScrolled;
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 0);
+    };
+
+    if (isHomePage) {
+      window.addEventListener('scroll', handleScroll);
+      return () => window.removeEventListener('scroll', handleScroll);
+    } else {
+      setIsScrolled(true);
+    }
+  }, [isHomePage]);
 
   const navItems = [
     { name: '홈', path: '/' },
@@ -55,16 +74,22 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow-md sticky top-0 z-50">
+    <header className={cn(
+      "sticky top-0 z-50 transition-colors duration-200",
+      shouldBeTransparent ? "bg-transparent" : "bg-white shadow-md"
+    )}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           <Link to="/" className="flex items-center">
             <OptimizedImage
               src="/images/rin-korea-logo-black.png"
               alt="린코리아 로고"
-              className="h-8 sm:h-10 w-auto"
-              loadingClassName="bg-white"
-              errorClassName="bg-white"
+              className={cn(
+                "h-8 sm:h-10 w-auto transition-all duration-200",
+                shouldBeTransparent && "brightness-0 invert"
+              )}
+              loadingClassName="bg-transparent"
+              errorClassName="bg-transparent"
             />
           </Link>
 
@@ -75,10 +100,16 @@ const Header = () => {
                 key={item.name}
                 to={item.path}
                 onClick={() => handleNavigation(item.path)}
-                className={`text-sm font-medium transition-colors hover:text-blue-900 whitespace-nowrap ${location.pathname === item.path
-                  ? 'text-blue-900 border-b-2 border-blue-900'
-                  : 'text-gray-700'
-                  }`}
+                className={cn(
+                  "text-sm font-medium transition-colors whitespace-nowrap",
+                  location.pathname === item.path
+                    ? shouldBeTransparent
+                      ? "text-blue-400 border-b-2 border-blue-400"
+                      : "text-blue-900 border-b-2 border-blue-900"
+                    : shouldBeTransparent
+                      ? "text-white hover:text-blue-200"
+                      : "text-gray-700 hover:text-blue-900"
+                )}
               >
                 {item.name}
               </Link>
@@ -91,7 +122,14 @@ const Header = () => {
               <div className="relative">
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className={`inline-flex items-center px-3 py-2 rounded-full text-sm font-semibold transition-colors ${isAdmin ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`}
+                  className={cn(
+                    "inline-flex items-center px-3 py-2 rounded-full text-sm font-semibold transition-colors",
+                    isAdmin
+                      ? "bg-red-100 text-red-800"
+                      : shouldBeTransparent
+                        ? "bg-white text-gray-800 hover:bg-gray-100"
+                        : "bg-blue-100 text-blue-800"
+                  )}
                 >
                   <User className="w-4 h-4 mr-2" />
                   <span className="hidden xl:inline">
@@ -131,7 +169,12 @@ const Header = () => {
             ) : (
               <Link
                 to="/auth"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                className={cn(
+                  "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                  shouldBeTransparent
+                    ? "bg-white/20 text-white hover:bg-white/30"
+                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                )}
               >
                 로그인
               </Link>
@@ -140,7 +183,12 @@ const Header = () => {
 
           {/* Mobile menu button */}
           <button
-            className="xl:hidden p-2 rounded-md hover:bg-gray-100 transition-colors touch-manipulation"
+            className={cn(
+              "xl:hidden p-2 rounded-md transition-colors touch-manipulation",
+              shouldBeTransparent
+                ? "hover:bg-white/20 text-white"
+                : "hover:bg-gray-100 text-gray-700"
+            )}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="메뉴 열기/닫기"
           >

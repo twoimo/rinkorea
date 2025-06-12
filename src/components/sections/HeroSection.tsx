@@ -70,7 +70,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative min-h-screen overflow-hidden">
+    <section className="relative min-h-screen overflow-hidden -mt-16 sm:-mt-20">
       {/* Background Video */}
       <div className="absolute inset-0 w-full h-full">
         <iframe
@@ -80,7 +80,7 @@ const HeroSection = () => {
             height: '56.25vw',
             minHeight: '100vh',
             minWidth: '177.78vh',
-            transform: 'translate(-50%, -50%) scale(1.11)',
+            transform: 'translate(-50%, -50%) scale(1.12)',
             objectFit: 'cover',
             pointerEvents: 'none'
           }}
@@ -96,7 +96,7 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-blue-900/60"></div>
 
       {/* Content Container */}
-      <div className="relative z-10 h-screen flex items-center">
+      <div className="relative z-10 h-screen flex items-center pt-16 sm:pt-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl">
             {/* Patent & Trademark Info */}
@@ -153,7 +153,7 @@ const HeroSection = () => {
       {/* Admin Controls */}
       {
         isAdmin && (
-          <div className="absolute top-4 right-4 z-20 bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-xl shadow-xl max-w-xs sm:max-w-md border">
+          <div className="absolute top-24 right-4 z-20 bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-xl shadow-xl max-w-xs sm:max-w-md border">
             <div className="mb-3 font-bold text-gray-900 flex items-center gap-2 text-sm sm:text-base">
               <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" style={{ display: loading ? 'inline' : 'none' }} />
               메인 유튜브 영상 링크 수정
