@@ -5,6 +5,7 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
     fallbackSrc?: string;
     loadingClassName?: string;
     errorClassName?: string;
+    skipOptimization?: boolean;
 }
 
 export const OptimizedImage: React.FC<OptimizedImageProps> = ({
@@ -14,6 +15,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     fallbackSrc = '/images/optimized/rin-korea-logo-black.webp',
     loadingClassName = '',
     errorClassName = '',
+    skipOptimization = false,
     ...props
 }) => {
     const [isLoading, setIsLoading] = useState(true);
@@ -22,7 +24,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
 
     // Convert src to WebP path
     const getWebPSrc = (originalSrc: string) => {
-        if (!originalSrc) return '';
+        if (!originalSrc || skipOptimization) return originalSrc;
         const parts = originalSrc.split('/');
         const filename = parts.pop()?.split('.')[0];
         return `/images/optimized/${filename}.webp`;
@@ -33,7 +35,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     };
 
     const handleError = () => {
-        if (!useFallback) {
+        if (!useFallback && !skipOptimization) {
             // Try original format if WebP fails
             setUseFallback(true);
             return;

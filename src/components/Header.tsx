@@ -87,6 +87,7 @@ const Header = () => {
               className="h-8 sm:h-10 w-auto transition-all duration-200"
               loadingClassName="bg-transparent"
               errorClassName="bg-transparent"
+              skipOptimization
             />
           </Link>
 
