@@ -9,6 +9,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
+            <h3 className="text-xl font-bold text-white">회사 정보</h3>
             <div className="space-y-2">
               <p className="text-gray-300 flex items-center">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
