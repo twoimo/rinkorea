@@ -1,191 +1,108 @@
-import React, { useEffect, useState } from 'react';
+
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Loader2, CheckCircle, XCircle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useUserRole } from '@/hooks/useUserRole';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { ArrowRight, Shield, Building2, Wrench } from 'lucide-react';
+import { OptimizedImage } from '@/components/ui/image';
 
 const HeroSection = () => {
-  const { isAdmin } = useUserRole();
-  const [youtubeLink, setYoutubeLink] = useState('https://www.youtube.com/embed/W6ACoEMN3-0?autoplay=1&mute=1&controls=0&loop=1&playlist=W6ACoEMN3-0&showinfo=0&rel=0&modestbranding=1');
-  const [editLink, setEditLink] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState('');
-
-  const loadYoutubeLink = async () => {
-    try {
-      const { data, error } = await (supabase as SupabaseClient)
-        .from('site_settings')
-        .select('value')
-        .eq('key', 'youtube_link')
-        .single();
-      if (!error && data?.value) {
-        setYoutubeLink(data.value);
-        setEditLink(data.value);
-      }
-    } catch (e) {
-      // 기본값 유지
-    }
-  };
-
-  useEffect(() => {
-    loadYoutubeLink();
-  }, []);
-
-  const toEmbedUrl = (url: string) => {
-    if (url.includes('/embed/')) return url;
-    const watchMatch = url.match(/(?:youtube\.com\/watch\?v=)([\w-]+)/);
-    if (watchMatch) {
-      const id = watchMatch[1];
-      return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&showinfo=0&rel=0&modestbranding=1`;
-    }
-    const shortMatch = url.match(/youtu\.be\/([\w-]+)/);
-    if (shortMatch) {
-      const id = shortMatch[1];
-      return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&showinfo=0&rel=0&modestbranding=1`;
-    }
-    return url;
-  };
-
-  const embedPreview = toEmbedUrl(editLink);
-
-  const handleSaveYoutubeLink = async () => {
-    setLoading(true);
-    setResult('');
-    try {
-      const embedUrl = toEmbedUrl(editLink);
-      const { error } = await (supabase as SupabaseClient)
-        .from('site_settings')
-        .upsert({ key: 'youtube_link', value: embedUrl, updated_at: new Date().toISOString() }, { onConflict: 'key' });
-      if (error) {
-        setResult('error:' + error.message);
-      } else {
-        setYoutubeLink(embedUrl);
-        setResult('success:유튜브 링크가 저장되었습니다.');
-      }
-    } catch (e) {
-      setResult('error:' + (e.message || e));
-    }
-    setLoading(false);
-  };
-
   return (
-    <section className="relative min-h-screen overflow-hidden">
-      {/* Background Video */}
-      <div className="absolute inset-0 w-full h-full">
-        <iframe
-          className="absolute top-1/2 left-1/2"
-          style={{
-            width: '100vw',
-            height: '56.25vw',
-            minHeight: '100vh',
-            minWidth: '177.78vh',
-            transform: 'translate(-50%, -50%) scale(1.11)',
-            objectFit: 'cover',
-            pointerEvents: 'none'
-          }}
-          src={youtubeLink}
-          title="RIN-COAT Introduction"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        ></iframe>
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Background Image with Overlay */}
+      <div className="absolute inset-0 z-0">
+        <OptimizedImage
+          src="/images/homepage-main.jpg"
+          alt="린코리아 건설 현장"
+          className="w-full h-full object-cover"
+          loadingClassName="bg-gradient-to-r from-blue-900 to-blue-700"
+          errorClassName="bg-gradient-to-r from-blue-900 to-blue-700"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-blue-800/80 to-blue-700/90"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30"></div>
       </div>
 
-      {/* Enhanced Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-blue-900/60"></div>
+      {/* Content */}
+      <div className="relative z-10 container mx-auto px-4 text-center text-white">
+        <div className="max-w-5xl mx-auto">
+          {/* Company Badge */}
+          <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-3 mb-8">
+            <Shield className="w-5 h-5 text-yellow-400" />
+            <span className="text-sm font-medium">since 2019 | 건설업계 전문기업</span>
+          </div>
 
-      {/* Content Container */}
-      <div className="relative z-10 h-screen flex items-center">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl">
-            {/* Patent & Trademark Info */}
-            <div className="mb-8">
-              <div className="flex flex-wrap gap-3 sm:gap-4">
-                <div className="bg-yellow-400 text-black px-3 py-2 rounded-full text-sm font-bold tracking-wider shadow-lg text-left w-fit">
-                  특허 제10-2312833호
-                </div>
-                <div className="bg-yellow-400 text-black px-3 py-2 rounded-full text-sm font-bold tracking-wider shadow-lg text-left w-fit">
-                  상표 제40-1678504호
-                </div>
+          {/* Main Heading */}
+          <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight">
+            <span className="block text-white drop-shadow-2xl">더 나은</span>
+            <span className="block bg-gradient-to-r from-yellow-400 via-yellow-300 to-orange-400 bg-clip-text text-transparent drop-shadow-2xl">
+              건설환경을
+            </span>
+            <span className="block text-white drop-shadow-2xl">만들어갑니다</span>
+          </h1>
+
+          {/* Subtitle */}
+          <p className="text-xl md:text-2xl text-gray-200 mb-12 leading-relaxed max-w-3xl mx-auto">
+            린코리아는 혁신적인 건설재료와 첨단 건설기계를 통해<br />
+            건설업계의 미래를 선도하는 종합 솔루션 제공업체입니다.
+          </p>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+            <Link
+              to="/products"
+              className="group bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center space-x-2"
+            >
+              <span>제품 둘러보기</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              to="/about"
+              className="group border-2 border-white text-white hover:bg-white hover:text-blue-900 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform hover:scale-105 backdrop-blur-sm"
+            >
+              회사소개
+            </Link>
+          </div>
+
+          {/* Key Features Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div className="group bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300">
+              <div className="bg-gradient-to-br from-red-500 to-red-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
+                <Shield className="w-8 h-8 text-white" />
               </div>
+              <h3 className="text-xl font-bold mb-2">건설재료사업부</h3>
+              <p className="text-gray-200 text-sm leading-relaxed">
+                친환경 고성능 콘크리트 보호 솔루션 RIN-COAT로 구조물의 내구성을 극대화합니다.
+              </p>
             </div>
 
-            {/* Main Heading */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-6 sm:mb-8 leading-tight">
-              <span className="text-white drop-shadow-2xl block">
-                친환경 불연재(1액형)
-              </span>
-              <div className="h-2 sm:h-4"></div>
-              <span className="text-blue-400 drop-shadow-2xl block">
-                신소재 세라믹 코팅제
-              </span>
-            </h1>
+            <div className="group bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300">
+              <div className="bg-gradient-to-br from-blue-500 to-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
+                <Building2 className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">건설기계사업부</h3>
+              <p className="text-gray-200 text-sm leading-relaxed">
+                JS FLOOR SYSTEMS 공식 파트너로서 최첨단 연삭기와 연마기를 공급합니다.
+              </p>
+            </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-12">
-              <Link
-                to="/contact"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 sm:px-8 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg touch-manipulation text-base sm:text-lg"
-              >
-                제품 문의하기
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                to="/shop"
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-4 sm:px-8 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg touch-manipulation text-base sm:text-lg"
-              >
-                제품 구매하기
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                to="/projects"
-                className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-6 py-4 sm:px-8 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg touch-manipulation text-base sm:text-lg"
-              >
-                시공사례 보기
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
+            <div className="group bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300">
+              <div className="bg-gradient-to-br from-green-500 to-green-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
+                <Wrench className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">전문 서비스</h3>
+              <p className="text-gray-200 text-sm leading-relaxed">
+                판매부터 A/S까지 원스톱 서비스로 고객의 성공적인 프로젝트를 지원합니다.
+              </p>
             </div>
           </div>
         </div>
-      </div >
+      </div>
 
-      {/* Admin Controls */}
-      {
-        isAdmin && (
-          <div className="absolute top-4 right-4 z-20 bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-xl shadow-xl max-w-xs sm:max-w-md border">
-            <div className="mb-3 font-bold text-gray-900 flex items-center gap-2 text-sm sm:text-base">
-              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" style={{ display: loading ? 'inline' : 'none' }} />
-              메인 유튜브 영상 링크 수정
-            </div>
-            <input
-              type="text"
-              className="border border-gray-300 px-3 py-2 rounded-lg w-full text-xs sm:text-sm focus:ring-2 focus:ring-blue-400 mb-2"
-              value={editLink}
-              onChange={e => setEditLink(e.target.value)}
-              placeholder="유튜브 영상 주소 입력"
-              disabled={loading}
-            />
-            <div className="text-xs text-gray-600 mb-3 font-mono break-all">
-              변환된 embed 주소: <span>{embedPreview}</span>
-            </div>
-            <button
-              onClick={handleSaveYoutubeLink}
-              disabled={loading || !editLink}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg disabled:opacity-50 transition-colors font-semibold text-sm touch-manipulation"
-            >
-              {loading ? (<span className="flex items-center gap-2 justify-center"><Loader2 className="w-4 h-4 animate-spin" /> 저장 중...</span>) : '저장'}
-            </button>
-            {result && (
-              <div className={`flex items-center gap-2 text-xs mt-2 ${result.startsWith('success:') ? 'text-green-700' : 'text-red-600'}`}>
-                {result.startsWith('success:') ? <CheckCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
-                {result.replace(/^\w+:/, '')}
-              </div>
-            )}
-          </div>
-        )
-      }
-    </section >
+      {/* Scroll Indicator */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
+        <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
+          <div className="w-1 h-3 bg-white rounded-full mt-2 animate-bounce"></div>
+        </div>
+      </div>
+    </section>
   );
 };
 
