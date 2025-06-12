@@ -453,11 +453,6 @@ const Shop = () => {
                           <span className="text-gray-300">|</span>
                           <span className="text-sm text-gray-600">{product.reviews} 리뷰</span>
                         </div>
-                        {product.stock_quantity && (
-                          <span className="text-sm font-medium text-green-600">
-                            재고: {product.stock_quantity}개
-                          </span>
-                        )}
                       </div>
                       <div className="flex items-center justify-between mt-auto">
                         <div className="flex flex-col">

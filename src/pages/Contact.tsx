@@ -34,7 +34,8 @@ const Contact = () => {
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">주소</h3>
                 <p className="text-gray-600">
-                  인천광역시 서구 백범로 707 (주안국가산업단지)
+                  인천광역시 서구 백범로 707 (주안국가산업단지) <br />
+                  천안 테크노파크 산업단지 입주예정 (2026~)
                 </p>
               </div>
             </div>
@@ -43,7 +44,7 @@ const Contact = () => {
               <Phone className="w-6 h-6 text-blue-600 mt-1 mr-4 flex-shrink-0" />
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">전화번호</h3>
-                <p className="text-gray-600">032-123-4567</p>
+                <p className="text-gray-600">032-571-1023</p>
               </div>
             </div>
 
@@ -51,7 +52,7 @@ const Contact = () => {
               <Mail className="w-6 h-6 text-blue-600 mt-1 mr-4 flex-shrink-0" />
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">이메일</h3>
-                <p className="text-gray-600">info@rinkorea.com</p>
+                <p className="text-gray-600">2019@rinkorea.com</p>
               </div>
             </div>
 
