@@ -108,6 +108,43 @@ const Products = () => {
         </div>
       </section>
 
+      {/* Products Grid */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {products.map((product, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <div className="relative h-64 overflow-hidden">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-cover transition-transform hover:scale-105"
+                  />
+                  <div className="absolute top-4 right-4 bg-white p-2 rounded-full">
+                    {product.icon}
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{product.name}</h3>
+                  <p className="text-gray-600 mb-4">{product.description}</p>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-gray-900">주요 특징:</h4>
+                    <ul className="space-y-1">
+                      {product.features.map((feature, featureIndex) => (
+                        <li key={featureIndex} className="flex items-center text-gray-600">
+                          <div className="w-2 h-2 bg-blue-600 rounded-full mr-2"></div>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Product Benefits */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
@@ -150,43 +187,6 @@ const Products = () => {
               <h3 className="text-lg font-bold text-gray-900 mb-2">다양한 선택</h3>
               <p className="text-gray-600">용도와 요구사항에 맞는 다양한 제품군</p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Products Grid */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {products.map((product, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                <div className="relative h-64 overflow-hidden">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-full object-cover transition-transform hover:scale-105"
-                  />
-                  <div className="absolute top-4 right-4 bg-white p-2 rounded-full">
-                    {product.icon}
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{product.name}</h3>
-                  <p className="text-gray-600 mb-4">{product.description}</p>
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-gray-900">주요 특징:</h4>
-                    <ul className="space-y-1">
-                      {product.features.map((feature, featureIndex) => (
-                        <li key={featureIndex} className="flex items-center text-gray-600">
-                          <div className="w-2 h-2 bg-blue-600 rounded-full mr-2"></div>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>

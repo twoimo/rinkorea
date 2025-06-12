@@ -58,7 +58,7 @@ const Certificates = () => {
 
   const testReportImages = [
     {
-      title: "시험성적서 1페이지",
+      title: "불연재 인증",
       src: "/images/rin-coat-test-report-page-01.jpg",
       alt: "린코리아 RIN-COAT 시험성적서 1페이지"
     },
