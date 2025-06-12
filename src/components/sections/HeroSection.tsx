@@ -80,7 +80,7 @@ const HeroSection = () => {
             height: '56.25vw',
             minHeight: '100vh',
             minWidth: '177.78vh',
-            transform: 'translate(-50%, -50%) scale(1.12)',
+            transform: 'translate(-50%, -50%) scale(1.27)',
             objectFit: 'cover',
             pointerEvents: 'none'
           }}
