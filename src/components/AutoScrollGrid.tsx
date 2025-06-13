@@ -53,7 +53,7 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
             rowRef.current.style.transition = 'none';
             rowRef.current.style.transform = `translateX(0px)`;
             // Force reflow
-            rowRef.current.offsetHeight;
+            void rowRef.current.offsetHeight;
             rowRef.current.style.transition = 'transform 0.3s ease-out';
         }
     }, [items.length]);
@@ -69,10 +69,10 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
         lastTimeRef.current = timestamp;
 
         const row = rowRef.current;
-        const itemWidth = 400 + 32; // card width + gap
+        const itemWidth = 400 + 32;
         const singleSetWidth = itemWidth * items.length;
 
-        positionRef.current += scrollSpeed * (deltaTime / 16); // Normalize speed
+        positionRef.current += scrollSpeed * (deltaTime / 16);
 
         if (positionRef.current >= singleSetWidth) {
             resetPosition();
@@ -93,22 +93,23 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
         };
     }, [animate]);
 
-    const handleDragStart = useCallback((e: React.MouseEvent) => {
+    const handleDragStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
         if (!rowRef.current) return;
 
         setIsDragging(true);
-        setStartX(e.clientX);
+        const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+        setStartX(clientX);
         setCurrentTranslate(positionRef.current);
 
         rowRef.current.style.cursor = 'grabbing';
         rowRef.current.style.transition = 'none';
     }, []);
 
-    const handleDragMove = useCallback((e: MouseEvent) => {
+    const handleDragMove = useCallback((e: MouseEvent | TouchEvent) => {
         if (!isDragging || !rowRef.current) return;
 
-        const currentX = e.clientX;
-        const diff = currentX - startX;
+        const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+        const diff = clientX - startX;
         const newTranslate = currentTranslate - diff;
 
         positionRef.current = newTranslate;
@@ -122,7 +123,6 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
         rowRef.current.style.cursor = 'grab';
         rowRef.current.style.transition = 'transform 0.3s ease-out';
 
-        // Reset position if needed
         resetPosition();
     }, [resetPosition]);
 
@@ -138,7 +138,7 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
         handleDragEnd();
     }, [handleDragEnd]);
 
-    // Add global mouse event listeners
+    // Add global mouse and touch event listeners
     useEffect(() => {
         const handleGlobalMouseUp = () => {
             if (isDragging) {
@@ -149,11 +149,15 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
         if (isDragging) {
             window.addEventListener('mousemove', handleDragMove);
             window.addEventListener('mouseup', handleGlobalMouseUp);
+            window.addEventListener('touchmove', handleDragMove);
+            window.addEventListener('touchend', handleGlobalMouseUp);
         }
 
         return () => {
             window.removeEventListener('mousemove', handleDragMove);
             window.removeEventListener('mouseup', handleGlobalMouseUp);
+            window.removeEventListener('touchmove', handleDragMove);
+            window.removeEventListener('touchend', handleGlobalMouseUp);
         };
     }, [isDragging, handleDragMove, handleDragEnd]);
 
@@ -165,8 +169,9 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
         >
             <div
                 ref={rowRef}
-                className="flex gap-8 transition-transform duration-1000 ease-linear will-change-transform cursor-grab active:cursor-grabbing"
+                className="flex gap-8 transition-transform duration-1000 ease-linear will-change-transform cursor-grab active:cursor-grabbing touch-pan-x"
                 onMouseDown={handleDragStart}
+                onTouchStart={handleDragStart}
             >
                 {repeatedItems.map((item, index) => (
                     <div
