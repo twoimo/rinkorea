@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Shield, Leaf, Award, CheckCircle, Factory, Zap } from 'lucide-react';
 
@@ -54,7 +55,7 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+    <section className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white relative overflow-hidden py-20">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
@@ -62,37 +63,37 @@ const FeaturesSection = () => {
         }} />
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative max-w-7xl">
         {/* Section Header */}
-        <div className="text-center mb-12 sm:mb-16 max-w-3xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-4 sm:mb-6 leading-tight">
+        <div className="text-center mb-16 max-w-3xl mx-auto">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
             린코리아만의
             <span className="text-red-600"> 특별함</span>
           </h2>
-          <p className="text-lg sm:text-xl text-gray-600 leading-relaxed px-4">
+          <p className="text-xl sm:text-2xl text-gray-600 leading-relaxed">
             최고 품질의 세라믹 코팅제로 안전하고 친환경적인 건설환경을 만들어갑니다
           </p>
         </div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="group relative bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-gray-200 transform hover:-translate-y-2 touch-manipulation"
+              className="group relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-gray-200 transform hover:-translate-y-2"
             >
               {/* Icon Container */}
-              <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-2xl ${feature.bgColor} flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300`}>
+              <div className={`w-16 h-16 rounded-2xl ${feature.bgColor} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
                 <div className={feature.textColor}>
                   {feature.icon}
                 </div>
               </div>
 
               {/* Content */}
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3 group-hover:text-red-600 transition-colors">
+              <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-red-600 transition-colors">
                 {feature.title}
               </h3>
-              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+              <p className="text-base text-gray-600 leading-relaxed">
                 {feature.description}
               </p>
 
