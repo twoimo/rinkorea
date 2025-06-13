@@ -7,6 +7,7 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import AutoScrollGrid from '@/components/AutoScrollGrid';
 
 const Projects = () => {
   const { projects, loading, createProject, updateProject, deleteProject } = useProjects();
@@ -222,13 +223,15 @@ const Projects = () => {
       </section>
 
       {/* Projects Grid */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {getVisibleProjects().map((project) => {
+      <section className="py-20 w-full">
+        <div className="w-full">
+          <AutoScrollGrid
+            items={getVisibleProjects()}
+            itemsPerRow={4}
+            renderItem={(project) => {
               const isHidden = hiddenProjectIds.includes(project.id);
               return (
-                <div key={project.id} className="bg-white rounded-xl shadow-lg overflow-hidden group relative">
+                <div className="bg-white rounded-xl shadow-lg overflow-hidden group relative w-full">
                   <div className="relative aspect-video overflow-hidden">
                     <img
                       src={project.image}
@@ -300,8 +303,8 @@ const Projects = () => {
                   </div>
                 </div>
               );
-            })}
-          </div>
+            }}
+          />
         </div>
       </section>
 
