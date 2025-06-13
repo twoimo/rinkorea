@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { ExternalLink, Calendar, MapPin, Plus, Edit2, Trash2, X, Save } from 'lucide-react';
+import { ExternalLink, Calendar, MapPin, Plus, Edit2, Trash2, X, Save, Eye, EyeOff } from 'lucide-react';
 import { useProjects } from '@/hooks/useProjects';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 const Projects = () => {
   const { projects, loading, createProject, updateProject, deleteProject } = useProjects();
@@ -24,6 +26,51 @@ const Projects = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
+  const [hiddenProjectIds, setHiddenProjectIds] = useState<string[]>([]);
+
+  // 숨김 프로젝트 목록 불러오기
+  const fetchHiddenProjects = async () => {
+    const { data, error } = await (supabase as unknown as SupabaseClient)
+      .from('project_hidden')
+      .select('project_id');
+    if (!error && data) {
+      setHiddenProjectIds(data.map((h: { project_id: string }) => h.project_id));
+    }
+  };
+
+  useEffect(() => {
+    fetchHiddenProjects();
+  }, []);
+
+  // 숨김/해제 핸들러
+  const handleToggleHide = async (projectId: string) => {
+    setFormLoading(true);
+    setFormError(null);
+    setFormSuccess(null);
+    try {
+      if (hiddenProjectIds.includes(projectId)) {
+        // 숨김 해제
+        const { error } = await (supabase as unknown as SupabaseClient)
+          .from('project_hidden')
+          .delete()
+          .eq('project_id', projectId);
+        if (error) setFormError(error.message);
+        else setFormSuccess('노출되었습니다.');
+      } else {
+        // 숨기기
+        const { error } = await (supabase as unknown as SupabaseClient)
+          .from('project_hidden')
+          .upsert({ project_id: projectId });
+        if (error) setFormError(error.message);
+        else setFormSuccess('숨김 처리되었습니다.');
+      }
+      await fetchHiddenProjects();
+      setTimeout(() => setFormSuccess(null), 700);
+    } catch (e) {
+      setFormError(e instanceof Error ? e.message : String(e));
+    }
+    setFormLoading(false);
+  };
 
   // 폼 열기
   const openForm = (project?: any) => {
@@ -142,6 +189,12 @@ const Projects = () => {
     }));
   };
 
+  // 프로젝트 목록 필터링
+  const getVisibleProjects = () => {
+    if (isAdmin) return projects;
+    return projects.filter(p => !hiddenProjectIds.includes(p.id));
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -172,70 +225,82 @@ const Projects = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((project) => (
-              <div key={project.id} className="bg-white rounded-xl shadow-lg overflow-hidden group relative">
-                <div className="relative aspect-video overflow-hidden">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  {isAdmin && (
-                    <div className="absolute top-3 right-3 flex gap-2 z-10">
-                      <button
-                        className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow"
-                        onClick={() => openForm(project)}
-                        title="수정"
-                        aria-label="수정"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-2 shadow"
-                        onClick={() => handleDeleteProject(project.id)}
-                        title="삭제"
-                        aria-label="삭제"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
-                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4" />
-                      {project.location}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      {project.date}
-                    </div>
+            {getVisibleProjects().map((project) => {
+              const isHidden = hiddenProjectIds.includes(project.id);
+              return (
+                <div key={project.id} className="bg-white rounded-xl shadow-lg overflow-hidden group relative">
+                  <div className="relative aspect-video overflow-hidden">
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    {isAdmin && (
+                      <div className="absolute top-3 right-3 flex gap-2 z-10">
+                        <button
+                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          onClick={() => handleToggleHide(project.id)}
+                          title={isHidden ? '노출 해제' : '숨기기'}
+                          disabled={formLoading}
+                          aria-label={isHidden ? '노출 해제' : '숨기기'}
+                        >
+                          {isHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                        </button>
+                        <button
+                          className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow"
+                          onClick={() => openForm(project)}
+                          title="수정"
+                          aria-label="수정"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-2 shadow"
+                          onClick={() => handleDeleteProject(project.id)}
+                          title="삭제"
+                          aria-label="삭제"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  <p className="text-gray-600 mb-4">{project.description}</p>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {project.features.map((feature, index) => (
-                      <span
-                        key={index}
-                        className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm"
-                      >
-                        {feature}
-                      </span>
-                    ))}
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
+                    <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        {project.location}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        {project.date}
+                      </div>
+                    </div>
+                    <p className="text-gray-600 mb-4">{project.description}</p>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {project.features.map((feature, index) => (
+                        <span
+                          key={index}
+                          className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm"
+                        >
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      자세히 보기
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
                   </div>
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
-                  >
-                    자세히 보기
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
