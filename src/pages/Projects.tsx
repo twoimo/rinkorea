@@ -10,8 +10,9 @@ const Projects = () => {
   const { projects, loading, createProject, updateProject, deleteProject } = useProjects();
   const { isAdmin } = useUserRole();
   const { toast } = useToast();
+  const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState<string | null>(null);
-  const [newProject, setNewProject] = useState({
+  const [formValues, setFormValues] = useState({
     title: '',
     location: '',
     date: '',
@@ -20,25 +21,26 @@ const Projects = () => {
     url: '',
     features: ['']
   });
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [formSuccess, setFormSuccess] = useState<string | null>(null);
 
-  const handleCreateProject = async () => {
-    const { error } = await createProject({
-      ...newProject,
-      features: newProject.features.filter(f => f.trim() !== '')
-    });
-
-    if (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to create project',
-        variant: 'destructive'
+  // 폼 열기
+  const openForm = (project?: any) => {
+    if (project) {
+      setEditingProject(project.id);
+      setFormValues({
+        title: project.title,
+        location: project.location,
+        date: project.date,
+        image: project.image,
+        description: project.description,
+        url: project.url,
+        features: project.features.length > 0 ? project.features : ['']
       });
     } else {
-      toast({
-        title: 'Success',
-        description: 'Project created successfully'
-      });
-      setNewProject({
+      setEditingProject(null);
+      setFormValues({
         title: '',
         location: '',
         date: '',
@@ -48,66 +50,93 @@ const Projects = () => {
         features: ['']
       });
     }
+    setShowForm(true);
   };
 
-  const handleUpdateProject = async (id: string) => {
-    const project = projects.find(p => p.id === id);
-    if (!project) return;
-
-    const { error } = await updateProject(id, {
-      ...project,
-      features: project.features.filter(f => f.trim() !== '')
+  // 폼 닫기
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingProject(null);
+    setFormValues({
+      title: '',
+      location: '',
+      date: '',
+      image: '',
+      description: '',
+      url: '',
+      features: ['']
     });
+    setFormError(null);
+    setFormSuccess(null);
+  };
 
-    if (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to update project',
-        variant: 'destructive'
-      });
-    } else {
-      toast({
-        title: 'Success',
-        description: 'Project updated successfully'
-      });
-      setEditingProject(null);
+  const handleFormSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormLoading(true);
+    setFormError(null);
+    setFormSuccess(null);
+
+    try {
+      const payload = {
+        ...formValues,
+        features: formValues.features.filter(f => f.trim() !== '')
+      };
+
+      let result;
+      if (editingProject) {
+        result = await updateProject(editingProject, payload);
+      } else {
+        result = await createProject(payload);
+      }
+
+      if (result.error) {
+        setFormError(result.error.message);
+      } else {
+        setFormSuccess('저장되었습니다.');
+        setTimeout(() => {
+          closeForm();
+        }, 700);
+      }
+    } catch (e) {
+      setFormError(e instanceof Error ? e.message : String(e));
     }
+    setFormLoading(false);
   };
 
   const handleDeleteProject = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this project?')) return;
+    if (!window.confirm('정말로 이 프로젝트를 삭제하시겠습니까?')) return;
 
     const { error } = await deleteProject(id);
     if (error) {
       toast({
         title: 'Error',
-        description: 'Failed to delete project',
+        description: '프로젝트 삭제에 실패했습니다.',
         variant: 'destructive'
       });
     } else {
       toast({
         title: 'Success',
-        description: 'Project deleted successfully'
+        description: '프로젝트가 삭제되었습니다.'
       });
     }
   };
 
   const addFeature = () => {
-    setNewProject(prev => ({
+    setFormValues(prev => ({
       ...prev,
       features: [...prev.features, '']
     }));
   };
 
   const updateFeature = (index: number, value: string) => {
-    setNewProject(prev => ({
+    setFormValues(prev => ({
       ...prev,
       features: prev.features.map((f, i) => i === index ? value : f)
     }));
   };
 
   const removeFeature = (index: number) => {
-    setNewProject(prev => ({
+    setFormValues(prev => ({
       ...prev,
       features: prev.features.filter((_, i) => i !== index)
     }));
@@ -126,6 +155,15 @@ const Projects = () => {
               린코리아의 세라믹 코팅제가 적용된 다양한 프로젝트를 통해 <br />
               우수한 품질과 성능을 확인하세요.
             </p>
+            {isAdmin && (
+              <button
+                className="mt-8 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 mx-auto"
+                onClick={() => openForm()}
+                aria-label="프로젝트 추가"
+              >
+                <Plus className="w-5 h-5" /> 프로젝트 추가
+              </button>
+            )}
           </div>
         </div>
       </section>
@@ -133,208 +171,206 @@ const Projects = () => {
       {/* Projects Grid */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          {isAdmin && (
-            <div className="mb-8 bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-2xl font-bold mb-4">Add New Project</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  placeholder="Title"
-                  value={newProject.title}
-                  onChange={e => setNewProject(prev => ({ ...prev, title: e.target.value }))}
-                  className="border rounded-lg p-2"
-                />
-                <input
-                  type="text"
-                  placeholder="Location"
-                  value={newProject.location}
-                  onChange={e => setNewProject(prev => ({ ...prev, location: e.target.value }))}
-                  className="border rounded-lg p-2"
-                />
-                <input
-                  type="text"
-                  placeholder="Date"
-                  value={newProject.date}
-                  onChange={e => setNewProject(prev => ({ ...prev, date: e.target.value }))}
-                  className="border rounded-lg p-2"
-                />
-                <input
-                  type="text"
-                  placeholder="Image URL"
-                  value={newProject.image}
-                  onChange={e => setNewProject(prev => ({ ...prev, image: e.target.value }))}
-                  className="border rounded-lg p-2"
-                />
-                <input
-                  type="text"
-                  placeholder="URL"
-                  value={newProject.url}
-                  onChange={e => setNewProject(prev => ({ ...prev, url: e.target.value }))}
-                  className="border rounded-lg p-2"
-                />
-                <textarea
-                  placeholder="Description"
-                  value={newProject.description}
-                  onChange={e => setNewProject(prev => ({ ...prev, description: e.target.value }))}
-                  className="border rounded-lg p-2 md:col-span-2"
-                  rows={3}
-                />
-                <div className="md:col-span-2">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold">Features</h3>
-                    <button
-                      onClick={addFeature}
-                      className="bg-blue-600 text-white px-3 py-1 rounded-lg flex items-center gap-1"
-                    >
-                      <Plus className="w-4 h-4" /> Add Feature
-                    </button>
-                  </div>
-                  {newProject.features.map((feature, index) => (
-                    <div key={index} className="flex gap-2 mb-2">
-                      <input
-                        type="text"
-                        value={feature}
-                        onChange={e => updateFeature(index, e.target.value)}
-                        className="border rounded-lg p-2 flex-1"
-                        placeholder={`Feature ${index + 1}`}
-                      />
-                      <button
-                        onClick={() => removeFeature(index)}
-                        className="bg-red-600 text-white px-3 py-1 rounded-lg"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <button
-                  onClick={handleCreateProject}
-                  className="bg-green-600 text-white px-6 py-2 rounded-lg md:col-span-2 flex items-center justify-center gap-2"
-                >
-                  <Plus className="w-5 h-5" /> Add Project
-                </button>
-              </div>
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {projects.map((project) => (
-              <div key={project.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                <div className="relative h-64 overflow-hidden">
+              <div key={project.id} className="bg-white rounded-xl shadow-lg overflow-hidden group relative">
+                <div className="relative aspect-video overflow-hidden">
                   <img
                     src={project.image}
                     alt={project.title}
-                    className="w-full h-full object-cover transition-transform hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
-                  <div className="absolute top-4 right-4 flex gap-2">
-                    <a
-                      href={project.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
-                    >
-                      <ExternalLink className="w-5 h-5 text-gray-700" />
-                    </a>
-                    {isAdmin && (
-                      <>
-                        <button
-                          onClick={() => setEditingProject(project.id)}
-                          className="bg-blue-600 p-2 rounded-full hover:bg-blue-700 transition-colors"
-                        >
-                          <Edit2 className="w-5 h-5 text-white" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteProject(project.id)}
-                          className="bg-red-600 p-2 rounded-full hover:bg-red-700 transition-colors"
-                        >
-                          <Trash2 className="w-5 h-5 text-white" />
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  {editingProject === project.id ? (
-                    <div className="space-y-4">
-                      <input
-                        type="text"
-                        value={project.title}
-                        onChange={e => updateProject(project.id, { title: e.target.value })}
-                        className="border rounded-lg p-2 w-full"
-                      />
-                      <div className="flex items-center text-gray-600 mb-2">
-                        <MapPin className="w-4 h-4 mr-2" />
-                        <input
-                          type="text"
-                          value={project.location}
-                          onChange={e => updateProject(project.id, { location: e.target.value })}
-                          className="border rounded-lg p-2 flex-1"
-                        />
-                      </div>
-                      <div className="flex items-center text-gray-600 mb-4">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        <input
-                          type="text"
-                          value={project.date}
-                          onChange={e => updateProject(project.id, { date: e.target.value })}
-                          className="border rounded-lg p-2 flex-1"
-                        />
-                      </div>
-                      <textarea
-                        value={project.description}
-                        onChange={e => updateProject(project.id, { description: e.target.value })}
-                        className="border rounded-lg p-2 w-full"
-                        rows={3}
-                      />
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleUpdateProject(project.id)}
-                          className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                        >
-                          <Save className="w-4 h-4" /> Save
-                        </button>
-                        <button
-                          onClick={() => setEditingProject(null)}
-                          className="bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                        >
-                          <X className="w-4 h-4" /> Cancel
-                        </button>
-                      </div>
+                  {isAdmin && (
+                    <div className="absolute top-3 right-3 flex gap-2 z-10">
+                      <button
+                        className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow"
+                        onClick={() => openForm(project)}
+                        title="수정"
+                        aria-label="수정"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-2 shadow"
+                        onClick={() => handleDeleteProject(project.id)}
+                        title="삭제"
+                        aria-label="삭제"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                  ) : (
-                    <>
-                      <h3 className="text-xl font-bold text-gray-900 mb-3">{project.title}</h3>
-                      <div className="flex items-center text-gray-600 mb-2">
-                        <MapPin className="w-4 h-4 mr-2" />
-                        <span className="text-sm">{project.location}</span>
-                      </div>
-                      <div className="flex items-center text-gray-600 mb-4">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        <span className="text-sm">{project.date}</span>
-                      </div>
-                      <p className="text-gray-600 mb-4">{project.description}</p>
-                      <div className="space-y-2">
-                        <h4 className="font-semibold text-gray-900">적용 특징:</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {project.features.map((feature, featureIndex) => (
-                            <span
-                              key={featureIndex}
-                              className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium"
-                            >
-                              {feature}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </>
                   )}
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
+                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4" />
+                      {project.location}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-4 h-4" />
+                      {project.date}
+                    </div>
+                  </div>
+                  <p className="text-gray-600 mb-4">{project.description}</p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {project.features.map((feature, index) => (
+                      <span
+                        key={index}
+                        className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm"
+                      >
+                        {feature}
+                      </span>
+                    ))}
+                  </div>
+                  <a
+                    href={project.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    자세히 보기
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </section>
+
+      {/* 프로젝트 추가/수정 모달 폼 */}
+      {showForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full relative">
+            <button
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700"
+              onClick={closeForm}
+              aria-label="닫기"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <h2 className="text-2xl font-bold mb-4">
+              {editingProject ? '프로젝트 수정' : '프로젝트 추가'}
+            </h2>
+            <form className="space-y-4" onSubmit={handleFormSave}>
+              <div>
+                <label className="block text-sm font-medium mb-1">프로젝트명</label>
+                <input
+                  type="text"
+                  className="w-full border px-3 py-2 rounded"
+                  value={formValues.title}
+                  onChange={e => setFormValues(v => ({ ...v, title: e.target.value }))}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">위치</label>
+                <input
+                  type="text"
+                  className="w-full border px-3 py-2 rounded"
+                  value={formValues.location}
+                  onChange={e => setFormValues(v => ({ ...v, location: e.target.value }))}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">날짜</label>
+                <input
+                  type="text"
+                  className="w-full border px-3 py-2 rounded"
+                  value={formValues.date}
+                  onChange={e => setFormValues(v => ({ ...v, date: e.target.value }))}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">이미지 URL</label>
+                <input
+                  type="text"
+                  className="w-full border px-3 py-2 rounded"
+                  value={formValues.image}
+                  onChange={e => setFormValues(v => ({ ...v, image: e.target.value }))}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">설명</label>
+                <textarea
+                  className="w-full border px-3 py-2 rounded"
+                  value={formValues.description}
+                  onChange={e => setFormValues(v => ({ ...v, description: e.target.value }))}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">URL</label>
+                <input
+                  type="text"
+                  className="w-full border px-3 py-2 rounded"
+                  value={formValues.url}
+                  onChange={e => setFormValues(v => ({ ...v, url: e.target.value }))}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">특징</label>
+                <div className="space-y-2">
+                  {formValues.features.map((feature, index) => (
+                    <div key={index} className="flex gap-2">
+                      <input
+                        type="text"
+                        className="flex-1 border px-3 py-2 rounded"
+                        value={feature}
+                        onChange={e => updateFeature(index, e.target.value)}
+                        placeholder="특징 입력"
+                      />
+                      <button
+                        type="button"
+                        className="px-3 py-2 text-red-600 hover:text-red-700"
+                        onClick={() => removeFeature(index)}
+                        aria-label="특징 삭제"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1"
+                    onClick={addFeature}
+                  >
+                    <Plus className="w-4 h-4" /> 특징 추가
+                  </button>
+                </div>
+              </div>
+              {formError && (
+                <div className="text-red-600 text-sm">{formError}</div>
+              )}
+              {formSuccess && (
+                <div className="text-green-600 text-sm">{formSuccess}</div>
+              )}
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  className="px-4 py-2 text-gray-600 hover:text-gray-700"
+                  onClick={closeForm}
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                  disabled={formLoading}
+                >
+                  {formLoading ? '저장 중...' : '저장'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Stats Section */}
       <section className="py-20 bg-gray-50">
