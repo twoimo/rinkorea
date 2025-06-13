@@ -29,12 +29,6 @@ const Certificates = () => {
       type: "특허",
       icon: <Award className="w-8 h-8 text-yellow-600" />,
       description: "1액형 세라믹 제조기술에 대한 특허 등록으로 기술력을 인정받았습니다."
-    },
-    {
-      title: "대체예정",
-      type: "대체예정",
-      icon: <CheckCircle className="w-8 h-8 text-purple-600" />,
-      description: "대체예정"
     }
   ];
 
@@ -133,9 +127,9 @@ const Certificates = () => {
       {/* Certificates Grid */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
             {certificates.map((cert, index) => (
-              <div key={index} className="bg-white p-8 rounded-lg shadow-lg border hover:shadow-xl transition-shadow">
+              <div key={index} className="bg-white p-8 rounded-lg shadow-lg border hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                 <div className="flex items-center mb-6">
                   <div className="bg-gray-50 p-3 rounded-full mr-4">
                     {cert.icon}
