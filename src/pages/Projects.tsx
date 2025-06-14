@@ -546,6 +546,16 @@ const Projects = () => {
                   </div>
                   <div className="p-6">
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
+                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        <span>{project.location}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        <span>{project.date}</span>
+                      </div>
+                    </div>
                     <p className="text-gray-600 mb-4">{project.description}</p>
                     <div className="flex gap-2 mb-4">
                       {project.features.map((feature, index) => (
@@ -554,6 +564,15 @@ const Projects = () => {
                         </span>
                       ))}
                     </div>
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      자세히 보기
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
                   </div>
                 </div>
               ))}
