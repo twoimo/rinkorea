@@ -30,21 +30,39 @@ const About = () => {
               린코리아는 건설재료와 건설기계 분야에서 혁신적인 솔루션을 제공하는 전문 기업으로 성장해왔습니다
               최고의 품질과 기술력으로 고객의 성공을 위한 최적의 파트너가 되겠습니다.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-              <div className="bg-blue-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <Target className="w-16 h-16 text-blue-600 mx-auto mb-6" />
-                <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">비전</h3>
-                <p className="text-gray-600 text-lg text-center">건설업계의 혁신을 선도하는 글로벌 기업</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mt-12 max-w-7xl mx-auto">
+              <div className="bg-blue-50 p-12 px-16 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 min-h-[300px] flex flex-col items-center justify-center">
+                <div className="h-20 flex items-center">
+                  <Target className="w-20 h-20 text-blue-600" />
+                </div>
+                <div className="h-16 flex items-center">
+                  <h3 className="text-3xl font-bold text-gray-900 text-center">비전</h3>
+                </div>
+                <div className="h-16 flex items-center">
+                  <p className="text-gray-600 text-xl text-center">건설업계의 혁신을 선도하는 글로벌 기업</p>
+                </div>
               </div>
-              <div className="bg-green-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <Award className="w-16 h-16 text-green-600 mx-auto mb-6" />
-                <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">미션</h3>
-                <p className="text-gray-600 text-lg text-center">최고의 품질과 기술로 고객 가치 창출</p>
+              <div className="bg-green-50 p-12 px-16 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 min-h-[300px] flex flex-col items-center justify-center">
+                <div className="h-20 flex items-center">
+                  <Award className="w-20 h-20 text-green-600" />
+                </div>
+                <div className="h-16 flex items-center">
+                  <h3 className="text-3xl font-bold text-gray-900 text-center">미션</h3>
+                </div>
+                <div className="h-16 flex items-center">
+                  <p className="text-gray-600 text-xl text-center">최고의 품질과 기술로 고객 가치 창출</p>
+                </div>
               </div>
-              <div className="bg-purple-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <CheckCircle className="w-16 h-16 text-purple-600 mx-auto mb-6" />
-                <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">핵심가치</h3>
-                <p className="text-gray-600 text-lg text-center">신뢰, 혁신, 지속가능성</p>
+              <div className="bg-purple-50 p-12 px-16 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 min-h-[300px] flex flex-col items-center justify-center">
+                <div className="h-20 flex items-center">
+                  <CheckCircle className="w-20 h-20 text-purple-600" />
+                </div>
+                <div className="h-16 flex items-center">
+                  <h3 className="text-3xl font-bold text-gray-900 text-center">핵심가치</h3>
+                </div>
+                <div className="h-16 flex items-center">
+                  <p className="text-gray-600 text-xl text-center whitespace-nowrap">신뢰, 혁신, 지속가능성</p>
+                </div>
               </div>
             </div>
           </div>
