@@ -223,39 +223,34 @@ const Products = () => {
                     alt={product.name}
                     className="w-full h-full object-cover transition-transform hover:scale-105"
                   />
-                  <div className="absolute top-4 right-4 bg-white p-2 rounded-full">
-                    {product.icon === 'Shield' && <Shield className="w-8 h-8 text-blue-600" />}
-                    {product.icon === 'Palette' && <Palette className="w-8 h-8 text-green-600" />}
-                    {product.icon === 'Star' && <Star className="w-8 h-8 text-yellow-600" />}
-                    {product.icon === 'Zap' && <Zap className="w-8 h-8 text-purple-600" />}
-                    {product.icon === 'Leaf' && <Leaf className="w-8 h-8 text-green-600" />}
+                  <div className="absolute top-4 right-4 flex space-x-2">
+                    {isAdmin && (
+                      <>
+                        <button
+                          onClick={() => openForm(product)}
+                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                          <Edit className="w-5 h-5 text-blue-600" />
+                        </button>
+                        <button
+                          onClick={() => openDeleteConfirm(product)}
+                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                          <Trash2 className="w-5 h-5 text-red-600" />
+                        </button>
+                        <button
+                          onClick={() => handleToggleHide(product)}
+                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                          {hiddenProductIds.includes(product.id) ? (
+                            <Eye className="w-5 h-5 text-gray-600" />
+                          ) : (
+                            <EyeOff className="w-5 h-5 text-gray-600" />
+                          )}
+                        </button>
+                      </>
+                    )}
                   </div>
-                  {isAdmin && (
-                    <div className="absolute top-4 right-4 flex space-x-2">
-                      <button
-                        onClick={() => openForm(product)}
-                        className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
-                      >
-                        <Edit className="w-5 h-5 text-blue-600" />
-                      </button>
-                      <button
-                        onClick={() => openDeleteConfirm(product)}
-                        className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
-                      >
-                        <Trash2 className="w-5 h-5 text-red-600" />
-                      </button>
-                      <button
-                        onClick={() => handleToggleHide(product)}
-                        className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
-                      >
-                        {hiddenProductIds.includes(product.id) ? (
-                          <Eye className="w-5 h-5 text-gray-600" />
-                        ) : (
-                          <EyeOff className="w-5 h-5 text-gray-600" />
-                        )}
-                      </button>
-                    </div>
-                  )}
                 </div>
                 <div className="p-6">
                   <h3 className="text-2xl font-bold text-gray-900 mb-3">{product.name}</h3>
