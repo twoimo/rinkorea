@@ -389,7 +389,7 @@ const Certificates = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
             {certificates
               .filter(cert => cert.category === 'certification' && !hiddenCertificateIds.includes(cert.id))
               .map((cert, index) => (
