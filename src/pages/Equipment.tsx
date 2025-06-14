@@ -249,12 +249,8 @@ const Equipment = () => {
                                             alt={item.name}
                                             className="w-full h-full object-cover transition-transform hover:scale-105"
                                         />
-                                        <div className="absolute top-4 right-4 bg-white p-2 rounded-full">
-                                            {item.icon === 'settings' && <Settings className="w-8 h-8 text-blue-600" />}
-                                            {item.icon === 'wrench' && <Wrench className="w-8 h-8 text-blue-600" />}
-                                        </div>
                                         {isAdmin && (
-                                            <div className="absolute top-4 left-4 flex space-x-2">
+                                            <div className="absolute top-4 right-4 flex space-x-2">
                                                 <button
                                                     onClick={() => handleToggleHide(item)}
                                                     className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
@@ -279,6 +275,10 @@ const Equipment = () => {
                                                 </button>
                                             </div>
                                         )}
+                                        <div className="absolute top-4 left-4 bg-white p-2 rounded-full">
+                                            {item.icon === 'settings' && <Settings className="w-8 h-8 text-blue-600" />}
+                                            {item.icon === 'wrench' && <Wrench className="w-8 h-8 text-blue-600" />}
+                                        </div>
                                     </div>
                                     <div className="p-6">
                                         <h3 className="text-2xl font-bold text-gray-900 mb-3">{item.name}</h3>
@@ -322,12 +322,8 @@ const Equipment = () => {
                                             alt={item.name}
                                             className="w-full h-full object-cover transition-transform hover:scale-105"
                                         />
-                                        <div className="absolute top-4 right-4 bg-white p-2 rounded-full">
-                                            {item.icon === 'settings' && <Settings className="w-8 h-8 text-blue-600" />}
-                                            {item.icon === 'wrench' && <Wrench className="w-8 h-8 text-blue-600" />}
-                                        </div>
                                         {isAdmin && (
-                                            <div className="absolute top-4 left-4 flex space-x-2">
+                                            <div className="absolute top-4 right-4 flex space-x-2">
                                                 <button
                                                     onClick={() => handleToggleHide(item)}
                                                     className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
@@ -352,6 +348,10 @@ const Equipment = () => {
                                                 </button>
                                             </div>
                                         )}
+                                        <div className="absolute top-4 left-4 bg-white p-2 rounded-full">
+                                            {item.icon === 'settings' && <Settings className="w-8 h-8 text-blue-600" />}
+                                            {item.icon === 'wrench' && <Wrench className="w-8 h-8 text-blue-600" />}
+                                        </div>
                                     </div>
                                     <div className="p-6">
                                         <h3 className="text-2xl font-bold text-gray-900 mb-3">{item.name}</h3>
@@ -460,8 +460,8 @@ const Equipment = () => {
                                     required
                                 >
                                     <option value="">선택하세요</option>
-                                    <option value="premium">Premium</option>
-                                    <option value="professional">Professional</option>
+                                    <option value="premium">1번째</option>
+                                    <option value="professional">2번째</option>
                                 </select>
                             </div>
                             <div>
