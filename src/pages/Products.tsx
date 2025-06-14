@@ -223,6 +223,13 @@ const Products = () => {
                     alt={product.name}
                     className="w-full h-full object-cover transition-transform hover:scale-105"
                   />
+                  <div className="absolute top-4 left-4">
+                    {product.icon === 'Shield' && <Shield className="w-8 h-8 text-blue-600 bg-white p-1 rounded-full" />}
+                    {product.icon === 'Palette' && <Palette className="w-8 h-8 text-purple-600 bg-white p-1 rounded-full" />}
+                    {product.icon === 'Star' && <Star className="w-8 h-8 text-yellow-600 bg-white p-1 rounded-full" />}
+                    {product.icon === 'Zap' && <Zap className="w-8 h-8 text-orange-600 bg-white p-1 rounded-full" />}
+                    {product.icon === 'Leaf' && <Leaf className="w-8 h-8 text-green-600 bg-white p-1 rounded-full" />}
+                  </div>
                   <div className="absolute top-4 right-4 flex space-x-2">
                     {isAdmin && (
                       <>
