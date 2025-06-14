@@ -1,95 +1,189 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { Shield, Palette, Star, Zap, Leaf } from 'lucide-react';
+import { Shield, Palette, Star, Zap, Leaf, Plus, Edit, Trash2, X, EyeOff, Eye } from 'lucide-react';
+import { supabase } from '../integrations/supabase/client';
+import { useUserRole } from '../hooks/useUserRole';
+import { SupabaseClient } from '@supabase/supabase-js';
+
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  image_url: string;
+  icon: string;
+  features: string[];
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
 
 const Products = () => {
-  const products = [
-    {
-      name: "RIN-COAT",
-      image: '/images/main-18.jpg',
-      icon: <Shield className="w-8 h-8 text-blue-600" />,
-      description: "세라믹계 고분자화합물을 주원료로 개발된 자연경화형 친환경 무기질코팅제입니다. 표면경도, 내마모성, 내화학성, 내열성, 내오염성 등의 물리적, 화학적 특성을 고루 갖춘 콘크리트 표면마감 일액형 세라믹코팅제입니다.",
-      features: ["불연재 인증", "1액형 타입", "표면경도, 내마모성 강화", "친환경 마감 공법"]
-    },
-    {
-      name: "RIN-COAT COLOR",
-      image: '/images/main-8.jpg',
-      icon: <Palette className="w-8 h-8 text-green-600" />,
-      description: "다양한 색상을 적용할 수 있는 컬러형 세라믹 코팅제입니다.",
-      features: ["다양한 색상", "미적 효과", "불연 성능", "장기 내구성"]
-    },
-    {
-      name: "RIN-HARD PLUS",
-      image: '/images/main-11.jpg',
-      icon: <Star className="w-8 h-8 text-yellow-600" />,
-      description: "강화된 성능의 프리미엄 세라믹 코팅제로 최고의 품질을 제공합니다.",
-      features: ["프리미엄 품질", "향상된 강도", "특수 용도", "고성능 불연재"]
-    },
-    {
-      name: "RIN-COAT PRIMER",
-      image: '/images/main-18.jpg',
-      icon: <Shield className="w-8 h-8 text-purple-600" />,
-      description: "콘크리트 표면의 전처리를 위한 프라이머 코팅제입니다.",
-      features: ["표면 전처리", "접착력 강화", "내구성 향상", "시공성 개선"]
-    },
-    {
-      name: "RIN-COAT SEALER",
-      image: '/images/main-8.jpg',
-      icon: <Shield className="w-8 h-8 text-red-600" />,
-      description: "표면 보호와 광택을 위한 상도 실러 코팅제입니다.",
-      features: ["표면 보호", "광택 효과", "내구성 강화", "유지관리 용이"]
-    },
-    {
-      name: "RIN-COAT ANTI-STATIC",
-      image: '/images/main-11.jpg',
-      icon: <Zap className="w-8 h-8 text-blue-600" />,
-      description: "정전기 방지 기능이 추가된 특수 목적 코팅제입니다.",
-      features: ["정전기 방지", "전도성 확보", "안전성 강화", "특수 환경 적합"]
-    },
-    {
-      name: "RIN-COAT WATERPROOF",
-      image: '/images/main-18.jpg',
-      icon: <Shield className="w-8 h-8 text-green-600" />,
-      description: "방수 기능이 강화된 특수 코팅제입니다.",
-      features: ["방수 성능", "내수성 강화", "구조물 보호", "장기 내구성"]
-    },
-    {
-      name: "RIN-COAT HEAT-RESIST",
-      image: '/images/main-8.jpg',
-      icon: <Shield className="w-8 h-8 text-yellow-600" />,
-      description: "고온 환경에 적합한 내열성 코팅제입니다.",
-      features: ["내열성 강화", "온도 저항성", "열화 방지", "특수 환경용"]
-    },
-    {
-      name: "RIN-COAT ECO-FRESH",
-      image: '/images/main-11.jpg',
-      icon: <Leaf className="w-8 h-8 text-green-600" />,
-      description: "친환경 성능이 더욱 강화된 프리미엄 코팅제입니다.",
-      features: ["친환경 인증", "무독성", "환경 친화적", "지속가능성"]
-    },
-    {
-      name: "RIN-COAT QUICK-SET",
-      image: '/images/main-18.jpg',
-      icon: <Zap className="w-8 h-8 text-purple-600" />,
-      description: "빠른 경화가 가능한 속경화형 코팅제입니다.",
-      features: ["빠른 경화", "신속 시공", "조기 강도 발현", "공기 단축"]
-    },
-    {
-      name: "RIN-COAT FLEX",
-      image: '/images/main-8.jpg',
-      icon: <Star className="w-8 h-8 text-blue-600" />,
-      description: "유연성이 향상된 탄성 코팅제입니다.",
-      features: ["고탄성", "크랙 저항성", "충격 흡수", "변형 대응"]
-    },
-    {
-      name: "RIN-COAT ULTRA-HARD",
-      image: '/images/main-11.jpg',
-      icon: <Shield className="w-8 h-8 text-red-600" />,
-      description: "초고강도 성능을 제공하는 특수 코팅제입니다.",
-      features: ["초고강도", "내마모성 극대화", "중하중 적용", "산업용 특화"]
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { isAdmin } = useUserRole();
+  const [showForm, setShowForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [formValues, setFormValues] = useState<Partial<Product>>({});
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [formSuccess, setFormSuccess] = useState<string | null>(null);
+  const [hiddenProductIds, setHiddenProductIds] = useState<string[]>([]);
+
+  // 숨김 상품 목록 불러오기 함수
+  const fetchHiddenProducts = async () => {
+    const { data, error } = await (supabase as unknown as SupabaseClient)
+      .from('product_introduction_hidden')
+      .select('product_id');
+    if (!error && data) {
+      setHiddenProductIds(data.map((h: { product_id: string }) => h.product_id));
     }
-  ];
+  };
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      const { data, error } = await (supabase as unknown as SupabaseClient)
+        .from('product_introductions')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+      if (!error && data) {
+        setProducts(data);
+      }
+      setLoading(false);
+    };
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    fetchHiddenProducts();
+  }, []);
+
+  // 폼 열기
+  const openForm = (product?: Product) => {
+    setEditingProduct(product || null);
+    setFormValues(product ? { ...product } : {});
+    setShowForm(true);
+  };
+
+  // 폼 닫기
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingProduct(null);
+    setFormValues({});
+    setFormError(null);
+    setFormSuccess(null);
+  };
+
+  // 삭제 확인 모달 열기
+  const openDeleteConfirm = (product: Product) => {
+    setDeleteTarget(product);
+    setShowDeleteConfirm(true);
+  };
+
+  // 삭제 확인 모달 닫기
+  const closeDeleteConfirm = () => {
+    setDeleteTarget(null);
+    setShowDeleteConfirm(false);
+  };
+
+  // 상품 저장(추가/수정)
+  const handleFormSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormLoading(true);
+    setFormError(null);
+    setFormSuccess(null);
+
+    try {
+      const payload = {
+        ...formValues,
+        updated_at: new Date().toISOString(),
+      };
+
+      let result;
+      if (editingProduct) {
+        // 수정
+        result = await (supabase as unknown as SupabaseClient)
+          .from('product_introductions')
+          .update(payload)
+          .eq('id', editingProduct.id);
+      } else {
+        // 추가
+        result = await (supabase as unknown as SupabaseClient)
+          .from('product_introductions')
+          .insert([{ ...payload, created_at: new Date().toISOString(), is_active: true }]);
+      }
+
+      if (result.error) {
+        setFormError(result.error.message);
+      } else {
+        setFormSuccess(editingProduct ? '제품이 수정되었습니다.' : '제품이 추가되었습니다.');
+        setTimeout(() => {
+          closeForm();
+          window.location.reload();
+        }, 1500);
+      }
+    } catch (error) {
+      setFormError('오류가 발생했습니다.');
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  // 상품 삭제
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+
+    try {
+      const { error } = await (supabase as unknown as SupabaseClient)
+        .from('product_introductions')
+        .delete()
+        .eq('id', deleteTarget.id);
+
+      if (error) {
+        console.error('Error deleting product:', error);
+      } else {
+        setProducts(products.filter(p => p.id !== deleteTarget.id));
+        closeDeleteConfirm();
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  // 상품 숨기기/보이기 토글
+  const handleToggleHide = async (product: Product) => {
+    try {
+      if (hiddenProductIds.includes(product.id)) {
+        // 숨김 해제
+        const { error } = await (supabase as unknown as SupabaseClient)
+          .from('product_introduction_hidden')
+          .delete()
+          .eq('product_id', product.id);
+        if (!error) {
+          setHiddenProductIds(prev => prev.filter(id => id !== product.id));
+        }
+      } else {
+        // 숨김 처리
+        const { error } = await (supabase as unknown as SupabaseClient)
+          .from('product_introduction_hidden')
+          .insert([{ product_id: product.id }]);
+        if (!error) {
+          setHiddenProductIds(prev => [...prev, product.id]);
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling product visibility:', error);
+    }
+  };
+
+  // 보이는 상품만 필터링
+  const getVisibleProducts = () => {
+    return products.filter(product => !hiddenProductIds.includes(product.id));
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -104,6 +198,15 @@ const Products = () => {
               린코리아의 혁신적인 세라믹 코팅제 제품군을 만나보세요. <br />
               최고 품질의 불연재로 안전한 건설환경을 만들어갑니다.
             </p>
+            {isAdmin && (
+              <button
+                className="mt-8 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 mx-auto"
+                onClick={() => openForm()}
+                aria-label="제품 추가"
+              >
+                <Plus className="w-5 h-5" /> 제품 추가
+              </button>
+            )}
           </div>
         </div>
       </section>
@@ -112,17 +215,47 @@ const Products = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {products.map((product, index) => (
+            {getVisibleProducts().map((product, index) => (
               <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                 <div className="relative h-64 overflow-hidden">
                   <img
-                    src={product.image}
+                    src={product.image_url}
                     alt={product.name}
                     className="w-full h-full object-cover transition-transform hover:scale-105"
                   />
                   <div className="absolute top-4 right-4 bg-white p-2 rounded-full">
-                    {product.icon}
+                    {product.icon === 'Shield' && <Shield className="w-8 h-8 text-blue-600" />}
+                    {product.icon === 'Palette' && <Palette className="w-8 h-8 text-green-600" />}
+                    {product.icon === 'Star' && <Star className="w-8 h-8 text-yellow-600" />}
+                    {product.icon === 'Zap' && <Zap className="w-8 h-8 text-purple-600" />}
+                    {product.icon === 'Leaf' && <Leaf className="w-8 h-8 text-green-600" />}
                   </div>
+                  {isAdmin && (
+                    <div className="absolute top-4 right-4 flex space-x-2">
+                      <button
+                        onClick={() => openForm(product)}
+                        className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                      >
+                        <Edit className="w-5 h-5 text-blue-600" />
+                      </button>
+                      <button
+                        onClick={() => openDeleteConfirm(product)}
+                        className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                      >
+                        <Trash2 className="w-5 h-5 text-red-600" />
+                      </button>
+                      <button
+                        onClick={() => handleToggleHide(product)}
+                        className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                      >
+                        {hiddenProductIds.includes(product.id) ? (
+                          <Eye className="w-5 h-5 text-gray-600" />
+                        ) : (
+                          <EyeOff className="w-5 h-5 text-gray-600" />
+                        )}
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div className="p-6">
                   <h3 className="text-2xl font-bold text-gray-900 mb-3">{product.name}</h3>
@@ -145,7 +278,7 @@ const Products = () => {
         </div>
       </section>
 
-      {/* Product Benefits */}
+      {/* Product Benefits Section */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
@@ -190,6 +323,149 @@ const Products = () => {
           </div>
         </div>
       </section>
+
+      {/* Product Form Modal */}
+      {showForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                {editingProduct ? '제품 수정' : '제품 추가'}
+              </h2>
+              <button
+                onClick={closeForm}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleFormSave} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  제품명
+                </label>
+                <input
+                  type="text"
+                  value={formValues.name || ''}
+                  onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  설명
+                </label>
+                <textarea
+                  value={formValues.description || ''}
+                  onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  rows={4}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  이미지 URL
+                </label>
+                <input
+                  type="text"
+                  value={formValues.image_url || ''}
+                  onChange={(e) => setFormValues({ ...formValues, image_url: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  아이콘
+                </label>
+                <select
+                  value={formValues.icon || ''}
+                  onChange={(e) => setFormValues({ ...formValues, icon: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                >
+                  <option value="">아이콘 선택</option>
+                  <option value="Shield">Shield</option>
+                  <option value="Palette">Palette</option>
+                  <option value="Star">Star</option>
+                  <option value="Zap">Zap</option>
+                  <option value="Leaf">Leaf</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  주요 특징 (쉼표로 구분)
+                </label>
+                <input
+                  type="text"
+                  value={formValues.features?.join(', ') || ''}
+                  onChange={(e) => setFormValues({ ...formValues, features: e.target.value.split(',').map(f => f.trim()) })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+
+              {formError && (
+                <div className="text-red-600 text-sm">{formError}</div>
+              )}
+
+              {formSuccess && (
+                <div className="text-green-600 text-sm">{formSuccess}</div>
+              )}
+
+              <div className="flex justify-end space-x-4">
+                <button
+                  type="button"
+                  onClick={closeForm}
+                  className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  disabled={formLoading}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {formLoading ? '저장 중...' : '저장'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && deleteTarget && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">제품 삭제</h2>
+            <p className="text-gray-600 mb-6">
+              정말로 "{deleteTarget.name}" 제품을 삭제하시겠습니까?
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={closeDeleteConfirm}
+                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                삭제
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
