@@ -221,21 +221,41 @@ const Certificates = () => {
 
   // 인증서 숨기기/보이기 토글
   const handleToggleHide = async (certificate: Certificate) => {
+    setFormLoading(true);
+    setFormError(null);
+    setFormSuccess(null);
     try {
       if (hiddenCertificateIds.includes(certificate.id)) {
-        await (supabase as unknown as SupabaseClient)
+        // 숨김 해제
+        const { error } = await (supabase as unknown as SupabaseClient)
           .from('certificate_hidden')
           .delete()
           .eq('certificate_id', certificate.id);
-        setHiddenCertificateIds(prev => prev.filter(id => id !== certificate.id));
+        if (error) setFormError(error.message);
+        else setFormSuccess('노출되었습니다.');
       } else {
-        await (supabase as unknown as SupabaseClient)
+        // 숨기기
+        const { error } = await (supabase as unknown as SupabaseClient)
           .from('certificate_hidden')
-          .insert([{ certificate_id: certificate.id }]);
-        setHiddenCertificateIds(prev => [...prev, certificate.id]);
+          .upsert({ certificate_id: certificate.id });
+        if (error) setFormError(error.message);
+        else setFormSuccess('숨김 처리되었습니다.');
       }
-    } catch (error) {
-      console.error('Error:', error);
+      await fetchHiddenCertificates();
+      setTimeout(() => setFormSuccess(null), 700);
+    } catch (e) {
+      setFormError(e instanceof Error ? e.message : String(e));
+    }
+    setFormLoading(false);
+  };
+
+  // 숨김 인증서 목록 불러오기
+  const fetchHiddenCertificates = async () => {
+    const { data, error } = await (supabase as unknown as SupabaseClient)
+      .from('certificate_hidden')
+      .select('certificate_id');
+    if (!error && data) {
+      setHiddenCertificateIds(data.map((h: { certificate_id: string }) => h.certificate_id));
     }
   };
 
@@ -327,7 +347,7 @@ const Certificates = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
             {certificates
-              .filter(cert => cert.category === 'patent' && !hiddenCertificateIds.includes(cert.id))
+              .filter(cert => cert.category === 'patent')
               .map((cert, index) => (
                 <div key={index} className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
                   <div className="relative">
@@ -345,13 +365,15 @@ const Certificates = () => {
                       <div className="absolute top-2 right-2 flex space-x-2">
                         <button
                           onClick={() => handleToggleHide(cert)}
-                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
-                          title={hiddenCertificateIds.includes(cert.id) ? "노출하기" : "숨기기"}
+                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          title={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
+                          disabled={formLoading}
+                          aria-label={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
                         >
                           {hiddenCertificateIds.includes(cert.id) ? (
-                            <EyeOff className="w-5 h-5 text-gray-600" />
+                            <Eye className="w-4 h-4" />
                           ) : (
-                            <Eye className="w-5 h-5 text-gray-600" />
+                            <EyeOff className="w-4 h-4" />
                           )}
                         </button>
                         <button
@@ -392,9 +414,9 @@ const Certificates = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
             {certificates
-              .filter(cert => cert.category === 'certification' && !hiddenCertificateIds.includes(cert.id))
+              .filter(cert => cert.category === 'certification')
               .map((cert, index) => (
-                <div key={index} className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                <div key={index} className={`bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow ${hiddenCertificateIds.includes(cert.id) ? 'opacity-50' : ''}`}>
                   <div className="relative">
                     <div
                       className="cursor-pointer"
@@ -410,13 +432,15 @@ const Certificates = () => {
                       <div className="absolute top-2 right-2 flex space-x-2">
                         <button
                           onClick={() => handleToggleHide(cert)}
-                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
-                          title={hiddenCertificateIds.includes(cert.id) ? "노출하기" : "숨기기"}
+                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          title={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
+                          disabled={formLoading}
+                          aria-label={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
                         >
                           {hiddenCertificateIds.includes(cert.id) ? (
-                            <EyeOff className="w-5 h-5 text-gray-600" />
+                            <Eye className="w-4 h-4" />
                           ) : (
-                            <Eye className="w-5 h-5 text-gray-600" />
+                            <EyeOff className="w-4 h-4" />
                           )}
                         </button>
                         <button
@@ -457,9 +481,9 @@ const Certificates = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
             {certificates
-              .filter(cert => cert.category === 'rin_test' && !hiddenCertificateIds.includes(cert.id))
+              .filter(cert => cert.category === 'rin_test')
               .map((cert, index) => (
-                <div key={index} className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                <div key={index} className={`bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow ${hiddenCertificateIds.includes(cert.id) ? 'opacity-50' : ''}`}>
                   <div className="relative">
                     <div
                       className="cursor-pointer"
@@ -475,13 +499,15 @@ const Certificates = () => {
                       <div className="absolute top-2 right-2 flex space-x-2">
                         <button
                           onClick={() => handleToggleHide(cert)}
-                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
-                          title={hiddenCertificateIds.includes(cert.id) ? "노출하기" : "숨기기"}
+                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          title={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
+                          disabled={formLoading}
+                          aria-label={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
                         >
                           {hiddenCertificateIds.includes(cert.id) ? (
-                            <EyeOff className="w-5 h-5 text-gray-600" />
+                            <Eye className="w-4 h-4" />
                           ) : (
-                            <Eye className="w-5 h-5 text-gray-600" />
+                            <EyeOff className="w-4 h-4" />
                           )}
                         </button>
                         <button
