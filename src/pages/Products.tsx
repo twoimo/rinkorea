@@ -196,6 +196,11 @@ const Products = () => {
     return products.filter(product => !hiddenProductIds.includes(product.id));
   };
 
+  const getImageUrl = (imagePath: string) => {
+    if (imagePath.includes('://') || imagePath.startsWith('@')) return imagePath;
+    return `/images/${imagePath}`;
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -230,9 +235,13 @@ const Products = () => {
               <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                 <div className="relative h-64 overflow-hidden">
                   <img
-                    src={product.image_url}
+                    src={getImageUrl(product.image_url)}
                     alt={product.name}
-                    className="w-full h-full object-cover transition-transform hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    loading="lazy"
+                    width={800}
+                    height={450}
+                    style={{ maxWidth: '100%', maxHeight: '450px' }}
                   />
                   <div className="absolute top-4 left-4">
                     {product.icon === 'Shield' && <Shield className="w-8 h-8 text-blue-600 bg-white p-1 rounded-full" />}
