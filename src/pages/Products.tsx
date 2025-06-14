@@ -110,11 +110,23 @@ const Products = () => {
           .from('product_introductions')
           .update(payload)
           .eq('id', editingProduct.id);
+
+        if (!result.error) {
+          // 수정된 제품으로 상태 업데이트
+          setProducts(products.map(p =>
+            p.id === editingProduct.id ? { ...p, ...payload } : p
+          ));
+        }
       } else {
         // 추가
         result = await (supabase as unknown as SupabaseClient)
           .from('product_introductions')
           .insert([{ ...payload, created_at: new Date().toISOString(), is_active: true }]);
+
+        if (!result.error && result.data) {
+          // 새 제품 추가
+          setProducts([...products, result.data[0]]);
+        }
       }
 
       if (result.error) {
@@ -123,7 +135,6 @@ const Products = () => {
         setFormSuccess(editingProduct ? '제품이 수정되었습니다.' : '제품이 추가되었습니다.');
         setTimeout(() => {
           closeForm();
-          window.location.reload();
         }, 1500);
       }
     } catch (error) {
