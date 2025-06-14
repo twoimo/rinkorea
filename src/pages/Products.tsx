@@ -328,70 +328,26 @@ const Products = () => {
 
       {/* Product Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">
-                {editingProduct ? '제품 수정' : '제품 추가'}
-              </h2>
-              <button
-                onClick={closeForm}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-
-            <form onSubmit={handleFormSave} className="space-y-6">
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full relative">
+            <button className="absolute top-4 right-4 text-gray-400 hover:text-gray-700" onClick={closeForm}><X className="w-6 h-6" /></button>
+            <h2 className="text-2xl font-bold mb-4">{editingProduct ? '제품 수정' : '제품 추가'}</h2>
+            <form className="space-y-4" onSubmit={handleFormSave}>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  제품명
-                </label>
-                <input
-                  type="text"
-                  value={formValues.name || ''}
-                  onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  required
-                />
+                <label className="block text-sm font-medium mb-1">제품명</label>
+                <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.name || ''} onChange={e => setFormValues(v => ({ ...v, name: e.target.value }))} />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  설명
-                </label>
-                <textarea
-                  value={formValues.description || ''}
-                  onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  rows={4}
-                  required
-                />
+                <label className="block text-sm font-medium mb-1">설명</label>
+                <textarea className="w-full border px-3 py-2 rounded" value={formValues.description || ''} onChange={e => setFormValues(v => ({ ...v, description: e.target.value }))} />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  이미지 URL
-                </label>
-                <input
-                  type="text"
-                  value={formValues.image_url || ''}
-                  onChange={(e) => setFormValues({ ...formValues, image_url: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  required
-                />
+                <label className="block text-sm font-medium mb-1">이미지 URL</label>
+                <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.image_url || ''} onChange={e => setFormValues(v => ({ ...v, image_url: e.target.value }))} />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  아이콘
-                </label>
-                <select
-                  value={formValues.icon || ''}
-                  onChange={(e) => setFormValues({ ...formValues, icon: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  required
-                >
+                <label className="block text-sm font-medium mb-1">아이콘</label>
+                <select className="w-full border px-3 py-2 rounded" value={formValues.icon || ''} onChange={e => setFormValues(v => ({ ...v, icon: e.target.value }))}>
                   <option value="">아이콘 선택</option>
                   <option value="Shield">Shield</option>
                   <option value="Palette">Palette</option>
@@ -400,43 +356,15 @@ const Products = () => {
                   <option value="Leaf">Leaf</option>
                 </select>
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  주요 특징 (쉼표로 구분)
-                </label>
-                <input
-                  type="text"
-                  value={formValues.features?.join(', ') || ''}
-                  onChange={(e) => setFormValues({ ...formValues, features: e.target.value.split(',').map(f => f.trim()) })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  required
-                />
+                <label className="block text-sm font-medium mb-1">주요 특징 (쉼표로 구분)</label>
+                <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.features?.join(', ') || ''} onChange={e => setFormValues(v => ({ ...v, features: e.target.value.split(',').map(f => f.trim()) }))} />
               </div>
-
-              {formError && (
-                <div className="text-red-600 text-sm">{formError}</div>
-              )}
-
-              {formSuccess && (
-                <div className="text-green-600 text-sm">{formSuccess}</div>
-              )}
-
-              <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  onClick={closeForm}
-                  className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                >
-                  취소
-                </button>
-                <button
-                  type="submit"
-                  disabled={formLoading}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {formLoading ? '저장 중...' : '저장'}
-                </button>
+              {formError && <div className="mt-2 text-sm text-red-600">{formError}</div>}
+              {formSuccess && <div className="mt-2 text-sm text-green-700">{formSuccess}</div>}
+              <div className="flex gap-2 justify-end">
+                <button type="button" className="px-4 py-2 rounded bg-gray-200 text-gray-700" onClick={closeForm} disabled={formLoading}>취소</button>
+                <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white font-semibold disabled:opacity-50" disabled={formLoading}>{formLoading ? '저장 중...' : '저장'}</button>
               </div>
             </form>
           </div>
