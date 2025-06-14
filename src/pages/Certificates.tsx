@@ -1,8 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ImageModal from '../components/ImageModal';
-import { Award, FileText, Shield, CheckCircle } from 'lucide-react';
+import { Award, FileText, Shield, CheckCircle, Plus, Edit, Trash2, X, EyeOff, Eye } from 'lucide-react';
+import { supabase } from '../integrations/supabase/client';
+import { useUserRole } from '../hooks/useUserRole';
+import { SupabaseClient } from '@supabase/supabase-js';
+
+interface Certificate {
+  id: string;
+  name: string;
+  description: string;
+  image_url: string;
+  category: string;
+  issue_date?: string;
+  expiry_date?: string;
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  icon?: React.ReactNode;
+  type?: string;
+}
 
 const Certificates = () => {
   const [selectedImage, setSelectedImage] = useState<{
@@ -10,22 +28,34 @@ const Certificates = () => {
     alt: string;
     title: string;
   } | null>(null);
+  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { isAdmin } = useUserRole();
+  const [showForm, setShowForm] = useState(false);
+  const [editingCertificate, setEditingCertificate] = useState<Certificate | null>(null);
+  const [formValues, setFormValues] = useState<Partial<Certificate>>({});
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Certificate | null>(null);
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [formSuccess, setFormSuccess] = useState<string | null>(null);
+  const [hiddenCertificateIds, setHiddenCertificateIds] = useState<string[]>([]);
 
-  const certificates = [
+  const certificateTypes = [
     {
-      title: "불연재 인증",
+      name: "불연재 인증",
       type: "인증서",
       icon: <Shield className="w-8 h-8 text-blue-600" />,
       description: "안전한 순수 무기질 세라믹 코팅제입니다"
     },
     {
-      title: "품질시험성적서",
+      name: "품질시험성적서",
       type: "시험성적서",
       icon: <FileText className="w-8 h-8 text-green-600" />,
       description: "공인시험기관에서 실시한 각종 품질 시험 결과를 확인할 수 있습니다."
     },
     {
-      title: "특허 등록증",
+      name: "특허 등록증",
       type: "특허",
       icon: <Award className="w-8 h-8 text-yellow-600" />,
       description: "1액형 세라믹 제조기술에 대한 특허 등록으로 기술력을 인정받았습니다."
@@ -107,6 +137,136 @@ const Certificates = () => {
     setSelectedImage({ src, alt, title });
   };
 
+  // 폼 열기
+  const openForm = (certificate?: Certificate) => {
+    setEditingCertificate(certificate || null);
+    setFormValues(certificate ? { ...certificate } : {});
+    setShowForm(true);
+  };
+
+  // 폼 닫기
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingCertificate(null);
+    setFormValues({});
+    setFormError(null);
+    setFormSuccess(null);
+  };
+
+  // 인증서 저장(추가/수정)
+  const handleFormSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormLoading(true);
+    setFormError(null);
+    setFormSuccess(null);
+
+    try {
+      const payload = {
+        ...formValues,
+        updated_at: new Date().toISOString(),
+      };
+
+      let result;
+      if (editingCertificate) {
+        result = await (supabase as unknown as SupabaseClient)
+          .from('certificates')
+          .update(payload)
+          .eq('id', editingCertificate.id);
+      } else {
+        result = await (supabase as unknown as SupabaseClient)
+          .from('certificates')
+          .insert([{ ...payload, created_at: new Date().toISOString(), is_active: true }]);
+      }
+
+      if (result.error) {
+        setFormError(result.error.message);
+      } else {
+        setFormSuccess(editingCertificate ? '인증서가 수정되었습니다.' : '인증서가 추가되었습니다.');
+        setTimeout(closeForm, 1500);
+        // Refresh certificates
+        const { data } = await (supabase as unknown as SupabaseClient)
+          .from('certificates')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: true });
+        if (data) {
+          setCertificates(data);
+        }
+      }
+    } catch (error) {
+      setFormError('오류가 발생했습니다.');
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  // 인증서 삭제
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+
+    try {
+      const { error } = await (supabase as unknown as SupabaseClient)
+        .from('certificates')
+        .delete()
+        .eq('id', deleteTarget.id);
+
+      if (!error) {
+        setCertificates(certificates.filter(c => c.id !== deleteTarget.id));
+        setShowDeleteConfirm(false);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  // 인증서 숨기기/보이기 토글
+  const handleToggleHide = async (certificate: Certificate) => {
+    try {
+      if (hiddenCertificateIds.includes(certificate.id)) {
+        await (supabase as unknown as SupabaseClient)
+          .from('certificate_hidden')
+          .delete()
+          .eq('certificate_id', certificate.id);
+        setHiddenCertificateIds(prev => prev.filter(id => id !== certificate.id));
+      } else {
+        await (supabase as unknown as SupabaseClient)
+          .from('certificate_hidden')
+          .insert([{ certificate_id: certificate.id }]);
+        setHiddenCertificateIds(prev => [...prev, certificate.id]);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchCertificates = async () => {
+      setLoading(true);
+      const { data, error } = await (supabase as unknown as SupabaseClient)
+        .from('certificates')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: true });
+      if (!error && data) {
+        setCertificates(data);
+      }
+      setLoading(false);
+    };
+    fetchCertificates();
+  }, []);
+
+  useEffect(() => {
+    const fetchHiddenCertificates = async () => {
+      const { data, error } = await (supabase as unknown as SupabaseClient)
+        .from('certificate_hidden')
+        .select('certificate_id');
+      if (!error && data) {
+        setHiddenCertificateIds(data.map((h: { certificate_id: string }) => h.certificate_id));
+      }
+    };
+    fetchHiddenCertificates();
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -120,6 +280,15 @@ const Certificates = () => {
               린코리아 제품의 우수한 품질과 안전성을 증명하는 <br />
               각종 인증서와 시험성적서를 확인하세요.
             </p>
+            {isAdmin && (
+              <button
+                onClick={() => openForm()}
+                className="mt-8 bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors flex items-center mx-auto"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                인증서 추가
+              </button>
+            )}
           </div>
         </div>
       </section>
@@ -128,14 +297,14 @@ const Certificates = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-            {certificates.map((cert, index) => (
+            {certificateTypes.map((cert, index) => (
               <div key={index} className="bg-white p-8 rounded-lg shadow-lg border hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                 <div className="flex items-center mb-6">
                   <div className="bg-gray-50 p-3 rounded-full mr-4">
                     {cert.icon}
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">{cert.title}</h3>
+                    <h3 className="text-xl font-bold text-gray-900">{cert.name}</h3>
                     <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{cert.type}</span>
                   </div>
                 </div>
@@ -157,22 +326,55 @@ const Certificates = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-            {patentImages.map((image, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-                <div
-                  className="cursor-pointer"
-                  onClick={() => handleImageClick(image.src, image.alt, image.title)}
-                >
-                  <img
-                    src={image.src}
-                    alt={image.alt}
-                    className="w-full h-80 object-contain rounded-lg mb-4 border hover:border-blue-300 transition-colors"
-                  />
+            {certificates
+              .filter(cert => cert.category === 'patent' && !hiddenCertificateIds.includes(cert.id))
+              .map((cert, index) => (
+                <div key={index} className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                  <div className="relative">
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => handleImageClick(cert.image_url, cert.name, cert.name)}
+                    >
+                      <img
+                        src={cert.image_url}
+                        alt={cert.name}
+                        className="w-full h-80 object-contain rounded-lg mb-4 border hover:border-blue-300 transition-colors"
+                      />
+                    </div>
+                    {isAdmin && (
+                      <div className="absolute top-2 right-2 flex space-x-2">
+                        <button
+                          onClick={() => handleToggleHide(cert)}
+                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                          {hiddenCertificateIds.includes(cert.id) ? (
+                            <Eye className="w-5 h-5 text-gray-600" />
+                          ) : (
+                            <EyeOff className="w-5 h-5 text-gray-600" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => openForm(cert)}
+                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                          <Edit className="w-5 h-5 text-blue-600" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setDeleteTarget(cert);
+                            setShowDeleteConfirm(true);
+                          }}
+                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                          <Trash2 className="w-5 h-5 text-red-600" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2 text-center">{cert.name}</h3>
+                  <p className="text-sm text-gray-500 text-center">클릭하여 확대보기</p>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2 text-center">{image.title}</h3>
-                <p className="text-sm text-gray-500 text-center">클릭하여 확대보기</p>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </section>
@@ -188,22 +390,55 @@ const Certificates = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {testReportImages.map((image, index) => (
-              <div key={index} className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-                <div
-                  className="cursor-pointer"
-                  onClick={() => handleImageClick(image.src, image.alt, image.title)}
-                >
-                  <img
-                    src={image.src}
-                    alt={image.alt}
-                    className="w-full h-96 object-contain rounded-lg mb-4 border hover:border-blue-300 transition-colors"
-                  />
+            {certificates
+              .filter(cert => cert.category === 'certification' && !hiddenCertificateIds.includes(cert.id))
+              .map((cert, index) => (
+                <div key={index} className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                  <div className="relative">
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => handleImageClick(cert.image_url, cert.name, cert.name)}
+                    >
+                      <img
+                        src={cert.image_url}
+                        alt={cert.name}
+                        className="w-full h-96 object-contain rounded-lg mb-4 border hover:border-blue-300 transition-colors"
+                      />
+                    </div>
+                    {isAdmin && (
+                      <div className="absolute top-2 right-2 flex space-x-2">
+                        <button
+                          onClick={() => handleToggleHide(cert)}
+                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                          {hiddenCertificateIds.includes(cert.id) ? (
+                            <Eye className="w-5 h-5 text-gray-600" />
+                          ) : (
+                            <EyeOff className="w-5 h-5 text-gray-600" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => openForm(cert)}
+                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                          <Edit className="w-5 h-5 text-blue-600" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setDeleteTarget(cert);
+                            setShowDeleteConfirm(true);
+                          }}
+                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                          <Trash2 className="w-5 h-5 text-red-600" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="text-base font-bold text-gray-900 text-center mb-1">{cert.name}</h3>
+                  <p className="text-xs text-gray-500 text-center">클릭하여 확대보기</p>
                 </div>
-                <h3 className="text-base font-bold text-gray-900 text-center mb-1">{image.title}</h3>
-                <p className="text-xs text-gray-500 text-center">클릭하여 확대보기</p>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </section>
@@ -216,6 +451,129 @@ const Certificates = () => {
         imageAlt={selectedImage?.alt || ''}
         imageTitle={selectedImage?.title || ''}
       />
+
+      {/* Certificate Form Modal */}
+      {showForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full relative">
+            <button className="absolute top-4 right-4 text-gray-400 hover:text-gray-700" onClick={closeForm}>
+              <X className="w-6 h-6" />
+            </button>
+            <h2 className="text-2xl font-bold mb-4">{editingCertificate ? '인증서 수정' : '인증서 추가'}</h2>
+            <form onSubmit={handleFormSave} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
+                <input
+                  type="text"
+                  value={formValues.name || ''}
+                  onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">설명</label>
+                <textarea
+                  value={formValues.description || ''}
+                  onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={3}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">이미지 URL</label>
+                <input
+                  type="text"
+                  value={formValues.image_url || ''}
+                  onChange={(e) => setFormValues({ ...formValues, image_url: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
+                <select
+                  value={formValues.category || ''}
+                  onChange={(e) => setFormValues({ ...formValues, category: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                >
+                  <option value="">선택하세요</option>
+                  <option value="patent">특허 및 상표</option>
+                  <option value="certification">시험성적서</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">발급일</label>
+                <input
+                  type="date"
+                  value={formValues.issue_date || ''}
+                  onChange={(e) => setFormValues({ ...formValues, issue_date: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">만료일</label>
+                <input
+                  type="date"
+                  value={formValues.expiry_date || ''}
+                  onChange={(e) => setFormValues({ ...formValues, expiry_date: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              {formError && (
+                <div className="text-red-600 text-sm">{formError}</div>
+              )}
+              {formSuccess && (
+                <div className="text-green-600 text-sm">{formSuccess}</div>
+              )}
+              <div className="flex justify-end space-x-4">
+                <button
+                  type="button"
+                  onClick={closeForm}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  disabled={formLoading}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {formLoading ? '저장 중...' : '저장'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && deleteTarget && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
+            <h2 className="text-2xl font-bold mb-4">인증서 삭제</h2>
+            <p className="text-gray-600 mb-6">
+              정말로 "{deleteTarget.name}" 인증서를 삭제하시겠습니까?
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+              >
+                삭제
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
