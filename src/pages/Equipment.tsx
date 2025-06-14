@@ -243,7 +243,7 @@ const Equipment = () => {
                             .filter(e => e.category === 'premium')
                             .map((item, index) => (
                                 <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                                    <div className="relative h-64 overflow-hidden">
+                                    <div className="relative aspect-[2/3] overflow-hidden">
                                         <img
                                             src={getImageUrl(item.image_url)}
                                             alt={item.name}
@@ -316,7 +316,7 @@ const Equipment = () => {
                             .filter(e => e.category === 'professional')
                             .map((item, index) => (
                                 <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                                    <div className="relative h-64 overflow-hidden">
+                                    <div className="relative aspect-[2/3] overflow-hidden">
                                         <img
                                             src={getImageUrl(item.image_url)}
                                             alt={item.name}
