@@ -176,7 +176,7 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
                 {repeatedItems.map((item, index) => (
                     <div
                         key={`item-${index}`}
-                        className="flex-shrink-0 w-[400px] transform transition-all duration-300 hover:scale-105 select-none"
+                        className="flex-shrink-0 w-[500px] transform transition-all duration-300 hover:scale-105 select-none"
                     >
                         {renderItem(item)}
                     </div>

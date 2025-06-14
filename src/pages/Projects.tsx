@@ -290,11 +290,11 @@ const Projects = () => {
                       </div>
                     </div>
                     <p className="text-gray-600 mb-4">{project.description}</p>
-                    <div className="flex flex-wrap gap-2 mb-4">
+                    <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
                       {project.features.map((feature, index) => (
                         <span
                           key={index}
-                          className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm"
+                          className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm whitespace-nowrap flex-shrink-0"
                         >
                           {feature}
                         </span>
