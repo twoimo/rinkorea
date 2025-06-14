@@ -9,6 +9,17 @@ import { supabase } from '@/integrations/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import AutoScrollGrid from '@/components/AutoScrollGrid';
 
+interface Project {
+  id: string;
+  title: string;
+  location: string;
+  date: string;
+  image: string;
+  description: string;
+  url: string;
+  features: string[];
+}
+
 const Projects = () => {
   const { projects, loading, createProject, updateProject, deleteProject } = useProjects();
   const { isAdmin } = useUserRole();
@@ -74,7 +85,7 @@ const Projects = () => {
   };
 
   // 폼 열기
-  const openForm = (project?: any) => {
+  const openForm = (project?: Project) => {
     if (project) {
       setEditingProject(project.id);
       setFormValues({
@@ -229,14 +240,12 @@ const Projects = () => {
 
       {/* Projects Grid */}
       <section className="py-20 w-full">
-        <div className="w-full">
-          <AutoScrollGrid
-            items={getVisibleProjects()}
-            itemsPerRow={4}
-            renderItem={(project) => {
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            {getVisibleProjects().map((project) => {
               const isHidden = hiddenProjectIds.includes(project.id);
               return (
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden group relative w-full">
+                <div key={project.id} className="bg-white rounded-xl shadow-lg overflow-hidden group relative w-full">
                   <div className="relative aspect-video overflow-hidden">
                     <img
                       src={getImageUrl(project.image)}
@@ -312,8 +321,8 @@ const Projects = () => {
                   </div>
                 </div>
               );
-            }}
-          />
+            })}
+          </div>
         </div>
       </section>
 
