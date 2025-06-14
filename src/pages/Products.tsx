@@ -49,7 +49,7 @@ const Products = () => {
         .from('product_introductions')
         .select('*')
         .eq('is_active', true)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: true });
       if (!error && data) {
         setProducts(data);
       }
@@ -227,6 +227,16 @@ const Products = () => {
                     {isAdmin && (
                       <>
                         <button
+                          onClick={() => handleToggleHide(product)}
+                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                          {hiddenProductIds.includes(product.id) ? (
+                            <Eye className="w-5 h-5 text-gray-600" />
+                          ) : (
+                            <EyeOff className="w-5 h-5 text-gray-600" />
+                          )}
+                        </button>
+                        <button
                           onClick={() => openForm(product)}
                           className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
                         >
@@ -237,16 +247,6 @@ const Products = () => {
                           className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
                         >
                           <Trash2 className="w-5 h-5 text-red-600" />
-                        </button>
-                        <button
-                          onClick={() => handleToggleHide(product)}
-                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
-                        >
-                          {hiddenProductIds.includes(product.id) ? (
-                            <Eye className="w-5 h-5 text-gray-600" />
-                          ) : (
-                            <EyeOff className="w-5 h-5 text-gray-600" />
-                          )}
                         </button>
                       </>
                     )}
