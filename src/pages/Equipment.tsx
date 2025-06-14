@@ -228,6 +228,35 @@ const Equipment = () => {
                 </div>
             </section>
 
+            {/* Partnership Section */}
+            <section className="py-20">
+                <div className="container mx-auto px-4">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div className="md:w-1/2">
+                            <div className="flex items-center mb-4">
+                                <Award className="w-8 h-8 text-blue-600 mr-3" />
+                                <h2 className="text-3xl font-bold text-gray-900">Shanghai JS Floor Systems 공식 파트너</h2>
+                            </div>
+                            <p className="text-lg text-gray-600 leading-relaxed">
+                                Shanghai JS Floor Systems의 공식 파트너사로서 한국 공식 판매업체 및 서비스센터를 운영하고 있습니다.
+                                세계적인 공사 현장에서 사용되는 콘크리트 연삭기 및 연마기 시장의 선두주자입니다.
+                                <br /><br />
+                                한국 공식판매 & 공식서비스센터(AS)<br />
+                                주소: 인천광역시 서구 백범로 707, 린코리아<br />
+                                문의전화: 032-571-1023
+                            </p>
+                        </div>
+                        <div className="md:w-1/2">
+                            <img
+                                src="/images/js-floor-systems.png"
+                                alt="Shanghai JS Floor Systems Partnership"
+                                className="rounded-lg shadow-xl"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Premium Grinders Section */}
             <section className="py-20">
                 <div className="container mx-auto px-4">
@@ -370,35 +399,6 @@ const Equipment = () => {
                                     </div>
                                 </div>
                             ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Partnership Section */}
-            <section className="py-20">
-                <div className="container mx-auto px-4">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-                        <div className="md:w-1/2">
-                            <div className="flex items-center mb-4">
-                                <Award className="w-8 h-8 text-blue-600 mr-3" />
-                                <h2 className="text-3xl font-bold text-gray-900">Shanghai JS Floor Systems 공식 파트너</h2>
-                            </div>
-                            <p className="text-lg text-gray-600 leading-relaxed">
-                                Shanghai JS Floor Systems의 공식 파트너사로서 한국 공식 판매업체 및 서비스센터를 운영하고 있습니다.
-                                세계적인 공사 현장에서 사용되는 콘크리트 연삭기 및 연마기 시장의 선두주자입니다.
-                                <br /><br />
-                                한국 공식판매 & 공식서비스센터(AS)<br />
-                                주소: 인천광역시 서구 백범로 707, 린코리아<br />
-                                문의전화: 032-571-1023
-                            </p>
-                        </div>
-                        <div className="md:w-1/2">
-                            <img
-                                src="/images/js-floor-systems.png"
-                                alt="Shanghai JS Floor Systems Partnership"
-                                className="rounded-lg shadow-xl"
-                            />
-                        </div>
                     </div>
                 </div>
             </section>
