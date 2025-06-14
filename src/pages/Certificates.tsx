@@ -50,7 +50,7 @@ const Certificates = () => {
     },
     {
       name: "불연재 인증",
-      type: "인증서",
+      type: "성적서",
       icon: <Shield className="w-8 h-8 text-blue-600" />,
       description: "안전한 순수 무기질 세라믹 코팅제입니다"
     },
