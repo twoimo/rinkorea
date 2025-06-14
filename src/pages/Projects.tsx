@@ -476,6 +476,77 @@ const Projects = () => {
         </div>
       </section>
 
+      {/* 기타 프로젝트 섹션 */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">기타 프로젝트</h2>
+            <p className="text-xl text-gray-600">
+              린코리아의 다양한 프로젝트 사례
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300">
+              <div className="relative aspect-video overflow-hidden">
+                <img
+                  src="/images/projects/other-1.jpg"
+                  alt="기타 프로젝트 1"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">산업용 시설 프로젝트</h3>
+                <p className="text-gray-600 mb-4">산업용 시설의 내구성과 안전성을 높이는 세라믹 코팅 적용 사례</p>
+                <div className="flex gap-2 mb-4">
+                  <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">내구성 향상</span>
+                  <span className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm">안전성 확보</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300">
+              <div className="relative aspect-video overflow-hidden">
+                <img
+                  src="/images/projects/other-2.jpg"
+                  alt="기타 프로젝트 2"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">상업 시설 프로젝트</h3>
+                <p className="text-gray-600 mb-4">상업 시설의 미관과 기능성을 개선한 세라믹 코팅 적용 사례</p>
+                <div className="flex gap-2 mb-4">
+                  <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">미관 개선</span>
+                  <span className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm">기능성 향상</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300">
+              <div className="relative aspect-video overflow-hidden">
+                <img
+                  src="/images/projects/other-3.jpg"
+                  alt="기타 프로젝트 3"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">공공 시설 프로젝트</h3>
+                <p className="text-gray-600 mb-4">공공 시설의 안전성과 내구성을 강화한 세라믹 코팅 적용 사례</p>
+                <div className="flex gap-2 mb-4">
+                  <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">안전성 강화</span>
+                  <span className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm">내구성 향상</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <Footer />
     </div>
   );
