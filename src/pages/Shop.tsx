@@ -414,7 +414,7 @@ const Shop = () => {
                 const isSoldOut = !product.stock_quantity || product.stock_quantity <= 0;
                 const isHidden = hiddenProductIds.includes(product.id);
                 return (
-                  <div key={product.id} className="bg-white rounded-xl shadow-lg p-6 flex flex-col group relative">
+                  <div key={product.id} className="bg-white rounded-xl shadow-lg p-4 flex flex-col group relative">
                     {/* 뱃지 영역 */}
                     <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
                       {product.discount && (
