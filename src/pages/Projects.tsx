@@ -241,7 +241,7 @@ const Projects = () => {
                     <img
                       src={getImageUrl(project.image)}
                       alt={project.title}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 select-none pointer-events-none"
                       loading="lazy"
                       width={800}
                       height={450}
