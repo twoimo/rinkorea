@@ -213,7 +213,7 @@ const Equipment = () => {
                     <div className="text-center">
                         <h1 className="text-5xl font-bold mb-6">건설기계소개</h1>
                         <p className="text-xl max-w-2xl mx-auto">
-                            최첨단 콘크리트 연삭기와 연마기로 <br />
+                            최첨단 기술의 콘크리트 연삭기로  <br />
                             최고의 품질과 효율성을 제공합니다.
                         </p>
                         {isAdmin && (
@@ -240,7 +240,7 @@ const Equipment = () => {
                             </div>
                             <p className="text-lg text-gray-600 leading-relaxed">
                                 Shanghai JS Floor Systems의 공식 파트너사로서 한국 공식 판매업체 및 서비스센터를 운영하고 있습니다.
-                                세계적인 공사 현장에서 사용되는 콘크리트 연삭기 및 연마기 시장의 선두주자입니다.
+                                세계적인 공사 현장에서 사용되는 콘크리트 연삭기 시장의 선두주자입니다.
                                 <br /><br />
                                 한국 공식판매 & 공식서비스센터(AS)<br />
                                 주소: 인천광역시 서구 백범로 707, 린코리아<br />
