@@ -154,7 +154,7 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
 
     return (
         <div
-            className="w-full overflow-hidden relative group"
+            className="w-full overflow-hidden relative group pb-4"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
