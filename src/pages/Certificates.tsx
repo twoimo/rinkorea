@@ -347,7 +347,7 @@ const Certificates = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
             {certificates
-              .filter(cert => cert.category === 'patent')
+              .filter(cert => cert.category === 'patent' && (!hiddenCertificateIds.includes(cert.id) || isAdmin))
               .map((cert, index) => (
                 <div key={index} className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
                   <div className="relative">
@@ -414,7 +414,7 @@ const Certificates = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
             {certificates
-              .filter(cert => cert.category === 'certification')
+              .filter(cert => cert.category === 'certification' && (!hiddenCertificateIds.includes(cert.id) || isAdmin))
               .map((cert, index) => (
                 <div key={index} className={`bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow ${hiddenCertificateIds.includes(cert.id) ? 'opacity-50' : ''}`}>
                   <div className="relative">
@@ -481,7 +481,7 @@ const Certificates = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
             {certificates
-              .filter(cert => cert.category === 'rin_test')
+              .filter(cert => cert.category === 'rin_test' && (!hiddenCertificateIds.includes(cert.id) || isAdmin))
               .map((cert, index) => (
                 <div key={index} className={`bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow ${hiddenCertificateIds.includes(cert.id) ? 'opacity-50' : ''}`}>
                   <div className="relative">
