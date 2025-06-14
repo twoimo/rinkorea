@@ -475,7 +475,7 @@ const Shop = () => {
                             <>품절</>
                           ) : (
                             <>
-                              제품 구매하기
+                              구매하기
                               <ShoppingCart className="w-4 h-4 ml-1" />
                             </>
                           )}
