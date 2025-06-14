@@ -40,7 +40,7 @@ const Header = () => {
     { name: '홈', path: '/' },
     { name: '회사소개', path: '/about' },
     { name: '제품소개', path: '/products' },
-    { name: '기계소개', path: '/equipment' },
+    { name: '건설기계소개', path: '/equipment' },
     { name: '온라인 스토어', path: '/shop' },
     { name: '시공사례', path: '/projects' },
     { name: '시험성적서/인증', path: '/certificates' },

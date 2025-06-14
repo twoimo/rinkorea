@@ -53,7 +53,7 @@ const Equipment = () => {
             <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
                 <div className="container mx-auto px-4">
                     <div className="text-center">
-                        <h1 className="text-5xl font-bold mb-6">기계소개</h1>
+                        <h1 className="text-5xl font-bold mb-6">건설기계소개</h1>
                         <p className="text-xl max-w-2xl mx-auto">
                             최첨단 콘크리트 연삭기와 연마기로 <br />
                             최고의 품질과 효율성을 제공합니다.
