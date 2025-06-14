@@ -220,7 +220,7 @@ const Projects = () => {
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-6">시공사례</h1>
             <p className="text-xl max-w-2xl mx-auto">
-              린코리아의 세라믹 코팅제가 적용된 다양한 프로젝트를 통해 <br />
+              린코리아의 린코트가 적용된 다양한 프로젝트를 통해 <br />
               우수한 품질과 성능을 확인하세요.
             </p>
             {isAdmin && (
