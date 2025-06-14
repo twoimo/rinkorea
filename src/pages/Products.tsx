@@ -213,8 +213,8 @@ const Products = () => {
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-6">제품소개</h1>
             <p className="text-xl max-w-2xl mx-auto">
-              린코리아의 혁신적인 세라믹 코팅제 제품군을 만나보세요. <br />
-              최고 품질의 불연재로 안전한 건설환경을 만들어갑니다.
+              린코리아의 혁신적인 제품군을 만나보세요. <br />
+              최고 품질과 기술력으로 안전한 건설환경을 만들어갑니다.
             </p>
             {isAdmin && (
               <button
