@@ -121,7 +121,7 @@ const News = () => {
 
         {/* News List */}
         <section className="py-20">
-          <div className="container mx-auto px-4 max-w-4xl">
+          <div className="container mx-auto px-4 max-w-6xl">
             {loading ? (
               <div className="text-center py-12">
                 <p className="text-gray-500">로딩 중...</p>
@@ -130,7 +130,7 @@ const News = () => {
               <div className="space-y-8">
                 {displayNews.map((newsItem) => (
                   <article key={newsItem.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-                    <div className="p-6">
+                    <div className="p-8">
                       <div className="flex items-center justify-between mb-3">
                         <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
                           공지사항
