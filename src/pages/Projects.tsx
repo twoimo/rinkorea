@@ -196,6 +196,11 @@ const Projects = () => {
     return projects.filter(p => !hiddenProjectIds.includes(p.id));
   };
 
+  const getImageUrl = (imagePath: string) => {
+    if (imagePath.startsWith('http')) return imagePath;
+    return `/images/${imagePath}`;
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -234,7 +239,7 @@ const Projects = () => {
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden group relative w-full">
                   <div className="relative aspect-video overflow-hidden">
                     <img
-                      src={project.image}
+                      src={getImageUrl(project.image)}
                       alt={project.title}
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
