@@ -447,6 +447,7 @@ const Equipment = () => {
                                     required
                                 >
                                     <option value="">선택하세요</option>
+                                    <option value="none">None</option>
                                     <option value="settings">Settings</option>
                                     <option value="wrench">Wrench</option>
                                 </select>

@@ -245,12 +245,12 @@ const Products = () => {
                     height={800}
                     style={{ maxWidth: '100%', maxHeight: '100%' }}
                   />
-                  <div className="absolute top-4 left-4">
-                    {product.icon === 'Shield' && <Shield className="w-8 h-8 text-blue-600 bg-white p-1 rounded-full" />}
-                    {product.icon === 'Palette' && <Palette className="w-8 h-8 text-purple-600 bg-white p-1 rounded-full" />}
-                    {product.icon === 'Star' && <Star className="w-8 h-8 text-yellow-600 bg-white p-1 rounded-full" />}
-                    {product.icon === 'Zap' && <Zap className="w-8 h-8 text-orange-600 bg-white p-1 rounded-full" />}
-                    {product.icon === 'Leaf' && <Leaf className="w-8 h-8 text-green-600 bg-white p-1 rounded-full" />}
+                  <div className="absolute top-4 left-4 bg-white p-2 rounded-full">
+                    {product.icon === 'shield' && <Shield className="w-8 h-8 text-blue-600" />}
+                    {product.icon === 'palette' && <Palette className="w-8 h-8 text-blue-600" />}
+                    {product.icon === 'star' && <Star className="w-8 h-8 text-blue-600" />}
+                    {product.icon === 'zap' && <Zap className="w-8 h-8 text-blue-600" />}
+                    {product.icon === 'leaf' && <Leaf className="w-8 h-8 text-blue-600" />}
                   </div>
                   <div className="absolute top-4 right-4 flex space-x-2">
                     {isAdmin && (
@@ -369,13 +369,18 @@ const Products = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">아이콘</label>
-                <select className="w-full border px-3 py-2 rounded" value={formValues.icon || ''} onChange={e => setFormValues(v => ({ ...v, icon: e.target.value }))}>
+                <select
+                  value={formValues.icon || ''}
+                  onChange={(e) => setFormValues({ ...formValues, icon: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
+                >
                   <option value="">아이콘 선택</option>
-                  <option value="Shield">Shield</option>
-                  <option value="Palette">Palette</option>
-                  <option value="Star">Star</option>
-                  <option value="Zap">Zap</option>
-                  <option value="Leaf">Leaf</option>
+                  <option value="none">None</option>
+                  <option value="shield">Shield</option>
+                  <option value="palette">Palette</option>
+                  <option value="star">Star</option>
+                  <option value="zap">Zap</option>
+                  <option value="leaf">Leaf</option>
                 </select>
               </div>
               <div>
