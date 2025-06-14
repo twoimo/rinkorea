@@ -194,7 +194,7 @@ const Equipment = () => {
 
     // 보이는 기계만 필터링
     const getVisibleEquipment = () => {
-        return equipment.filter(e => !hiddenEquipmentIds.includes(e.id));
+        return equipment;
     };
 
     const getImageUrl = (imagePath: string) => {
