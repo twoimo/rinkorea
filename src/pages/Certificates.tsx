@@ -338,7 +338,7 @@ const Certificates = () => {
                       <img
                         src={cert.image_url}
                         alt={cert.name}
-                        className="w-full h-80 object-contain rounded-lg mb-4 border hover:border-blue-300 transition-colors"
+                        className="w-full aspect-[1/1.4142] object-contain rounded-lg mb-4 border hover:border-blue-300 transition-colors"
                       />
                     </div>
                     {isAdmin && (
@@ -402,7 +402,7 @@ const Certificates = () => {
                       <img
                         src={cert.image_url}
                         alt={cert.name}
-                        className="w-full h-96 object-contain rounded-lg mb-4 border hover:border-blue-300 transition-colors"
+                        className="w-full aspect-[1/1.4142] object-contain rounded-lg mb-4 border hover:border-blue-300 transition-colors"
                       />
                     </div>
                     {isAdmin && (
