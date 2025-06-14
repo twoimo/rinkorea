@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import AutoScrollGrid from '@/components/AutoScrollGrid';
+import { useCounter } from '@/hooks/useCounter';
 
 const Projects = () => {
   const { projects, loading, createProject, updateProject, deleteProject } = useProjects();
@@ -29,6 +30,10 @@ const Projects = () => {
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
   const [hiddenProjectIds, setHiddenProjectIds] = useState<string[]>([]);
+
+  const projectCount = useCounter(1000);
+  const satisfactionRate = useCounter(100);
+  const yearsOfExperience = useCounter(12);
 
   // 숨김 프로젝트 목록 불러오기
   const fetchHiddenProjects = async () => {
@@ -477,16 +482,16 @@ const Projects = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">1000+</div>
-              <div className="text-gray-600">완료된 프로젝트</div>
+              <div className="text-4xl font-bold text-blue-600 mb-2">{projectCount}+</div>
+              <div className="text-gray-600">시공 프로젝트</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-green-600 mb-2">100%</div>
+              <div className="text-4xl font-bold text-green-600 mb-2">{satisfactionRate}%</div>
               <div className="text-gray-600">고객 만족도</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-purple-600 mb-2">12+</div>
-              <div className="text-gray-600">주요 제품군</div>
+              <div className="text-4xl font-bold text-purple-600 mb-2">{yearsOfExperience}+</div>
+              <div className="text-gray-600">시공 경력</div>
             </div>
           </div>
         </div>
