@@ -31,20 +31,20 @@ const About = () => {
               최고의 품질과 기술력으로 고객의 성공을 위한 최적의 파트너가 되겠습니다.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-              <div className="bg-blue-50 p-6 rounded-xl">
-                <Target className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">비전</h3>
-                <p className="text-gray-600">건설업계의 혁신을 선도하는 글로벌 기업</p>
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-2xl">
+                <Target className="w-14 h-14 text-blue-600 mx-auto mb-6" />
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">비전</h3>
+                <p className="text-gray-700 text-lg leading-relaxed">건설업계의 혁신을 <br />선도하는 글로벌 기업</p>
               </div>
-              <div className="bg-green-50 p-6 rounded-xl">
-                <Award className="w-12 h-12 text-green-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">미션</h3>
-                <p className="text-gray-600">최고의 품질과 기술로 고객 가치 창출</p>
+              <div className="bg-gradient-to-br from-green-50 to-green-100 p-8 rounded-2xl">
+                <Award className="w-14 h-14 text-green-600 mx-auto mb-6" />
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">미션</h3>
+                <p className="text-gray-700 text-lg leading-relaxed">최고의 품질과 기술로 <br />고객 가치 창출</p>
               </div>
-              <div className="bg-purple-50 p-6 rounded-xl">
-                <CheckCircle className="w-12 h-12 text-purple-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">핵심가치</h3>
-                <p className="text-gray-600">신뢰, 혁신, 지속가능성</p>
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-8 rounded-2xl">
+                <CheckCircle className="w-14 h-14 text-purple-600 mx-auto mb-6" />
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">핵심가치</h3>
+                <p className="text-gray-700 text-lg leading-relaxed">신뢰, 혁신, 지속가능성</p>
               </div>
             </div>
           </div>
