@@ -350,7 +350,7 @@ const Projects = () => {
                   required
                 >
                   <option value="construction">시공 실적</option>
-                  <option value="other">기타 프로젝트</option>
+                  <option value="other">다양한 프로젝트</option>
                 </select>
               </div>
               <div>
@@ -491,19 +491,19 @@ const Projects = () => {
             </div>
             <div className="text-center">
               <div className="text-4xl font-bold text-purple-600 mb-2">{yearsOfExperience}+</div>
-              <div className="text-gray-600">시공 경력</div>
+              <div className="text-gray-600">린코리아 제품군</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 기타 프로젝트 섹션 */}
+      {/* 다양한 프로젝트 섹션 */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">기타 프로젝트</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">다양한 프로젝트</h2>
             <p className="text-xl text-gray-600">
-              린코리아의 다양한 프로젝트 사례
+              린코리아의 프로젝트 사례
             </p>
           </div>
 
