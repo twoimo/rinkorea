@@ -346,11 +346,12 @@ const Certificates = () => {
                         <button
                           onClick={() => handleToggleHide(cert)}
                           className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                          title={hiddenCertificateIds.includes(cert.id) ? "노출하기" : "숨기기"}
                         >
                           {hiddenCertificateIds.includes(cert.id) ? (
-                            <Eye className="w-5 h-5 text-gray-600" />
-                          ) : (
                             <EyeOff className="w-5 h-5 text-gray-600" />
+                          ) : (
+                            <Eye className="w-5 h-5 text-gray-600" />
                           )}
                         </button>
                         <button
@@ -410,11 +411,77 @@ const Certificates = () => {
                         <button
                           onClick={() => handleToggleHide(cert)}
                           className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                          title={hiddenCertificateIds.includes(cert.id) ? "노출하기" : "숨기기"}
                         >
                           {hiddenCertificateIds.includes(cert.id) ? (
-                            <Eye className="w-5 h-5 text-gray-600" />
-                          ) : (
                             <EyeOff className="w-5 h-5 text-gray-600" />
+                          ) : (
+                            <Eye className="w-5 h-5 text-gray-600" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => openForm(cert)}
+                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                          <Edit className="w-5 h-5 text-blue-600" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setDeleteTarget(cert);
+                            setShowDeleteConfirm(true);
+                          }}
+                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                          <Trash2 className="w-5 h-5 text-red-600" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="text-base font-bold text-gray-900 text-center mb-1">{cert.name}</h3>
+                  <p className="text-xs text-gray-500 text-center">클릭하여 확대보기</p>
+                </div>
+              ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 린코리아 시험성적서 */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">린코리아 시험성적서</h2>
+            <p className="text-xl text-gray-600">
+              린코리아 제품의 품질을 검증하는 시험성적서
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+            {certificates
+              .filter(cert => cert.category === 'rin_test' && !hiddenCertificateIds.includes(cert.id))
+              .map((cert, index) => (
+                <div key={index} className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                  <div className="relative">
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => handleImageClick(cert.image_url, cert.name, cert.name)}
+                    >
+                      <img
+                        src={cert.image_url}
+                        alt={cert.name}
+                        className="w-full aspect-[1/1.4142] object-contain rounded-lg mb-4 border hover:border-blue-300 transition-colors"
+                      />
+                    </div>
+                    {isAdmin && (
+                      <div className="absolute top-2 right-2 flex space-x-2">
+                        <button
+                          onClick={() => handleToggleHide(cert)}
+                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                          title={hiddenCertificateIds.includes(cert.id) ? "노출하기" : "숨기기"}
+                        >
+                          {hiddenCertificateIds.includes(cert.id) ? (
+                            <EyeOff className="w-5 h-5 text-gray-600" />
+                          ) : (
+                            <Eye className="w-5 h-5 text-gray-600" />
                           )}
                         </button>
                         <button
@@ -501,7 +568,8 @@ const Certificates = () => {
                 >
                   <option value="">선택하세요</option>
                   <option value="patent">특허 및 상표</option>
-                  <option value="certification">시험성적서</option>
+                  <option value="certification">RIN-COAT 시험성적서</option>
+                  <option value="rin_test">린코리아 시험성적서</option>
                 </select>
               </div>
               <div>
