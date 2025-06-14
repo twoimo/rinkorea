@@ -293,6 +293,7 @@ export type Database = {
           description: string
           url: string
           features: string[]
+          category: string
           created_at: string
           updated_at: string
         }
@@ -305,6 +306,7 @@ export type Database = {
           description: string
           url: string
           features: string[]
+          category?: string
           created_at?: string
           updated_at?: string
         }
@@ -317,6 +319,7 @@ export type Database = {
           description?: string
           url?: string
           features?: string[]
+          category?: string
           created_at?: string
           updated_at?: string
         }

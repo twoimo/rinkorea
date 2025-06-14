@@ -22,7 +22,8 @@ const Projects = () => {
     image: '',
     description: '',
     url: '',
-    features: ['']
+    features: [''],
+    category: 'construction'
   });
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -84,7 +85,8 @@ const Projects = () => {
         image: project.image,
         description: project.description,
         url: project.url,
-        features: project.features.length > 0 ? project.features : ['']
+        features: project.features.length > 0 ? project.features : [''],
+        category: project.category || 'construction'
       });
     } else {
       setEditingProject(null);
@@ -95,7 +97,8 @@ const Projects = () => {
         image: '',
         description: '',
         url: '',
-        features: ['']
+        features: [''],
+        category: 'construction'
       });
     }
     setShowForm(true);
@@ -112,7 +115,8 @@ const Projects = () => {
       image: '',
       description: '',
       url: '',
-      features: ['']
+      features: [''],
+      category: 'construction'
     });
     setFormError(null);
     setFormSuccess(null);
@@ -231,7 +235,7 @@ const Projects = () => {
       <section className="py-20 w-full">
         <div className="w-full">
           <AutoScrollGrid
-            items={getVisibleProjects()}
+            items={getVisibleProjects().filter(p => p.category === 'construction')}
             itemsPerRow={4}
             renderItem={(project) => {
               const isHidden = hiddenProjectIds.includes(project.id);
@@ -332,6 +336,18 @@ const Projects = () => {
               {editingProject ? '프로젝트 수정' : '프로젝트 추가'}
             </h2>
             <form className="space-y-4" onSubmit={handleFormSave}>
+              <div>
+                <label className="block text-sm font-medium mb-1">프로젝트 유형</label>
+                <select
+                  className="w-full border px-3 py-2 rounded"
+                  value={formValues.category || 'construction'}
+                  onChange={e => setFormValues(v => ({ ...v, category: e.target.value }))}
+                  required
+                >
+                  <option value="construction">시공 실적</option>
+                  <option value="other">기타 프로젝트</option>
+                </select>
+              </div>
               <div>
                 <label className="block text-sm font-medium mb-1">프로젝트명</label>
                 <input
@@ -487,62 +503,60 @@ const Projects = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300">
-              <div className="relative aspect-video overflow-hidden">
-                <img
-                  src="/images/projects/other-1.jpg"
-                  alt="기타 프로젝트 1"
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  loading="lazy"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">산업용 시설 프로젝트</h3>
-                <p className="text-gray-600 mb-4">산업용 시설의 내구성과 안전성을 높이는 세라믹 코팅 적용 사례</p>
-                <div className="flex gap-2 mb-4">
-                  <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">내구성 향상</span>
-                  <span className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm">안전성 확보</span>
+            {getVisibleProjects()
+              .filter(p => p.category === 'other')
+              .map((project) => (
+                <div key={project.id} className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300">
+                  <div className="relative aspect-video overflow-hidden">
+                    <img
+                      src={getImageUrl(project.image)}
+                      alt={project.title}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    {isAdmin && (
+                      <div className="absolute top-3 right-3 flex gap-2 z-10">
+                        <button
+                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          onClick={() => handleToggleHide(project.id)}
+                          title={hiddenProjectIds.includes(project.id) ? '노출 해제' : '숨기기'}
+                          disabled={formLoading}
+                          aria-label={hiddenProjectIds.includes(project.id) ? '노출 해제' : '숨기기'}
+                        >
+                          {hiddenProjectIds.includes(project.id) ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                        </button>
+                        <button
+                          className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow"
+                          onClick={() => openForm(project)}
+                          title="수정"
+                          aria-label="수정"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-2 shadow"
+                          onClick={() => handleDeleteProject(project.id)}
+                          title="삭제"
+                          aria-label="삭제"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
+                    <p className="text-gray-600 mb-4">{project.description}</p>
+                    <div className="flex gap-2 mb-4">
+                      {project.features.map((feature, index) => (
+                        <span key={index} className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300">
-              <div className="relative aspect-video overflow-hidden">
-                <img
-                  src="/images/projects/other-2.jpg"
-                  alt="기타 프로젝트 2"
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  loading="lazy"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">상업 시설 프로젝트</h3>
-                <p className="text-gray-600 mb-4">상업 시설의 미관과 기능성을 개선한 세라믹 코팅 적용 사례</p>
-                <div className="flex gap-2 mb-4">
-                  <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">미관 개선</span>
-                  <span className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm">기능성 향상</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300">
-              <div className="relative aspect-video overflow-hidden">
-                <img
-                  src="/images/projects/other-3.jpg"
-                  alt="기타 프로젝트 3"
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  loading="lazy"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">공공 시설 프로젝트</h3>
-                <p className="text-gray-600 mb-4">공공 시설의 안전성과 내구성을 강화한 세라믹 코팅 적용 사례</p>
-                <div className="flex gap-2 mb-4">
-                  <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">안전성 강화</span>
-                  <span className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm">내구성 향상</span>
-                </div>
-              </div>
-            </div>
+              ))}
           </div>
         </div>
       </section>

@@ -11,6 +11,7 @@ interface Project {
     description: string;
     url: string;
     features: string[];
+    category: string;
     created_at: string;
     updated_at: string;
 }

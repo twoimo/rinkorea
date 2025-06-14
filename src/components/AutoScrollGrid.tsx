@@ -9,6 +9,7 @@ interface Project {
     description: string;
     url: string;
     features: string[];
+    category: string;
 }
 
 interface AutoScrollGridProps {
