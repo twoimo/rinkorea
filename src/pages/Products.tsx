@@ -233,15 +233,15 @@ const Products = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {getVisibleProducts().map((product, index) => (
               <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                <div className="relative h-64 overflow-hidden">
+                <div className="relative aspect-square overflow-hidden">
                   <img
                     src={getImageUrl(product.image_url)}
                     alt={product.name}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     loading="lazy"
                     width={800}
-                    height={450}
-                    style={{ maxWidth: '100%', maxHeight: '450px' }}
+                    height={800}
+                    style={{ maxWidth: '100%', maxHeight: '100%' }}
                   />
                   <div className="absolute top-4 left-4">
                     {product.icon === 'Shield' && <Shield className="w-8 h-8 text-blue-600 bg-white p-1 rounded-full" />}
