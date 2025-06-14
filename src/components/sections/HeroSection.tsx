@@ -101,18 +101,18 @@ const HeroSection = () => {
           <div className="max-w-4xl">
             {/* Patent & Trademark Info */}
             <div className="mb-8">
-              <div className="flex flex-wrap gap-3 sm:gap-4">
-                <div className="bg-yellow-400 text-black px-3 py-2 rounded-full text-sm font-bold tracking-wider shadow-lg text-left w-fit">
+              <div className="flex flex-nowrap gap-2 sm:gap-4">
+                <div className="bg-yellow-400 text-black px-2 sm:px-3 py-2 rounded-full text-xs sm:text-sm font-bold tracking-wider shadow-lg text-left whitespace-nowrap">
                   특허 제10-2312833호
                 </div>
-                <div className="bg-yellow-400 text-black px-3 py-2 rounded-full text-sm font-bold tracking-wider shadow-lg text-left w-fit">
+                <div className="bg-yellow-400 text-black px-2 sm:px-3 py-2 rounded-full text-xs sm:text-sm font-bold tracking-wider shadow-lg text-left whitespace-nowrap">
                   상표 제40-1678504호
                 </div>
               </div>
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-6 sm:mb-8 leading-tight">
+            <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-6 sm:mb-8 leading-tight">
               <span className="text-white drop-shadow-2xl block">
                 친환경 불연재(1액형)
               </span>
