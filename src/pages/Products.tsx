@@ -112,10 +112,12 @@ const Products = () => {
           .eq('id', editingProduct.id);
 
         if (!result.error) {
-          // 수정된 제품으로 상태 업데이트
-          setProducts(products.map(p =>
-            p.id === editingProduct.id ? { ...p, ...payload } : p
-          ));
+          // 수정된 제품으로 상태 업데이트 (순서 유지)
+          setProducts(prevProducts =>
+            prevProducts.map(p =>
+              p.id === editingProduct.id ? { ...p, ...payload } : p
+            )
+          );
         }
       } else {
         // 추가
@@ -124,8 +126,8 @@ const Products = () => {
           .insert([{ ...payload, created_at: new Date().toISOString(), is_active: true }]);
 
         if (!result.error && result.data) {
-          // 새 제품 추가
-          setProducts([...products, result.data[0]]);
+          // 새 제품 추가 (맨 뒤에 추가)
+          setProducts(prevProducts => [...prevProducts, result.data[0]]);
         }
       }
 
