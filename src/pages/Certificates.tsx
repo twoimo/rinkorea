@@ -43,6 +43,12 @@ const Certificates = () => {
 
   const certificateTypes = [
     {
+      name: "특허 등록증",
+      type: "특허",
+      icon: <Award className="w-8 h-8 text-yellow-600" />,
+      description: "1액형 세라믹 제조기술에 대한 특허 등록으로 기술력을 인정받았습니다."
+    },
+    {
       name: "불연재 인증",
       type: "인증서",
       icon: <Shield className="w-8 h-8 text-blue-600" />,
@@ -53,12 +59,6 @@ const Certificates = () => {
       type: "시험성적서",
       icon: <FileText className="w-8 h-8 text-green-600" />,
       description: "공인시험기관에서 실시한 각종 품질 시험 결과를 확인할 수 있습니다."
-    },
-    {
-      name: "특허 등록증",
-      type: "특허",
-      icon: <Award className="w-8 h-8 text-yellow-600" />,
-      description: "1액형 세라믹 제조기술에 대한 특허 등록으로 기술력을 인정받았습니다."
     }
   ];
 
