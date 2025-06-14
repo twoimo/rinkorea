@@ -59,39 +59,30 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
     }, [items.length]);
 
     // Memoize the animation function
-    const animate = useCallback((timestamp: number) => {
-        if (!rowRef.current || isHovered || isDragging) {
-            animationFrameRef.current = requestAnimationFrame(animate);
-            return;
-        }
+    const animate = useCallback(() => {
+        if (!rowRef.current || isHovered || isDragging) return;
 
-        const deltaTime = timestamp - lastTimeRef.current;
-        lastTimeRef.current = timestamp;
+        const now = performance.now();
+        const delta = now - lastTimeRef.current;
+        lastTimeRef.current = now;
 
-        const row = rowRef.current;
-        const itemWidth = 400 + 32;
-        const singleSetWidth = itemWidth * items.length;
+        positionRef.current += delta * scrollSpeed * 0.1;
+        rowRef.current.style.transform = `translateX(-${positionRef.current}px)`;
 
-        positionRef.current += scrollSpeed * (deltaTime / 16);
-
-        if (positionRef.current >= singleSetWidth) {
-            resetPosition();
-        } else {
-            row.style.transform = `translateX(-${positionRef.current}px)`;
-        }
-
+        resetPosition();
         animationFrameRef.current = requestAnimationFrame(animate);
-    }, [isHovered, isDragging, scrollSpeed, items.length, resetPosition]);
+    }, [isHovered, isDragging, scrollSpeed, resetPosition]);
 
     useEffect(() => {
-        animationFrameRef.current = requestAnimationFrame(animate);
-
+        if (!isHovered && !isDragging) {
+            animationFrameRef.current = requestAnimationFrame(animate);
+        }
         return () => {
             if (animationFrameRef.current) {
                 cancelAnimationFrame(animationFrameRef.current);
             }
         };
-    }, [animate]);
+    }, [animate, isHovered, isDragging]);
 
     const handleDragStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
         if (!rowRef.current) return;
