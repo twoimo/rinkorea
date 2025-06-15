@@ -1,35 +1,29 @@
+
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import AdminOnly from '../components/AdminOnly';
-import { MessageCircle, Plus, Search, User, Calendar, CheckCircle, Clock, ChevronDown, Reply, Trash2, Send, Edit, X, Lock } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useInquiries } from '@/hooks/useInquiries';
 import { useUserRole } from '@/hooks/useUserRole';
-import { Link } from 'react-router-dom';
 import { useProfile } from '@/hooks/useProfile';
+import QnAHero from '../components/qna/QnAHero';
+import QnAStats from '../components/qna/QnAStats';
+import QnAFilters from '../components/qna/QnAFilters';
+import QnAForm from '../components/qna/QnAForm';
+import QnAItem from '../components/qna/QnAItem';
+import QnAEmptyState from '../components/qna/QnAEmptyState';
 
 const QnA = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { inquiries, loading, createInquiry, updateInquiry, deleteInquiry, getReplies } = useInquiries();
   const { isAdmin } = useUserRole();
+  const { profile } = useProfile();
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('전체');
   const [selectedStatus, setSelectedStatus] = useState('전체');
-  const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [editingReply, setEditingReply] = useState<string | null>(null);
-  const [replyText, setReplyText] = useState('');
-  const [formData, setFormData] = useState({
-    name: user?.user_metadata?.name || '',
-    email: user?.email || '',
-    phone: user?.user_metadata?.phone || '',
-    title: '',
-    content: '',
-    is_private: false
-  });
   const [editingInquiryId, setEditingInquiryId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState({
     name: '',
@@ -40,10 +34,6 @@ const QnA = () => {
     is_private: false
   });
   const [inquiryReplies, setInquiryReplies] = useState<Record<string, boolean>>({});
-  const { profile } = useProfile();
-
-  const categories = ['전체', '제품문의', '시공문의', '기술지원', '기타'];
-  const statusFilter = ['전체', '답변대기', '답변완료'];
 
   const filteredItems = inquiries.filter(item => {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -53,15 +43,6 @@ const QnA = () => {
       (selectedStatus === '답변대기' && item.status === 'pending');
     return matchesSearch && matchesStatus;
   });
-
-  useEffect(() => {
-    setFormData(prev => ({
-      ...prev,
-      name: user?.user_metadata?.name || '',
-      email: user?.email || '',
-      phone: profile?.phone || user?.user_metadata?.phone || ''
-    }));
-  }, [user, profile]);
 
   useEffect(() => {
     const checkReplies = async () => {
@@ -75,37 +56,7 @@ const QnA = () => {
     checkReplies();
   }, [inquiries]);
 
-  const validatePhone = (value: string) => {
-    return /^0\d{1,2}-\d{3,4}-\d{4}$/.test(value);
-  };
-  const [phoneError, setPhoneError] = useState('');
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/[^0-9]/g, '');
-    if (value.length <= 2) {
-      // 지역번호
-    } else if (value.length <= 3) {
-      value = value.replace(/(\d{2,3})/, '$1');
-    } else if (value.length <= 7) {
-      value = value.replace(/(\d{2,3})(\d{3,4})/, '$1-$2');
-    } else {
-      value = value.replace(/(\d{2,3})(\d{3,4})(\d{4})/, '$1-$2-$3');
-    }
-    setFormData(prev => ({ ...prev, phone: value }));
-    if (value && !validatePhone(value)) {
-      setPhoneError('연락처 형식이 올바르지 않습니다. 예: 010-1234-5678');
-    } else {
-      setPhoneError('');
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (formData.phone && !validatePhone(formData.phone)) {
-      setPhoneError('연락처 형식이 올바르지 않습니다. 예: 010-1234-5678');
-      return;
-    }
-
+  const handleSubmit = async (formData: any) => {
     const { error } = await createInquiry(formData);
 
     if (error) {
@@ -118,68 +69,6 @@ const QnA = () => {
       toast({
         title: "문의가 접수되었습니다",
         description: "빠른 시일 내에 답변드리겠습니다.",
-      });
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        title: '',
-        content: '',
-        is_private: false
-      });
-      setShowForm(false);
-    }
-  };
-
-  const handleReply = async (inquiryId: string) => {
-    if (!replyText.trim()) return;
-
-    const { error } = await updateInquiry(inquiryId, {
-      admin_reply: replyText,
-      status: 'answered'
-    });
-
-    if (error) {
-      toast({
-        title: "답변 등록 실패",
-        description: "다시 시도해주세요.",
-        variant: "destructive"
-      });
-    } else {
-      toast({
-        title: "답변이 등록되었습니다",
-        description: "고객에게 답변이 전달되었습니다."
-      });
-      setReplyingTo(null);
-      setEditingReply(null);
-      setReplyText('');
-    }
-  };
-
-  const handleEditReply = (inquiryId: string, currentReply: string) => {
-    setEditingReply(inquiryId);
-    setReplyText(currentReply);
-    setReplyingTo(null);
-  };
-
-  const handleDeleteReply = async (inquiryId: string) => {
-    if (!confirm('답변을 삭제하시겠습니까?')) return;
-
-    const { error } = await updateInquiry(inquiryId, {
-      admin_reply: null,
-      status: 'pending'
-    });
-
-    if (error) {
-      toast({
-        title: "답변 삭제 실패",
-        description: "다시 시도해주세요.",
-        variant: "destructive"
-      });
-    } else {
-      toast({
-        title: "답변이 삭제되었습니다",
-        description: "답변이 성공적으로 삭제되었습니다."
       });
     }
   };
@@ -203,254 +92,47 @@ const QnA = () => {
     }
   };
 
-  const cancelEdit = () => {
-    setEditingReply(null);
-    setReplyingTo(null);
-    setReplyText('');
-  };
-
   const maskName = (name: string) => {
     if (!name || isAdmin) return name;
     return name.charAt(0) + '*'.repeat(name.length - 1);
   };
+
+  const answeredCount = Object.values(inquiryReplies).filter(hasReplies => hasReplies).length;
+  const pendingCount = Object.values(inquiryReplies).filter(hasReplies => !hasReplies).length;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
 
       <main>
-        {/* Hero Section - 모바일 최적화 */}
-        <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 md:py-20">
-          <div className="container mx-auto px-4">
-            <div className="text-center">
-              <h1 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6">고객상담 및 문의</h1>
-              <p className="text-base md:text-xl max-w-2xl mx-auto leading-relaxed">
-                린코리아 제품에 대한 문의사항이 있으시면 언제든지 연락주세요.<br />
-              </p>
-              <div className="flex flex-col gap-3 justify-center mt-6 md:mt-8 px-4">
-                {!user ? (
-                  <Link
-                    to="/auth"
-                    className="inline-flex items-center justify-center bg-white text-blue-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 w-full sm:w-auto"
-                    aria-label="로그인하여 문의하기"
-                  >
-                    <User className="w-5 h-5 mr-2" aria-hidden="true" />
-                    로그인하여 문의하기
-                  </Link>
-                ) : (
-                  <button
-                    onClick={() => setShowForm(true)}
-                    className="inline-flex items-center justify-center bg-white text-blue-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 w-full sm:w-auto"
-                    aria-label="새 문의 작성"
-                  >
-                    <Plus className="w-5 h-5 mr-2" aria-hidden="true" />
-                    새 문의 작성
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
+        <QnAHero user={user} setShowForm={setShowForm} />
 
-        {/* Main Content */}
         <section className="flex-1 py-8 md:py-12">
           <div className="container mx-auto px-4">
-            {/* Stats Cards - 모바일 최적화 */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-              <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                <div className="flex items-center">
-                  <div className="bg-blue-100 p-2 md:p-3 rounded-lg">
-                    <MessageCircle className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
-                  </div>
-                  <div className="ml-3 md:ml-4">
-                    <p className="text-xs md:text-sm text-gray-600">전체 문의</p>
-                    <p className="text-xl md:text-2xl font-bold text-gray-900">{inquiries.length}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                <div className="flex items-center">
-                  <div className="bg-green-100 p-2 md:p-3 rounded-lg">
-                    <CheckCircle className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
-                  </div>
-                  <div className="ml-3 md:ml-4">
-                    <p className="text-xs md:text-sm text-gray-600">답변 완료</p>
-                    <p className="text-xl md:text-2xl font-bold text-gray-900">
-                      {Object.values(inquiryReplies).filter(hasReplies => hasReplies).length}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                <div className="flex items-center">
-                  <div className="bg-yellow-100 p-2 md:p-3 rounded-lg">
-                    <Clock className="w-5 h-5 md:w-6 md:h-6 text-yellow-600" />
-                  </div>
-                  <div className="ml-3 md:ml-4">
-                    <p className="text-xs md:text-sm text-gray-600">답변 대기</p>
-                    <p className="text-xl md:text-2xl font-bold text-gray-900">
-                      {Object.values(inquiryReplies).filter(hasReplies => !hasReplies).length}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <QnAStats 
+              totalInquiries={inquiries.length}
+              answeredCount={answeredCount}
+              pendingCount={pendingCount}
+            />
 
-            {/* Search and Filters - 모바일 최적화 */}
-            <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100 mb-6 md:mb-8">
-              <div className="flex flex-col gap-4">
-                {/* Search */}
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" />
-                  <input
-                    type="text"
-                    placeholder="문의 제목이나 내용을 검색하세요"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-9 md:pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm md:text-base"
-                  />
-                </div>
+            <QnAFilters
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              selectedStatus={selectedStatus}
+              setSelectedStatus={setSelectedStatus}
+              showForm={showForm}
+              setShowForm={setShowForm}
+              user={user}
+            />
 
-                <div className="flex flex-col sm:flex-row gap-3">
-                  {/* Status Filter */}
-                  <div className="relative flex-1 sm:flex-none">
-                    <select
-                      value={selectedStatus}
-                      onChange={(e) => setSelectedStatus(e.target.value)}
-                      className="appearance-none bg-white border border-gray-200 rounded-lg px-4 py-3 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all w-full text-sm md:text-base"
-                    >
-                      {statusFilter.map(status => (
-                        <option key={status} value={status}>{status}</option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  </div>
+            <QnAForm
+              showForm={showForm}
+              setShowForm={setShowForm}
+              onSubmit={handleSubmit}
+              user={user}
+              profile={profile}
+            />
 
-                  {/* New Question Button */}
-                  {user && (
-                    <button
-                      onClick={() => setShowForm(!showForm)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md text-sm md:text-base whitespace-nowrap"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      문의하기
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Question Form - 모바일 최적화 */}
-            {showForm && (
-              <div className="bg-white rounded-xl p-4 md:p-8 shadow-sm border border-gray-100 mb-6 md:mb-8 animate-fade-in">
-                <div className="flex items-center mb-4 md:mb-6">
-                  <div className="bg-blue-100 p-2 rounded-lg mr-3">
-                    <MessageCircle className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
-                  </div>
-                  <h3 className="text-lg md:text-xl font-bold text-gray-900">새 문의 작성</h3>
-                </div>
-
-                <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        이름 <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-3 md:px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm md:text-base"
-                        placeholder="이름을 입력하세요"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        이메일 <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-3 md:px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm md:text-base"
-                        placeholder="이메일을 입력하세요"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">연락처</label>
-                    <input
-                      type="tel"
-                      value={formData.phone}
-                      onChange={handlePhoneChange}
-                      className={`w-full px-3 md:px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm md:text-base ${phoneError ? 'border-red-500' : 'border-gray-200'}`}
-                      placeholder="연락처를 입력하세요"
-                    />
-                    {phoneError && <p className="text-xs text-red-500 mt-1">{phoneError}</p>}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      제목 <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.title}
-                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      className="w-full px-3 md:px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm md:text-base"
-                      placeholder="문의 제목을 입력하세요"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      문의 내용 <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      value={formData.content}
-                      onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                      rows={6}
-                      className="w-full px-3 md:px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none text-sm md:text-base"
-                      placeholder="문의하실 내용을 자세히 입력해주세요"
-                      required
-                    />
-                  </div>
-
-                  <label className="flex items-center mt-4">
-                    <input
-                      type="checkbox"
-                      checked={formData.is_private}
-                      onChange={e => setFormData(prev => ({ ...prev, is_private: e.target.checked }))}
-                      className="mr-2 w-4 h-4"
-                    />
-                    <span className="text-sm md:text-base">비밀글로 등록 (관리자/작성자만 열람)</span>
-                  </label>
-
-                  <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                    <button
-                      type="submit"
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 md:px-8 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center text-sm md:text-base"
-                    >
-                      <MessageCircle className="w-4 h-4 mr-2" />
-                      문의 접수
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowForm(false)}
-                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 md:px-8 py-3 rounded-lg font-semibold transition-all duration-200 text-sm md:text-base"
-                    >
-                      취소
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {/* Q&A List - 모바일 최적화 */}
             {loading ? (
               <div className="bg-white rounded-xl p-8 md:p-12 shadow-sm border border-gray-100 text-center">
                 <div className="animate-spin rounded-full h-8 w-8 md:h-12 md:w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -462,231 +144,34 @@ const QnA = () => {
                   const isOwner = user && user.id === item.user_id;
                   const canView = !item.is_private || isAdmin || isOwner;
                   const canShowContent = canView && !!user;
+                  
                   return (
-                    <div key={item.id} className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 md:mb-4 gap-3">
-                        {/* 상태 뱃지 */}
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 w-fit ${inquiryReplies[item.id]
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                          {inquiryReplies[item.id] ? (
-                            <>
-                              <CheckCircle className="w-3 h-3" /> 답변완료
-                            </>
-                          ) : (
-                            <>
-                              <Clock className="w-3 h-3" /> 답변대기
-                            </>
-                          )}
-                        </span>
-
-                        {/* 사용자 정보 */}
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                          <div className="flex flex-wrap items-center text-xs md:text-sm text-gray-500 gap-2 sm:gap-3">
-                            <div className="flex items-center gap-1">
-                              <User className="w-3 h-3 md:w-4 md:h-4" />
-                              {maskName(item.name)}
-                            </div>
-                            {isAdmin && (
-                              <>
-                                <div className="flex items-center gap-1">
-                                  <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">{item.email}</span>
-                                </div>
-                                {item.phone && (
-                                  <div className="flex items-center gap-1">
-                                    <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">{item.phone}</span>
-                                  </div>
-                                )}
-                              </>
-                            )}
-                            <div className="flex items-center gap-1">
-                              <Calendar className="w-3 h-3 md:w-4 md:h-4" />
-                              {new Date(item.created_at).toLocaleDateString('ko-KR')}
-                            </div>
-                          </div>
-                          {(isAdmin || isOwner) && (
-                            <div className="flex gap-2">
-                              <button onClick={() => {
-                                setEditingInquiryId(item.id);
-                                setEditFormData({
-                                  name: item.name,
-                                  email: item.email,
-                                  phone: item.phone || '',
-                                  title: item.title,
-                                  content: item.content,
-                                  is_private: item.is_private || false
-                                });
-                              }} className="text-blue-600 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-lg transition-colors" title="수정">
-                                <Edit className="w-4 h-4" />
-                              </button>
-                              <button onClick={() => handleDelete(item.id)} className="text-red-600 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors" title="삭제">
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      {editingInquiryId === item.id ? (
-                        <div className="bg-gray-50 rounded-xl p-4 md:p-6 animate-fade-in">
-                          <div className="flex items-center mb-4 md:mb-6">
-                            <div className="bg-blue-100 p-2 rounded-lg mr-3">
-                              <Edit className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
-                            </div>
-                            <h3 className="text-lg md:text-xl font-bold text-gray-900">문의 수정</h3>
-                          </div>
-
-                          <form className="space-y-4 md:space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                  이름 <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                  type="text"
-                                  value={editFormData.name}
-                                  onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
-                                  className="w-full px-3 md:px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm md:text-base"
-                                  placeholder="이름을 입력하세요"
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                  이메일 <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                  type="email"
-                                  value={editFormData.email}
-                                  onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
-                                  className="w-full px-3 md:px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm md:text-base"
-                                  placeholder="이메일을 입력하세요"
-                                  required
-                                />
-                              </div>
-                            </div>
-
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">연락처</label>
-                              <input
-                                type="tel"
-                                value={editFormData.phone}
-                                onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
-                                className="w-full px-3 md:px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm md:text-base"
-                                placeholder="연락처를 입력하세요"
-                              />
-                            </div>
-
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                제목 <span className="text-red-500">*</span>
-                              </label>
-                              <input
-                                type="text"
-                                value={editFormData.title}
-                                onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
-                                className="w-full px-3 md:px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm md:text-base"
-                                placeholder="문의 제목을 입력하세요"
-                                required
-                              />
-                            </div>
-
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                문의 내용 <span className="text-red-500">*</span>
-                              </label>
-                              <textarea
-                                value={editFormData.content}
-                                onChange={(e) => setEditFormData({ ...editFormData, content: e.target.value })}
-                                rows={6}
-                                className="w-full px-3 md:px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none text-sm md:text-base"
-                                placeholder="문의하실 내용을 자세히 입력해주세요"
-                                required
-                              />
-                            </div>
-
-                            <label className="flex items-center mt-4">
-                              <input
-                                type="checkbox"
-                                checked={editFormData.is_private}
-                                onChange={e => setEditFormData(prev => ({ ...prev, is_private: e.target.checked }))}
-                                className="mr-2 w-4 h-4"
-                              />
-                              <span className="text-sm md:text-base">비밀글로 등록 (관리자/작성자만 열람)</span>
-                            </label>
-
-                            <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                              <button
-                                type="button"
-                                onClick={async () => {
-                                  await updateInquiry(item.id, {
-                                    name: editFormData.name,
-                                    email: editFormData.email,
-                                    phone: editFormData.phone,
-                                    title: editFormData.title,
-                                    content: editFormData.content,
-                                    is_private: editFormData.is_private
-                                  });
-                                  setEditingInquiryId(null);
-                                }}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 md:px-8 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center text-sm md:text-base"
-                              >
-                                <Edit className="w-4 h-4 mr-2" />
-                                수정 완료
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setEditingInquiryId(null)}
-                                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 md:px-8 py-3 rounded-lg font-semibold transition-all duration-200 text-sm md:text-base"
-                              >
-                                취소
-                              </button>
-                            </div>
-                          </form>
-                        </div>
-                      ) : (
-                        <>
-                          <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                            {item.is_private && <Lock className="w-4 h-4 text-gray-400 mr-1" />} {item.title}
-                          </h3>
-                          {canShowContent ? (
-                            <>
-                              <p className="text-gray-600 mb-4 leading-relaxed whitespace-pre-wrap text-sm md:text-base">{item.content}</p>
-                              <RepliesSection inquiryId={item.id} canView={canShowContent} isAdmin={isAdmin} />
-                            </>
-                          ) : (
-                            <div className="text-gray-400 italic flex items-center text-sm md:text-base">
-                              <Lock className="w-4 h-4 mr-1" /> 비밀글입니다
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
+                    <QnAItem
+                      key={item.id}
+                      item={item}
+                      isOwner={isOwner}
+                      isAdmin={isAdmin}
+                      canView={canView}
+                      canShowContent={canShowContent}
+                      inquiryReplies={inquiryReplies}
+                      editingInquiryId={editingInquiryId}
+                      editFormData={editFormData}
+                      setEditFormData={setEditFormData}
+                      setEditingInquiryId={setEditingInquiryId}
+                      onUpdate={updateInquiry}
+                      onDelete={handleDelete}
+                      maskName={maskName}
+                    />
                   );
                 })}
               </div>
             ) : (
-              <div className="bg-white rounded-xl p-8 md:p-12 shadow-sm border border-gray-100 text-center">
-                <MessageCircle className="w-12 h-12 md:w-16 md:h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-base md:text-lg font-medium text-gray-900 mb-2">
-                  {searchTerm || selectedStatus !== '전체' ? '검색 결과가 없습니다' : '아직 문의사항이 없습니다'}
-                </h3>
-                <p className="text-gray-500 mb-6 text-sm md:text-base">
-                  {searchTerm || selectedStatus !== '전체'
-                    ? '다른 검색어나 필터를 시도해보세요'
-                    : '첫 번째 문의를 남겨주세요'
-                  }
-                </p>
-                {!searchTerm && selectedStatus === '전체' && user && (
-                  <button
-                    onClick={() => setShowForm(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-6 py-3 rounded-lg font-semibold transition-all duration-200 inline-flex items-center text-sm md:text-base"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    문의하기
-                  </button>
-                )}
-              </div>
+              <QnAEmptyState
+                searchTerm={searchTerm}
+                selectedStatus={selectedStatus}
+                user={user}
+                setShowForm={setShowForm}
+              />
             )}
           </div>
         </section>
@@ -696,89 +181,5 @@ const QnA = () => {
     </div>
   );
 };
-
-function RepliesSection({ inquiryId, canView, isAdmin }) {
-  const { getReplies, createReply, updateReply, deleteReply } = useInquiries();
-  const [replies, setReplies] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
-  const [replyText, setReplyText] = React.useState('');
-  const [editingId, setEditingId] = React.useState(null);
-  React.useEffect(() => {
-    if (canView) {
-      setLoading(true);
-      getReplies(inquiryId).then(setReplies).finally(() => setLoading(false));
-    }
-  }, [inquiryId, canView]);
-  if (!canView) return null;
-  return (
-    <div className="mt-4 md:mt-6">
-      {loading ? <div className="text-gray-400 text-sm md:text-base">답변 불러오는 중...</div> : (
-        <>
-          {replies.length === 0 && <div className="text-gray-400 text-sm md:text-base">아직 답변이 없습니다.</div>}
-          {replies.map(reply => (
-            <div key={reply.id} className="p-3 md:p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400 mb-2 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
-              <div className="flex-1">
-                <div className="flex flex-col sm:flex-row sm:items-center mb-1 gap-1 sm:gap-2">
-                  <div className="flex items-center">
-                    <User className="w-3 h-3 md:w-4 md:h-4 text-blue-600 mr-1" />
-                    <span className="text-xs md:text-sm font-medium text-blue-900">관리자 답변</span>
-                  </div>
-                  <span className="text-xs text-gray-400">{new Date(reply.created_at).toLocaleString('ko-KR')}</span>
-                </div>
-                <div className="text-blue-800 leading-relaxed whitespace-pre-wrap text-sm md:text-base">
-                  {editingId === reply.id ? (
-                    <textarea 
-                      value={replyText} 
-                      onChange={e => setReplyText(e.target.value)} 
-                      className="w-full p-2 rounded border text-sm md:text-base" 
-                      rows={3} 
-                    />
-                  ) : reply.content}
-                </div>
-              </div>
-              {isAdmin && (
-                <div className="flex gap-2 sm:flex-col sm:gap-1 sm:ml-2">
-                  {editingId === reply.id ? (
-                    <>
-                      <button onClick={async () => { await updateReply(reply.id, replyText); setEditingId(null); setReplyText(''); setReplies(await getReplies(inquiryId)); }} className="text-blue-600 text-xs px-2 py-1 hover:bg-blue-100 rounded">저장</button>
-                      <button onClick={() => { setEditingId(null); setReplyText(''); }} className="text-gray-400 text-xs px-2 py-1 hover:bg-gray-100 rounded">취소</button>
-                    </>
-                  ) : (
-                    <>
-                      <button onClick={() => { setEditingId(reply.id); setReplyText(reply.content); }} className="text-blue-600 text-xs px-2 py-1 hover:bg-blue-100 rounded">수정</button>
-                      <button onClick={async () => { await deleteReply(reply.id); setReplies(await getReplies(inquiryId)); }} className="text-red-600 text-xs px-2 py-1 hover:bg-red-100 rounded">삭제</button>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
-          {isAdmin && (
-            <div className="mt-2 flex flex-col sm:flex-row gap-2">
-              <textarea 
-                value={replyText} 
-                onChange={e => setReplyText(e.target.value)} 
-                className="w-full p-2 rounded border text-sm md:text-base" 
-                rows={3} 
-                placeholder="답변을 입력하세요..." 
-              />
-              <button 
-                onClick={async () => { 
-                  if (!replyText.trim()) return; 
-                  await createReply(inquiryId, replyText); 
-                  setReplyText(''); 
-                  setReplies(await getReplies(inquiryId)); 
-                }} 
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors text-sm md:text-base whitespace-nowrap sm:self-start"
-              >
-                등록
-              </button>
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  );
-}
 
 export default QnA;
