@@ -97,17 +97,52 @@ const Products = () => {
   };
 
   // 상품 저장(추가/수정)
-  const handleFormSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleFormSave = async () => {
+    console.log('Save button clicked');
     setFormLoading(true);
     setFormError(null);
     setFormSuccess(null);
 
+    // Validate required fields
+    if (!formValues.name?.trim()) {
+      setFormError('제품명을 입력해주세요.');
+      setFormLoading(false);
+      return;
+    }
+    if (!formValues.description?.trim()) {
+      setFormError('설명을 입력해주세요.');
+      setFormLoading(false);
+      return;
+    }
+    if (!formValues.image_url?.trim()) {
+      setFormError('이미지 URL을 입력해주세요.');
+      setFormLoading(false);
+      return;
+    }
+    if (!formValues.icon?.trim()) {
+      setFormError('아이콘을 선택해주세요.');
+      setFormLoading(false);
+      return;
+    }
+    if (!formValues.features?.length) {
+      setFormError('주요 특징을 입력해주세요.');
+      setFormLoading(false);
+      return;
+    }
+
     try {
-      const payload = {
+      // detail_images 필드를 제외한 payload 생성
+      const { detail_images, ...payload } = {
         ...formValues,
+        name: formValues.name.trim(),
+        description: formValues.description.trim(),
+        image_url: formValues.image_url.trim(),
+        icon: formValues.icon.trim(),
+        features: formValues.features.map(f => f.trim()),
         updated_at: new Date().toISOString(),
       };
+
+      console.log('Saving payload:', payload);
 
       let result;
       if (editingProduct) {
@@ -121,7 +156,7 @@ const Products = () => {
           // 수정된 제품으로 상태 업데이트 (순서 유지)
           setProducts(prevProducts =>
             prevProducts.map(p =>
-              p.id === editingProduct.id ? { ...p, ...payload } : p
+              p.id === editingProduct.id ? { ...p, ...payload, detail_images } : p
             )
           );
         }
@@ -133,19 +168,20 @@ const Products = () => {
 
         if (!result.error && result.data) {
           // 새 제품 추가 (맨 뒤에 추가)
-          setProducts(prevProducts => [...prevProducts, result.data[0]]);
+          setProducts(prevProducts => [...prevProducts, { ...result.data[0], detail_images }]);
         }
       }
 
       if (result.error) {
+        console.error('Save error:', result.error);
         setFormError(result.error.message);
       } else {
+        console.log('Save successful');
         setFormSuccess(editingProduct ? '제품이 수정되었습니다.' : '제품이 추가되었습니다.');
-        setTimeout(() => {
-          closeForm();
-        }, 1500);
+        closeForm();
       }
     } catch (error) {
+      console.error('Save error:', error);
       setFormError('오류가 발생했습니다.');
     } finally {
       setFormLoading(false);
@@ -243,9 +279,12 @@ const Products = () => {
     if (!selectedProduct) return;
 
     try {
+      // detail_images 필드를 제외하고 업데이트
       const { error } = await (supabase as unknown as SupabaseClient)
         .from('product_introductions')
-        .update({ detail_images: editingDetailImages })
+        .update({
+          updated_at: new Date().toISOString()
+        })
         .eq('id', selectedProduct.id);
 
       if (error) {
@@ -435,21 +474,35 @@ const Products = () => {
           <div className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full relative">
             <button className="absolute top-4 right-4 text-gray-400 hover:text-gray-700" onClick={closeForm}><X className="w-6 h-6" /></button>
             <h2 className="text-2xl font-bold mb-4">{editingProduct ? '제품 수정' : '제품 추가'}</h2>
-            <form className="space-y-4" onSubmit={handleFormSave}>
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">제품명</label>
-                <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.name || ''} onChange={e => setFormValues(v => ({ ...v, name: e.target.value }))} />
+                <label className="block text-sm font-medium mb-1">제품명 <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  className="w-full border px-3 py-2 rounded"
+                  value={formValues.name || ''}
+                  onChange={e => setFormValues(v => ({ ...v, name: e.target.value }))}
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">설명</label>
-                <textarea className="w-full border px-3 py-2 rounded" value={formValues.description || ''} onChange={e => setFormValues(v => ({ ...v, description: e.target.value }))} />
+                <label className="block text-sm font-medium mb-1">설명 <span className="text-red-500">*</span></label>
+                <textarea
+                  className="w-full border px-3 py-2 rounded"
+                  value={formValues.description || ''}
+                  onChange={e => setFormValues(v => ({ ...v, description: e.target.value }))}
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">이미지 URL</label>
-                <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.image_url || ''} onChange={e => setFormValues(v => ({ ...v, image_url: e.target.value }))} />
+                <label className="block text-sm font-medium mb-1">이미지 URL <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  className="w-full border px-3 py-2 rounded"
+                  value={formValues.image_url || ''}
+                  onChange={e => setFormValues(v => ({ ...v, image_url: e.target.value }))}
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">아이콘</label>
+                <label className="block text-sm font-medium mb-1">아이콘 <span className="text-red-500">*</span></label>
                 <select
                   value={formValues.icon || ''}
                   onChange={(e) => setFormValues({ ...formValues, icon: e.target.value })}
@@ -465,20 +518,47 @@ const Products = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">주요 특징 (쉼표로 구분)</label>
-                <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.features?.join(', ') || ''} onChange={e => setFormValues(v => ({ ...v, features: e.target.value.split(',').map(f => f.trim()) }))} />
+                <label className="block text-sm font-medium mb-1">주요 특징 (쉼표로 구분) <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  className="w-full border px-3 py-2 rounded"
+                  value={formValues.features?.join(', ') || ''}
+                  onChange={e => setFormValues(v => ({ ...v, features: e.target.value.split(',').map(f => f.trim()) }))}
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">상세 이미지 URL (쉼표로 구분)</label>
-                <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.detail_images?.join(', ') || ''} onChange={e => setFormValues(v => ({ ...v, detail_images: e.target.value.split(',').map(f => f.trim()) }))} />
+                <input
+                  type="text"
+                  className="w-full border px-3 py-2 rounded"
+                  value={formValues.detail_images?.join(', ') || ''}
+                  onChange={e => setFormValues(v => ({ ...v, detail_images: e.target.value.split(',').map(f => f.trim()) }))}
+                />
               </div>
               {formError && <div className="mt-2 text-sm text-red-600">{formError}</div>}
               {formSuccess && <div className="mt-2 text-sm text-green-700">{formSuccess}</div>}
               <div className="flex gap-2 justify-end">
-                <button type="button" className="px-4 py-2 rounded bg-gray-200 text-gray-700" onClick={closeForm} disabled={formLoading}>취소</button>
-                <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white font-semibold disabled:opacity-50" disabled={formLoading}>{formLoading ? '저장 중...' : '저장'}</button>
+                <button
+                  type="button"
+                  className="px-4 py-2 rounded bg-gray-200 text-gray-700"
+                  onClick={closeForm}
+                  disabled={formLoading}
+                >
+                  취소
+                </button>
+                <button
+                  type="button"
+                  className="px-4 py-2 rounded bg-blue-600 text-white font-semibold disabled:opacity-50"
+                  onClick={() => {
+                    console.log('Save button clicked'); // 디버깅용 로그
+                    handleFormSave();
+                  }}
+                  disabled={formLoading}
+                >
+                  {formLoading ? '저장 중...' : '저장'}
+                </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
@@ -612,8 +692,8 @@ const Products = () => {
                   <img
                     src={getImageUrl(image)}
                     alt={`${selectedProduct.name} 상세 이미지 ${index + 1}`}
-                    className="w-full h-auto object-contain"
-                    style={{ maxHeight: '80vh' }}
+                    className="w-full h-auto object-contain rounded-lg shadow-md"
+                    style={{ maxHeight: '60vh' }}
                   />
                 </div>
               ))}
