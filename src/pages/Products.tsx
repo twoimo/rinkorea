@@ -117,10 +117,9 @@ const Products = () => {
     setFormSuccess(null);
 
     try {
-      // detail_images를 제외한 payload 생성
-      const { detail_images, ...restFormValues } = formValues;
+      // 전체 payload 생성 (detail_images 포함)
       const payload = {
-        ...restFormValues,
+        ...formValues,
         updated_at: new Date().toISOString(),
       };
 
@@ -130,25 +129,33 @@ const Products = () => {
         result = await (supabase as unknown as SupabaseClient)
           .from('product_introductions')
           .update(payload)
-          .eq('id', editingProduct.id);
+          .eq('id', editingProduct.id)
+          .select('*');
 
-        if (!result.error) {
+        if (!result.error && result.data) {
           // 수정된 제품으로 상태 업데이트 (순서 유지)
           setProducts(prevProducts =>
             prevProducts.map(p =>
-              p.id === editingProduct.id ? { ...p, ...payload, detail_images: detail_images || [] } : p
+              p.id === editingProduct.id ? { ...result.data[0], detail_images: result.data[0].detail_images || [] } : p
             )
           );
         }
       } else {
         // 추가
+        const insertPayload = {
+          ...payload,
+          created_at: new Date().toISOString(),
+          is_active: true
+        };
+        
         result = await (supabase as unknown as SupabaseClient)
           .from('product_introductions')
-          .insert([{ ...payload, created_at: new Date().toISOString(), is_active: true }]);
+          .insert([insertPayload])
+          .select('*');
 
         if (!result.error && result.data) {
           // 새 제품 추가 (맨 뒤에 추가)
-          setProducts(prevProducts => [...prevProducts, { ...result.data[0], detail_images: detail_images || [] }]);
+          setProducts(prevProducts => [...prevProducts, { ...result.data[0], detail_images: result.data[0].detail_images || [] }]);
         }
       }
 
@@ -428,7 +435,7 @@ const Products = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">상세 이미지 URL (쉼표로 구분)</label>
-                <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.detail_images?.join(', ') || ''} onChange={e => setFormValues(v => ({ ...v, detail_images: e.target.value.split(',').map(f => f.trim()) }))} />
+                <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.detail_images?.join(', ') || ''} onChange={e => setFormValues(v => ({ ...v, detail_images: e.target.value.split(',').map(f => f.trim()).filter(f => f) }))} />
               </div>
               {formError && <div className="mt-2 text-sm text-red-600">{formError}</div>}
               {formSuccess && <div className="mt-2 text-sm text-green-700">{formSuccess}</div>}
@@ -481,16 +488,22 @@ const Products = () => {
               </button>
             </div>
             <div className="space-y-6">
-              {selectedProduct.detail_images?.map((image, index) => (
-                <div key={index} className="w-full">
-                  <img
-                    src={getImageUrl(image)}
-                    alt={`${selectedProduct.name} 상세 이미지 ${index + 1}`}
-                    className="w-full h-auto object-contain"
-                    style={{ maxHeight: '80vh' }}
-                  />
+              {selectedProduct.detail_images && selectedProduct.detail_images.length > 0 ? (
+                selectedProduct.detail_images.map((image, index) => (
+                  <div key={index} className="w-full">
+                    <img
+                      src={getImageUrl(image)}
+                      alt={`${selectedProduct.name} 상세 이미지 ${index + 1}`}
+                      className="w-full h-auto object-contain"
+                      style={{ maxHeight: '80vh' }}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  상세 이미지가 없습니다.
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
