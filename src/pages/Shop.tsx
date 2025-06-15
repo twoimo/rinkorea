@@ -42,6 +42,8 @@ const Shop = () => {
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
   const [hiddenProductIds, setHiddenProductIds] = useState<string[]>([]);
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
+  
   const gridOptions = [
     { value: 2, label: '2 x 2' },
     { value: 3, label: '3 x 3' },
@@ -59,7 +61,7 @@ const Shop = () => {
     { value: 'rating', label: '평점 높은순' },
   ];
 
-  // 숨김 상품 목록 불러오기 함수 (컴포넌트 상단에 선언)
+  // 숨김 상품 목록 불러오기 함수
   const fetchHiddenProducts = async () => {
     const { data, error } = await (supabase as unknown as SupabaseClient)
       .from('product_hidden')
@@ -83,6 +85,7 @@ const Shop = () => {
       setLoading(false);
     };
     fetchProducts();
+    
     const fetchGrid = async () => {
       setGridLoading(true);
       const { data, error } = await (supabase as unknown as SupabaseClient)
@@ -121,6 +124,7 @@ const Shop = () => {
 
   const handleSort = (value: string) => {
     setSortBy(value);
+    setShowSortDropdown(false);
   };
 
   const getSortedProducts = () => {
@@ -149,7 +153,6 @@ const Shop = () => {
         return sortedProducts.sort((a, b) => b.rating - a.rating);
       case 'popularity':
       default:
-        // 인기도는 판매량, 리뷰 수, 평점을 종합적으로 고려
         return sortedProducts.sort((a, b) => {
           const scoreA = (a.sales || 0) * 0.4 + a.reviews * 0.3 + a.rating * 0.3;
           const scoreB = (b.sales || 0) * 0.4 + b.reviews * 0.3 + b.rating * 0.3;
@@ -166,30 +169,28 @@ const Shop = () => {
     window.open(url, '_blank');
   };
 
-  // 폼 열기
   const openForm = (product?: Product) => {
     setEditingProduct(product || null);
     setFormValues(product ? { ...product } : {});
     setShowForm(true);
   };
-  // 폼 닫기
+  
   const closeForm = () => {
     setShowForm(false);
     setEditingProduct(null);
     setFormValues({});
   };
-  // 삭제 확인 모달 열기
+  
   const openDeleteConfirm = (product: Product) => {
     setDeleteTarget(product);
     setShowDeleteConfirm(true);
   };
-  // 삭제 확인 모달 닫기
+  
   const closeDeleteConfirm = () => {
     setDeleteTarget(null);
     setShowDeleteConfirm(false);
   };
 
-  // 그리드 변경 핸들러(관리자만, 적용 버튼 클릭 시)
   const handleGridApply = async () => {
     setGridCols(pendingGridCols);
     setGridLoading(true);
@@ -199,7 +200,6 @@ const Shop = () => {
     setGridLoading(false);
   };
 
-  // 상품 목록 새로고침 함수
   const refreshProducts = async () => {
     setLoading(true);
     const { data, error } = await (supabase as unknown as SupabaseClient)
@@ -213,7 +213,6 @@ const Shop = () => {
     setLoading(false);
   };
 
-  // 상품 저장(추가/수정)
   const handleFormSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormLoading(true);
@@ -234,13 +233,11 @@ const Shop = () => {
       };
       let result;
       if (editingProduct) {
-        // 수정
         result = await (supabase as unknown as SupabaseClient)
           .from('products')
           .update(payload)
           .eq('id', editingProduct.id);
       } else {
-        // 추가
         result = await (supabase as unknown as SupabaseClient)
           .from('products')
           .insert([{ ...payload, created_at: new Date().toISOString(), is_active: true }]);
@@ -263,7 +260,6 @@ const Shop = () => {
     setFormLoading(false);
   };
 
-  // 상품 삭제
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setFormLoading(true);
@@ -291,7 +287,6 @@ const Shop = () => {
     setFormLoading(false);
   };
 
-  // 할인율 자동 계산
   useEffect(() => {
     if (formValues.original_price && formValues.price && formValues.original_price > 0) {
       const discount = Math.round((1 - (Number(formValues.price) / Number(formValues.original_price))) * 100);
@@ -303,17 +298,14 @@ const Shop = () => {
     } else {
       setFormValues(v => ({ ...v, discount: 0 }));
     }
-
   }, [formValues.price, formValues.original_price]);
 
-  // 숨김/해제 핸들러
   const handleToggleHide = async (product: Product) => {
     setFormLoading(true);
     setFormError(null);
     setFormSuccess(null);
     try {
       if (hiddenProductIds.includes(product.id)) {
-        // 숨김 해제
         const { error } = await (supabase as unknown as SupabaseClient)
           .from('product_hidden')
           .delete()
@@ -321,7 +313,6 @@ const Shop = () => {
         if (error) setFormError(error.message);
         else setFormSuccess('노출되었습니다.');
       } else {
-        // 숨기기
         const { error } = await (supabase as unknown as SupabaseClient)
           .from('product_hidden')
           .upsert({ product_id: product.id });
@@ -336,7 +327,6 @@ const Shop = () => {
     setFormLoading(false);
   };
 
-  // 상품 목록 필터링
   const getVisibleProducts = () => {
     if (isAdmin) return getSortedProducts();
     return getSortedProducts().filter(p => !hiddenProductIds.includes(p.id));
@@ -347,17 +337,17 @@ const Shop = () => {
       <Header />
 
       <main>
-        {/* Hero Section */}
-        <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
+        {/* Hero Section - 모바일 최적화 */}
+        <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 sm:py-16 lg:py-20">
           <div className="container mx-auto px-4">
             <div className="text-center">
-              <h1 className="text-5xl font-bold mb-6">온라인 스토어</h1>
-              <p className="text-xl max-w-2xl mx-auto">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">온라인 스토어</h1>
+              <p className="text-base sm:text-lg lg:text-xl max-w-2xl mx-auto px-4">
                 안전하고 친환경적인 건설재료를 온라인에서 편리하게 구매하세요.
               </p>
               {isAdmin && (
                 <button
-                  className="mt-8 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 mx-auto"
+                  className="mt-6 sm:mt-8 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 mx-auto touch-manipulation"
                   onClick={() => openForm()}
                   aria-label="상품 추가"
                 >
@@ -367,15 +357,51 @@ const Shop = () => {
             </div>
           </div>
         </section>
-        {/* Products Grid */}
-        <section className="py-16">
+
+        {/* Products Grid - 모바일 최적화 */}
+        <section className="py-8 sm:py-12 lg:py-16">
           <div className="container mx-auto px-4">
-            <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex flex-wrap gap-2">
+            {/* 모바일 최적화된 컨트롤 */}
+            <div className="mb-6 sm:mb-8">
+              {/* 모바일용 정렬 드롭다운 */}
+              <div className="block sm:hidden mb-4">
+                <div className="relative">
+                  <button
+                    className="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-left flex items-center justify-between touch-manipulation"
+                    onClick={() => setShowSortDropdown(!showSortDropdown)}
+                    aria-label="정렬 방식 선택"
+                  >
+                    <span className="font-medium">
+                      {sortOptions.find(opt => opt.value === sortBy)?.label}
+                    </span>
+                    <ChevronDown className={`w-5 h-5 transition-transform ${showSortDropdown ? 'rotate-180' : ''}`} />
+                  </button>
+                  {showSortDropdown && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                      {sortOptions.map(opt => (
+                        <button
+                          key={opt.value}
+                          className="w-full px-4 py-3 text-left hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg touch-manipulation"
+                          onClick={() => handleSort(opt.value)}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* 데스크톱용 정렬 버튼들 */}
+              <div className="hidden sm:flex flex-wrap gap-2 mb-4">
                 {sortOptions.map(opt => (
                   <button
                     key={opt.value}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${sortBy === opt.value ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'}`}
+                    className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 touch-manipulation ${
+                      sortBy === opt.value 
+                        ? 'bg-blue-600 text-white shadow-md' 
+                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                    }`}
                     onClick={() => handleSort(opt.value)}
                     aria-label={opt.label}
                   >
@@ -383,11 +409,13 @@ const Shop = () => {
                   </button>
                 ))}
               </div>
+
+              {/* 관리자 그리드 설정 */}
               {isAdmin && (
-                <div className="flex items-center gap-2 ml-auto">
+                <div className="flex items-center gap-2 justify-end">
                   <label className="text-sm font-medium text-gray-700">그리드:</label>
                   <select
-                    className="border rounded px-2 py-1 text-sm"
+                    className="border rounded px-2 py-1 text-sm touch-manipulation"
                     value={pendingGridCols}
                     onChange={e => setPendingGridCols(Number(e.target.value))}
                     disabled={gridLoading}
@@ -398,35 +426,44 @@ const Shop = () => {
                     ))}
                   </select>
                   <button
-                    className="px-3 py-1 rounded bg-blue-600 text-white text-xs font-semibold disabled:opacity-50"
+                    className="px-3 py-1 rounded bg-blue-600 text-white text-xs font-semibold disabled:opacity-50 touch-manipulation"
                     onClick={handleGridApply}
                     disabled={gridLoading || pendingGridCols === gridCols}
                     aria-label="그리드 적용"
                   >
                     {gridLoading ? '적용 중...' : '적용'}
                   </button>
-                  {gridLoading && <span className="ml-2 text-xs text-blue-600">저장 중...</span>}
                 </div>
               )}
             </div>
-            <div className={`grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-${gridCols} lg:grid-cols-${gridCols}`}>
-              {(isAdmin ? getVisibleProducts() : getVisibleProducts()).map((product) => {
+
+            {/* 반응형 그리드 */}
+            <div className={`grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-${Math.min(gridCols, 3)} lg:grid-cols-${gridCols}`}>
+              {getVisibleProducts().map((product) => {
                 const isSoldOut = !product.stock_quantity || product.stock_quantity <= 0;
                 const isHidden = hiddenProductIds.includes(product.id);
                 return (
-                  <div key={product.id} className="bg-white rounded-xl shadow-lg p-4 flex flex-col group relative">
+                  <div key={product.id} className="bg-white rounded-xl shadow-lg overflow-hidden group relative">
                     {/* 뱃지 영역 */}
-                    <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+                    <div className="absolute top-3 sm:top-4 left-3 sm:left-4 flex flex-col gap-1 sm:gap-2 z-10">
                       {product.discount && (
-                        <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow">-{product.discount}%</span>
+                        <span className="bg-red-600 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-bold shadow">
+                          -{product.discount}%
+                        </span>
                       )}
                       {product.is_best && (
-                        <span className="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow">BEST</span>
+                        <span className="bg-yellow-400 text-yellow-900 px-2 sm:px-3 py-1 rounded-full text-xs font-bold shadow">
+                          BEST
+                        </span>
                       )}
                       {product.is_new && (
-                        <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow">NEW</span>
+                        <span className="bg-blue-600 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-bold shadow">
+                          NEW
+                        </span>
                       )}
                     </div>
+
+                    {/* 상품 이미지 */}
                     <div className="relative aspect-square w-full overflow-hidden">
                       <img
                         src={product.image_url}
@@ -435,15 +472,19 @@ const Shop = () => {
                         loading="lazy"
                       />
                     </div>
-                    <div className="p-6 flex flex-col flex-grow">
+
+                    {/* 상품 정보 */}
+                    <div className="p-4 sm:p-6 flex flex-col flex-grow">
                       <div className="mb-3">
-                        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
                           {product.name}
                         </h3>
                         <p className="text-gray-600 text-sm line-clamp-2 mb-3">
                           {product.description}
                         </p>
                       </div>
+
+                      {/* 평점 및 리뷰 */}
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-2">
                           <div className="flex items-center">
@@ -454,7 +495,9 @@ const Shop = () => {
                           <span className="text-sm text-gray-600">{product.reviews} 리뷰</span>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between mt-auto">
+
+                      {/* 가격 및 구매 버튼 */}
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-auto">
                         <div className="flex flex-col">
                           {product.original_price && (
                             <del className="text-sm text-gray-400">
@@ -467,7 +510,11 @@ const Shop = () => {
                         </div>
                         <button
                           onClick={() => handleProductClick(product.naver_url || '')}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 hover:scale-105 ${isSoldOut ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+                          className={`w-full sm:w-auto px-4 py-3 sm:py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 hover:scale-105 touch-manipulation ${
+                            isSoldOut 
+                              ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                              : 'bg-blue-600 hover:bg-blue-700 text-white'
+                          }`}
                           disabled={isSoldOut}
                           aria-label={isSoldOut ? '품절' : '제품 구매하기'}
                         >
@@ -476,17 +523,20 @@ const Shop = () => {
                           ) : (
                             <>
                               구매하기
-                              <ShoppingCart className="w-4 h-4 ml-1" />
+                              <ShoppingCart className="w-4 h-4" />
                             </>
                           )}
                         </button>
                       </div>
                     </div>
-                    {/* 관리자만 수정/삭제/숨기기 버튼 노출 */}
+
+                    {/* 관리자 버튼들 - 모바일 최적화 */}
                     {isAdmin && (
-                      <div className="absolute top-3 right-3 flex gap-2 z-10">
+                      <div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex flex-col sm:flex-row gap-1 sm:gap-2 z-10">
                         <button
-                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow touch-manipulation ${
+                            formLoading ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
                           onClick={() => handleToggleHide(product)}
                           title={isHidden ? '노출 해제' : '숨기기'}
                           disabled={formLoading}
@@ -495,7 +545,7 @@ const Shop = () => {
                           {isHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                         </button>
                         <button
-                          className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow"
+                          className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow touch-manipulation"
                           onClick={() => openForm(product)}
                           title="수정"
                           disabled={formLoading}
@@ -504,7 +554,7 @@ const Shop = () => {
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
-                          className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-2 shadow"
+                          className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-2 shadow touch-manipulation"
                           onClick={() => openDeleteConfirm(product)}
                           title="삭제"
                           disabled={formLoading}
@@ -522,90 +572,198 @@ const Shop = () => {
         </section>
       </main>
 
-      {/* 상품 추가/수정 모달 폼 */}
+      {/* 모바일 최적화된 상품 추가/수정 모달 */}
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full relative">
-            <button className="absolute top-4 right-4 text-gray-400 hover:text-gray-700" onClick={closeForm}><X className="w-6 h-6" /></button>
-            <h2 className="text-2xl font-bold mb-4">{editingProduct ? '상품 수정' : '상품 추가'}</h2>
-            <form className="space-y-4" onSubmit={handleFormSave}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-lg my-4 sm:my-0 relative max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white px-6 py-4 border-b flex items-center justify-between">
+              <h2 className="text-xl font-bold">{editingProduct ? '상품 수정' : '상품 추가'}</h2>
+              <button 
+                className="text-gray-400 hover:text-gray-700 p-1 touch-manipulation" 
+                onClick={closeForm}
+                aria-label="닫기"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <form className="p-6 space-y-4" onSubmit={handleFormSave}>
               <div>
-                <label className="block text-sm font-medium mb-1">상품명</label>
-                <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.name || ''} onChange={e => setFormValues(v => ({ ...v, name: e.target.value }))} />
+                <label className="block text-sm font-medium mb-2">상품명</label>
+                <input 
+                  type="text" 
+                  className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation" 
+                  value={formValues.name || ''} 
+                  onChange={e => setFormValues(v => ({ ...v, name: e.target.value }))} 
+                />
               </div>
+              
               <div>
-                <label className="block text-sm font-medium mb-1">설명</label>
-                <textarea className="w-full border px-3 py-2 rounded" value={formValues.description || ''} onChange={e => setFormValues(v => ({ ...v, description: e.target.value }))} />
+                <label className="block text-sm font-medium mb-2">설명</label>
+                <textarea 
+                  className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation min-h-[100px]" 
+                  value={formValues.description || ''} 
+                  onChange={e => setFormValues(v => ({ ...v, description: e.target.value }))} 
+                />
               </div>
+              
               <div>
-                <label className="block text-sm font-medium mb-1">이미지 URL</label>
-                <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.image_url || ''} onChange={e => setFormValues(v => ({ ...v, image_url: e.target.value }))} />
+                <label className="block text-sm font-medium mb-2">이미지 URL</label>
+                <input 
+                  type="text" 
+                  className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation" 
+                  value={formValues.image_url || ''} 
+                  onChange={e => setFormValues(v => ({ ...v, image_url: e.target.value }))} 
+                />
               </div>
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <label className="block text-sm font-medium mb-1">판매가(원)</label>
-                  <input type="number" className="w-full border px-3 py-2 rounded" value={formValues.price || ''} onChange={e => setFormValues(v => ({ ...v, price: Number(e.target.value) }))} />
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">판매가(원)</label>
+                  <input 
+                    type="number" 
+                    className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation" 
+                    value={formValues.price || ''} 
+                    onChange={e => setFormValues(v => ({ ...v, price: Number(e.target.value) }))} 
+                  />
                 </div>
-                <div className="flex-1">
-                  <label className="block text-sm font-medium mb-1">정가(원)</label>
-                  <input type="number" className="w-full border px-3 py-2 rounded" value={formValues.original_price || ''} onChange={e => setFormValues(v => ({ ...v, original_price: Number(e.target.value) }))} />
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <label className="block text-sm font-medium mb-1">할인율(%)</label>
-                  <input type="number" className="w-full border px-3 py-2 rounded bg-gray-100" value={formValues.discount || ''} readOnly tabIndex={-1} />
-                </div>
-                <div className="flex-1">
-                  <label className="block text-sm font-medium mb-1">재고</label>
-                  <input type="number" className="w-full border px-3 py-2 rounded" value={formValues.stock_quantity || ''} onChange={e => setFormValues(v => ({ ...v, stock_quantity: Number(e.target.value) }))} />
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <label className="block text-sm font-medium mb-1">평점</label>
-                  <input type="number" step="0.01" className="w-full border px-3 py-2 rounded" value={formValues.rating || ''} onChange={e => setFormValues(v => ({ ...v, rating: Number(e.target.value) }))} />
-                </div>
-                <div className="flex-1">
-                  <label className="block text-sm font-medium mb-1">리뷰 수</label>
-                  <input type="number" className="w-full border px-3 py-2 rounded" value={formValues.reviews || ''} onChange={e => setFormValues(v => ({ ...v, reviews: Number(e.target.value) }))} />
+                <div>
+                  <label className="block text-sm font-medium mb-2">정가(원)</label>
+                  <input 
+                    type="number" 
+                    className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation" 
+                    value={formValues.original_price || ''} 
+                    onChange={e => setFormValues(v => ({ ...v, original_price: Number(e.target.value) }))} 
+                  />
                 </div>
               </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">할인율(%)</label>
+                  <input 
+                    type="number" 
+                    className="w-full border border-gray-300 px-3 py-3 rounded-lg bg-gray-100 text-base" 
+                    value={formValues.discount || ''} 
+                    readOnly 
+                    tabIndex={-1} 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">재고</label>
+                  <input 
+                    type="number" 
+                    className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation" 
+                    value={formValues.stock_quantity || ''} 
+                    onChange={e => setFormValues(v => ({ ...v, stock_quantity: Number(e.target.value) }))} 
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">평점</label>
+                  <input 
+                    type="number" 
+                    step="0.01" 
+                    className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation" 
+                    value={formValues.rating || ''} 
+                    onChange={e => setFormValues(v => ({ ...v, rating: Number(e.target.value) }))} 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">리뷰 수</label>
+                  <input 
+                    type="number" 
+                    className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation" 
+                    value={formValues.reviews || ''} 
+                    onChange={e => setFormValues(v => ({ ...v, reviews: Number(e.target.value) }))} 
+                  />
+                </div>
+              </div>
+              
               <div>
-                <label className="block text-sm font-medium mb-1">네이버 스토어 URL</label>
-                <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.naver_url || ''} onChange={e => setFormValues(v => ({ ...v, naver_url: e.target.value }))} />
+                <label className="block text-sm font-medium mb-2">네이버 스토어 URL</label>
+                <input 
+                  type="text" 
+                  className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation" 
+                  value={formValues.naver_url || ''} 
+                  onChange={e => setFormValues(v => ({ ...v, naver_url: e.target.value }))} 
+                />
               </div>
-              <div className="flex gap-2">
-                <label className="inline-flex items-center gap-1">
-                  <input type="checkbox" checked={!!formValues.is_new} onChange={e => setFormValues(v => ({ ...v, is_new: e.target.checked }))} /> 신상품
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <label className="inline-flex items-center gap-2 touch-manipulation">
+                  <input 
+                    type="checkbox" 
+                    className="w-4 h-4"
+                    checked={!!formValues.is_new} 
+                    onChange={e => setFormValues(v => ({ ...v, is_new: e.target.checked }))} 
+                  /> 
+                  <span className="text-sm font-medium">신상품</span>
                 </label>
-                <label className="inline-flex items-center gap-1">
-                  <input type="checkbox" checked={!!formValues.is_best} onChange={e => setFormValues(v => ({ ...v, is_best: e.target.checked }))} /> 베스트
+                <label className="inline-flex items-center gap-2 touch-manipulation">
+                  <input 
+                    type="checkbox" 
+                    className="w-4 h-4"
+                    checked={!!formValues.is_best} 
+                    onChange={e => setFormValues(v => ({ ...v, is_best: e.target.checked }))} 
+                  /> 
+                  <span className="text-sm font-medium">베스트</span>
                 </label>
               </div>
-              <div className="flex justify-end gap-2 mt-6">
-                <button type="button" className="px-4 py-2 rounded bg-gray-200 text-gray-700" onClick={closeForm} disabled={formLoading}>취소</button>
-                <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white font-semibold disabled:opacity-50" disabled={formLoading}>{formLoading ? '저장 중...' : '저장'}</button>
+              
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <button 
+                  type="button" 
+                  className="w-full sm:w-auto px-6 py-3 rounded-lg bg-gray-200 text-gray-700 font-medium touch-manipulation" 
+                  onClick={closeForm} 
+                  disabled={formLoading}
+                >
+                  취소
+                </button>
+                <button 
+                  type="submit" 
+                  className="w-full sm:w-auto px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold disabled:opacity-50 touch-manipulation" 
+                  disabled={formLoading}
+                >
+                  {formLoading ? '저장 중...' : '저장'}
+                </button>
               </div>
-              {formError && <div className="mt-2 text-sm text-red-600">{formError}</div>}
-              {formSuccess && <div className="mt-2 text-sm text-green-700">{formSuccess}</div>}
+              
+              {formError && <div className="mt-4 text-sm text-red-600 p-3 bg-red-50 rounded-lg">{formError}</div>}
+              {formSuccess && <div className="mt-4 text-sm text-green-700 p-3 bg-green-50 rounded-lg">{formSuccess}</div>}
             </form>
           </div>
         </div>
       )}
 
-      {/* 삭제 확인 모달 */}
+      {/* 모바일 최적화된 삭제 확인 모달 */}
       {showDeleteConfirm && deleteTarget && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-8 max-w-xs w-full text-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-sm text-center p-6">
             <div className="text-lg font-bold text-red-700 mb-4">상품 삭제</div>
-            <div className="mb-6 text-gray-800">정말로 <b>{deleteTarget.name}</b> 상품을 삭제하시겠습니까?</div>
-            <div className="flex gap-4 justify-center">
-              <button onClick={closeDeleteConfirm} className="bg-gray-300 text-gray-700 px-4 py-2 rounded" disabled={formLoading}>취소</button>
-              <button className="bg-red-600 text-white px-4 py-2 rounded disabled:opacity-50" onClick={handleDelete} disabled={formLoading}>{formLoading ? '삭제 중...' : '삭제'}</button>
+            <div className="mb-6 text-gray-800">
+              정말로 <strong>{deleteTarget.name}</strong> 상품을 삭제하시겠습니까?
             </div>
-            {formError && <div className="mt-4 text-sm text-red-600">{formError}</div>}
-            {formSuccess && <div className="mt-4 text-sm text-green-700">{formSuccess}</div>}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button 
+                onClick={closeDeleteConfirm} 
+                className="w-full px-4 py-3 bg-gray-300 text-gray-700 rounded-lg font-medium touch-manipulation" 
+                disabled={formLoading}
+              >
+                취소
+              </button>
+              <button 
+                className="w-full px-4 py-3 bg-red-600 text-white rounded-lg font-medium disabled:opacity-50 touch-manipulation" 
+                onClick={handleDelete} 
+                disabled={formLoading}
+              >
+                {formLoading ? '삭제 중...' : '삭제'}
+              </button>
+            </div>
+            {formError && <div className="mt-4 text-sm text-red-600 p-3 bg-red-50 rounded-lg">{formError}</div>}
+            {formSuccess && <div className="mt-4 text-sm text-green-700 p-3 bg-green-50 rounded-lg">{formSuccess}</div>}
           </div>
         </div>
       )}
