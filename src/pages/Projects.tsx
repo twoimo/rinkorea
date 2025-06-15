@@ -342,24 +342,12 @@ const Projects = () => {
             </h2>
             <form className="space-y-4" onSubmit={handleFormSave}>
               <div>
-                <label className="block text-sm font-medium mb-1">프로젝트 유형</label>
-                <select
-                  className="w-full border px-3 py-2 rounded"
-                  value={formValues.category || 'construction'}
-                  onChange={e => setFormValues(v => ({ ...v, category: e.target.value }))}
-                  required
-                >
-                  <option value="construction">시공 실적</option>
-                  <option value="other">다양한 프로젝트</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">프로젝트명</label>
+                <label className="block text-sm font-medium mb-1">제목</label>
                 <input
                   type="text"
-                  className="w-full border px-3 py-2 rounded"
                   value={formValues.title}
-                  onChange={e => setFormValues(v => ({ ...v, title: e.target.value }))}
+                  onChange={(e) => setFormValues({ ...formValues, title: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
                   required
                 />
               </div>
@@ -367,9 +355,9 @@ const Projects = () => {
                 <label className="block text-sm font-medium mb-1">위치</label>
                 <input
                   type="text"
-                  className="w-full border px-3 py-2 rounded"
                   value={formValues.location}
-                  onChange={e => setFormValues(v => ({ ...v, location: e.target.value }))}
+                  onChange={(e) => setFormValues({ ...formValues, location: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
                   required
                 />
               </div>
@@ -377,40 +365,53 @@ const Projects = () => {
                 <label className="block text-sm font-medium mb-1">날짜</label>
                 <input
                   type="text"
-                  className="w-full border px-3 py-2 rounded"
                   value={formValues.date}
-                  onChange={e => setFormValues(v => ({ ...v, date: e.target.value }))}
+                  onChange={(e) => setFormValues({ ...formValues, date: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">이미지 URL</label>
+                <label className="block text-sm font-medium mb-1">이미지</label>
                 <input
                   type="text"
-                  className="w-full border px-3 py-2 rounded"
                   value={formValues.image}
-                  onChange={e => setFormValues(v => ({ ...v, image: e.target.value }))}
+                  onChange={(e) => setFormValues({ ...formValues, image: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
                   required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">설명</label>
                 <textarea
-                  className="w-full border px-3 py-2 rounded"
                   value={formValues.description}
-                  onChange={e => setFormValues(v => ({ ...v, description: e.target.value }))}
+                  onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
+                  rows={4}
                   required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">URL</label>
                 <input
-                  type="text"
-                  className="w-full border px-3 py-2 rounded"
+                  type="url"
                   value={formValues.url}
-                  onChange={e => setFormValues(v => ({ ...v, url: e.target.value }))}
+                  onChange={(e) => setFormValues({ ...formValues, url: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
                   required
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">카테고리</label>
+                <select
+                  value={formValues.category}
+                  onChange={(e) => setFormValues({ ...formValues, category: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
+                  required
+                >
+                  <option value="construction">시공 실적</option>
+                  <option value="other">다양한 프로젝트</option>
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">특징</label>

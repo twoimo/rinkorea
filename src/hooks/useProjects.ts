@@ -60,7 +60,7 @@ export const useProjects = () => {
                 return { error };
             }
 
-            setProjects(prev => [data, ...prev]);
+            setProjects(prev => [...prev, data]);
             return { data };
         } catch (error) {
             return { error };
