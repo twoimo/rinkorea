@@ -15,6 +15,13 @@ export function useCounter(end: number, duration: number = 2000) {
 
             if (progress < 1) {
                 animationFrame = requestAnimationFrame(animate);
+            } else {
+                // Reset animation after completion
+                setTimeout(() => {
+                    setCount(0);
+                    startTime = 0;
+                    animationFrame = requestAnimationFrame(animate);
+                }, 2000); // 1 second pause before restart
             }
         };
 
