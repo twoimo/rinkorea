@@ -34,6 +34,9 @@ const Products = () => {
   const [hiddenProductIds, setHiddenProductIds] = useState<string[]>([]);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [editingDetailImages, setEditingDetailImages] = useState<string[]>([]);
+  const [isEditingImages, setIsEditingImages] = useState(false);
+  const [newImageUrl, setNewImageUrl] = useState('');
 
   // 숨김 상품 목록 불러오기 함수
   const fetchHiddenProducts = async () => {
@@ -199,13 +202,70 @@ const Products = () => {
   // 상세 보기 다이얼로그 열기
   const openDetailDialog = (product: Product) => {
     setSelectedProduct(product);
+    setEditingDetailImages(product.detail_images || []);
+    setIsEditingImages(false);
+    setNewImageUrl('');
     setShowDetailDialog(true);
   };
 
   // 상세 보기 다이얼로그 닫기
   const closeDetailDialog = () => {
     setSelectedProduct(null);
+    setEditingDetailImages([]);
+    setIsEditingImages(false);
+    setNewImageUrl('');
     setShowDetailDialog(false);
+  };
+
+  // 이미지 추가
+  const handleAddImage = () => {
+    if (newImageUrl.trim()) {
+      setEditingDetailImages([...editingDetailImages, newImageUrl.trim()]);
+      setNewImageUrl('');
+    }
+  };
+
+  // 이미지 삭제
+  const handleRemoveImage = (index: number) => {
+    setEditingDetailImages(editingDetailImages.filter((_, i) => i !== index));
+  };
+
+  // 이미지 순서 변경
+  const handleMoveImage = (fromIndex: number, toIndex: number) => {
+    const newImages = [...editingDetailImages];
+    const [movedImage] = newImages.splice(fromIndex, 1);
+    newImages.splice(toIndex, 0, movedImage);
+    setEditingDetailImages(newImages);
+  };
+
+  // 이미지 변경사항 저장
+  const handleSaveImages = async () => {
+    if (!selectedProduct) return;
+
+    try {
+      const { error } = await (supabase as unknown as SupabaseClient)
+        .from('product_introductions')
+        .update({ detail_images: editingDetailImages })
+        .eq('id', selectedProduct.id);
+
+      if (error) {
+        console.error('Error updating images:', error);
+        return;
+      }
+
+      // 제품 목록 업데이트
+      setProducts(prevProducts =>
+        prevProducts.map(p =>
+          p.id === selectedProduct.id
+            ? { ...p, detail_images: editingDetailImages }
+            : p
+        )
+      );
+
+      setIsEditingImages(false);
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   // 보이는 상품만 필터링
@@ -455,15 +515,99 @@ const Products = () => {
           <div className="bg-white rounded-lg p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-900">{selectedProduct.name} 상세 정보</h2>
-              <button
-                onClick={closeDetailDialog}
-                className="text-gray-400 hover:text-gray-700"
-              >
-                <X className="w-6 h-6" />
-              </button>
+              <div className="flex items-center gap-4">
+                {isAdmin && (
+                  <>
+                    {isEditingImages ? (
+                      <>
+                        <button
+                          onClick={handleSaveImages}
+                          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                        >
+                          저장
+                        </button>
+                        <button
+                          onClick={() => {
+                            setEditingDetailImages(selectedProduct.detail_images || []);
+                            setIsEditingImages(false);
+                          }}
+                          className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                        >
+                          취소
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => setIsEditingImages(true)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        이미지 관리
+                      </button>
+                    )}
+                  </>
+                )}
+                <button
+                  onClick={closeDetailDialog}
+                  className="text-gray-400 hover:text-gray-700"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
             </div>
+
+            {isAdmin && isEditingImages && (
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <div className="flex gap-2 mb-4">
+                  <input
+                    type="text"
+                    value={newImageUrl}
+                    onChange={(e) => setNewImageUrl(e.target.value)}
+                    placeholder="새 이미지 URL 입력"
+                    className="flex-grow px-3 py-2 border rounded"
+                  />
+                  <button
+                    onClick={handleAddImage}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                  >
+                    추가
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {editingDetailImages.map((image, index) => (
+                    <div key={index} className="flex items-center gap-2 p-2 bg-white rounded">
+                      <span className="flex-grow truncate">{image}</span>
+                      <div className="flex gap-2">
+                        {index > 0 && (
+                          <button
+                            onClick={() => handleMoveImage(index, index - 1)}
+                            className="p-1 text-gray-600 hover:text-gray-900"
+                          >
+                            ↑
+                          </button>
+                        )}
+                        {index < editingDetailImages.length - 1 && (
+                          <button
+                            onClick={() => handleMoveImage(index, index + 1)}
+                            className="p-1 text-gray-600 hover:text-gray-900"
+                          >
+                            ↓
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleRemoveImage(index)}
+                          className="p-1 text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="space-y-6">
-              {selectedProduct.detail_images?.map((image, index) => (
+              {(isEditingImages ? editingDetailImages : selectedProduct.detail_images || []).map((image, index) => (
                 <div key={index} className="w-full">
                   <img
                     src={getImageUrl(image)}
