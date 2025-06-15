@@ -1,296 +1,594 @@
-
-import React, { memo, useState, useCallback, Suspense } from 'react';
-import { Calendar, MapPin, Building, Filter } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { useOptimizedIntersectionObserver } from '@/hooks/useOptimizedIntersectionObserver';
-import { OptimizedImage } from '@/components/ui/image';
-import MobileOptimizedModal from '@/components/ui/mobile-optimized-modal';
-import OptimizedButton from '@/components/ui/optimized-button';
+import { ExternalLink, Calendar, MapPin, Plus, Edit2, Trash2, X, Save, Eye, EyeOff } from 'lucide-react';
+import { useProjects, type Project } from '@/hooks/useProjects';
+import { useUserRole } from '@/hooks/useUserRole';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import AutoScrollGrid from '@/components/AutoScrollGrid';
+import { useCounter } from '@/hooks/useCounter';
 
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  location: string;
-  date: string;
-  category: string;
-  images: string[];
-  details?: string;
-}
+const Projects = () => {
+  const { projects, loading, createProject, updateProject, deleteProject } = useProjects();
+  const { isAdmin } = useUserRole();
+  const { toast } = useToast();
+  const [showForm, setShowForm] = useState(false);
+  const [editingProject, setEditingProject] = useState<string | null>(null);
+  const [formValues, setFormValues] = useState({
+    title: '',
+    location: '',
+    date: '',
+    image: '',
+    description: '',
+    url: '',
+    features: [''],
+    category: 'construction'
+  });
+  const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [formSuccess, setFormSuccess] = useState<string | null>(null);
+  const [hiddenProjectIds, setHiddenProjectIds] = useState<string[]>([]);
 
-const ProjectCard = memo(({ project, index, onViewDetails }: { 
-  project: Project; 
-  index: number;
-  onViewDetails: (project: Project) => void;
-}) => {
-  const { targetRef, isIntersecting } = useOptimizedIntersectionObserver();
+  const projectCount = useCounter(1000);
+  const satisfactionRate = useCounter(100);
+  const yearsOfExperience = useCounter(12);
 
-  const getCategoryColor = (category: string) => {
-    switch (category.toLowerCase()) {
-      case 'commercial':
-        return 'bg-blue-100 text-blue-800';
-      case 'industrial':
-        return 'bg-green-100 text-green-800';
-      case 'residential':
-        return 'bg-purple-100 text-purple-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  // 숨김 프로젝트 목록 불러오기
+  const fetchHiddenProjects = async () => {
+    const { data, error } = await (supabase as unknown as SupabaseClient)
+      .from('project_hidden')
+      .select('project_id');
+    if (!error && data) {
+      setHiddenProjectIds(data.map((h: { project_id: string }) => h.project_id));
     }
   };
 
-  return (
-    <div 
-      ref={targetRef}
-      className={`transition-all duration-700 transform ${
-        isIntersecting ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-      }`}
-      style={{ transitionDelay: `${index * 100}ms` }}
-    >
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow group">
-        <div className="relative aspect-video overflow-hidden">
-          <Suspense fallback={<LoadingSpinner />}>
-            <OptimizedImage
-              src={project.images[0]}
-              alt={project.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              loading="lazy"
-            />
-          </Suspense>
-          <div className="absolute top-4 left-4">
-            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(project.category)}`}>
-              {project.category}
-            </span>
-          </div>
-        </div>
-        
-        <div className="p-4 sm:p-6">
-          <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 line-clamp-2">
-            {project.title}
-          </h3>
-          <p className="text-sm sm:text-base text-gray-600 mb-4 leading-relaxed line-clamp-2">
-            {project.description}
-          </p>
-          
-          <div className="space-y-2 mb-4">
-            <div className="flex items-center text-sm text-gray-500">
-              <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
-              <span className="truncate">{project.location}</span>
-            </div>
-            <div className="flex items-center text-sm text-gray-500">
-              <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
-              <span>{new Date(project.date).toLocaleDateString('ko-KR')}</span>
-            </div>
-          </div>
-          
-          <OptimizedButton
-            onClick={() => onViewDetails(project)}
-            className="w-full"
-            size="sm"
-          >
-            프로젝트 상세보기
-          </OptimizedButton>
-        </div>
-      </div>
-    </div>
-  );
-});
+  useEffect(() => {
+    fetchHiddenProjects();
+  }, []);
 
-ProjectCard.displayName = 'ProjectCard';
-
-const Projects = memo(() => {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-
-  const [projects] = useState<Project[]>([
-    {
-      id: '1',
-      title: '현대건설기계 군산공장 세라믹 코팅',
-      description: '대규모 산업시설의 방화 코팅 작업을 성공적으로 완료했습니다.',
-      location: '전북 군산시',
-      date: '2024-03-15',
-      category: 'industrial',
-      images: ['/images/현대건설기계 군산공장001.jpg', '/images/현대건설기계 군산공장002.jpg'],
-      details: '총 시공면적 15,000㎡에 달하는 대규모 프로젝트로, 고온 환경에서의 방화 성능을 요구하는 산업시설에 최적화된 세라믹 코팅을 적용했습니다.'
-    },
-    {
-      id: '2',
-      title: '인하대 CGV타워 린코트 시공',
-      description: '복합문화시설의 안전성 강화를 위한 세라믹 코팅 프로젝트입니다.',
-      location: '인천광역시',
-      date: '2024-02-20',
-      category: 'commercial',
-      images: ['/images/인하대 CGV타워 린코트  (5).jpeg'],
-      details: '다중이용시설의 화재 안전성을 높이기 위해 린코트 제품을 사용한 전면 코팅 작업을 진행했습니다.'
-    },
-    {
-      id: '3',
-      title: '순창농협창고 신축공사',
-      description: '농업시설의 화재 방지를 위한 전문 코팅 솔루션을 제공했습니다.',
-      location: '전북 순창군',
-      date: '2024-01-10',
-      category: 'commercial',
-      images: ['/images/순창농협창고동신축 (4).jpeg'],
-      details: '농산물 저장시설의 특성을 고려한 맞춤형 세라믹 코팅으로 화재 위험을 최소화했습니다.'
+  // 숨김/해제 핸들러
+  const handleToggleHide = async (projectId: string) => {
+    setFormLoading(true);
+    setFormError(null);
+    setFormSuccess(null);
+    try {
+      if (hiddenProjectIds.includes(projectId)) {
+        // 숨김 해제
+        const { error } = await (supabase as unknown as SupabaseClient)
+          .from('project_hidden')
+          .delete()
+          .eq('project_id', projectId);
+        if (error) setFormError(error.message);
+        else setFormSuccess('노출되었습니다.');
+      } else {
+        // 숨기기
+        const { error } = await (supabase as unknown as SupabaseClient)
+          .from('project_hidden')
+          .upsert({ project_id: projectId });
+        if (error) setFormError(error.message);
+        else setFormSuccess('숨김 처리되었습니다.');
+      }
+      await fetchHiddenProjects();
+      setTimeout(() => setFormSuccess(null), 700);
+    } catch (e) {
+      setFormError(e instanceof Error ? e.message : String(e));
     }
-  ]);
+    setFormLoading(false);
+  };
 
-  const categories = [
-    { value: 'all', label: '전체' },
-    { value: 'industrial', label: '산업시설' },
-    { value: 'commercial', label: '상업시설' },
-    { value: 'residential', label: '주거시설' }
-  ];
+  // 폼 열기
+  const openForm = (project?: Project) => {
+    if (project) {
+      setEditingProject(project.id);
+      setFormValues({
+        title: project.title,
+        location: project.location,
+        date: project.date,
+        image: project.image,
+        description: project.description,
+        url: project.url,
+        features: project.features.length > 0 ? project.features : [''],
+        category: project.category || 'construction'
+      });
+    } else {
+      setEditingProject(null);
+      setFormValues({
+        title: '',
+        location: '',
+        date: '',
+        image: '',
+        description: '',
+        url: '',
+        features: [''],
+        category: 'construction'
+      });
+    }
+    setShowForm(true);
+  };
 
-  const filteredProjects = selectedCategory === 'all' 
-    ? projects 
-    : projects.filter(project => project.category === selectedCategory);
+  // 폼 닫기
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingProject(null);
+    setFormValues({
+      title: '',
+      location: '',
+      date: '',
+      image: '',
+      description: '',
+      url: '',
+      features: [''],
+      category: 'construction'
+    });
+    setFormError(null);
+    setFormSuccess(null);
+  };
 
-  const handleViewDetails = useCallback((project: Project) => {
-    setSelectedProject(project);
-    setShowDetails(true);
-  }, []);
+  const handleFormSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormLoading(true);
+    setFormError(null);
+    setFormSuccess(null);
 
-  const handleCloseDetails = useCallback(() => {
-    setShowDetails(false);
-    setSelectedProject(null);
-  }, []);
+    try {
+      const payload = {
+        ...formValues,
+        features: formValues.features.filter(f => f.trim() !== '')
+      };
+
+      let result;
+      if (editingProject) {
+        result = await updateProject(editingProject, payload);
+      } else {
+        result = await createProject(payload);
+      }
+
+      if (result.error) {
+        setFormError(result.error.message);
+      } else {
+        setFormSuccess('저장되었습니다.');
+        setTimeout(() => {
+          closeForm();
+        }, 700);
+      }
+    } catch (e) {
+      setFormError(e instanceof Error ? e.message : String(e));
+    }
+    setFormLoading(false);
+  };
+
+  const handleDeleteProject = async (id: string) => {
+    if (!window.confirm('정말로 이 프로젝트를 삭제하시겠습니까?')) return;
+
+    const { error } = await deleteProject(id);
+    if (error) {
+      toast({
+        title: 'Error',
+        description: '프로젝트 삭제에 실패했습니다.',
+        variant: 'destructive'
+      });
+    } else {
+      toast({
+        title: 'Success',
+        description: '프로젝트가 삭제되었습니다.'
+      });
+    }
+  };
+
+  const addFeature = () => {
+    setFormValues(prev => ({
+      ...prev,
+      features: [...prev.features, '']
+    }));
+  };
+
+  const updateFeature = (index: number, value: string) => {
+    setFormValues(prev => ({
+      ...prev,
+      features: prev.features.map((f, i) => i === index ? value : f)
+    }));
+  };
+
+  const removeFeature = (index: number) => {
+    setFormValues(prev => ({
+      ...prev,
+      features: prev.features.filter((_, i) => i !== index)
+    }));
+  };
+
+  // 프로젝트 목록 필터링
+  const getVisibleProjects = () => {
+    if (isAdmin) return projects;
+    return projects.filter(p => !hiddenProjectIds.includes(p.id));
+  };
+
+  const getImageUrl = (imagePath: string) => {
+    if (imagePath.includes('://') || imagePath.startsWith('@')) return imagePath;
+    return `/images/${imagePath}`;
+  };
 
   return (
     <div className="min-h-screen bg-white">
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 sm:py-16 lg:py-20">
+      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 lg:mb-6">
-              시공사례
-            </h1>
-            <p className="text-lg sm:text-xl max-w-3xl mx-auto leading-relaxed">
-              린코리아의 전문 기술력으로 완성된 <br className="hidden sm:inline" />
-              다양한 세라믹 코팅 프로젝트를 확인하세요.
+            <h1 className="text-5xl font-bold mb-6">시공사례</h1>
+            <p className="text-xl max-w-2xl mx-auto">
+              린코리아의 린코트가 적용된 다양한 프로젝트를 통해 <br />
+              우수한 품질과 성능을 확인하세요.
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Filter Section */}
-      <section className="py-8 bg-gray-50 sticky top-0 z-10">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center text-gray-700">
-              <Filter className="w-5 h-5 mr-2" />
-              <span className="font-medium">카테고리:</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <button
-                  key={category.value}
-                  onClick={() => setSelectedCategory(category.value)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors touch-manipulation ${
-                    selectedCategory === category.value
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  {category.label}
-                </button>
-              ))}
-            </div>
+            {isAdmin && (
+              <button
+                className="mt-8 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 mx-auto"
+                onClick={() => openForm()}
+                aria-label="프로젝트 추가"
+              >
+                <Plus className="w-5 h-5" /> 프로젝트 추가
+              </button>
+            )}
           </div>
         </div>
       </section>
 
       {/* Projects Grid */}
-      <section className="py-12 sm:py-16 lg:py-20">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {filteredProjects.map((project, index) => (
-              <ProjectCard 
-                key={project.id} 
-                project={project} 
-                index={index}
-                onViewDetails={handleViewDetails}
-              />
-            ))}
-          </div>
-          
-          {filteredProjects.length === 0 && (
-            <div className="text-center py-12">
-              <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-medium text-gray-600 mb-2">
-                해당 카테고리의 프로젝트가 없습니다
-              </h3>
-              <p className="text-gray-500">다른 카테고리를 선택해보세요.</p>
-            </div>
-          )}
+      <section className="py-20">
+        <div className="w-full">
+          <AutoScrollGrid
+            items={getVisibleProjects().filter(p => p.category === 'construction')}
+            itemsPerRow={4}
+            renderItem={(project) => {
+              const isHidden = hiddenProjectIds.includes(project.id);
+              return (
+                <div className="bg-white rounded-xl shadow-lg overflow-hidden group relative w-full">
+                  <div className="relative aspect-video overflow-hidden">
+                    <img
+                      src={getImageUrl(project.image)}
+                      alt={project.title}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 select-none pointer-events-none"
+                      loading="lazy"
+                      width={800}
+                      height={450}
+                      style={{ maxWidth: '100%', maxHeight: '450px' }}
+                    />
+                    {isAdmin && (
+                      <div className="absolute top-3 right-3 flex gap-2 z-10">
+                        <button
+                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          onClick={() => handleToggleHide(project.id)}
+                          title={isHidden ? '노출 해제' : '숨기기'}
+                          disabled={formLoading}
+                          aria-label={isHidden ? '노출 해제' : '숨기기'}
+                        >
+                          {isHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                        </button>
+                        <button
+                          className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow"
+                          onClick={() => openForm(project)}
+                          title="수정"
+                          aria-label="수정"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-2 shadow"
+                          onClick={() => handleDeleteProject(project.id)}
+                          title="삭제"
+                          aria-label="삭제"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
+                    <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        {project.location}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        {project.date}
+                      </div>
+                    </div>
+                    <p className="text-gray-600 mb-4">{project.description}</p>
+                    <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+                      {project.features.map((feature, index) => (
+                        <span
+                          key={index}
+                          className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm whitespace-nowrap flex-shrink-0"
+                        >
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      자세히 보기
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </div>
+                </div>
+              );
+            }}
+          />
         </div>
       </section>
 
-      {/* Project Details Modal */}
-      <MobileOptimizedModal
-        isOpen={showDetails}
-        onClose={handleCloseDetails}
-        title={selectedProject?.title || ''}
-        maxWidth="xl"
-      >
-        {selectedProject && (
-          <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {selectedProject.images.map((image, index) => (
-                <Suspense key={index} fallback={<LoadingSpinner />}>
-                  <OptimizedImage
-                    src={image}
-                    alt={`${selectedProject.title} - ${index + 1}`}
-                    className="w-full h-48 object-cover rounded-lg"
-                    loading="lazy"
-                  />
-                </Suspense>
-              ))}
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center">
-                <MapPin className="w-5 h-5 text-gray-500 mr-2" />
-                <div>
-                  <div className="text-sm text-gray-500">위치</div>
-                  <div className="font-medium">{selectedProject.location}</div>
+      {/* 프로젝트 추가/수정 모달 폼 */}
+      {showForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full relative">
+            <button
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700"
+              onClick={closeForm}
+              aria-label="닫기"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <h2 className="text-2xl font-bold mb-4">
+              {editingProject ? '프로젝트 수정' : '프로젝트 추가'}
+            </h2>
+            <form className="space-y-4" onSubmit={handleFormSave}>
+              <div>
+                <label className="block text-sm font-medium mb-1">제목</label>
+                <input
+                  type="text"
+                  value={formValues.title}
+                  onChange={(e) => setFormValues({ ...formValues, title: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">위치</label>
+                <input
+                  type="text"
+                  value={formValues.location}
+                  onChange={(e) => setFormValues({ ...formValues, location: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">날짜</label>
+                <input
+                  type="text"
+                  value={formValues.date}
+                  onChange={(e) => setFormValues({ ...formValues, date: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">이미지</label>
+                <input
+                  type="text"
+                  value={formValues.image}
+                  onChange={(e) => setFormValues({ ...formValues, image: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">설명</label>
+                <textarea
+                  value={formValues.description}
+                  onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
+                  rows={4}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">URL</label>
+                <input
+                  type="url"
+                  value={formValues.url}
+                  onChange={(e) => setFormValues({ ...formValues, url: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">카테고리</label>
+                <select
+                  value={formValues.category}
+                  onChange={(e) => setFormValues({ ...formValues, category: e.target.value })}
+                  className="w-full border px-3 py-2 rounded"
+                  required
+                >
+                  <option value="construction">시공 실적</option>
+                  <option value="other">다양한 프로젝트</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">특징</label>
+                <div className="space-y-2">
+                  {formValues.features.map((feature, index) => (
+                    <div key={index} className="flex gap-2">
+                      <input
+                        type="text"
+                        className="flex-1 border px-3 py-2 rounded"
+                        value={feature}
+                        onChange={e => updateFeature(index, e.target.value)}
+                        placeholder="특징 입력"
+                      />
+                      <button
+                        type="button"
+                        className="px-3 py-2 text-red-600 hover:text-red-700"
+                        onClick={() => removeFeature(index)}
+                        aria-label="특징 삭제"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1"
+                    onClick={addFeature}
+                  >
+                    <Plus className="w-4 h-4" /> 특징 추가
+                  </button>
                 </div>
               </div>
-              <div className="flex items-center">
-                <Calendar className="w-5 h-5 text-gray-500 mr-2" />
-                <div>
-                  <div className="text-sm text-gray-500">완료일</div>
-                  <div className="font-medium">
-                    {new Date(selectedProject.date).toLocaleDateString('ko-KR')}
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-3">프로젝트 설명</h4>
-              <p className="text-gray-600 leading-relaxed mb-4">
-                {selectedProject.description}
-              </p>
-              {selectedProject.details && (
-                <p className="text-gray-600 leading-relaxed">
-                  {selectedProject.details}
-                </p>
+              {formError && (
+                <div className="text-red-600 text-sm">{formError}</div>
               )}
+              {formSuccess && (
+                <div className="text-green-600 text-sm">{formSuccess}</div>
+              )}
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  className="px-4 py-2 text-gray-600 hover:text-gray-700"
+                  onClick={closeForm}
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                  disabled={formLoading}
+                >
+                  {formLoading ? '저장 중...' : '저장'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Stats Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">시공 실적</h2>
+            <p className="text-xl text-gray-600">
+              다양한 분야에서 인정받는 린코리아의 기술력
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="text-4xl font-bold text-blue-600 mb-2">{projectCount}+</div>
+              <div className="text-gray-600">시공 프로젝트</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-green-600 mb-2">{satisfactionRate}%</div>
+              <div className="text-gray-600">고객 만족도</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-purple-600 mb-2">{yearsOfExperience}+</div>
+              <div className="text-gray-600">린코리아 제품군</div>
             </div>
           </div>
-        )}
-      </MobileOptimizedModal>
+        </div>
+      </section>
+
+      {/* 다양한 프로젝트 섹션 */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">다양한 프로젝트</h2>
+            <p className="text-xl text-gray-600">
+              린코리아의 프로젝트 사례
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {getVisibleProjects()
+              .filter(p => p.category === 'other')
+              .map((project) => (
+                <div key={project.id} className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300">
+                  <div className="relative aspect-video overflow-hidden">
+                    <img
+                      src={getImageUrl(project.image)}
+                      alt={project.title}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    {isAdmin && (
+                      <div className="absolute top-3 right-3 flex gap-2 z-10">
+                        <button
+                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          onClick={() => handleToggleHide(project.id)}
+                          title={hiddenProjectIds.includes(project.id) ? '노출 해제' : '숨기기'}
+                          disabled={formLoading}
+                          aria-label={hiddenProjectIds.includes(project.id) ? '노출 해제' : '숨기기'}
+                        >
+                          {hiddenProjectIds.includes(project.id) ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                        </button>
+                        <button
+                          className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow"
+                          onClick={() => openForm(project)}
+                          title="수정"
+                          aria-label="수정"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-2 shadow"
+                          onClick={() => handleDeleteProject(project.id)}
+                          title="삭제"
+                          aria-label="삭제"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
+                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        <span>{project.location}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        <span>{project.date}</span>
+                      </div>
+                    </div>
+                    <p className="text-gray-600 mb-4">{project.description}</p>
+                    <div className="flex gap-2 mb-4">
+                      {project.features.map((feature, index) => (
+                        <span key={index} className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      자세히 보기
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      </section>
 
       <Footer />
     </div>
   );
-});
-
-Projects.displayName = 'Projects';
+};
 
 export default Projects;
