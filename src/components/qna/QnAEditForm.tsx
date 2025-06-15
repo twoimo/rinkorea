@@ -20,7 +20,7 @@ interface Inquiry {
 interface QnAEditFormProps {
   inquiry: Inquiry;
   onClose: () => void;
-  onSave: (id: string, data: any) => Promise<void>;
+  onSave: (id: string, data: any) => Promise<{ data?: any; error?: any }>;
   onRefetch: () => Promise<void>;
 }
 
@@ -40,7 +40,7 @@ const QnAEditForm: React.FC<QnAEditFormProps> = ({
   });
 
   const handleSave = async () => {
-    await onSave(inquiry.id, {
+    const result = await onSave(inquiry.id, {
       name: editFormData.name,
       email: editFormData.email,
       phone: editFormData.phone,
@@ -48,8 +48,11 @@ const QnAEditForm: React.FC<QnAEditFormProps> = ({
       content: editFormData.content,
       is_private: editFormData.is_private
     });
-    await onRefetch();
-    onClose();
+    
+    if (!result.error) {
+      await onRefetch();
+      onClose();
+    }
   };
 
   return (
