@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -11,6 +10,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import AutoScrollGrid from '@/components/AutoScrollGrid';
 import { useCounter } from '@/hooks/useCounter';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const Projects = () => {
   const { projects, loading, createProject, updateProject, deleteProject } = useProjects();
@@ -332,8 +332,8 @@ const Projects = () => {
       {/* Mobile Optimized Modal Form */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
-          <div className={`bg-white rounded-lg shadow-lg relative w-full ${isMobile ? 'max-h-[90vh] overflow-y-auto' : 'max-w-lg'}`}>
-            <div className="sticky top-0 bg-white border-b p-4 sm:p-6 flex items-center justify-between">
+          <div className={`bg-white rounded-lg shadow-lg relative w-full ${isMobile ? 'max-h-[90vh]' : 'max-w-lg max-h-[85vh]'}`}>
+            <div className="sticky top-0 bg-white border-b p-4 sm:p-6 flex items-center justify-between z-10">
               <h2 className="text-xl sm:text-2xl font-bold">
                 {editingProject ? '프로젝트 수정' : '프로젝트 추가'}
               </h2>
@@ -346,133 +346,135 @@ const Projects = () => {
               </button>
             </div>
             
-            <form className="p-4 sm:p-6 space-y-4" onSubmit={handleFormSave}>
-              <div>
-                <label className="block text-sm font-medium mb-2">제목</label>
-                <input
-                  type="text"
-                  value={formValues.title}
-                  onChange={(e) => setFormValues({ ...formValues, title: e.target.value })}
-                  className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">위치</label>
-                <input
-                  type="text"
-                  value={formValues.location}
-                  onChange={(e) => setFormValues({ ...formValues, location: e.target.value })}
-                  className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">날짜</label>
-                <input
-                  type="text"
-                  value={formValues.date}
-                  onChange={(e) => setFormValues({ ...formValues, date: e.target.value })}
-                  className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">이미지</label>
-                <input
-                  type="text"
-                  value={formValues.image}
-                  onChange={(e) => setFormValues({ ...formValues, image: e.target.value })}
-                  className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">설명</label>
-                <textarea
-                  value={formValues.description}
-                  onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
-                  className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                  rows={4}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">URL</label>
-                <input
-                  type="url"
-                  value={formValues.url}
-                  onChange={(e) => setFormValues({ ...formValues, url: e.target.value })}
-                  className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">카테고리</label>
-                <select
-                  value={formValues.category}
-                  onChange={(e) => setFormValues({ ...formValues, category: e.target.value })}
-                  className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                >
-                  <option value="construction">시공 실적</option>
-                  <option value="other">다양한 프로젝트</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">특징</label>
-                <div className="space-y-3">
-                  {formValues.features.map((feature, index) => (
-                    <div key={index} className="flex gap-2">
-                      <input
-                        type="text"
-                        className="flex-1 border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        value={feature}
-                        onChange={e => updateFeature(index, e.target.value)}
-                        placeholder="특징 입력"
-                      />
-                      <button
-                        type="button"
-                        className="px-3 py-3 text-red-600 hover:text-red-700 touch-manipulation"
-                        onClick={() => removeFeature(index)}
-                        aria-label="특징 삭제"
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                    </div>
-                  ))}
+            <ScrollArea className="flex-1 overflow-hidden">
+              <form className="p-4 sm:p-6 space-y-4" onSubmit={handleFormSave}>
+                <div>
+                  <label className="block text-sm font-medium mb-2">제목</label>
+                  <input
+                    type="text"
+                    value={formValues.title}
+                    onChange={(e) => setFormValues({ ...formValues, title: e.target.value })}
+                    className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">위치</label>
+                  <input
+                    type="text"
+                    value={formValues.location}
+                    onChange={(e) => setFormValues({ ...formValues, location: e.target.value })}
+                    className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">날짜</label>
+                  <input
+                    type="text"
+                    value={formValues.date}
+                    onChange={(e) => setFormValues({ ...formValues, date: e.target.value })}
+                    className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">이미지</label>
+                  <input
+                    type="text"
+                    value={formValues.image}
+                    onChange={(e) => setFormValues({ ...formValues, image: e.target.value })}
+                    className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">설명</label>
+                  <textarea
+                    value={formValues.description}
+                    onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
+                    className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    rows={4}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">URL</label>
+                  <input
+                    type="url"
+                    value={formValues.url}
+                    onChange={(e) => setFormValues({ ...formValues, url: e.target.value })}
+                    className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">카테고리</label>
+                  <select
+                    value={formValues.category}
+                    onChange={(e) => setFormValues({ ...formValues, category: e.target.value })}
+                    className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="construction">시공 실적</option>
+                    <option value="other">다양한 프로젝트</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">특징</label>
+                  <div className="space-y-3">
+                    {formValues.features.map((feature, index) => (
+                      <div key={index} className="flex gap-2">
+                        <input
+                          type="text"
+                          className="flex-1 border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          value={feature}
+                          onChange={e => updateFeature(index, e.target.value)}
+                          placeholder="특징 입력"
+                        />
+                        <button
+                          type="button"
+                          className="px-3 py-3 text-red-600 hover:text-red-700 touch-manipulation"
+                          onClick={() => removeFeature(index)}
+                          aria-label="특징 삭제"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 py-2 touch-manipulation"
+                      onClick={addFeature}
+                    >
+                      <Plus className="w-4 h-4" /> 특징 추가
+                    </button>
+                  </div>
+                </div>
+                {formError && (
+                  <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">{formError}</div>
+                )}
+                {formSuccess && (
+                  <div className="text-green-600 text-sm bg-green-50 p-3 rounded-lg">{formSuccess}</div>
+                )}
+                <div className="flex flex-col sm:flex-row gap-3 pt-4">
                   <button
                     type="button"
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 py-2 touch-manipulation"
-                    onClick={addFeature}
+                    className="flex-1 px-4 py-3 text-gray-600 hover:text-gray-700 border border-gray-300 rounded-lg touch-manipulation"
+                    onClick={closeForm}
                   >
-                    <Plus className="w-4 h-4" /> 특징 추가
+                    취소
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 touch-manipulation"
+                    disabled={formLoading}
+                  >
+                    {formLoading ? '저장 중...' : '저장'}
                   </button>
                 </div>
-              </div>
-              {formError && (
-                <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">{formError}</div>
-              )}
-              {formSuccess && (
-                <div className="text-green-600 text-sm bg-green-50 p-3 rounded-lg">{formSuccess}</div>
-              )}
-              <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <button
-                  type="button"
-                  className="flex-1 px-4 py-3 text-gray-600 hover:text-gray-700 border border-gray-300 rounded-lg touch-manipulation"
-                  onClick={closeForm}
-                >
-                  취소
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 touch-manipulation"
-                  disabled={formLoading}
-                >
-                  {formLoading ? '저장 중...' : '저장'}
-                </button>
-              </div>
-            </form>
+              </form>
+            </ScrollArea>
           </div>
         </div>
       )}
