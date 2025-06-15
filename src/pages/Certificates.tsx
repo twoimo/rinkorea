@@ -6,6 +6,7 @@ import { Award, FileText, Shield, CheckCircle, Plus, Edit, Trash2, X, EyeOff, Ey
 import { supabase } from '../integrations/supabase/client';
 import { useUserRole } from '../hooks/useUserRole';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { useIsMobile } from '../hooks/use-mobile';
 
 interface Certificate {
   id: string;
@@ -31,6 +32,7 @@ const Certificates = () => {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
   const { isAdmin } = useUserRole();
+  const isMobile = useIsMobile();
   const [showForm, setShowForm] = useState(false);
   const [editingCertificate, setEditingCertificate] = useState<Certificate | null>(null);
   const [formValues, setFormValues] = useState<Partial<Certificate>>({});
@@ -45,19 +47,19 @@ const Certificates = () => {
     {
       name: "특허 등록증",
       type: "특허",
-      icon: <Award className="w-8 h-8 text-yellow-600" />,
+      icon: <Award className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-600" />,
       description: "1액형 세라믹 제조기술에 대한 특허 등록으로 기술력을 인정받았습니다."
     },
     {
       name: "불연재 인증",
       type: "성적서",
-      icon: <Shield className="w-8 h-8 text-blue-600" />,
+      icon: <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />,
       description: "안전한 순수 무기질 세라믹 코팅제입니다"
     },
     {
       name: "품질시험성적서",
       type: "시험성적서",
-      icon: <FileText className="w-8 h-8 text-green-600" />,
+      icon: <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />,
       description: "공인시험기관에서 실시한 각종 품질 시험 결과를 확인할 수 있습니다."
     }
   ];
@@ -291,19 +293,19 @@ const Certificates = () => {
     <div className="min-h-screen bg-white">
       <Header />
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
+      {/* Hero Section - Mobile Optimized */}
+      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 sm:py-20">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <h1 className="text-5xl font-bold mb-6">시험성적서/인증</h1>
-            <p className="text-xl max-w-2xl mx-auto">
-              린코리아 제품의 우수한 품질과 안전성을 증명하는 <br />
+            <h1 className="text-3xl sm:text-5xl font-bold mb-4 sm:mb-6">시험성적서/인증</h1>
+            <p className="text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
+              린코리아 제품의 우수한 품질과 안전성을 증명하는 <br className="hidden sm:block" />
               각종 인증서와 시험성적서를 확인하세요.
             </p>
             {isAdmin && (
               <button
                 onClick={() => openForm()}
-                className="mt-8 bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors flex items-center mx-auto"
+                className="mt-6 sm:mt-8 bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors flex items-center mx-auto touch-manipulation"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 인증서 추가
@@ -313,43 +315,43 @@ const Certificates = () => {
         </div>
       </section>
 
-      {/* Certificates Grid */}
-      <section className="py-20">
+      {/* Certificates Grid - Mobile Optimized */}
+      <section className="py-12 sm:py-20">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
             {certificateTypes.map((cert, index) => (
-              <div key={index} className="bg-white p-8 rounded-lg shadow-lg border hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <div className="flex items-center mb-6">
-                  <div className="bg-gray-50 p-3 rounded-full mr-4">
+              <div key={index} className="bg-white p-6 sm:p-8 rounded-lg shadow-lg border hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div className="flex items-center mb-4 sm:mb-6">
+                  <div className="bg-gray-50 p-2 sm:p-3 rounded-full mr-3 sm:mr-4 flex-shrink-0">
                     {cert.icon}
                   </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900">{cert.name}</h3>
-                    <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{cert.type}</span>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">{cert.name}</h3>
+                    <span className="text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded whitespace-nowrap">{cert.type}</span>
                   </div>
                 </div>
-                <p className="text-gray-600">{cert.description}</p>
+                <p className="text-sm sm:text-base text-gray-600">{cert.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Patents and Trademarks */}
-      <section className="py-20 bg-gray-50">
+      {/* Patents and Trademarks - Mobile Optimized */}
+      <section className="py-12 sm:py-20 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">특허 및 상표 등록증</h2>
-            <p className="text-xl text-gray-600">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">특허 및 상표 등록증</h2>
+            <p className="text-lg sm:text-xl text-gray-600">
               린코리아의 기술력과 브랜드를 보증하는 공식 문서들
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
             {certificates
               .filter(cert => cert.category === 'patent' && (!hiddenCertificateIds.includes(cert.id) || isAdmin))
               .map((cert, index) => (
-                <div key={index} className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                <div key={index} className={`bg-white p-4 sm:p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow ${hiddenCertificateIds.includes(cert.id) && isAdmin ? 'opacity-50' : ''}`}>
                   <div className="relative">
                     <div
                       className="cursor-pointer"
@@ -359,13 +361,14 @@ const Certificates = () => {
                         src={cert.image_url}
                         alt={cert.name}
                         className="w-full aspect-[1/1.4142] object-contain rounded-lg mb-4 border hover:border-blue-300 transition-colors"
+                        loading="lazy"
                       />
                     </div>
                     {isAdmin && (
-                      <div className="absolute top-2 right-2 flex space-x-2">
+                      <div className={`absolute top-2 right-2 flex gap-2 z-10 ${isMobile ? 'flex-col' : 'flex-row'}`}>
                         <button
                           onClick={() => handleToggleHide(cert)}
-                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-3 sm:p-2 shadow touch-manipulation ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                           title={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
                           disabled={formLoading}
                           aria-label={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
@@ -378,45 +381,45 @@ const Certificates = () => {
                         </button>
                         <button
                           onClick={() => openForm(cert)}
-                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                          className="bg-white p-3 sm:p-2 rounded-full hover:bg-gray-100 transition-colors touch-manipulation"
                         >
-                          <Edit className="w-5 h-5 text-blue-600" />
+                          <Edit className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                         </button>
                         <button
                           onClick={() => {
                             setDeleteTarget(cert);
                             setShowDeleteConfirm(true);
                           }}
-                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                          className="bg-white p-3 sm:p-2 rounded-full hover:bg-gray-100 transition-colors touch-manipulation"
                         >
-                          <Trash2 className="w-5 h-5 text-red-600" />
+                          <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
                         </button>
                       </div>
                     )}
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2 text-center">{cert.name}</h3>
-                  <p className="text-sm text-gray-500 text-center">클릭하여 확대보기</p>
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2 text-center">{cert.name}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 text-center">클릭하여 확대보기</p>
                 </div>
               ))}
           </div>
         </div>
       </section>
 
-      {/* Test Reports */}
-      <section className="py-20">
+      {/* Test Reports - Mobile Optimized */}
+      <section className="py-12 sm:py-20">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">RIN-COAT 시험성적서</h2>
-            <p className="text-xl text-gray-600">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">RIN-COAT 시험성적서</h2>
+            <p className="text-lg sm:text-xl text-gray-600">
               공인시험기관에서 실시한 품질 시험 결과 전체 문서
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
             {certificates
               .filter(cert => cert.category === 'certification' && (!hiddenCertificateIds.includes(cert.id) || isAdmin))
               .map((cert, index) => (
-                <div key={index} className={`bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow ${hiddenCertificateIds.includes(cert.id) ? 'opacity-50' : ''}`}>
+                <div key={index} className={`bg-white p-3 sm:p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow ${hiddenCertificateIds.includes(cert.id) && isAdmin ? 'opacity-50' : ''}`}>
                   <div className="relative">
                     <div
                       className="cursor-pointer"
@@ -425,43 +428,44 @@ const Certificates = () => {
                       <img
                         src={cert.image_url}
                         alt={cert.name}
-                        className="w-full aspect-[1/1.4142] object-contain rounded-lg mb-4 border hover:border-blue-300 transition-colors"
+                        className="w-full aspect-[1/1.4142] object-contain rounded-lg mb-3 sm:mb-4 border hover:border-blue-300 transition-colors"
+                        loading="lazy"
                       />
                     </div>
                     {isAdmin && (
-                      <div className="absolute top-2 right-2 flex space-x-2">
+                      <div className={`absolute top-2 right-2 flex gap-1 sm:gap-2 z-10 ${isMobile ? 'flex-col' : 'flex-row'}`}>
                         <button
                           onClick={() => handleToggleHide(cert)}
-                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 sm:p-2 shadow touch-manipulation ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                           title={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
                           disabled={formLoading}
                           aria-label={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
                         >
                           {hiddenCertificateIds.includes(cert.id) ? (
-                            <Eye className="w-4 h-4" />
+                            <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                           ) : (
-                            <EyeOff className="w-4 h-4" />
+                            <EyeOff className="w-3 h-3 sm:w-4 sm:h-4" />
                           )}
                         </button>
                         <button
                           onClick={() => openForm(cert)}
-                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors touch-manipulation"
                         >
-                          <Edit className="w-5 h-5 text-blue-600" />
+                          <Edit className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
                         </button>
                         <button
                           onClick={() => {
                             setDeleteTarget(cert);
                             setShowDeleteConfirm(true);
                           }}
-                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors touch-manipulation"
                         >
-                          <Trash2 className="w-5 h-5 text-red-600" />
+                          <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 text-red-600" />
                         </button>
                       </div>
                     )}
                   </div>
-                  <h3 className="text-base font-bold text-gray-900 text-center mb-1">{cert.name}</h3>
+                  <h3 className="text-sm sm:text-base font-bold text-gray-900 text-center mb-1">{cert.name}</h3>
                   <p className="text-xs text-gray-500 text-center">클릭하여 확대보기</p>
                 </div>
               ))}
@@ -469,21 +473,21 @@ const Certificates = () => {
         </div>
       </section>
 
-      {/* 린코리아 시험성적서 */}
-      <section className="py-20 bg-gray-50">
+      {/* 린코리아 시험성적서 - Mobile Optimized */}
+      <section className="py-12 sm:py-20 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">린코리아 시험성적서</h2>
-            <p className="text-xl text-gray-600">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">린코리아 시험성적서</h2>
+            <p className="text-lg sm:text-xl text-gray-600">
               린코리아 제품의 품질을 검증하는 시험성적서
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
             {certificates
               .filter(cert => cert.category === 'rin_test' && (!hiddenCertificateIds.includes(cert.id) || isAdmin))
               .map((cert, index) => (
-                <div key={index} className={`bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow ${hiddenCertificateIds.includes(cert.id) ? 'opacity-50' : ''}`}>
+                <div key={index} className={`bg-white p-3 sm:p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow ${hiddenCertificateIds.includes(cert.id) && isAdmin ? 'opacity-50' : ''}`}>
                   <div className="relative">
                     <div
                       className="cursor-pointer"
@@ -492,43 +496,44 @@ const Certificates = () => {
                       <img
                         src={cert.image_url}
                         alt={cert.name}
-                        className="w-full aspect-[1/1.4142] object-contain rounded-lg mb-4 border hover:border-blue-300 transition-colors"
+                        className="w-full aspect-[1/1.4142] object-contain rounded-lg mb-3 sm:mb-4 border hover:border-blue-300 transition-colors"
+                        loading="lazy"
                       />
                     </div>
                     {isAdmin && (
-                      <div className="absolute top-2 right-2 flex space-x-2">
+                      <div className={`absolute top-2 right-2 flex gap-1 sm:gap-2 z-10 ${isMobile ? 'flex-col' : 'flex-row'}`}>
                         <button
                           onClick={() => handleToggleHide(cert)}
-                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow touch-manipulation ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                           title={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
                           disabled={formLoading}
                           aria-label={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
                         >
                           {hiddenCertificateIds.includes(cert.id) ? (
-                            <Eye className="w-4 h-4" />
+                            <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                           ) : (
-                            <EyeOff className="w-4 h-4" />
+                            <EyeOff className="w-3 h-3 sm:w-4 sm:h-4" />
                           )}
                         </button>
                         <button
                           onClick={() => openForm(cert)}
-                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors touch-manipulation"
                         >
-                          <Edit className="w-5 h-5 text-blue-600" />
+                          <Edit className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
                         </button>
                         <button
                           onClick={() => {
                             setDeleteTarget(cert);
                             setShowDeleteConfirm(true);
                           }}
-                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors"
+                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors touch-manipulation"
                         >
-                          <Trash2 className="w-5 h-5 text-red-600" />
+                          <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 text-red-600" />
                         </button>
                       </div>
                     )}
                   </div>
-                  <h3 className="text-base font-bold text-gray-900 text-center mb-1">{cert.name}</h3>
+                  <h3 className="text-sm sm:text-base font-bold text-gray-900 text-center mb-1">{cert.name}</h3>
                   <p className="text-xs text-gray-500 text-center">클릭하여 확대보기</p>
                 </div>
               ))}
@@ -545,51 +550,58 @@ const Certificates = () => {
         imageTitle={selectedImage?.title || ''}
       />
 
-      {/* Certificate Form Modal */}
+      {/* Certificate Form Modal - Mobile Optimized */}
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full relative">
-            <button className="absolute top-4 right-4 text-gray-400 hover:text-gray-700" onClick={closeForm}>
-              <X className="w-6 h-6" />
-            </button>
-            <h2 className="text-2xl font-bold mb-4">{editingCertificate ? '인증서 수정' : '인증서 추가'}</h2>
-            <form onSubmit={handleFormSave} className="space-y-4">
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
+          <div className={`bg-white rounded-lg shadow-lg relative w-full ${isMobile ? 'max-h-[90vh] overflow-y-auto' : 'max-w-lg'}`}>
+            <div className="sticky top-0 bg-white border-b p-4 sm:p-6 flex items-center justify-between">
+              <h2 className="text-xl sm:text-2xl font-bold">{editingCertificate ? '인증서 수정' : '인증서 추가'}</h2>
+              <button 
+                className="text-gray-400 hover:text-gray-700 p-2 touch-manipulation" 
+                onClick={closeForm}
+                aria-label="닫기"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleFormSave} className="p-4 sm:p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">이름</label>
                 <input
                   type="text"
                   value={formValues.name || ''}
                   onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">설명</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">설명</label>
                 <textarea
                   value={formValues.description || ''}
                   onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  rows={4}
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">이미지 URL</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">이미지 URL</label>
                 <input
                   type="text"
                   value={formValues.image_url || ''}
                   onChange={(e) => setFormValues({ ...formValues, image_url: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
                 <select
                   value={formValues.category || ''}
                   onChange={(e) => setFormValues({ ...formValues, category: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 >
                   <option value="">선택하세요</option>
@@ -599,41 +611,41 @@ const Certificates = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">발급일</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">발급일</label>
                 <input
                   type="date"
                   value={formValues.issue_date || ''}
                   onChange={(e) => setFormValues({ ...formValues, issue_date: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">만료일</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">만료일</label>
                 <input
                   type="date"
                   value={formValues.expiry_date || ''}
                   onChange={(e) => setFormValues({ ...formValues, expiry_date: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               {formError && (
-                <div className="text-red-600 text-sm">{formError}</div>
+                <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">{formError}</div>
               )}
               {formSuccess && (
-                <div className="text-green-600 text-sm">{formSuccess}</div>
+                <div className="text-green-600 text-sm bg-green-50 p-3 rounded-lg">{formSuccess}</div>
               )}
-              <div className="flex justify-end space-x-4">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <button
                   type="button"
                   onClick={closeForm}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                  className="flex-1 px-4 py-3 text-gray-600 hover:text-gray-700 border border-gray-300 rounded-lg touch-manipulation"
                 >
                   취소
                 </button>
                 <button
                   type="submit"
                   disabled={formLoading}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 touch-manipulation"
                 >
                   {formLoading ? '저장 중...' : '저장'}
                 </button>
@@ -643,24 +655,24 @@ const Certificates = () => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Confirmation Modal - Mobile Optimized */}
       {showDeleteConfirm && deleteTarget && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
-            <h2 className="text-2xl font-bold mb-4">인증서 삭제</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 max-w-md w-full">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4">인증서 삭제</h2>
             <p className="text-gray-600 mb-6">
               정말로 "{deleteTarget.name}" 인증서를 삭제하시겠습니까?
             </p>
-            <div className="flex justify-end space-x-4">
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                className="flex-1 px-4 py-3 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg touch-manipulation"
               >
                 취소
               </button>
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 touch-manipulation"
               >
                 삭제
               </button>
