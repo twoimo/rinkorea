@@ -131,14 +131,14 @@ const Products = () => {
     }
 
     try {
-      // detail_images 필드를 제외한 payload 생성
-      const { detail_images, ...payload } = {
+      const payload = {
         ...formValues,
         name: formValues.name.trim(),
         description: formValues.description.trim(),
         image_url: formValues.image_url.trim(),
         icon: formValues.icon.trim(),
         features: formValues.features.map(f => f.trim()),
+        detail_images: formValues.detail_images || [],
         updated_at: new Date().toISOString(),
       };
 
@@ -156,7 +156,7 @@ const Products = () => {
           // 수정된 제품으로 상태 업데이트 (순서 유지)
           setProducts(prevProducts =>
             prevProducts.map(p =>
-              p.id === editingProduct.id ? { ...p, ...payload, detail_images } : p
+              p.id === editingProduct.id ? { ...p, ...payload } : p
             )
           );
         }
@@ -168,7 +168,7 @@ const Products = () => {
 
         if (!result.error && result.data) {
           // 새 제품 추가 (맨 뒤에 추가)
-          setProducts(prevProducts => [...prevProducts, { ...result.data[0], detail_images }]);
+          setProducts(prevProducts => [...prevProducts, result.data[0]]);
         }
       }
 
@@ -279,10 +279,11 @@ const Products = () => {
     if (!selectedProduct) return;
 
     try {
-      // detail_images 필드를 제외하고 업데이트
+      // 단순화된 업데이트 로직
       const { error } = await (supabase as unknown as SupabaseClient)
         .from('product_introductions')
         .update({
+          detail_images: editingDetailImages || [],
           updated_at: new Date().toISOString()
         })
         .eq('id', selectedProduct.id);
@@ -296,14 +297,15 @@ const Products = () => {
       setProducts(prevProducts =>
         prevProducts.map(p =>
           p.id === selectedProduct.id
-            ? { ...p, detail_images: editingDetailImages }
+            ? { ...p, detail_images: editingDetailImages || [] }
             : p
         )
       );
 
       setIsEditingImages(false);
+      closeDetailDialog();
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Unexpected error:', error);
     }
   };
 
