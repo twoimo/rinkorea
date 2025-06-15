@@ -84,13 +84,14 @@ const ProductForm = memo(({ product, onSave, onClose, loading, error, success }:
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2" htmlFor="product-image">이미지 URL</label>
+            <label className="block text-sm font-medium mb-2" htmlFor="product-image">이미지 URL 또는 파일명</label>
             <input 
               id="product-image"
-              type="url" 
+              type="text" 
               className="w-full border border-gray-300 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base" 
               value={formValues.image_url || ''} 
               onChange={e => setFormValues(prev => ({ ...prev, image_url: e.target.value }))} 
+              placeholder="예: https://example.com/image.jpg 또는 image.jpg"
               required
             />
           </div>
@@ -122,13 +123,13 @@ const ProductForm = memo(({ product, onSave, onClose, loading, error, success }:
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2" htmlFor="product-detail-images">상세 이미지 URL (쉼표로 구분)</label>
+            <label className="block text-sm font-medium mb-2" htmlFor="product-detail-images">상세 이미지 URL 또는 파일명 (쉼표로 구분)</label>
             <textarea
               id="product-detail-images"
               className="w-full border border-gray-300 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base min-h-[80px]"
               value={formValues.detail_images?.join(', ') || ''} 
               onChange={e => handleDetailImagesChange(e.target.value)}
-              placeholder="상세 이미지 URL을 쉼표로 구분하여 입력하세요"
+              placeholder="예: detail1.jpg, https://example.com/detail2.jpg"
             />
           </div>
           {error && (
