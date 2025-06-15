@@ -1,16 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-
-interface Project {
-    id: string;
-    title: string;
-    location: string;
-    date: string;
-    image: string;
-    description: string;
-    url: string;
-    features: string[];
-    category: string;
-}
+import type { Project } from '../hooks/useProjects';
 
 interface AutoScrollGridProps {
     items: Project[];

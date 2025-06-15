@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { ExternalLink, Calendar, MapPin, Plus, Edit2, Trash2, X, Save, Eye, EyeOff } from 'lucide-react';
-import { useProjects } from '@/hooks/useProjects';
+import { useProjects, type Project } from '@/hooks/useProjects';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -80,7 +80,7 @@ const Projects = () => {
   };
 
   // 폼 열기
-  const openForm = (project?: any) => {
+  const openForm = (project?: Project) => {
     if (project) {
       setEditingProject(project.id);
       setFormValues({
@@ -237,7 +237,7 @@ const Projects = () => {
       </section>
 
       {/* Projects Grid */}
-      <section className="py-20 w-full">
+      <section className="py-20">
         <div className="w-full">
           <AutoScrollGrid
             items={getVisibleProjects().filter(p => p.category === 'construction')}
@@ -499,7 +499,7 @@ const Projects = () => {
       </section>
 
       {/* 다양한 프로젝트 섹션 */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">다양한 프로젝트</h2>
