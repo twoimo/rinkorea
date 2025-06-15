@@ -213,6 +213,12 @@ const Shop = () => {
     setLoading(false);
   };
 
+  const getImageUrl = (imagePath: string) => {
+    if (!imagePath) return '';
+    if (imagePath.includes('://') || imagePath.startsWith('@') || imagePath.startsWith('/')) return imagePath;
+    return `/images/${imagePath}`;
+  };
+
   const handleFormSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormLoading(true);
@@ -221,6 +227,7 @@ const Shop = () => {
     try {
       const payload = {
         ...formValues,
+        image_url: getImageUrl(formValues.image_url || ''),
         price: Number(formValues.price) || 0,
         original_price: formValues.original_price ? Number(formValues.original_price) : null,
         discount: formValues.discount ? Number(formValues.discount) : null,
@@ -608,13 +615,17 @@ const Shop = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-2">이미지 URL</label>
+                <label className="block text-sm font-medium mb-2">이미지 URL 또는 파일명</label>
                 <input 
                   type="text" 
                   className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation" 
                   value={formValues.image_url || ''} 
-                  onChange={e => setFormValues(v => ({ ...v, image_url: e.target.value }))} 
+                  onChange={e => setFormValues(v => ({ ...v, image_url: e.target.value }))}
+                  placeholder="예: image.jpg 또는 https://example.com/image.jpg"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  파일명만 입력하면 자동으로 /images/ 경로가 추가됩니다
+                </p>
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
