@@ -19,7 +19,7 @@ const QnA = () => {
     loading, 
     refetch, 
     createInquiry, 
-    updateInquiry: originalUpdateInquiry, 
+    updateInquiry, 
     deleteInquiry 
   } = useInquiries();
   
@@ -27,11 +27,6 @@ const QnA = () => {
   const [editingInquiry, setEditingInquiry] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('전체');
-
-  // Wrapper function to match the expected signature
-  const updateInquiry = async (id: string, data: any): Promise<void> => {
-    await originalUpdateInquiry(id, data);
-  };
 
   const filteredInquiries = inquiries.filter(inquiry => {
     const matchesSearch = inquiry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
