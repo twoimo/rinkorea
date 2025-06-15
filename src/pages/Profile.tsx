@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
@@ -195,59 +196,63 @@ const Profile = () => {
       <Header />
 
       <main>
-        <section className="container mx-auto px-4 py-20">
+        <section className="container mx-auto px-4 py-12 sm:py-20">
           <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-lg shadow-lg p-8">
-              <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-                  <User className="w-10 h-10 text-blue-600" aria-hidden="true" />
+            <div className="bg-white rounded-lg shadow-lg p-4 sm:p-8">
+              <div className="text-center mb-6 sm:mb-8">
+                <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full mb-4">
+                  <User className="w-6 h-6 sm:w-10 sm:h-10 text-blue-600" aria-hidden="true" />
                 </div>
-                <h2 className="text-3xl font-bold mb-2">프로필 설정</h2>
-                <p className="text-gray-500">회원정보를 확인하고 수정할 수 있습니다.</p>
+                <h2 className="text-2xl sm:text-3xl font-bold mb-2">프로필 설정</h2>
+                <p className="text-sm sm:text-base text-gray-500">회원정보를 확인하고 수정할 수 있습니다.</p>
               </div>
-              <form onSubmit={handleSaveAll} className="space-y-6">
+              
+              <form onSubmit={handleSaveAll} className="space-y-4 sm:space-y-6">
                 <div>
                   <label className="block text-sm font-medium mb-1" htmlFor="name">이름</label>
                   <input
                     id="name"
                     type="text"
-                    className="w-full border px-3 py-2 rounded"
+                    className="w-full border border-gray-300 px-3 py-2.5 sm:py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                     value={name}
                     onChange={e => setName(e.target.value)}
                     autoComplete="name"
                     aria-label="이름"
                   />
                 </div>
+                
                 <div>
                   <label className="block text-sm font-medium mb-1" htmlFor="email">이메일</label>
                   <input
                     id="email"
                     type="email"
-                    className="w-full border px-3 py-2 rounded bg-gray-50"
+                    className="w-full border border-gray-300 px-3 py-2.5 sm:py-2 rounded-lg bg-gray-50 text-base"
                     value={user.email}
                     readOnly
                     disabled
                     aria-label="이메일"
                   />
                 </div>
+                
                 <div>
                   <label className="block text-sm font-medium mb-1" htmlFor="company">회사명</label>
                   <input
                     id="company"
                     type="text"
-                    className="w-full border px-3 py-2 rounded"
+                    className="w-full border border-gray-300 px-3 py-2.5 sm:py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                     value={company}
                     onChange={e => setCompany(e.target.value)}
                     autoComplete="organization"
                     aria-label="회사명"
                   />
                 </div>
+                
                 <div>
                   <label className="block text-sm font-medium mb-1" htmlFor="phone">연락처</label>
                   <input
                     id="phone"
                     type="text"
-                    className="w-full border px-3 py-2 rounded"
+                    className="w-full border border-gray-300 px-3 py-2.5 sm:py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                     value={phone}
                     onChange={handlePhoneChange}
                     autoComplete="tel"
@@ -255,14 +260,15 @@ const Profile = () => {
                   />
                   {phoneError && <div className="text-xs text-red-600 mt-1">{phoneError}</div>}
                 </div>
-                <div className="border-t pt-6 mt-6">
+                
+                <div className="border-t pt-4 sm:pt-6 mt-4 sm:mt-6">
                   <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
                     <Shield className="w-5 h-5 text-blue-600" aria-hidden="true" /> 비밀번호 변경
                   </h3>
                   <div className="space-y-4">
                     <input
                       type="password"
-                      className="w-full border px-3 py-2 rounded"
+                      className="w-full border border-gray-300 px-3 py-2.5 sm:py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                       value={currentPassword}
                       onChange={e => setCurrentPassword(e.target.value)}
                       placeholder="현재 비밀번호"
@@ -271,7 +277,7 @@ const Profile = () => {
                     />
                     <input
                       type="password"
-                      className="w-full border px-3 py-2 rounded"
+                      className="w-full border border-gray-300 px-3 py-2.5 sm:py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                       value={newPassword}
                       onChange={e => setNewPassword(e.target.value)}
                       placeholder="새 비밀번호"
@@ -280,7 +286,7 @@ const Profile = () => {
                     />
                     <input
                       type="password"
-                      className="w-full border px-3 py-2 rounded"
+                      className="w-full border border-gray-300 px-3 py-2.5 sm:py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
                       value={confirmPassword}
                       onChange={e => setConfirmPassword(e.target.value)}
                       placeholder="새 비밀번호 확인"
@@ -288,37 +294,38 @@ const Profile = () => {
                       aria-label="새 비밀번호 확인"
                     />
                   </div>
-                  {passwordError && <div className="text-xs text-red-600 mt-1">{passwordError}</div>}
-                  {passwordSuccess && <div className="text-xs text-green-700 mt-1">{passwordSuccess}</div>}
-                  <div className="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                    <AlertTriangle className="w-4 h-4" />
-                    비밀번호를 잊어버리면 복구할 수 없으니 안전한 곳에 보관해주세요.
+                  {passwordError && <div className="text-xs text-red-600 mt-2">{passwordError}</div>}
+                  {passwordSuccess && <div className="text-xs text-green-700 mt-2">{passwordSuccess}</div>}
+                  <div className="text-xs text-gray-500 mt-2 flex items-start gap-1">
+                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <span>비밀번호를 잊어버리면 복구할 수 없으니 안전한 곳에 보관해주세요.</span>
                   </div>
                 </div>
-                <div className="flex justify-end mt-8">
+                
+                <div className="flex justify-end mt-6 sm:mt-8">
                   <button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 touch-manipulation"
                     disabled={savingAll || (!isProfileChanged && !isPasswordChanged)}
                     aria-label="저장"
                   >
-                    <Save className="w-5 h-5 mr-2 inline" aria-hidden="true" /> 저장
+                    <Save className="w-5 h-5 mr-2 inline" aria-hidden="true" /> {savingAll ? '저장 중...' : '저장'}
                   </button>
                 </div>
               </form>
 
               {/* 계정 탈퇴 섹션 */}
-              <div className="border-t mt-12 pt-8">
+              <div className="border-t mt-8 sm:mt-12 pt-6 sm:pt-8">
                 <div className="flex items-center gap-2 mb-4">
                   <Trash2 className="w-5 h-5 text-red-600" />
                   <h3 className="text-lg font-bold text-red-600">계정 탈퇴</h3>
                 </div>
-                <p className="text-gray-600 mb-4">
+                <p className="text-sm sm:text-base text-gray-600 mb-4 leading-relaxed">
                   계정을 탈퇴하면 모든 데이터가 영구적으로 삭제되며 복구할 수 없습니다.
                 </p>
                 <button
                   type="button"
-                  className="w-full bg-red-100 hover:bg-red-200 text-red-700 px-6 py-3 rounded-lg font-semibold transition-colors"
+                  className="w-full bg-red-100 hover:bg-red-200 text-red-700 px-6 py-3 rounded-lg font-semibold transition-colors touch-manipulation"
                   onClick={() => setShowDeleteConfirm(true)}
                   aria-label="계정 탈퇴"
                 >
@@ -333,25 +340,25 @@ const Profile = () => {
       {/* 계정 탈퇴 확인 모달 */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+          <div className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-4">
             <div className="flex items-center gap-2 mb-4">
               <AlertTriangle className="w-6 h-6 text-red-600" />
-              <h3 className="text-xl font-bold">계정 탈퇴 확인</h3>
+              <h3 className="text-lg sm:text-xl font-bold">계정 탈퇴 확인</h3>
             </div>
-            <p className="text-gray-600 mb-6">
+            <p className="text-sm sm:text-base text-gray-600 mb-6 leading-relaxed">
               정말로 계정을 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없으며, 모든 데이터가 영구적으로 삭제됩니다.
             </p>
-            <div className="flex justify-end gap-4">
+            <div className="flex flex-col sm:flex-row justify-end gap-3">
               <button
                 type="button"
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                className="flex-1 sm:flex-initial px-4 py-2.5 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg touch-manipulation"
                 onClick={() => setShowDeleteConfirm(false)}
               >
                 취소
               </button>
               <button
                 type="button"
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+                className="flex-1 sm:flex-initial bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-semibold touch-manipulation"
                 onClick={handleDeleteAccount}
               >
                 계정 탈퇴
