@@ -1,12 +1,16 @@
+
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ImageModal from '../components/ImageModal';
-import { Award, FileText, Shield, CheckCircle, Plus, Edit, Trash2, X, EyeOff, Eye } from 'lucide-react';
+import CertificateForm from '../components/certificates/CertificateForm';
+import DeleteConfirmModal from '../components/certificates/DeleteConfirmModal';
+import CertificateTypeCard from '../components/certificates/CertificateTypeCard';
+import CertificateSection from '../components/certificates/CertificateSection';
+import { Award, FileText, Shield, Plus } from 'lucide-react';
 import { supabase } from '../integrations/supabase/client';
 import { useUserRole } from '../hooks/useUserRole';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { useIsMobile } from '../hooks/use-mobile';
 
 interface Certificate {
   id: string;
@@ -19,8 +23,6 @@ interface Certificate {
   is_active?: boolean;
   created_at?: string;
   updated_at?: string;
-  icon?: React.ReactNode;
-  type?: string;
 }
 
 const Certificates = () => {
@@ -32,10 +34,8 @@ const Certificates = () => {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
   const { isAdmin } = useUserRole();
-  const isMobile = useIsMobile();
   const [showForm, setShowForm] = useState(false);
   const [editingCertificate, setEditingCertificate] = useState<Certificate | null>(null);
-  const [formValues, setFormValues] = useState<Partial<Certificate>>({});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Certificate | null>(null);
   const [formLoading, setFormLoading] = useState(false);
@@ -64,100 +64,23 @@ const Certificates = () => {
     }
   ];
 
-  const patentImages = [
-    {
-      title: "특허등록증",
-      src: "/images/scan-0025.jpg",
-      alt: "린코리아 특허등록증"
-    },
-    {
-      title: "상표등록증",
-      src: "/images/rin-coat.jpg",
-      alt: "RIN-COAT 상표등록증"
-    },
-    {
-      title: "유통표준코드 회원증",
-      src: "/images/scan-0024.jpg",
-      alt: "유통표준코드 회원증"
-    }
-  ];
-
-  const testReportImages = [
-    {
-      title: "불연재 인증",
-      src: "/images/rin-coat-test-report-page-01.jpg",
-      alt: "린코리아 RIN-COAT 시험성적서 1페이지"
-    },
-    {
-      title: "불연재 인증",
-      src: "/images/rin-coat-test-report-page-02.jpg",
-      alt: "린코리아 RIN-COAT 시험성적서 2페이지"
-    },
-    {
-      title: "불연재 인증",
-      src: "/images/rin-coat-test-report-page-03.jpg",
-      alt: "린코리아 RIN-COAT 시험성적서 3페이지"
-    },
-    {
-      title: "불연재 인증",
-      src: "/images/rin-coat-test-report-page-04.jpg",
-      alt: "린코리아 RIN-COAT 시험성적서 4페이지"
-    },
-    {
-      title: "불연재 인증",
-      src: "/images/rin-coat-test-report-page-05.jpg",
-      alt: "린코리아 RIN-COAT 시험성적서 5페이지"
-    },
-    {
-      title: "불연재 인증",
-      src: "/images/rin-coat-test-report-page-06.jpg",
-      alt: "린코리아 RIN-COAT 시험성적서 6페이지"
-    },
-    {
-      title: "불연재 인증",
-      src: "/images/rin-coat-test-report-page-07.jpg",
-      alt: "린코리아 RIN-COAT 시험성적서 7페이지"
-    },
-    {
-      title: "불연재 인증",
-      src: "/images/rin-coat-test-report-page-08.jpg",
-      alt: "린코리아 RIN-COAT 시험성적서 8페이지"
-    },
-    {
-      title: "불연재 인증",
-      src: "/images/rin-coat-test-report-page-09.jpg",
-      alt: "린코리아 RIN-COAT 시험성적서 9페이지"
-    },
-    {
-      title: "불연재 인증",
-      src: "/images/rin-coat-test-report-page-10.jpg",
-      alt: "린코리아 RIN-COAT 시험성적서 10페이지"
-    }
-  ];
-
   const handleImageClick = (src: string, alt: string, title: string) => {
     setSelectedImage({ src, alt, title });
   };
 
-  // 폼 열기
   const openForm = (certificate?: Certificate) => {
     setEditingCertificate(certificate || null);
-    setFormValues(certificate ? { ...certificate } : {});
     setShowForm(true);
   };
 
-  // 폼 닫기
   const closeForm = () => {
     setShowForm(false);
     setEditingCertificate(null);
-    setFormValues({});
     setFormError(null);
     setFormSuccess(null);
   };
 
-  // 인증서 저장(추가/수정)
-  const handleFormSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleFormSave = async (formValues: Partial<Certificate>) => {
     setFormLoading(true);
     setFormError(null);
     setFormSuccess(null);
@@ -185,15 +108,7 @@ const Certificates = () => {
       } else {
         setFormSuccess(editingCertificate ? '인증서가 수정되었습니다.' : '인증서가 추가되었습니다.');
         setTimeout(closeForm, 1500);
-        // Refresh certificates
-        const { data } = await (supabase as unknown as SupabaseClient)
-          .from('certificates')
-          .select('*')
-          .eq('is_active', true)
-          .order('created_at', { ascending: true });
-        if (data) {
-          setCertificates(data);
-        }
+        await fetchCertificates();
       }
     } catch (error) {
       setFormError('오류가 발생했습니다.');
@@ -202,7 +117,6 @@ const Certificates = () => {
     }
   };
 
-  // 인증서 삭제
   const handleDelete = async () => {
     if (!deleteTarget) return;
 
@@ -221,14 +135,12 @@ const Certificates = () => {
     }
   };
 
-  // 인증서 숨기기/보이기 토글
   const handleToggleHide = async (certificate: Certificate) => {
     setFormLoading(true);
     setFormError(null);
     setFormSuccess(null);
     try {
       if (hiddenCertificateIds.includes(certificate.id)) {
-        // 숨김 해제
         const { error } = await (supabase as unknown as SupabaseClient)
           .from('certificate_hidden')
           .delete()
@@ -236,7 +148,6 @@ const Certificates = () => {
         if (error) setFormError(error.message);
         else setFormSuccess('노출되었습니다.');
       } else {
-        // 숨기기
         const { error } = await (supabase as unknown as SupabaseClient)
           .from('certificate_hidden')
           .upsert({ certificate_id: certificate.id });
@@ -251,7 +162,17 @@ const Certificates = () => {
     setFormLoading(false);
   };
 
-  // 숨김 인증서 목록 불러오기
+  const fetchCertificates = async () => {
+    const { data, error } = await (supabase as unknown as SupabaseClient)
+      .from('certificates')
+      .select('*')
+      .eq('is_active', true)
+      .order('created_at', { ascending: true });
+    if (!error && data) {
+      setCertificates(data);
+    }
+  };
+
   const fetchHiddenCertificates = async () => {
     const { data, error } = await (supabase as unknown as SupabaseClient)
       .from('certificate_hidden')
@@ -262,38 +183,20 @@ const Certificates = () => {
   };
 
   useEffect(() => {
-    const fetchCertificates = async () => {
+    const loadData = async () => {
       setLoading(true);
-      const { data, error } = await (supabase as unknown as SupabaseClient)
-        .from('certificates')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: true });
-      if (!error && data) {
-        setCertificates(data);
-      }
+      await fetchCertificates();
+      await fetchHiddenCertificates();
       setLoading(false);
     };
-    fetchCertificates();
-  }, []);
-
-  useEffect(() => {
-    const fetchHiddenCertificates = async () => {
-      const { data, error } = await (supabase as unknown as SupabaseClient)
-        .from('certificate_hidden')
-        .select('certificate_id');
-      if (!error && data) {
-        setHiddenCertificateIds(data.map((h: { certificate_id: string }) => h.certificate_id));
-      }
-    };
-    fetchHiddenCertificates();
+    loadData();
   }, []);
 
   return (
     <div className="min-h-screen bg-white">
       <Header />
 
-      {/* Hero Section - Mobile Optimized */}
+      {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 sm:py-20">
         <div className="container mx-auto px-4">
           <div className="text-center">
@@ -315,233 +218,73 @@ const Certificates = () => {
         </div>
       </section>
 
-      {/* Certificates Grid - Mobile Optimized */}
+      {/* Certificate Types */}
       <section className="py-12 sm:py-20">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
             {certificateTypes.map((cert, index) => (
-              <div key={index} className="bg-white p-6 sm:p-8 rounded-lg shadow-lg border hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <div className="flex items-center mb-4 sm:mb-6">
-                  <div className="bg-gray-50 p-2 sm:p-3 rounded-full mr-3 sm:mr-4 flex-shrink-0">
-                    {cert.icon}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">{cert.name}</h3>
-                    <span className="text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded whitespace-nowrap">{cert.type}</span>
-                  </div>
-                </div>
-                <p className="text-sm sm:text-base text-gray-600">{cert.description}</p>
-              </div>
+              <CertificateTypeCard
+                key={index}
+                name={cert.name}
+                type={cert.type}
+                icon={cert.icon}
+                description={cert.description}
+              />
             ))}
           </div>
         </div>
       </section>
 
-      {/* Patents and Trademarks - Mobile Optimized */}
-      <section className="py-12 sm:py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">특허 및 상표 등록증</h2>
-            <p className="text-lg sm:text-xl text-gray-600">
-              린코리아의 기술력과 브랜드를 보증하는 공식 문서들
-            </p>
-          </div>
+      {/* Patents and Trademarks */}
+      <CertificateSection
+        title="특허 및 상표 등록증"
+        description="린코리아의 기술력과 브랜드를 보증하는 공식 문서들"
+        certificates={certificates.filter(cert => cert.category === 'patent')}
+        hiddenCertificateIds={hiddenCertificateIds}
+        isAdmin={isAdmin}
+        onImageClick={handleImageClick}
+        onEdit={openForm}
+        onDelete={(cert) => { setDeleteTarget(cert); setShowDeleteConfirm(true); }}
+        onToggleHide={handleToggleHide}
+        isLoading={formLoading}
+        backgroundColor="bg-gray-50"
+        gridCols="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+      />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
-            {certificates
-              .filter(cert => cert.category === 'patent' && (!hiddenCertificateIds.includes(cert.id) || isAdmin))
-              .map((cert, index) => (
-                <div key={index} className={`bg-white p-4 sm:p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow ${hiddenCertificateIds.includes(cert.id) && isAdmin ? 'opacity-50' : ''}`}>
-                  <div className="relative">
-                    <div
-                      className="cursor-pointer"
-                      onClick={() => handleImageClick(cert.image_url, cert.name, cert.name)}
-                    >
-                      <img
-                        src={cert.image_url}
-                        alt={cert.name}
-                        className="w-full aspect-[1/1.4142] object-contain rounded-lg mb-4 border hover:border-blue-300 transition-colors"
-                        loading="lazy"
-                      />
-                    </div>
-                    {isAdmin && (
-                      <div className={`absolute top-2 right-2 flex gap-2 z-10 ${isMobile ? 'flex-col' : 'flex-row'}`}>
-                        <button
-                          onClick={() => handleToggleHide(cert)}
-                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-3 sm:p-2 shadow touch-manipulation ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          title={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
-                          disabled={formLoading}
-                          aria-label={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
-                        >
-                          {hiddenCertificateIds.includes(cert.id) ? (
-                            <Eye className="w-4 h-4" />
-                          ) : (
-                            <EyeOff className="w-4 h-4" />
-                          )}
-                        </button>
-                        <button
-                          onClick={() => openForm(cert)}
-                          className="bg-white p-3 sm:p-2 rounded-full hover:bg-gray-100 transition-colors touch-manipulation"
-                        >
-                          <Edit className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setDeleteTarget(cert);
-                            setShowDeleteConfirm(true);
-                          }}
-                          className="bg-white p-3 sm:p-2 rounded-full hover:bg-gray-100 transition-colors touch-manipulation"
-                        >
-                          <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2 text-center">{cert.name}</h3>
-                  <p className="text-xs sm:text-sm text-gray-500 text-center">클릭하여 확대보기</p>
-                </div>
-              ))}
-          </div>
-        </div>
-      </section>
+      {/* Test Reports */}
+      <CertificateSection
+        title="RIN-COAT 시험성적서"
+        description="공인시험기관에서 실시한 품질 시험 결과 전체 문서"
+        certificates={certificates.filter(cert => cert.category === 'certification')}
+        hiddenCertificateIds={hiddenCertificateIds}
+        isAdmin={isAdmin}
+        onImageClick={handleImageClick}
+        onEdit={openForm}
+        onDelete={(cert) => { setDeleteTarget(cert); setShowDeleteConfirm(true); }}
+        onToggleHide={handleToggleHide}
+        isLoading={formLoading}
+        gridCols="grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+        cardSize="small"
+      />
 
-      {/* Test Reports - Mobile Optimized */}
-      <section className="py-12 sm:py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">RIN-COAT 시험성적서</h2>
-            <p className="text-lg sm:text-xl text-gray-600">
-              공인시험기관에서 실시한 품질 시험 결과 전체 문서
-            </p>
-          </div>
+      {/* Rin Korea Test Reports */}
+      <CertificateSection
+        title="린코리아 시험성적서"
+        description="린코리아 제품의 품질을 검증하는 시험성적서"
+        certificates={certificates.filter(cert => cert.category === 'rin_test')}
+        hiddenCertificateIds={hiddenCertificateIds}
+        isAdmin={isAdmin}
+        onImageClick={handleImageClick}
+        onEdit={openForm}
+        onDelete={(cert) => { setDeleteTarget(cert); setShowDeleteConfirm(true); }}
+        onToggleHide={handleToggleHide}
+        isLoading={formLoading}
+        backgroundColor="bg-gray-50"
+        gridCols="grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+        cardSize="small"
+      />
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-            {certificates
-              .filter(cert => cert.category === 'certification' && (!hiddenCertificateIds.includes(cert.id) || isAdmin))
-              .map((cert, index) => (
-                <div key={index} className={`bg-white p-3 sm:p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow ${hiddenCertificateIds.includes(cert.id) && isAdmin ? 'opacity-50' : ''}`}>
-                  <div className="relative">
-                    <div
-                      className="cursor-pointer"
-                      onClick={() => handleImageClick(cert.image_url, cert.name, cert.name)}
-                    >
-                      <img
-                        src={cert.image_url}
-                        alt={cert.name}
-                        className="w-full aspect-[1/1.4142] object-contain rounded-lg mb-3 sm:mb-4 border hover:border-blue-300 transition-colors"
-                        loading="lazy"
-                      />
-                    </div>
-                    {isAdmin && (
-                      <div className={`absolute top-2 right-2 flex gap-1 sm:gap-2 z-10 ${isMobile ? 'flex-col' : 'flex-row'}`}>
-                        <button
-                          onClick={() => handleToggleHide(cert)}
-                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 sm:p-2 shadow touch-manipulation ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          title={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
-                          disabled={formLoading}
-                          aria-label={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
-                        >
-                          {hiddenCertificateIds.includes(cert.id) ? (
-                            <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
-                          ) : (
-                            <EyeOff className="w-3 h-3 sm:w-4 sm:h-4" />
-                          )}
-                        </button>
-                        <button
-                          onClick={() => openForm(cert)}
-                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors touch-manipulation"
-                        >
-                          <Edit className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setDeleteTarget(cert);
-                            setShowDeleteConfirm(true);
-                          }}
-                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors touch-manipulation"
-                        >
-                          <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 text-red-600" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  <h3 className="text-sm sm:text-base font-bold text-gray-900 text-center mb-1">{cert.name}</h3>
-                  <p className="text-xs text-gray-500 text-center">클릭하여 확대보기</p>
-                </div>
-              ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 린코리아 시험성적서 - Mobile Optimized */}
-      <section className="py-12 sm:py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">린코리아 시험성적서</h2>
-            <p className="text-lg sm:text-xl text-gray-600">
-              린코리아 제품의 품질을 검증하는 시험성적서
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-            {certificates
-              .filter(cert => cert.category === 'rin_test' && (!hiddenCertificateIds.includes(cert.id) || isAdmin))
-              .map((cert, index) => (
-                <div key={index} className={`bg-white p-3 sm:p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow ${hiddenCertificateIds.includes(cert.id) && isAdmin ? 'opacity-50' : ''}`}>
-                  <div className="relative">
-                    <div
-                      className="cursor-pointer"
-                      onClick={() => handleImageClick(cert.image_url, cert.name, cert.name)}
-                    >
-                      <img
-                        src={cert.image_url}
-                        alt={cert.name}
-                        className="w-full aspect-[1/1.4142] object-contain rounded-lg mb-3 sm:mb-4 border hover:border-blue-300 transition-colors"
-                        loading="lazy"
-                      />
-                    </div>
-                    {isAdmin && (
-                      <div className={`absolute top-2 right-2 flex gap-1 sm:gap-2 z-10 ${isMobile ? 'flex-col' : 'flex-row'}`}>
-                        <button
-                          onClick={() => handleToggleHide(cert)}
-                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow touch-manipulation ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          title={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
-                          disabled={formLoading}
-                          aria-label={hiddenCertificateIds.includes(cert.id) ? "노출 해제" : "숨기기"}
-                        >
-                          {hiddenCertificateIds.includes(cert.id) ? (
-                            <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
-                          ) : (
-                            <EyeOff className="w-3 h-3 sm:w-4 sm:h-4" />
-                          )}
-                        </button>
-                        <button
-                          onClick={() => openForm(cert)}
-                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors touch-manipulation"
-                        >
-                          <Edit className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setDeleteTarget(cert);
-                            setShowDeleteConfirm(true);
-                          }}
-                          className="bg-white p-2 rounded-full hover:bg-gray-100 transition-colors touch-manipulation"
-                        >
-                          <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 text-red-600" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  <h3 className="text-sm sm:text-base font-bold text-gray-900 text-center mb-1">{cert.name}</h3>
-                  <p className="text-xs text-gray-500 text-center">클릭하여 확대보기</p>
-                </div>
-              ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Image Modal */}
+      {/* Modals */}
       <ImageModal
         isOpen={selectedImage !== null}
         onClose={() => setSelectedImage(null)}
@@ -550,136 +293,22 @@ const Certificates = () => {
         imageTitle={selectedImage?.title || ''}
       />
 
-      {/* Certificate Form Modal - Mobile Optimized */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
-          <div className={`bg-white rounded-lg shadow-lg relative w-full ${isMobile ? 'max-h-[90vh] overflow-y-auto' : 'max-w-lg'}`}>
-            <div className="sticky top-0 bg-white border-b p-4 sm:p-6 flex items-center justify-between">
-              <h2 className="text-xl sm:text-2xl font-bold">{editingCertificate ? '인증서 수정' : '인증서 추가'}</h2>
-              <button 
-                className="text-gray-400 hover:text-gray-700 p-2 touch-manipulation" 
-                onClick={closeForm}
-                aria-label="닫기"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            
-            <form onSubmit={handleFormSave} className="p-4 sm:p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">이름</label>
-                <input
-                  type="text"
-                  value={formValues.name || ''}
-                  onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">설명</label>
-                <textarea
-                  value={formValues.description || ''}
-                  onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                  rows={4}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">이미지 URL</label>
-                <input
-                  type="text"
-                  value={formValues.image_url || ''}
-                  onChange={(e) => setFormValues({ ...formValues, image_url: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
-                <select
-                  value={formValues.category || ''}
-                  onChange={(e) => setFormValues({ ...formValues, category: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                >
-                  <option value="">선택하세요</option>
-                  <option value="patent">특허 및 상표</option>
-                  <option value="certification">RIN-COAT 시험성적서</option>
-                  <option value="rin_test">린코리아 시험성적서</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">발급일</label>
-                <input
-                  type="date"
-                  value={formValues.issue_date || ''}
-                  onChange={(e) => setFormValues({ ...formValues, issue_date: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">만료일</label>
-                <input
-                  type="date"
-                  value={formValues.expiry_date || ''}
-                  onChange={(e) => setFormValues({ ...formValues, expiry_date: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              {formError && (
-                <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">{formError}</div>
-              )}
-              {formSuccess && (
-                <div className="text-green-600 text-sm bg-green-50 p-3 rounded-lg">{formSuccess}</div>
-              )}
-              <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={closeForm}
-                  className="flex-1 px-4 py-3 text-gray-600 hover:text-gray-700 border border-gray-300 rounded-lg touch-manipulation"
-                >
-                  취소
-                </button>
-                <button
-                  type="submit"
-                  disabled={formLoading}
-                  className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 touch-manipulation"
-                >
-                  {formLoading ? '저장 중...' : '저장'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <CertificateForm
+        isOpen={showForm}
+        certificate={editingCertificate}
+        onClose={closeForm}
+        onSave={handleFormSave}
+        isLoading={formLoading}
+        error={formError}
+        success={formSuccess}
+      />
 
-      {/* Delete Confirmation Modal - Mobile Optimized */}
-      {showDeleteConfirm && deleteTarget && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 max-w-md w-full">
-            <h2 className="text-xl sm:text-2xl font-bold mb-4">인증서 삭제</h2>
-            <p className="text-gray-600 mb-6">
-              정말로 "{deleteTarget.name}" 인증서를 삭제하시겠습니까?
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 px-4 py-3 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg touch-manipulation"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleDelete}
-                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 touch-manipulation"
-              >
-                삭제
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteConfirmModal
+        isOpen={showDeleteConfirm}
+        certificate={deleteTarget}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+      />
 
       <Footer />
     </div>
