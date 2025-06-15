@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -9,11 +10,13 @@ import { supabase } from '@/integrations/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import AutoScrollGrid from '@/components/AutoScrollGrid';
 import { useCounter } from '@/hooks/useCounter';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Projects = () => {
   const { projects, loading, createProject, updateProject, deleteProject } = useProjects();
   const { isAdmin } = useUserRole();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState<string | null>(null);
   const [formValues, setFormValues] = useState({
@@ -214,18 +217,18 @@ const Projects = () => {
     <div className="min-h-screen bg-white">
       <Header />
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
+      {/* Hero Section - Mobile Optimized */}
+      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 sm:py-20">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <h1 className="text-5xl font-bold mb-6">시공사례</h1>
-            <p className="text-xl max-w-2xl mx-auto">
-              린코리아의 린코트가 적용된 다양한 프로젝트를 통해 <br />
+            <h1 className="text-3xl sm:text-5xl font-bold mb-4 sm:mb-6">시공사례</h1>
+            <p className="text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
+              린코리아의 린코트가 적용된 다양한 프로젝트를 통해 <br className="hidden sm:block" />
               우수한 품질과 성능을 확인하세요.
             </p>
             {isAdmin && (
               <button
-                className="mt-8 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 mx-auto"
+                className="mt-6 sm:mt-8 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 mx-auto touch-manipulation"
                 onClick={() => openForm()}
                 aria-label="프로젝트 추가"
               >
@@ -236,16 +239,16 @@ const Projects = () => {
         </div>
       </section>
 
-      {/* Projects Grid */}
-      <section className="py-20">
+      {/* Projects Grid - Mobile Optimized */}
+      <section className="py-12 sm:py-20">
         <div className="w-full">
           <AutoScrollGrid
             items={getVisibleProjects().filter(p => p.category === 'construction')}
-            itemsPerRow={4}
+            itemsPerRow={isMobile ? 1 : 4}
             renderItem={(project) => {
               const isHidden = hiddenProjectIds.includes(project.id);
               return (
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden group relative w-full">
+                <div className="bg-white rounded-xl shadow-lg overflow-hidden group relative w-full mx-auto max-w-sm sm:max-w-none">
                   <div className="relative aspect-video overflow-hidden">
                     <img
                       src={getImageUrl(project.image)}
@@ -257,9 +260,9 @@ const Projects = () => {
                       style={{ maxWidth: '100%', maxHeight: '450px' }}
                     />
                     {isAdmin && (
-                      <div className="absolute top-3 right-3 flex gap-2 z-10">
+                      <div className={`absolute top-3 right-3 flex gap-2 z-10 ${isMobile ? 'flex-col' : 'flex-row'}`}>
                         <button
-                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-3 sm:p-2 shadow touch-manipulation ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                           onClick={() => handleToggleHide(project.id)}
                           title={isHidden ? '노출 해제' : '숨기기'}
                           disabled={formLoading}
@@ -268,7 +271,7 @@ const Projects = () => {
                           {isHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                         </button>
                         <button
-                          className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow"
+                          className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-3 sm:p-2 shadow touch-manipulation"
                           onClick={() => openForm(project)}
                           title="수정"
                           aria-label="수정"
@@ -276,7 +279,7 @@ const Projects = () => {
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
-                          className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-2 shadow"
+                          className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-3 sm:p-2 shadow touch-manipulation"
                           onClick={() => handleDeleteProject(project.id)}
                           title="삭제"
                           aria-label="삭제"
@@ -286,24 +289,24 @@ const Projects = () => {
                       </div>
                     )}
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
-                    <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                  <div className="p-4 sm:p-6">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-600 mb-4">
                       <div className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        {project.location}
+                        <MapPin className="w-4 h-4 flex-shrink-0" />
+                        <span>{project.location}</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {project.date}
+                        <Calendar className="w-4 h-4 flex-shrink-0" />
+                        <span>{project.date}</span>
                       </div>
                     </div>
-                    <p className="text-gray-600 mb-4">{project.description}</p>
+                    <p className="text-gray-600 mb-4 text-sm sm:text-base">{project.description}</p>
                     <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
                       {project.features.map((feature, index) => (
                         <span
                           key={index}
-                          className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm whitespace-nowrap flex-shrink-0"
+                          className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs sm:text-sm whitespace-nowrap flex-shrink-0"
                         >
                           {feature}
                         </span>
@@ -313,7 +316,7 @@ const Projects = () => {
                       href={project.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+                      className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm sm:text-base touch-manipulation"
                     >
                       자세히 보기
                       <ExternalLink className="w-4 h-4" />
@@ -326,87 +329,90 @@ const Projects = () => {
         </div>
       </section>
 
-      {/* 프로젝트 추가/수정 모달 폼 */}
+      {/* Mobile Optimized Modal Form */}
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full relative">
-            <button
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700"
-              onClick={closeForm}
-              aria-label="닫기"
-            >
-              <X className="w-6 h-6" />
-            </button>
-            <h2 className="text-2xl font-bold mb-4">
-              {editingProject ? '프로젝트 수정' : '프로젝트 추가'}
-            </h2>
-            <form className="space-y-4" onSubmit={handleFormSave}>
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
+          <div className={`bg-white rounded-lg shadow-lg relative w-full ${isMobile ? 'max-h-[90vh] overflow-y-auto' : 'max-w-lg'}`}>
+            <div className="sticky top-0 bg-white border-b p-4 sm:p-6 flex items-center justify-between">
+              <h2 className="text-xl sm:text-2xl font-bold">
+                {editingProject ? '프로젝트 수정' : '프로젝트 추가'}
+              </h2>
+              <button
+                className="text-gray-400 hover:text-gray-700 p-2 touch-manipulation"
+                onClick={closeForm}
+                aria-label="닫기"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <form className="p-4 sm:p-6 space-y-4" onSubmit={handleFormSave}>
               <div>
-                <label className="block text-sm font-medium mb-1">제목</label>
+                <label className="block text-sm font-medium mb-2">제목</label>
                 <input
                   type="text"
                   value={formValues.title}
                   onChange={(e) => setFormValues({ ...formValues, title: e.target.value })}
-                  className="w-full border px-3 py-2 rounded"
+                  className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">위치</label>
+                <label className="block text-sm font-medium mb-2">위치</label>
                 <input
                   type="text"
                   value={formValues.location}
                   onChange={(e) => setFormValues({ ...formValues, location: e.target.value })}
-                  className="w-full border px-3 py-2 rounded"
+                  className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">날짜</label>
+                <label className="block text-sm font-medium mb-2">날짜</label>
                 <input
                   type="text"
                   value={formValues.date}
                   onChange={(e) => setFormValues({ ...formValues, date: e.target.value })}
-                  className="w-full border px-3 py-2 rounded"
+                  className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">이미지</label>
+                <label className="block text-sm font-medium mb-2">이미지</label>
                 <input
                   type="text"
                   value={formValues.image}
                   onChange={(e) => setFormValues({ ...formValues, image: e.target.value })}
-                  className="w-full border px-3 py-2 rounded"
+                  className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">설명</label>
+                <label className="block text-sm font-medium mb-2">설명</label>
                 <textarea
                   value={formValues.description}
                   onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
-                  className="w-full border px-3 py-2 rounded"
+                  className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                   rows={4}
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">URL</label>
+                <label className="block text-sm font-medium mb-2">URL</label>
                 <input
                   type="url"
                   value={formValues.url}
                   onChange={(e) => setFormValues({ ...formValues, url: e.target.value })}
-                  className="w-full border px-3 py-2 rounded"
+                  className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">카테고리</label>
+                <label className="block text-sm font-medium mb-2">카테고리</label>
                 <select
                   value={formValues.category}
                   onChange={(e) => setFormValues({ ...formValues, category: e.target.value })}
-                  className="w-full border px-3 py-2 rounded"
+                  className="w-full border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 >
                   <option value="construction">시공 실적</option>
@@ -414,20 +420,20 @@ const Projects = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">특징</label>
-                <div className="space-y-2">
+                <label className="block text-sm font-medium mb-2">특징</label>
+                <div className="space-y-3">
                   {formValues.features.map((feature, index) => (
                     <div key={index} className="flex gap-2">
                       <input
                         type="text"
-                        className="flex-1 border px-3 py-2 rounded"
+                        className="flex-1 border border-gray-300 px-4 py-3 rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         value={feature}
                         onChange={e => updateFeature(index, e.target.value)}
                         placeholder="특징 입력"
                       />
                       <button
                         type="button"
-                        className="px-3 py-2 text-red-600 hover:text-red-700"
+                        className="px-3 py-3 text-red-600 hover:text-red-700 touch-manipulation"
                         onClick={() => removeFeature(index)}
                         aria-label="특징 삭제"
                       >
@@ -437,7 +443,7 @@ const Projects = () => {
                   ))}
                   <button
                     type="button"
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1"
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 py-2 touch-manipulation"
                     onClick={addFeature}
                   >
                     <Plus className="w-4 h-4" /> 특징 추가
@@ -445,22 +451,22 @@ const Projects = () => {
                 </div>
               </div>
               {formError && (
-                <div className="text-red-600 text-sm">{formError}</div>
+                <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">{formError}</div>
               )}
               {formSuccess && (
-                <div className="text-green-600 text-sm">{formSuccess}</div>
+                <div className="text-green-600 text-sm bg-green-50 p-3 rounded-lg">{formSuccess}</div>
               )}
-              <div className="flex justify-end gap-2">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <button
                   type="button"
-                  className="px-4 py-2 text-gray-600 hover:text-gray-700"
+                  className="flex-1 px-4 py-3 text-gray-600 hover:text-gray-700 border border-gray-300 rounded-lg touch-manipulation"
                   onClick={closeForm}
                 >
                   취소
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                  className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 touch-manipulation"
                   disabled={formLoading}
                 >
                   {formLoading ? '저장 중...' : '저장'}
@@ -471,44 +477,44 @@ const Projects = () => {
         </div>
       )}
 
-      {/* Stats Section */}
-      <section className="py-20 bg-gray-50">
+      {/* Stats Section - Mobile Optimized */}
+      <section className="py-12 sm:py-20 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">시공 실적</h2>
-            <p className="text-xl text-gray-600">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">시공 실적</h2>
+            <p className="text-lg sm:text-xl text-gray-600">
               다양한 분야에서 인정받는 린코리아의 기술력
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">{projectCount}+</div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
+            <div className="text-center bg-white p-6 rounded-lg shadow-sm">
+              <div className="text-3xl sm:text-4xl font-bold text-blue-600 mb-2">{projectCount}+</div>
               <div className="text-gray-600">시공 프로젝트</div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-green-600 mb-2">{satisfactionRate}%</div>
+            <div className="text-center bg-white p-6 rounded-lg shadow-sm">
+              <div className="text-3xl sm:text-4xl font-bold text-green-600 mb-2">{satisfactionRate}%</div>
               <div className="text-gray-600">고객 만족도</div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-purple-600 mb-2">{yearsOfExperience}+</div>
+            <div className="text-center bg-white p-6 rounded-lg shadow-sm">
+              <div className="text-3xl sm:text-4xl font-bold text-purple-600 mb-2">{yearsOfExperience}+</div>
               <div className="text-gray-600">린코리아 제품군</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 다양한 프로젝트 섹션 */}
-      <section className="py-20">
+      {/* 다양한 프로젝트 섹션 - Mobile Optimized */}
+      <section className="py-12 sm:py-20">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">다양한 프로젝트</h2>
-            <p className="text-xl text-gray-600">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">다양한 프로젝트</h2>
+            <p className="text-lg sm:text-xl text-gray-600">
               린코리아의 프로젝트 사례
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {getVisibleProjects()
               .filter(p => p.category === 'other')
               .map((project) => (
@@ -521,9 +527,9 @@ const Projects = () => {
                       loading="lazy"
                     />
                     {isAdmin && (
-                      <div className="absolute top-3 right-3 flex gap-2 z-10">
+                      <div className={`absolute top-3 right-3 flex gap-2 z-10 ${isMobile ? 'flex-col' : 'flex-row'}`}>
                         <button
-                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-3 sm:p-2 shadow touch-manipulation ${formLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                           onClick={() => handleToggleHide(project.id)}
                           title={hiddenProjectIds.includes(project.id) ? '노출 해제' : '숨기기'}
                           disabled={formLoading}
@@ -532,7 +538,7 @@ const Projects = () => {
                           {hiddenProjectIds.includes(project.id) ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                         </button>
                         <button
-                          className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow"
+                          className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-3 sm:p-2 shadow touch-manipulation"
                           onClick={() => openForm(project)}
                           title="수정"
                           aria-label="수정"
@@ -540,7 +546,7 @@ const Projects = () => {
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
-                          className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-2 shadow"
+                          className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-3 sm:p-2 shadow touch-manipulation"
                           onClick={() => handleDeleteProject(project.id)}
                           title="삭제"
                           aria-label="삭제"
@@ -550,22 +556,22 @@ const Projects = () => {
                       </div>
                     )}
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
-                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                  <div className="p-4 sm:p-6">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-500 mb-4">
                       <div className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
+                        <MapPin className="w-4 h-4 flex-shrink-0" />
                         <span>{project.location}</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
+                        <Calendar className="w-4 h-4 flex-shrink-0" />
                         <span>{project.date}</span>
                       </div>
                     </div>
-                    <p className="text-gray-600 mb-4">{project.description}</p>
-                    <div className="flex gap-2 mb-4">
+                    <p className="text-gray-600 mb-4 text-sm sm:text-base">{project.description}</p>
+                    <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
                       {project.features.map((feature, index) => (
-                        <span key={index} className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">
+                        <span key={index} className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs sm:text-sm whitespace-nowrap flex-shrink-0">
                           {feature}
                         </span>
                       ))}
@@ -574,7 +580,7 @@ const Projects = () => {
                       href={project.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+                      className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm sm:text-base touch-manipulation"
                     >
                       자세히 보기
                       <ExternalLink className="w-4 h-4" />
