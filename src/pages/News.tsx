@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import NewsDetail from '../components/NewsDetail';
-import NewsForm from '../components/NewsForm';
 import NewsHero from '../components/news/NewsHero';
 import NewsList from '../components/news/NewsList';
+import NewsModalManager from '../components/news/NewsModalManager';
 import { useNews } from '@/hooks/useNews';
 import { useNewsAdmin } from '@/hooks/useNewsAdmin';
 
@@ -89,22 +89,15 @@ const News = () => {
         </section>
       </main>
 
-      {/* News Form Modal */}
-      {(showForm || editingNews) && (
-        <NewsForm
-          onClose={() => {
-            setShowForm(false);
-            setEditingNews(null);
-          }}
-          onSave={editingNews ? handleUpdateNews : handleCreateNews}
-          initialData={editingNewsItem ? {
-            title: editingNewsItem.title,
-            content: editingNewsItem.content,
-            published: editingNewsItem.published
-          } : undefined}
-          isEdit={!!editingNews}
-        />
-      )}
+      <NewsModalManager
+        showForm={showForm}
+        editingNews={editingNews}
+        editingNewsItem={editingNewsItem}
+        onCloseForm={() => setShowForm(false)}
+        onCloseEdit={() => setEditingNews(null)}
+        onCreateNews={handleCreateNews}
+        onUpdateNews={handleUpdateNews}
+      />
 
       <Footer />
     </div>

@@ -66,6 +66,9 @@ const QnA = () => {
               setSearchTerm={setSearchTerm}
               selectedStatus={selectedStatus}
               setSelectedStatus={setSelectedStatus}
+              showForm={showForm}
+              setShowForm={setShowForm}
+              user={user}
             />
 
             {loading ? (
