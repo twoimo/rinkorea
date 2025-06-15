@@ -16,6 +16,7 @@ interface Product {
   is_active?: boolean;
   created_at?: string;
   updated_at?: string;
+  detail_images?: string[];
 }
 
 const Products = () => {
@@ -31,6 +32,8 @@ const Products = () => {
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
   const [hiddenProductIds, setHiddenProductIds] = useState<string[]>([]);
+  const [showDetailDialog, setShowDetailDialog] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   // 숨김 상품 목록 불러오기 함수
   const fetchHiddenProducts = async () => {
@@ -193,6 +196,18 @@ const Products = () => {
     }
   };
 
+  // 상세 보기 다이얼로그 열기
+  const openDetailDialog = (product: Product) => {
+    setSelectedProduct(product);
+    setShowDetailDialog(true);
+  };
+
+  // 상세 보기 다이얼로그 닫기
+  const closeDetailDialog = () => {
+    setSelectedProduct(null);
+    setShowDetailDialog(false);
+  };
+
   // 보이는 상품만 필터링
   const getVisibleProducts = () => {
     return products.filter(product => !hiddenProductIds.includes(product.id));
@@ -234,7 +249,7 @@ const Products = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {getVisibleProducts().map((product, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow flex flex-col">
                 <div className="relative aspect-square overflow-hidden">
                   <img
                     src={getImageUrl(product.image_url)}
@@ -281,10 +296,10 @@ const Products = () => {
                     )}
                   </div>
                 </div>
-                <div className="p-6">
+                <div className="p-6 flex flex-col flex-grow">
                   <h3 className="text-2xl font-bold text-gray-900 mb-3">{product.name}</h3>
                   <p className="text-gray-600 mb-4">{product.description}</p>
-                  <div className="space-y-2">
+                  <div className="space-y-2 flex-grow">
                     <h4 className="font-semibold text-gray-900">주요 특징:</h4>
                     <ul className="space-y-1">
                       {product.features.map((feature, featureIndex) => (
@@ -295,6 +310,12 @@ const Products = () => {
                       ))}
                     </ul>
                   </div>
+                  <button
+                    onClick={() => openDetailDialog(product)}
+                    className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                  >
+                    자세히 보기
+                  </button>
                 </div>
               </div>
             ))}
@@ -387,6 +408,10 @@ const Products = () => {
                 <label className="block text-sm font-medium mb-1">주요 특징 (쉼표로 구분)</label>
                 <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.features?.join(', ') || ''} onChange={e => setFormValues(v => ({ ...v, features: e.target.value.split(',').map(f => f.trim()) }))} />
               </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">상세 이미지 URL (쉼표로 구분)</label>
+                <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.detail_images?.join(', ') || ''} onChange={e => setFormValues(v => ({ ...v, detail_images: e.target.value.split(',').map(f => f.trim()) }))} />
+              </div>
               {formError && <div className="mt-2 text-sm text-red-600">{formError}</div>}
               {formSuccess && <div className="mt-2 text-sm text-green-700">{formSuccess}</div>}
               <div className="flex gap-2 justify-end">
@@ -419,6 +444,35 @@ const Products = () => {
               >
                 삭제
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 상세 보기 다이얼로그 */}
+      {showDetailDialog && selectedProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">{selectedProduct.name} 상세 정보</h2>
+              <button
+                onClick={closeDetailDialog}
+                className="text-gray-400 hover:text-gray-700"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="space-y-6">
+              {selectedProduct.detail_images?.map((image, index) => (
+                <div key={index} className="w-full">
+                  <img
+                    src={getImageUrl(image)}
+                    alt={`${selectedProduct.name} 상세 이미지 ${index + 1}`}
+                    className="w-full h-auto object-contain"
+                    style={{ maxHeight: '80vh' }}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </div>
