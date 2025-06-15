@@ -74,7 +74,7 @@ const News = () => {
       <div className="min-h-screen bg-white">
         <Header />
 
-        <section className="py-20">
+        <section className="py-8 md:py-20">
           <div className="container mx-auto px-4 max-w-4xl">
             <NewsDetail
               news={selectedNewsItem}
@@ -95,22 +95,22 @@ const News = () => {
       <Header />
 
       <main>
-        {/* Hero Section */}
-        <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
+        {/* Hero Section - 모바일 최적화 */}
+        <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 md:py-20">
           <div className="container mx-auto px-4">
             <div className="text-center">
-              <h1 className="text-5xl font-bold mb-6">공지사항</h1>
-              <p className="text-xl max-w-2xl mx-auto">
+              <h1 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6">공지사항</h1>
+              <p className="text-base md:text-xl max-w-2xl mx-auto px-4">
                 린코리아의 최신 소식과 중요한 공지사항을 확인하세요.
               </p>
               <AdminOnly>
-                <div className="mt-8">
+                <div className="mt-6 md:mt-8">
                   <button
                     onClick={() => setShowForm(true)}
-                    className="inline-flex items-center bg-white text-blue-900 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                    className="inline-flex items-center bg-white text-blue-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-sm md:text-base"
                     aria-label="새 공지사항 작성"
                   >
-                    <Plus className="w-5 h-5 mr-2" aria-hidden="true" />
+                    <Plus className="w-4 h-4 md:w-5 md:h-5 mr-2" aria-hidden="true" />
                     새 공지사항 작성
                   </button>
                 </div>
@@ -119,27 +119,27 @@ const News = () => {
           </div>
         </section>
 
-        {/* News List */}
-        <section className="py-20">
+        {/* News List - 모바일 최적화 */}
+        <section className="py-8 md:py-20">
           <div className="container mx-auto px-4 max-w-6xl">
             {loading ? (
               <div className="text-center py-12">
                 <p className="text-gray-500">로딩 중...</p>
               </div>
             ) : (
-              <div className="space-y-8">
+              <div className="space-y-4 md:space-y-8">
                 {displayNews.map((newsItem) => (
                   <article key={newsItem.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-                    <div className="p-8">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                    <div className="p-4 md:p-8">
+                      <div className="flex items-start justify-between mb-3 gap-2">
+                        <span className="bg-blue-100 text-blue-800 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium flex-shrink-0">
                           공지사항
                         </span>
                         <AdminOnly>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
                             <button
                               onClick={() => setEditingNews(newsItem.id)}
-                              className="text-blue-600 hover:text-blue-700 p-1"
+                              className="text-blue-600 hover:text-blue-700 p-2 md:p-1 hover:bg-blue-50 rounded-lg md:rounded-none md:hover:bg-transparent transition-colors"
                               title="수정"
                               aria-label="수정"
                             >
@@ -147,7 +147,7 @@ const News = () => {
                             </button>
                             <button
                               onClick={() => handleDeleteNews(newsItem.id)}
-                              className="text-red-600 hover:text-red-700 p-1"
+                              className="text-red-600 hover:text-red-700 p-2 md:p-1 hover:bg-red-50 rounded-lg md:rounded-none md:hover:bg-transparent transition-colors"
                               title="삭제"
                               aria-label="삭제"
                             >
@@ -158,32 +158,32 @@ const News = () => {
                       </div>
 
                       <h2
-                        className="text-2xl font-bold text-gray-900 mb-3 hover:text-blue-600 transition-colors cursor-pointer"
+                        className="text-lg md:text-2xl font-bold text-gray-900 mb-2 md:mb-3 hover:text-blue-600 transition-colors cursor-pointer line-clamp-2 leading-tight"
                         onClick={() => setSelectedNews(newsItem.id)}
                         aria-label="공지사항 상세보기"
                       >
                         {newsItem.title}
                       </h2>
 
-                      <p className="text-gray-600 mb-4 line-clamp-2">
+                      <p className="text-gray-600 mb-3 md:mb-4 line-clamp-2 text-sm md:text-base">
                         {newsItem.content}
                       </p>
 
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center text-sm text-gray-500 space-x-4">
+                        <div className="flex items-center text-xs md:text-sm text-gray-500">
                           <div className="flex items-center">
-                            <Calendar className="w-4 h-4 mr-1" aria-hidden="true" />
+                            <Calendar className="w-3 h-3 md:w-4 md:h-4 mr-1" aria-hidden="true" />
                             {new Date(newsItem.created_at).toLocaleDateString('ko-KR')}
                           </div>
                         </div>
 
                         <button
                           onClick={() => setSelectedNews(newsItem.id)}
-                          className="text-blue-600 hover:text-blue-700 font-medium flex items-center transition-colors"
+                          className="text-blue-600 hover:text-blue-700 font-medium flex items-center transition-colors text-sm md:text-base px-2 py-1 md:px-0 md:py-0 hover:bg-blue-50 md:hover:bg-transparent rounded"
                           aria-label="자세히 보기"
                         >
                           자세히 보기
-                          <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" />
+                          <ArrowRight className="w-3 h-3 md:w-4 md:h-4 ml-1" aria-hidden="true" />
                         </button>
                       </div>
                     </div>
@@ -201,7 +201,7 @@ const News = () => {
         </section>
       </main>
 
-      {/* News Form Modal */}
+      {/* News Form Modal - 모바일 최적화 */}
       {(showForm || editingNews) && (
         <NewsForm
           onClose={() => {
