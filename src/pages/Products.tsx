@@ -34,9 +34,6 @@ const Products = () => {
   const [hiddenProductIds, setHiddenProductIds] = useState<string[]>([]);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [editingDetailImages, setEditingDetailImages] = useState<string[]>([]);
-  const [isEditingImages, setIsEditingImages] = useState(false);
-  const [newImageUrl, setNewImageUrl] = useState('');
 
   // 숨김 상품 목록 불러오기 함수
   const fetchHiddenProducts = async () => {
@@ -51,15 +48,31 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
-      const { data, error } = await (supabase as unknown as SupabaseClient)
-        .from('product_introductions')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: true });
-      if (!error && data) {
-        setProducts(data);
+      try {
+        const { data, error } = await (supabase as unknown as SupabaseClient)
+          .from('product_introductions')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: true });
+
+        if (error) {
+          console.error('Error fetching products:', error);
+          return;
+        }
+
+        if (data) {
+          // detail_images가 없는 경우 빈 배열로 초기화
+          const productsWithDetailImages = data.map(product => ({
+            ...product,
+            detail_images: product.detail_images || []
+          }));
+          setProducts(productsWithDetailImages);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetchProducts();
   }, []);
@@ -97,52 +110,19 @@ const Products = () => {
   };
 
   // 상품 저장(추가/수정)
-  const handleFormSave = async () => {
-    console.log('Save button clicked');
+  const handleFormSave = async (e: React.FormEvent) => {
+    e.preventDefault();
     setFormLoading(true);
     setFormError(null);
     setFormSuccess(null);
 
-    // Validate required fields
-    if (!formValues.name?.trim()) {
-      setFormError('제품명을 입력해주세요.');
-      setFormLoading(false);
-      return;
-    }
-    if (!formValues.description?.trim()) {
-      setFormError('설명을 입력해주세요.');
-      setFormLoading(false);
-      return;
-    }
-    if (!formValues.image_url?.trim()) {
-      setFormError('이미지 URL을 입력해주세요.');
-      setFormLoading(false);
-      return;
-    }
-    if (!formValues.icon?.trim()) {
-      setFormError('아이콘을 선택해주세요.');
-      setFormLoading(false);
-      return;
-    }
-    if (!formValues.features?.length) {
-      setFormError('주요 특징을 입력해주세요.');
-      setFormLoading(false);
-      return;
-    }
-
     try {
+      // detail_images를 제외한 payload 생성
+      const { detail_images, ...restFormValues } = formValues;
       const payload = {
-        ...formValues,
-        name: formValues.name.trim(),
-        description: formValues.description.trim(),
-        image_url: formValues.image_url.trim(),
-        icon: formValues.icon.trim(),
-        features: formValues.features.map(f => f.trim()),
-        detail_images: formValues.detail_images || [],
+        ...restFormValues,
         updated_at: new Date().toISOString(),
       };
-
-      console.log('Saving payload:', payload);
 
       let result;
       if (editingProduct) {
@@ -156,7 +136,7 @@ const Products = () => {
           // 수정된 제품으로 상태 업데이트 (순서 유지)
           setProducts(prevProducts =>
             prevProducts.map(p =>
-              p.id === editingProduct.id ? { ...p, ...payload } : p
+              p.id === editingProduct.id ? { ...p, ...payload, detail_images: detail_images || [] } : p
             )
           );
         }
@@ -168,20 +148,19 @@ const Products = () => {
 
         if (!result.error && result.data) {
           // 새 제품 추가 (맨 뒤에 추가)
-          setProducts(prevProducts => [...prevProducts, result.data[0]]);
+          setProducts(prevProducts => [...prevProducts, { ...result.data[0], detail_images: detail_images || [] }]);
         }
       }
 
       if (result.error) {
-        console.error('Save error:', result.error);
         setFormError(result.error.message);
       } else {
-        console.log('Save successful');
         setFormSuccess(editingProduct ? '제품이 수정되었습니다.' : '제품이 추가되었습니다.');
-        closeForm();
+        setTimeout(() => {
+          closeForm();
+        }, 1500);
       }
     } catch (error) {
-      console.error('Save error:', error);
       setFormError('오류가 발생했습니다.');
     } finally {
       setFormLoading(false);
@@ -238,75 +217,13 @@ const Products = () => {
   // 상세 보기 다이얼로그 열기
   const openDetailDialog = (product: Product) => {
     setSelectedProduct(product);
-    setEditingDetailImages(product.detail_images || []);
-    setIsEditingImages(false);
-    setNewImageUrl('');
     setShowDetailDialog(true);
   };
 
   // 상세 보기 다이얼로그 닫기
   const closeDetailDialog = () => {
     setSelectedProduct(null);
-    setEditingDetailImages([]);
-    setIsEditingImages(false);
-    setNewImageUrl('');
     setShowDetailDialog(false);
-  };
-
-  // 이미지 추가
-  const handleAddImage = () => {
-    if (newImageUrl.trim()) {
-      setEditingDetailImages([...editingDetailImages, newImageUrl.trim()]);
-      setNewImageUrl('');
-    }
-  };
-
-  // 이미지 삭제
-  const handleRemoveImage = (index: number) => {
-    setEditingDetailImages(editingDetailImages.filter((_, i) => i !== index));
-  };
-
-  // 이미지 순서 변경
-  const handleMoveImage = (fromIndex: number, toIndex: number) => {
-    const newImages = [...editingDetailImages];
-    const [movedImage] = newImages.splice(fromIndex, 1);
-    newImages.splice(toIndex, 0, movedImage);
-    setEditingDetailImages(newImages);
-  };
-
-  // 이미지 변경사항 저장
-  const handleSaveImages = async () => {
-    if (!selectedProduct) return;
-
-    try {
-      // 단순화된 업데이트 로직
-      const { error } = await (supabase as unknown as SupabaseClient)
-        .from('product_introductions')
-        .update({
-          detail_images: editingDetailImages || [],
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', selectedProduct.id);
-
-      if (error) {
-        console.error('Error updating images:', error);
-        return;
-      }
-
-      // 제품 목록 업데이트
-      setProducts(prevProducts =>
-        prevProducts.map(p =>
-          p.id === selectedProduct.id
-            ? { ...p, detail_images: editingDetailImages || [] }
-            : p
-        )
-      );
-
-      setIsEditingImages(false);
-      closeDetailDialog();
-    } catch (error) {
-      console.error('Unexpected error:', error);
-    }
   };
 
   // 보이는 상품만 필터링
@@ -476,35 +393,21 @@ const Products = () => {
           <div className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full relative">
             <button className="absolute top-4 right-4 text-gray-400 hover:text-gray-700" onClick={closeForm}><X className="w-6 h-6" /></button>
             <h2 className="text-2xl font-bold mb-4">{editingProduct ? '제품 수정' : '제품 추가'}</h2>
-            <div className="space-y-4">
+            <form className="space-y-4" onSubmit={handleFormSave}>
               <div>
-                <label className="block text-sm font-medium mb-1">제품명 <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  className="w-full border px-3 py-2 rounded"
-                  value={formValues.name || ''}
-                  onChange={e => setFormValues(v => ({ ...v, name: e.target.value }))}
-                />
+                <label className="block text-sm font-medium mb-1">제품명</label>
+                <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.name || ''} onChange={e => setFormValues(v => ({ ...v, name: e.target.value }))} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">설명 <span className="text-red-500">*</span></label>
-                <textarea
-                  className="w-full border px-3 py-2 rounded"
-                  value={formValues.description || ''}
-                  onChange={e => setFormValues(v => ({ ...v, description: e.target.value }))}
-                />
+                <label className="block text-sm font-medium mb-1">설명</label>
+                <textarea className="w-full border px-3 py-2 rounded" value={formValues.description || ''} onChange={e => setFormValues(v => ({ ...v, description: e.target.value }))} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">이미지 URL <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  className="w-full border px-3 py-2 rounded"
-                  value={formValues.image_url || ''}
-                  onChange={e => setFormValues(v => ({ ...v, image_url: e.target.value }))}
-                />
+                <label className="block text-sm font-medium mb-1">이미지 URL</label>
+                <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.image_url || ''} onChange={e => setFormValues(v => ({ ...v, image_url: e.target.value }))} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">아이콘 <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-medium mb-1">아이콘</label>
                 <select
                   value={formValues.icon || ''}
                   onChange={(e) => setFormValues({ ...formValues, icon: e.target.value })}
@@ -520,47 +423,20 @@ const Products = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">주요 특징 (쉼표로 구분) <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  className="w-full border px-3 py-2 rounded"
-                  value={formValues.features?.join(', ') || ''}
-                  onChange={e => setFormValues(v => ({ ...v, features: e.target.value.split(',').map(f => f.trim()) }))}
-                />
+                <label className="block text-sm font-medium mb-1">주요 특징 (쉼표로 구분)</label>
+                <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.features?.join(', ') || ''} onChange={e => setFormValues(v => ({ ...v, features: e.target.value.split(',').map(f => f.trim()) }))} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">상세 이미지 URL (쉼표로 구분)</label>
-                <input
-                  type="text"
-                  className="w-full border px-3 py-2 rounded"
-                  value={formValues.detail_images?.join(', ') || ''}
-                  onChange={e => setFormValues(v => ({ ...v, detail_images: e.target.value.split(',').map(f => f.trim()) }))}
-                />
+                <input type="text" className="w-full border px-3 py-2 rounded" value={formValues.detail_images?.join(', ') || ''} onChange={e => setFormValues(v => ({ ...v, detail_images: e.target.value.split(',').map(f => f.trim()) }))} />
               </div>
               {formError && <div className="mt-2 text-sm text-red-600">{formError}</div>}
               {formSuccess && <div className="mt-2 text-sm text-green-700">{formSuccess}</div>}
               <div className="flex gap-2 justify-end">
-                <button
-                  type="button"
-                  className="px-4 py-2 rounded bg-gray-200 text-gray-700"
-                  onClick={closeForm}
-                  disabled={formLoading}
-                >
-                  취소
-                </button>
-                <button
-                  type="button"
-                  className="px-4 py-2 rounded bg-blue-600 text-white font-semibold disabled:opacity-50"
-                  onClick={() => {
-                    console.log('Save button clicked'); // 디버깅용 로그
-                    handleFormSave();
-                  }}
-                  disabled={formLoading}
-                >
-                  {formLoading ? '저장 중...' : '저장'}
-                </button>
+                <button type="button" className="px-4 py-2 rounded bg-gray-200 text-gray-700" onClick={closeForm} disabled={formLoading}>취소</button>
+                <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white font-semibold disabled:opacity-50" disabled={formLoading}>{formLoading ? '저장 중...' : '저장'}</button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       )}
@@ -597,105 +473,21 @@ const Products = () => {
           <div className="bg-white rounded-lg p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-900">{selectedProduct.name} 상세 정보</h2>
-              <div className="flex items-center gap-4">
-                {isAdmin && (
-                  <>
-                    {isEditingImages ? (
-                      <>
-                        <button
-                          onClick={handleSaveImages}
-                          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                        >
-                          저장
-                        </button>
-                        <button
-                          onClick={() => {
-                            setEditingDetailImages(selectedProduct.detail_images || []);
-                            setIsEditingImages(false);
-                          }}
-                          className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                        >
-                          취소
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        onClick={() => setIsEditingImages(true)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                      >
-                        이미지 관리
-                      </button>
-                    )}
-                  </>
-                )}
-                <button
-                  onClick={closeDetailDialog}
-                  className="text-gray-400 hover:text-gray-700"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
+              <button
+                onClick={closeDetailDialog}
+                className="text-gray-400 hover:text-gray-700"
+              >
+                <X className="w-6 h-6" />
+              </button>
             </div>
-
-            {isAdmin && isEditingImages && (
-              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                <div className="flex gap-2 mb-4">
-                  <input
-                    type="text"
-                    value={newImageUrl}
-                    onChange={(e) => setNewImageUrl(e.target.value)}
-                    placeholder="새 이미지 URL 입력"
-                    className="flex-grow px-3 py-2 border rounded"
-                  />
-                  <button
-                    onClick={handleAddImage}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                  >
-                    추가
-                  </button>
-                </div>
-                <div className="space-y-2">
-                  {editingDetailImages.map((image, index) => (
-                    <div key={index} className="flex items-center gap-2 p-2 bg-white rounded">
-                      <span className="flex-grow truncate">{image}</span>
-                      <div className="flex gap-2">
-                        {index > 0 && (
-                          <button
-                            onClick={() => handleMoveImage(index, index - 1)}
-                            className="p-1 text-gray-600 hover:text-gray-900"
-                          >
-                            ↑
-                          </button>
-                        )}
-                        {index < editingDetailImages.length - 1 && (
-                          <button
-                            onClick={() => handleMoveImage(index, index + 1)}
-                            className="p-1 text-gray-600 hover:text-gray-900"
-                          >
-                            ↓
-                          </button>
-                        )}
-                        <button
-                          onClick={() => handleRemoveImage(index)}
-                          className="p-1 text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             <div className="space-y-6">
-              {(isEditingImages ? editingDetailImages : selectedProduct.detail_images || []).map((image, index) => (
+              {selectedProduct.detail_images?.map((image, index) => (
                 <div key={index} className="w-full">
                   <img
                     src={getImageUrl(image)}
                     alt={`${selectedProduct.name} 상세 이미지 ${index + 1}`}
-                    className="w-full h-auto object-contain rounded-lg shadow-md"
-                    style={{ maxHeight: '60vh' }}
+                    className="w-full h-auto object-contain"
+                    style={{ maxHeight: '80vh' }}
                   />
                 </div>
               ))}
