@@ -135,6 +135,10 @@ const Products = memo(() => {
     }
   }, [deleteTarget, deleteProduct, handleCloseDeleteConfirm]);
 
+  const handleToggleVisibility = useCallback(async (product: Product) => {
+    await toggleProductVisibility(product.id);
+  }, [toggleProductVisibility]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
@@ -199,7 +203,7 @@ const Products = memo(() => {
                   isAdmin={isAdmin}
                   onEdit={handleOpenForm}
                   onDelete={handleOpenDeleteConfirm}
-                  onToggleHide={toggleProductVisibility}
+                  onToggleHide={handleToggleVisibility}
                   onViewDetail={handleOpenDetailDialog}
                 />
               ))}
