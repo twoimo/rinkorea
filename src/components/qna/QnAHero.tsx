@@ -21,7 +21,7 @@ const QnAHero: React.FC<QnAHeroProps> = ({ user, setShowForm }) => {
             {!user ? (
               <Link
                 to="/auth"
-                className="inline-flex items-center justify-center bg-white text-blue-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 w-full sm:w-auto"
+                className="inline-flex items-center justify-center bg-white text-blue-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 max-w-sm mx-auto"
                 aria-label="로그인하여 문의하기"
               >
                 <User className="w-5 h-5 mr-2" aria-hidden="true" />
@@ -30,7 +30,7 @@ const QnAHero: React.FC<QnAHeroProps> = ({ user, setShowForm }) => {
             ) : (
               <button
                 onClick={() => setShowForm(true)}
-                className="inline-flex items-center justify-center bg-white text-blue-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 w-full sm:w-auto"
+                className="inline-flex items-center justify-center bg-white text-blue-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 max-w-sm mx-auto"
                 aria-label="새 문의 작성"
               >
                 <Plus className="w-5 h-5 mr-2" aria-hidden="true" />
