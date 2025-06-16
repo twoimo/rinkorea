@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { User, Calendar, CheckCircle, Clock, Lock, Edit, Trash2 } from 'lucide-react';
 import QnAEditForm from './QnAEditForm';
 import RepliesSection from './RepliesSection';
+import { useUserRole } from '@/hooks/useUserRole';
 
 interface Inquiry {
   id: string;
@@ -34,8 +34,8 @@ const QnAItem: React.FC<QnAItemProps> = ({
   onDelete,
   onRefetch
 }) => {
+  const { isAdmin } = useUserRole();
   const isOwner = user && inquiry.user_id === user.id;
-  const isAdmin = user?.user_metadata?.role === 'admin';
   const canView = !inquiry.is_private || isOwner || isAdmin;
   const canShowContent = canView;
 
@@ -100,16 +100,16 @@ const QnAItem: React.FC<QnAItemProps> = ({
           </div>
           {(isAdmin || isOwner) && (
             <div className="flex gap-2">
-              <button 
-                onClick={handleEditClick} 
-                className="text-blue-600 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-lg transition-colors" 
+              <button
+                onClick={handleEditClick}
+                className="text-blue-600 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-lg transition-colors"
                 title="수정"
               >
                 <Edit className="w-4 h-4" />
               </button>
-              <button 
-                onClick={handleDeleteClick} 
-                className="text-red-600 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors" 
+              <button
+                onClick={handleDeleteClick}
+                className="text-red-600 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors"
                 title="삭제"
               >
                 <Trash2 className="w-4 h-4" />
