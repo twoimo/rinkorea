@@ -6,9 +6,10 @@ interface RepliesSectionProps {
   inquiryId: string;
   canView: boolean;
   isAdmin: boolean;
+  onRefetch?: () => Promise<void>;
 }
 
-const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isAdmin }) => {
+const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isAdmin, onRefetch }) => {
   const { getReplies, createReply, updateReply, deleteReply } = useInquiries();
   const [replies, setReplies] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
@@ -21,6 +22,21 @@ const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isA
       getReplies(inquiryId).then(setReplies).finally(() => setLoading(false));
     }
   }, [inquiryId, canView]);
+
+  const handleCreateReply = async () => {
+    if (!replyText.trim()) return;
+    try {
+      await createReply(inquiryId, replyText);
+      setReplyText('');
+      const updatedReplies = await getReplies(inquiryId);
+      setReplies(updatedReplies);
+      if (onRefetch) {
+        await onRefetch();
+      }
+    } catch (error) {
+      console.error('Error creating reply:', error);
+    }
+  };
 
   if (!canView) return null;
 
@@ -45,12 +61,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isA
                   />
                   <div className="mt-2 flex justify-end">
                     <button
-                      onClick={async () => {
-                        if (!replyText.trim()) return;
-                        await createReply(inquiryId, replyText);
-                        setReplyText('');
-                        setReplies(await getReplies(inquiryId));
-                      }}
+                      onClick={handleCreateReply}
                       className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors text-sm md:text-base"
                     >
                       답변 등록
@@ -91,7 +102,8 @@ const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isA
                               await updateReply(reply.id, replyText);
                               setEditingId(null);
                               setReplyText('');
-                              setReplies(await getReplies(inquiryId));
+                              const updatedReplies = await getReplies(inquiryId);
+                              setReplies(updatedReplies);
                             }}
                             className="text-blue-600 text-xs px-2 py-1 hover:bg-blue-100 rounded"
                           >
@@ -115,7 +127,11 @@ const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isA
                           <button
                             onClick={async () => {
                               await deleteReply(reply.id);
-                              setReplies(await getReplies(inquiryId));
+                              const updatedReplies = await getReplies(inquiryId);
+                              setReplies(updatedReplies);
+                              if (onRefetch) {
+                                await onRefetch();
+                              }
                             }}
                             className="text-red-600 text-xs px-2 py-1 hover:bg-red-100 rounded"
                           >
@@ -139,12 +155,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isA
                   />
                   <div className="mt-2 flex justify-end">
                     <button
-                      onClick={async () => {
-                        if (!replyText.trim()) return;
-                        await createReply(inquiryId, replyText);
-                        setReplyText('');
-                        setReplies(await getReplies(inquiryId));
-                      }}
+                      onClick={handleCreateReply}
                       className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors text-sm md:text-base"
                     >
                       답변 등록

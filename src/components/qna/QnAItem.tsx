@@ -125,7 +125,7 @@ const QnAItem: React.FC<QnAItemProps> = ({
       {canShowContent ? (
         <>
           <p className="text-gray-600 mb-4 leading-relaxed whitespace-pre-wrap text-sm md:text-base">{inquiry.content}</p>
-          <RepliesSection inquiryId={inquiry.id} canView={canShowContent} isAdmin={isAdmin} />
+          <RepliesSection inquiryId={inquiry.id} canView={canShowContent} isAdmin={isAdmin} onRefetch={onRefetch} />
         </>
       ) : (
         <div className="text-gray-400 italic flex items-center text-sm md:text-base">

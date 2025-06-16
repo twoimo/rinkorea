@@ -145,13 +145,39 @@ export const useInquiries = () => {
   };
 
   const createReply = async (inquiryId: string, content: string): Promise<Reply | null> => {
-    const { data, error } = await supabase
-      .from('replies')
-      .insert({ inquiry_id: inquiryId, content })
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
+    try {
+      // First create the reply
+      const { data: replyData, error: replyError } = await supabase
+        .from('replies')
+        .insert({ inquiry_id: inquiryId, content })
+        .select()
+        .single();
+
+      if (replyError) throw replyError;
+
+      // Then update the inquiry status
+      const { data: inquiryData, error: inquiryError } = await supabase
+        .from('inquiries')
+        .update({
+          status: '답변완료',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', inquiryId)
+        .select()
+        .single();
+
+      if (inquiryError) throw inquiryError;
+
+      // Update local state
+      setInquiries(prev => prev.map(inquiry =>
+        inquiry.id === inquiryId ? inquiryData : inquiry
+      ));
+
+      return replyData;
+    } catch (error) {
+      console.error('Error in createReply:', error);
+      throw error;
+    }
   };
 
   const updateReply = async (replyId: string, content: string): Promise<Reply | null> => {
