@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -6,6 +5,9 @@ import { Settings, Wrench, Award, Star, Plus, Edit, Trash2, X, EyeOff, Eye } fro
 import { supabase } from '../integrations/supabase/client';
 import { useUserRole } from '../hooks/useUserRole';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { arrayMove } from '@dnd-kit/sortable';
 
 interface Equipment {
     id: string;
@@ -33,6 +35,14 @@ const Equipment = () => {
     const [formError, setFormError] = useState<string | null>(null);
     const [formSuccess, setFormSuccess] = useState<string | null>(null);
     const [hiddenEquipmentIds, setHiddenEquipmentIds] = useState<string[]>([]);
+    const [newFeature, setNewFeature] = useState('');
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
 
     // 숨김 기계 목록 불러오기 함수
     const fetchHiddenEquipment = async () => {
@@ -202,6 +212,39 @@ const Equipment = () => {
     const getImageUrl = (imagePath: string) => {
         if (imagePath.includes('://') || imagePath.startsWith('@')) return imagePath;
         return `/images/${imagePath}`;
+    };
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            setFormValues(prev => {
+                const oldIndex = prev.features?.findIndex(item => item === active.id) ?? -1;
+                const newIndex = prev.features?.findIndex(item => item === over.id) ?? -1;
+
+                return {
+                    ...prev,
+                    features: arrayMove(prev.features || [], oldIndex, newIndex)
+                };
+            });
+        }
+    };
+
+    const handleAddFeature = () => {
+        if (newFeature.trim()) {
+            setFormValues(prev => ({
+                ...prev,
+                features: [...(prev.features || []), newFeature.trim()]
+            }));
+            setNewFeature('');
+        }
+    };
+
+    const handleRemoveFeature = (index: number) => {
+        setFormValues(prev => ({
+            ...prev,
+            features: prev.features?.filter((_, i) => i !== index) || []
+        }));
     };
 
     return (
@@ -413,8 +456,8 @@ const Equipment = () => {
                 <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-lg shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto relative">
                         <div className="sticky top-0 bg-white border-b border-gray-200 p-4 md:p-6">
-                            <button 
-                                className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 touch-manipulation" 
+                            <button
+                                className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 touch-manipulation"
                                 onClick={closeForm}
                             >
                                 <X className="w-6 h-6" />
@@ -476,19 +519,58 @@ const Equipment = () => {
                                         required
                                     >
                                         <option value="">선택하세요</option>
-                                        <option value="premium">1번째</option>
-                                        <option value="professional">2번째</option>
+                                        <option value="premium">최신형 콘크리트 연삭기</option>
+                                        <option value="professional">콘크리트 연삭기</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">특징 (쉼표로 구분)</label>
-                                    <input
-                                        type="text"
-                                        value={formValues.features?.join(', ') || ''}
-                                        onChange={(e) => setFormValues({ ...formValues, features: e.target.value.split(',').map(f => f.trim()) })}
-                                        className="w-full px-3 py-3 md:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
-                                        required
-                                    />
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">특징</label>
+                                    <div className="space-y-2">
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                className="flex-1 border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                                                value={newFeature}
+                                                onChange={e => setNewFeature(e.target.value)}
+                                                placeholder="새로운 특징을 입력하세요"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={handleAddFeature}
+                                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                            >
+                                                <Plus className="w-5 h-5" />
+                                            </button>
+                                        </div>
+                                        <DndContext
+                                            sensors={sensors}
+                                            collisionDetection={closestCenter}
+                                            onDragEnd={handleDragEnd}
+                                        >
+                                            <SortableContext
+                                                items={formValues.features || []}
+                                                strategy={verticalListSortingStrategy}
+                                            >
+                                                <ul className="space-y-2">
+                                                    {formValues.features?.map((feature, index) => (
+                                                        <li
+                                                            key={feature}
+                                                            className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
+                                                        >
+                                                            <span className="flex-1">{feature}</span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleRemoveFeature(index)}
+                                                                className="text-red-600 hover:text-red-700"
+                                                            >
+                                                                <X className="w-4 h-4" />
+                                                            </button>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </SortableContext>
+                                        </DndContext>
+                                    </div>
                                 </div>
                                 {formError && (
                                     <div className="text-red-600 text-sm">{formError}</div>
