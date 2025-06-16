@@ -192,11 +192,55 @@ export const useInquiries = () => {
   };
 
   const deleteReply = async (replyId: string): Promise<void> => {
-    const { error } = await supabase
-      .from('replies')
-      .delete()
-      .eq('id', replyId);
-    if (error) throw error;
+    try {
+      // First get the inquiry_id for this reply
+      const { data: reply, error: replyError } = await supabase
+        .from('replies')
+        .select('inquiry_id')
+        .eq('id', replyId)
+        .single();
+
+      if (replyError) throw replyError;
+
+      // Delete the reply
+      const { error: deleteError } = await supabase
+        .from('replies')
+        .delete()
+        .eq('id', replyId);
+
+      if (deleteError) throw deleteError;
+
+      // Check if there are any remaining replies
+      const { data: remainingReplies, error: countError } = await supabase
+        .from('replies')
+        .select('id')
+        .eq('inquiry_id', reply.inquiry_id);
+
+      if (countError) throw countError;
+
+      // If no replies left, update inquiry status to '답변대기'
+      if (!remainingReplies || remainingReplies.length === 0) {
+        const { data: inquiryData, error: updateError } = await supabase
+          .from('inquiries')
+          .update({
+            status: '답변대기',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', reply.inquiry_id)
+          .select()
+          .single();
+
+        if (updateError) throw updateError;
+
+        // Update local state
+        setInquiries(prev => prev.map(inquiry =>
+          inquiry.id === reply.inquiry_id ? inquiryData : inquiry
+        ));
+      }
+    } catch (error) {
+      console.error('Error in deleteReply:', error);
+      throw error;
+    }
   };
 
   return {
