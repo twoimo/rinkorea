@@ -48,8 +48,8 @@ const CATEGORY_PRODUCTS: Record<string, string[]> = {
     ]
 };
 
-// 제품명 콤보박스 컴포넌트
-interface ProductComboboxProps {
+// 제품명 셀렉트 컴포넌트 (카테고리 드롭다운과 유사하게 단순화)
+interface ProductSelectProps {
     value: string;
     category: string;
     onChange: (value: string) => void;
@@ -57,216 +57,30 @@ interface ProductComboboxProps {
     className?: string;
 }
 
-const ProductCombobox: React.FC<ProductComboboxProps> = ({
+const ProductSelect: React.FC<ProductSelectProps> = ({
     value,
     category,
     onChange,
     placeholder = "제품명",
     className = ""
 }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [inputValue, setInputValue] = useState(value);
-    const inputRef = useRef<HTMLInputElement>(null);
-    const dropdownRef = useRef<HTMLDivElement>(null);
-    const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
-
-    // value prop이 변경될 때 내부 상태 동기화
-    useEffect(() => {
-        setInputValue(value);
-    }, [value]);
-
-    // 드롭다운 위치 계산
-    const updateDropdownPosition = () => {
-        if (inputRef.current) {
-            const rect = inputRef.current.getBoundingClientRect();
-            setDropdownPosition({
-                top: rect.bottom + 2,
-                left: rect.left,
-                width: rect.width
-            });
-        }
-    };
-
-    // 외부 클릭 감지하여 드롭다운 닫기
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
-            }
-        };
-
-        if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-            return () => document.removeEventListener('mousedown', handleClickOutside);
-        }
-    }, [isOpen]);
-
-    // 드롭다운이 열릴 때 위치 업데이트
-    useEffect(() => {
-        if (isOpen) {
-            updateDropdownPosition();
-            // 스크롤 이벤트에 대응하여 위치 업데이트
-            const handleScroll = () => updateDropdownPosition();
-            window.addEventListener('scroll', handleScroll, true);
-            window.addEventListener('resize', handleScroll);
-            return () => {
-                window.removeEventListener('scroll', handleScroll, true);
-                window.removeEventListener('resize', handleScroll);
-            };
-        }
-    }, [isOpen]);
-
     // 카테고리에 해당하는 제품 목록 가져오기
     const availableProducts = CATEGORY_PRODUCTS[category] || [];
 
-    // 입력값에 따른 필터링된 제품 목록
-    const filteredProducts = availableProducts.filter(product =>
-        product.toLowerCase().includes(inputValue.toLowerCase())
-    );
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = e.target.value;
-        setInputValue(newValue);
-        onChange(newValue);
-        if (availableProducts.length > 0) {
-            setIsOpen(true);
-        }
-    };
-
-    const handleSelectProduct = (product: string) => {
-        setInputValue(product);
-        onChange(product);
-        setIsOpen(false);
-        inputRef.current?.blur();
-    };
-
-    const handleInputFocus = () => {
-        if (availableProducts.length > 0) {
-            setIsOpen(true);
-        }
-    };
-
-    const handleInputBlur = () => {
-        // 드롭다운 내부 클릭시에는 닫지 않도록 딜레이 조정
-        setTimeout(() => {
-            if (!dropdownRef.current?.contains(document.activeElement)) {
-                setIsOpen(false);
-            }
-        }, 100);
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (availableProducts.length > 0) {
-                setIsOpen(true);
-            }
-        } else if (e.key === 'Escape') {
-            setIsOpen(false);
-            inputRef.current?.blur();
-        }
-    };
-
-    const handleDropdownToggle = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (availableProducts.length > 0) {
-            setIsOpen(!isOpen);
-            if (!isOpen) {
-                inputRef.current?.focus();
-            }
-        }
-    };
-
     return (
-        <>
-            <div ref={dropdownRef} className="relative">
-                <div className="relative">
-                    <input
-                        ref={inputRef}
-                        type="text"
-                        value={inputValue}
-                        onChange={handleInputChange}
-                        onFocus={handleInputFocus}
-                        onBlur={handleInputBlur}
-                        onKeyDown={handleKeyDown}
-                        placeholder={placeholder}
-                        className={`w-full px-2 py-1 text-sm border border-gray-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 pr-8 rounded ${className}`}
-                    />
-                    {/* 드롭다운 버튼 - 항상 표시하되 비활성화 상태 구분 */}
-                    <button
-                        type="button"
-                        onClick={handleDropdownToggle}
-                        onMouseDown={(e) => e.preventDefault()} // 포커스 유지
-                        className={`absolute right-1 top-1/2 transform -translate-y-1/2 p-1 rounded transition-colors ${availableProducts.length > 0
-                                ? 'hover:bg-gray-100 cursor-pointer'
-                                : 'cursor-not-allowed opacity-50'
-                            }`}
-                        disabled={availableProducts.length === 0}
-                        title={availableProducts.length > 0 ? '제품 목록 보기' : '카테고리를 먼저 선택하세요'}
-                    >
-                        <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform ${isOpen && availableProducts.length > 0 ? 'rotate-180' : ''}`} />
-                    </button>
-                </div>
-
-                {/* 카테고리 미선택 시 안내 메시지 */}
-                {!category && !isOpen && (
-                    <div className="absolute top-full left-0 mt-1 text-xs text-gray-500 whitespace-nowrap bg-white px-2 py-1 rounded shadow-sm border z-10">
-                        카테고리를 먼저 선택하면 제품 목록이 표시됩니다
-                    </div>
-                )}
-            </div>
-
-            {/* 드롭다운 메뉴 - 포털을 사용하여 body에 렌더링 */}
-            {isOpen && availableProducts.length > 0 && (
-                <div
-                    className="fixed bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto"
-                    style={{
-                        zIndex: 9999,
-                        top: `${dropdownPosition.top}px`,
-                        left: `${dropdownPosition.left}px`,
-                        width: `${dropdownPosition.width}px`,
-                        minWidth: '200px'
-                    }}
-                >
-                    {filteredProducts.length > 0 ? (
-                        <>
-                            {/* 사용 가능한 제품 목록 헤더 */}
-                            {inputValue === '' && (
-                                <div className="px-3 py-2 text-xs text-gray-500 bg-gray-50 border-b sticky top-0">
-                                    {category} 제품 목록 ({availableProducts.length}개)
-                                </div>
-                            )}
-                            {filteredProducts.map((product, index) => (
-                                <button
-                                    key={index}
-                                    type="button"
-                                    onClick={() => handleSelectProduct(product)}
-                                    onMouseDown={(e) => e.preventDefault()} // 포커스 유지
-                                    className="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 hover:text-blue-700 focus:bg-blue-50 focus:text-blue-700 focus:outline-none transition-colors"
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <span className="truncate">{product}</span>
-                                        {inputValue !== '' && product.toLowerCase().includes(inputValue.toLowerCase()) && (
-                                            <span className="text-xs text-blue-500 ml-2 flex-shrink-0">일치</span>
-                                        )}
-                                    </div>
-                                </button>
-                            ))}
-                        </>
-                    ) : (
-                        <div className="px-3 py-2 text-sm text-gray-500 text-center">
-                            <div className="mb-1">"{inputValue}"와 일치하는 제품이 없습니다</div>
-                            {availableProducts.length > 0 && (
-                                <div className="text-xs text-gray-400 mt-2 max-h-20 overflow-y-auto">
-                                    사용 가능한 제품: {availableProducts.join(', ')}
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-            )}
-        </>
+        <select
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className={`w-full px-2 py-1 text-sm border-0 focus:ring-1 focus:ring-blue-500 ${className}`}
+            disabled={availableProducts.length === 0}
+        >
+            <option value="">{availableProducts.length > 0 ? placeholder : '카테고리를 먼저 선택하세요'}</option>
+            {availableProducts.map((product, index) => (
+                <option key={index} value={product}>
+                    {product}
+                </option>
+            ))}
+        </select>
     );
 };
 
@@ -528,7 +342,7 @@ const DataInput: React.FC<DataInputProps> = ({
                                             </select>
                                         </td>
                                         <td className="border border-gray-300 p-1">
-                                            <ProductCombobox
+                                            <ProductSelect
                                                 value={row.product_name || ''}
                                                 category={row.category || ''}
                                                 onChange={(value) => updateTableData(index, 'product_name', value)}

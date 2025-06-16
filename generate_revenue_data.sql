@@ -215,7 +215,7 @@ ORDER BY category, SUM(revenue) DESC;
 -- 기존 데이터 정리 (필요시)
 -- DELETE FROM revenue_data;
 
--- 임시 시퀀스 생성 함수
+-- 수정된 임시 시퀀스 생성 함수
 CREATE OR REPLACE FUNCTION generate_revenue_test_data()
 RETURNS void AS $$
 DECLARE
@@ -228,12 +228,14 @@ DECLARE
     random_unit_price DECIMAL(10,2);
     random_region TEXT;
     random_customer_type TEXT;
+    category_idx INTEGER;
+    product_idx INTEGER;
+    region_idx INTEGER;
+    customer_idx INTEGER;
+    random_value DECIMAL;
     
     -- 카테고리별 제품 정의
     categories TEXT[] := ARRAY['제품 매출', '건설기계 매출', '무역 매출', '온라인 매출', '기타 매출'];
-    
-    -- 제품별 가중치 (RIN-COAT가 가장 높음)
-    product_weights RECORD;
     
     -- 지역 목록
     regions TEXT[] := ARRAY['서울', '경기', '인천', '부산', '대구', '광주', '대전', '울산', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
@@ -251,43 +253,91 @@ BEGIN
         -- 랜덤 날짜 생성 (10년간의 데이터)
         random_date := start_date + (random() * (end_date - start_date))::INTEGER;
         
-        -- 카테고리 선택 (제품 매출이 60% 확률)
-        IF random() < 0.6 THEN
+        -- 카테고리 선택 (제품 매출이 60% 확률) - 수정된 로직
+        random_value := random();
+        IF random_value < 0.6 THEN
             random_category := '제품 매출';
         ELSE
-            random_category := categories[1 + floor(random() * array_length(categories, 1))];
+            -- 나머지 카테고리 중에서 균등하게 선택
+            category_idx := 1 + floor(random() * 4)::INTEGER; -- 0~3 범위로 제한
+            CASE category_idx
+                WHEN 1 THEN random_category := '건설기계 매출';
+                WHEN 2 THEN random_category := '무역 매출';
+                WHEN 3 THEN random_category := '온라인 매출';
+                ELSE random_category := '기타 매출';
+            END CASE;
         END IF;
         
-        -- 카테고리별 제품 선택
+        -- 카테고리가 설정되지 않은 경우 기본값 설정 (안전장치)
+        IF random_category IS NULL THEN
+            random_category := '제품 매출';
+        END IF;
+        
+        -- 카테고리별 제품 선택 - 수정된 로직
         CASE random_category
             WHEN '제품 매출' THEN
                 -- RIN-COAT가 40% 확률로 선택되도록 가중치 적용
                 IF random() < 0.4 THEN
                     random_product := 'RIN-COAT';
                 ELSE
-                    random_product := (ARRAY['RIN-SEAL PLUS', 'RIN-HARD PLUS', 'RIN-ONE COAT', 'RIN-ONE COAT(RK-61)', 'RIN-HARD ACE', 'RIN-HARD PLUS(LI)', 'RIN-CRETE', '고성능 침투성 방수제'])[1 + floor(random() * 8)];
+                    product_idx := 1 + floor(random() * 8)::INTEGER;
+                    CASE product_idx
+                        WHEN 1 THEN random_product := 'RIN-SEAL PLUS';
+                        WHEN 2 THEN random_product := 'RIN-HARD PLUS';
+                        WHEN 3 THEN random_product := 'RIN-ONE COAT';
+                        WHEN 4 THEN random_product := 'RIN-ONE COAT(RK-61)';
+                        WHEN 5 THEN random_product := 'RIN-HARD ACE';
+                        WHEN 6 THEN random_product := 'RIN-HARD PLUS(LI)';
+                        WHEN 7 THEN random_product := 'RIN-CRETE';
+                        ELSE random_product := '고성능 침투성 방수제';
+                    END CASE;
                 END IF;
                 
             WHEN '건설기계 매출' THEN
-                random_product := (ARRAY['950GT', '850GT', 'Falcon', 'D1688', 'Leopard-D1325'])[1 + floor(random() * 5)];
+                product_idx := 1 + floor(random() * 5)::INTEGER;
+                CASE product_idx
+                    WHEN 1 THEN random_product := '950GT';
+                    WHEN 2 THEN random_product := '850GT';
+                    WHEN 3 THEN random_product := 'Falcon';
+                    WHEN 4 THEN random_product := 'D1688';
+                    ELSE random_product := 'Leopard-D1325';
+                END CASE;
                 
             WHEN '무역 매출' THEN
-                random_product := (ARRAY['수출용 방수재', '수입 장비 부품', '해외 기술 라이선스'])[1 + floor(random() * 3)];
+                product_idx := 1 + floor(random() * 3)::INTEGER;
+                CASE product_idx
+                    WHEN 1 THEN random_product := '수출용 방수재';
+                    WHEN 2 THEN random_product := '수입 장비 부품';
+                    ELSE random_product := '해외 기술 라이선스';
+                END CASE;
                 
             WHEN '온라인 매출' THEN
-                random_product := (ARRAY['온라인 방수재 패키지', '디지털 기술 상담', '온라인 교육 과정'])[1 + floor(random() * 3)];
+                product_idx := 1 + floor(random() * 3)::INTEGER;
+                CASE product_idx
+                    WHEN 1 THEN random_product := '온라인 방수재 패키지';
+                    WHEN 2 THEN random_product := '디지털 기술 상담';
+                    ELSE random_product := '온라인 교육 과정';
+                END CASE;
                 
             WHEN '기타 매출' THEN
-                random_product := (ARRAY['기술 컨설팅', '시공 서비스', '품질 검사', 'A/S 서비스', '교육 프로그램'])[1 + floor(random() * 5)];
+                product_idx := 1 + floor(random() * 5)::INTEGER;
+                CASE product_idx
+                    WHEN 1 THEN random_product := '기술 컨설팅';
+                    WHEN 2 THEN random_product := '시공 서비스';
+                    WHEN 3 THEN random_product := '품질 검사';
+                    WHEN 4 THEN random_product := 'A/S 서비스';
+                    ELSE random_product := '교육 프로그램';
+                END CASE;
                 
             ELSE
                 random_product := 'RIN-COAT';
+                random_category := '제품 매출'; -- 안전장치
         END CASE;
         
         -- 제품별 매출 범위 설정
         CASE random_category
             WHEN '제품 매출' THEN
-                random_quantity := 1 + floor(random() * 100);
+                random_quantity := 1 + floor(random() * 100)::INTEGER;
                 CASE random_product
                     WHEN 'RIN-COAT' THEN
                         random_unit_price := 25000 + (random() * 15000)::DECIMAL(10,2); -- 25,000 ~ 40,000
@@ -300,36 +350,62 @@ BEGIN
                 END CASE;
                 
             WHEN '건설기계 매출' THEN
-                random_quantity := 1 + floor(random() * 10);
+                random_quantity := 1 + floor(random() * 10)::INTEGER;
                 random_unit_price := 1000000 + (random() * 4000000)::DECIMAL(10,2); -- 100만 ~ 500만
                 
             WHEN '무역 매출' THEN
-                random_quantity := 1 + floor(random() * 50);
+                random_quantity := 1 + floor(random() * 50)::INTEGER;
                 random_unit_price := 50000 + (random() * 150000)::DECIMAL(10,2); -- 5만 ~ 20만
                 
             WHEN '온라인 매출' THEN
-                random_quantity := 1 + floor(random() * 30);
+                random_quantity := 1 + floor(random() * 30)::INTEGER;
                 random_unit_price := 10000 + (random() * 40000)::DECIMAL(10,2); -- 1만 ~ 5만
                 
             ELSE -- 기타 매출
-                random_quantity := 1 + floor(random() * 20);
+                random_quantity := 1 + floor(random() * 20)::INTEGER;
                 random_unit_price := 100000 + (random() * 500000)::DECIMAL(10,2); -- 10만 ~ 60만
         END CASE;
         
         -- 매출 계산
         random_revenue := random_quantity * random_unit_price;
         
-        -- 지역 선택 (서울, 경기가 더 높은 확률)
-        IF random() < 0.3 THEN
+        -- 지역 선택 (서울, 경기가 더 높은 확률) - 수정된 로직
+        random_value := random();
+        IF random_value < 0.3 THEN
             random_region := '서울';
-        ELSIF random() < 0.5 THEN
+        ELSIF random_value < 0.5 THEN
             random_region := '경기';
         ELSE
-            random_region := regions[1 + floor(random() * array_length(regions, 1))];
+            region_idx := 1 + floor(random() * 14)::INTEGER; -- 나머지 14개 지역
+            CASE region_idx
+                WHEN 1 THEN random_region := '인천';
+                WHEN 2 THEN random_region := '부산';
+                WHEN 3 THEN random_region := '대구';
+                WHEN 4 THEN random_region := '광주';
+                WHEN 5 THEN random_region := '대전';
+                WHEN 6 THEN random_region := '울산';
+                WHEN 7 THEN random_region := '강원';
+                WHEN 8 THEN random_region := '충북';
+                WHEN 9 THEN random_region := '충남';
+                WHEN 10 THEN random_region := '전북';
+                WHEN 11 THEN random_region := '전남';
+                WHEN 12 THEN random_region := '경북';
+                WHEN 13 THEN random_region := '경남';
+                ELSE random_region := '제주';
+            END CASE;
         END IF;
         
-        -- 고객 유형 선택
-        random_customer_type := customer_types[1 + floor(random() * array_length(customer_types, 1))];
+        -- 고객 유형 선택 - 수정된 로직
+        customer_idx := 1 + floor(random() * 4)::INTEGER;
+        CASE customer_idx
+            WHEN 1 THEN random_customer_type := '일반';
+            WHEN 2 THEN random_customer_type := '기업';
+            WHEN 3 THEN random_customer_type := '대리점';
+            ELSE random_customer_type := '직판';
+        END CASE;
+        
+        -- 디버그: 변수 값 확인 (필요시 활성화)
+        -- RAISE NOTICE '데이터 %: 카테고리=%, 제품=%, 지역=%, 고객유형=%', i, random_category, random_product, random_region, random_customer_type;
         
         -- 데이터 삽입
         INSERT INTO revenue_data (
@@ -522,3 +598,337 @@ CREATE INDEX IF NOT EXISTS idx_revenue_data_created_at ON revenue_data(created_a
 
 -- 통계 정보 업데이트
 ANALYZE revenue_data;
+
+-- filepath: c:\Users\twoimo\Documents\GitHub\rinkorea\generate_revenue_data.sql
+-- 매출 관리 페이지용 최적화된 임의 데이터 250개 생성 (10년 기간)
+-- RIN-COAT가 인기 제품으로 나오도록 가중치 적용
+
+-- 기존 revenue_data 테이블 데이터 삭제 (선택사항)
+-- DELETE FROM public.revenue_data;
+
+-- 간단하고 안정적인 데이터 생성 SQL
+-- 250개의 임의 매출 데이터 생성
+WITH RECURSIVE date_series AS (
+    -- 10년 전부터 현재까지의 날짜 시리즈 생성
+    SELECT (CURRENT_DATE - INTERVAL '10 years')::date AS date
+    UNION ALL
+    SELECT (date + INTERVAL '1 day')::date
+    FROM date_series
+    WHERE date < CURRENT_DATE
+),
+sample_data AS (
+    SELECT 
+        date,
+        row_number() OVER (ORDER BY date, random()) AS rn
+    FROM date_series
+),
+product_weights AS (
+    -- RIN-COAT를 인기 제품으로 만들기 위한 가중치 테이블
+    VALUES 
+        ('제품 매출', 'RIN-COAT', 35),           -- 가장 높은 가중치
+        ('제품 매출', 'RIN-SEAL PLUS', 12),
+        ('제품 매출', 'RIN-HARD PLUS', 10),
+        ('제품 매출', 'RIN-ONE COAT', 8),
+        ('제품 매출', 'RIN-ONE COAT(RK-61)', 6),
+        ('제품 매출', 'RIN-HARD ACE', 5),
+        ('제품 매출', 'RIN-HARD PLUS(LI)', 4),
+        ('제품 매출', 'RIN-CRETE', 3),
+        ('제품 매출', '고성능 침투성 방수제', 2),
+        ('건설기계 매출', '950GT', 5),
+        ('건설기계 매출', '850GT', 4),
+        ('건설기계 매출', 'Falcon', 3),
+        ('건설기계 매출', 'D1688', 2),
+        ('건설기계 매출', 'Leopard-D1325', 1),
+        ('무역 매출', '수출용 방수재', 2),
+        ('무역 매출', '수입 장비 부품', 1),
+        ('무역 매출', '해외 기술 라이선스', 1),
+        ('온라인 매출', '온라인 방수재 패키지', 2),
+        ('온라인 매출', '디지털 기술 상담', 1),
+        ('온라인 매출', '온라인 교육 과정', 1),
+        ('기타 매출', '기술 컨설팅', 2),
+        ('기타 매출', '시공 서비스', 2),
+        ('기타 매출', '품질 검사', 1),
+        ('기타 매출', 'A/S 서비스', 1),
+        ('기타 매출', '교육 프로그램', 1)
+),
+expanded_products AS (
+    -- 가중치에 따라 제품 확장
+    SELECT 
+        category,
+        product_name,
+        generate_series(1, weight) as seq
+    FROM (
+        SELECT column1 as category, column2 as product_name, column3 as weight
+        FROM product_weights
+    ) pw
+)
+
+INSERT INTO public.revenue_data (
+    date,
+    category,
+    product_name,
+    quantity,
+    unit_price,
+    revenue,
+    region,
+    customer_type,
+    notes,
+    created_by,
+    created_at,
+    updated_at
+)
+SELECT 
+    -- 날짜: 랜덤하게 선택된 날짜
+    sd.date,
+    
+    -- 카테고리 및 제품명: 가중치 적용하여 선택
+    ep.category,
+    ep.product_name,
+    
+    -- 수량: 카테고리별로 현실적인 범위 설정
+    CASE 
+        WHEN ep.category = '제품 매출' THEN (random() * 50 + 1)::integer
+        WHEN ep.category = '건설기계 매출' THEN (random() * 5 + 1)::integer
+        WHEN ep.category = '무역 매출' THEN (random() * 20 + 1)::integer
+        WHEN ep.category = '온라인 매출' THEN (random() * 30 + 1)::integer
+        ELSE (random() * 10 + 1)::integer
+    END as quantity,
+    
+    -- 단가: 제품별로 현실적인 가격 범위 설정
+    CASE 
+        WHEN ep.category = '제품 매출' THEN 
+            CASE ep.product_name
+                WHEN 'RIN-COAT' THEN (random() * 30000 + 40000)::numeric(10,2) -- 40,000-70,000원
+                WHEN 'RIN-SEAL PLUS' THEN (random() * 25000 + 55000)::numeric(10,2) -- 55,000-80,000원
+                WHEN 'RIN-HARD PLUS' THEN (random() * 30000 + 50000)::numeric(10,2) -- 50,000-80,000원
+                WHEN 'RIN-ONE COAT' THEN (random() * 20000 + 40000)::numeric(10,2) -- 40,000-60,000원
+                WHEN 'RIN-ONE COAT(RK-61)' THEN (random() * 25000 + 45000)::numeric(10,2) -- 45,000-70,000원
+                WHEN 'RIN-HARD ACE' THEN (random() * 35000 + 65000)::numeric(10,2) -- 65,000-100,000원
+                WHEN 'RIN-HARD PLUS(LI)' THEN (random() * 30000 + 70000)::numeric(10,2) -- 70,000-100,000원
+                WHEN 'RIN-CRETE' THEN (random() * 20000 + 35000)::numeric(10,2) -- 35,000-55,000원
+                ELSE (random() * 25000 + 35000)::numeric(10,2) -- 35,000-60,000원
+            END
+        WHEN ep.category = '건설기계 매출' THEN (random() * 30000000 + 80000000)::numeric(12,2) -- 8천만-1.1억원
+        WHEN ep.category = '무역 매출' THEN (random() * 15000000 + 5000000)::numeric(10,2) -- 500만-2천만원
+        WHEN ep.category = '온라인 매출' THEN (random() * 80000 + 20000)::numeric(8,2) -- 2만-10만원
+        ELSE (random() * 400000 + 100000)::numeric(8,2) -- 10만-50만원
+    END as unit_price,
+    
+    -- 매출은 아래에서 계산
+    0 as revenue,
+    
+    -- 지역: 서울/경기 비중 높게 설정
+    CASE 
+        WHEN random() < 0.35 THEN '서울'
+        WHEN random() < 0.60 THEN '경기'
+        WHEN random() < 0.70 THEN '인천'
+        WHEN random() < 0.80 THEN '부산'
+        WHEN random() < 0.85 THEN '대구'
+        WHEN random() < 0.90 THEN '대전'
+        WHEN random() < 0.93 THEN '광주'
+        WHEN random() < 0.95 THEN '울산'
+        WHEN random() < 0.97 THEN '강원'
+        ELSE (ARRAY['충북', '충남', '전북', '전남', '경북', '경남', '제주'])[ceil(random() * 7)::int]
+    END as region,
+    
+    -- 고객 유형: 기업 비중 높게 설정
+    CASE 
+        WHEN random() < 0.45 THEN '기업'
+        WHEN random() < 0.70 THEN '일반'
+        WHEN random() < 0.90 THEN '대리점'
+        ELSE '직판'
+    END as customer_type,
+    
+    -- 비고: 다양한 메모
+    CASE 
+        WHEN random() < 0.15 THEN '정기 주문'
+        WHEN random() < 0.25 THEN '신규 고객'
+        WHEN random() < 0.35 THEN '재주문'
+        WHEN random() < 0.45 THEN '대량 주문'
+        WHEN random() < 0.55 THEN '프로모션 적용'
+        WHEN random() < 0.65 THEN '온라인 주문'
+        WHEN random() < 0.75 THEN '추천 고객'
+        WHEN random() < 0.85 THEN '계약 주문'
+        WHEN random() < 0.95 THEN '기존 고객'
+        ELSE NULL
+    END as notes,
+    
+    -- 생성자
+    NULL as created_by,
+    
+    -- 타임스탬프
+    NOW() as created_at,
+    NOW() as updated_at
+    
+FROM sample_data sd
+CROSS JOIN (
+    SELECT category, product_name
+    FROM expanded_products
+    ORDER BY random()
+    LIMIT 250
+) ep
+WHERE sd.rn <= 250
+ORDER BY random()
+LIMIT 250;
+
+-- 매출 계산 (수량 * 단가)
+UPDATE public.revenue_data 
+SET revenue = quantity * unit_price 
+WHERE revenue = 0;
+
+-- 성능을 위한 인덱스 생성
+CREATE INDEX IF NOT EXISTS idx_revenue_data_date ON public.revenue_data(date);
+CREATE INDEX IF NOT EXISTS idx_revenue_data_category ON public.revenue_data(category);
+CREATE INDEX IF NOT EXISTS idx_revenue_data_product_name ON public.revenue_data(product_name);
+CREATE INDEX IF NOT EXISTS idx_revenue_data_date_category ON public.revenue_data(date, category);
+CREATE INDEX IF NOT EXISTS idx_revenue_data_created_at ON public.revenue_data(created_at);
+CREATE INDEX IF NOT EXISTS idx_revenue_data_revenue ON public.revenue_data(revenue);
+
+-- 통계 정보 업데이트
+ANALYZE public.revenue_data;
+
+-- 결과 확인
+SELECT 
+    '총 데이터 수' as metric,
+    COUNT(*)::text as value
+FROM public.revenue_data
+
+UNION ALL
+
+SELECT 
+    '기간 범위' as metric,
+    MIN(date)::text || ' ~ ' || MAX(date)::text as value
+FROM public.revenue_data
+
+UNION ALL
+
+SELECT 
+    'RIN-COAT 데이터 수' as metric,
+    COUNT(*)::text as value
+FROM public.revenue_data
+WHERE product_name = 'RIN-COAT'
+
+UNION ALL
+
+SELECT 
+    '가장 인기 제품' as metric,
+    product_name as value
+FROM (
+    SELECT 
+        product_name,
+        COUNT(*) as cnt
+    FROM public.revenue_data
+    GROUP BY product_name
+    ORDER BY cnt DESC
+    LIMIT 1
+) top_product
+
+UNION ALL
+
+SELECT 
+    '총 매출액' as metric,
+    to_char(SUM(revenue), 'FM999,999,999,999') || '원' as value
+FROM public.revenue_data
+
+UNION ALL
+
+SELECT 
+    '제품 매출 비중' as metric,
+    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM public.revenue_data), 1) || '%' as value
+FROM public.revenue_data
+WHERE category = '제품 매출';
+
+-- 카테고리별 분포 확인
+SELECT 
+    category as 카테고리,
+    COUNT(*) as 건수,
+    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM public.revenue_data), 2) || '%' as 비율,
+    TO_CHAR(SUM(revenue), 'FM999,999,999,999') || '원' as 총매출
+FROM public.revenue_data 
+GROUP BY category 
+ORDER BY COUNT(*) DESC;
+
+-- 제품별 매출 상위 10개 확인 (RIN-COAT가 1위인지 확인)
+SELECT 
+    product_name as 제품명,
+    category as 카테고리,
+    COUNT(*) as 거래건수,
+    SUM(quantity) as 총수량,
+    TO_CHAR(SUM(revenue), 'FM999,999,999,999') || '원' as 총매출,
+    TO_CHAR(AVG(unit_price), 'FM999,999') || '원' as 평균단가
+FROM public.revenue_data 
+WHERE product_name IS NOT NULL
+GROUP BY product_name, category
+ORDER BY SUM(revenue) DESC
+LIMIT 10;
+
+-- 빠른 선택 기간별 데이터 분포 확인
+SELECT 
+    '최근 1일' as 기간,
+    COUNT(*) as 데이터수
+FROM public.revenue_data 
+WHERE date >= CURRENT_DATE - INTERVAL '1 day'
+
+UNION ALL
+
+SELECT 
+    '최근 7일' as 기간,
+    COUNT(*) as 데이터수
+FROM public.revenue_data 
+WHERE date >= CURRENT_DATE - INTERVAL '7 days'
+
+UNION ALL
+
+SELECT 
+    '최근 1개월' as 기간,
+    COUNT(*) as 데이터수
+FROM public.revenue_data 
+WHERE date >= CURRENT_DATE - INTERVAL '1 month'
+
+UNION ALL
+
+SELECT 
+    '최근 3개월' as 기간,
+    COUNT(*) as 데이터수
+FROM public.revenue_data 
+WHERE date >= CURRENT_DATE - INTERVAL '3 months'
+
+UNION ALL
+
+SELECT 
+    '최근 6개월' as 기간,
+    COUNT(*) as 데이터수
+FROM public.revenue_data 
+WHERE date >= CURRENT_DATE - INTERVAL '6 months'
+
+UNION ALL
+
+SELECT 
+    '최근 1년' as 기간,
+    COUNT(*) as 데이터수
+FROM public.revenue_data 
+WHERE date >= CURRENT_DATE - INTERVAL '1 year'
+
+UNION ALL
+
+SELECT 
+    '최근 3년' as 기간,
+    COUNT(*) as 데이터수
+FROM public.revenue_data 
+WHERE date >= CURRENT_DATE - INTERVAL '3 years'
+
+UNION ALL
+
+SELECT 
+    '최근 5년' as 기간,
+    COUNT(*) as 데이터수
+FROM public.revenue_data 
+WHERE date >= CURRENT_DATE - INTERVAL '5 years'
+
+UNION ALL
+
+SELECT 
+    '최근 10년' as 기간,
+    COUNT(*) as 데이터수
+FROM public.revenue_data 
+WHERE date >= CURRENT_DATE - INTERVAL '10 years';
