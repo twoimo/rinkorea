@@ -9,15 +9,16 @@ CREATE TABLE IF NOT EXISTS revenue_categories (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 카테고리 데이터 삽입
+-- 새로운 5가지 대표 카테고리 데이터 삽입
 INSERT INTO revenue_categories (name, color, is_active) VALUES
-('린코트 제품', '#3B82F6', true),
-('린하드 제품', '#10B981', true),
-('린씰 제품', '#F59E0B', true),
-('건설장비 판매', '#EF4444', true),
-('기술 서비스', '#8B5CF6', true),
-('유지보수', '#6B7280', true)
-ON CONFLICT (name) DO NOTHING;
+('제품 매출', '#3B82F6', true),
+('건설기계 매출', '#EF4444', true),
+('무역 매출', '#10B981', true),
+('온라인 매출', '#F59E0B', true),
+('기타 매출', '#8B5CF6', true)
+ON CONFLICT (name) DO UPDATE SET 
+    is_active = true,
+    color = EXCLUDED.color;
 
 -- 2. 매출 데이터 테이블 생성
 CREATE TABLE IF NOT EXISTS revenue_data (
@@ -25,9 +26,9 @@ CREATE TABLE IF NOT EXISTS revenue_data (
     date DATE NOT NULL,
     category TEXT NOT NULL,
     product_name TEXT,
-    revenue NUMERIC(15,2) NOT NULL CHECK (revenue >= 0),
-    quantity INTEGER CHECK (quantity >= 0),
-    unit_price NUMERIC(15,2) CHECK (unit_price >= 0),
+    revenue DECIMAL(12,2) NOT NULL,
+    quantity INTEGER DEFAULT 0,
+    unit_price DECIMAL(10,2),
     region TEXT,
     customer_type TEXT,
     notes TEXT,
@@ -36,21 +37,42 @@ CREATE TABLE IF NOT EXISTS revenue_data (
     created_by UUID
 );
 
--- 3. 임의 매출 데이터 생성 (최근 2년간 데이터)
-DO $$
+-- 3. 테스트 데이터 생성 함수
+CREATE OR REPLACE FUNCTION generate_revenue_test_data(
+    start_date DATE DEFAULT '2024-01-01',
+    end_date DATE DEFAULT '2024-12-31'
+)
+RETURNS VOID AS $$
 DECLARE
-    start_date DATE := '2023-01-01';
-    end_date DATE := '2025-06-15';
     current_date_iter DATE;
-    category_names TEXT[] := ARRAY['린코트 제품', '린하드 제품', '린씰 제품', '건설장비 판매', '기술 서비스', '유지보수'];
-    product_names TEXT[] := ARRAY[
-        '린코트 20kg', '린코트 18L', '린원코트 20kg', 
-        '린하드 에이스 20kg', '린하드 플러스 18L',
-        '린씰 플러스 20kg', '린씰 원샷 15L',
-        'D1325 굴삭기', 'DF20 덤프트럭', '850GT 로더',
-        '방수 컨설팅', '시공 기술 지원', '품질 검사',
-        '장비 점검', '보수 공사', 'A/S 서비스'
+    -- 새로운 카테고리 구조
+    category_names TEXT[] := ARRAY['제품 매출', '건설기계 매출', '무역 매출', '온라인 매출', '기타 매출'];
+    
+    -- 제품 매출 상세 제품
+    product_sales_products TEXT[] := ARRAY[
+        'RIN-COAT', 'RIN-SEAL PLUS', 'RIN-HARD PLUS', 'RIN-ONE COAT', 
+        'RIN-ONE COAT(RK-61)', 'RIN-HARD ACE', 'RIN-HARD PLUS(LI)', 
+        'RIN-CRETE', '고성능 침투성 방수제'
     ];
+    
+    -- 건설기계 매출 상세 제품
+    construction_equipment_products TEXT[] := ARRAY[
+        '950GT', '850GT', 'Falcon', 'D1688', 'Leopard-D1325'
+    ];
+    
+    -- 무역/온라인/기타 매출 제품 (예시)
+    trade_products TEXT[] := ARRAY[
+        '수출용 방수재', '수입 장비 부품', '해외 기술 라이선스'
+    ];
+    
+    online_products TEXT[] := ARRAY[
+        '온라인 방수재 패키지', '디지털 기술 상담', '온라인 교육 과정'
+    ];
+    
+    other_products TEXT[] := ARRAY[
+        '기술 컨설팅', '시공 서비스', '품질 검사', 'A/S 서비스', '교육 프로그램'
+    ];
+    
     regions TEXT[] := ARRAY['서울', '경기', '인천', '부산', '대구', '광주', '대전', '울산', '세종', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
     customer_types TEXT[] := ARRAY['일반', '기업', '대리점', '직판'];
     
@@ -67,100 +89,54 @@ BEGIN
     current_date_iter := start_date;
     
     WHILE current_date_iter <= end_date LOOP
-        -- 하루에 1~8개의 매출 기록 생성 (주말에는 적게)
-        IF EXTRACT(DOW FROM current_date_iter) IN (0, 6) THEN
-            records_per_day := (random() * 3 + 1)::INTEGER; -- 주말: 1-3개
-        ELSE
-            records_per_day := (random() * 6 + 2)::INTEGER; -- 평일: 2-7개
-        END IF;
+        -- 하루당 1-8개의 매출 기록 생성
+        records_per_day := (RANDOM() * 7)::INTEGER + 1;
         
         FOR i IN 1..records_per_day LOOP
-            -- 랜덤 카테고리 선택 (안전한 인덱스 계산)
-            random_category := category_names[1 + floor(random() * array_length(category_names, 1))::INTEGER];
+            -- 랜덤 카테고리 선택
+            random_category := category_names[1 + (RANDOM() * array_length(category_names, 1))::INTEGER];
             
-            -- 카테고리 유효성 검증 및 기본값 설정
-            IF random_category IS NULL OR random_category = '' THEN
-                random_category := '린코트 제품'; -- 기본값
-            END IF;
+            -- 카테고리에 따른 제품 선택
+            random_product := CASE 
+                WHEN random_category = '제품 매출' THEN 
+                    product_sales_products[1 + (RANDOM() * array_length(product_sales_products, 1))::INTEGER]
+                WHEN random_category = '건설기계 매출' THEN 
+                    construction_equipment_products[1 + (RANDOM() * array_length(construction_equipment_products, 1))::INTEGER]
+                WHEN random_category = '무역 매출' THEN 
+                    trade_products[1 + (RANDOM() * array_length(trade_products, 1))::INTEGER]
+                WHEN random_category = '온라인 매출' THEN 
+                    online_products[1 + (RANDOM() * array_length(online_products, 1))::INTEGER]
+                ELSE 
+                    other_products[1 + (RANDOM() * array_length(other_products, 1))::INTEGER]
+            END;
             
-            -- 카테고리에 따른 제품명 선택
+            random_region := regions[1 + (RANDOM() * array_length(regions, 1))::INTEGER];
+            random_customer_type := customer_types[1 + (RANDOM() * array_length(customer_types, 1))::INTEGER];
+            
+            -- 카테고리별 매출 규모 차별화
             CASE random_category
-                WHEN '린코트 제품' THEN
-                    random_product := (ARRAY['린코트 20kg', '린코트 18L', '린원코트 20kg', '린원코트 RK61 20kg'])[1 + floor(random() * 4)::INTEGER];
-                WHEN '린하드 제품' THEN
-                    random_product := (ARRAY['린하드 에이스 20kg', '린하드 플러스 18L', '린하드 프로 25kg'])[1 + floor(random() * 3)::INTEGER];
-                WHEN '린씰 제품' THEN
-                    random_product := (ARRAY['린씰 플러스 20kg', '린씰 원샷 15L', '린씰 프로 18L'])[1 + floor(random() * 3)::INTEGER];
-                WHEN '건설장비 판매' THEN
-                    random_product := (ARRAY['D1325 굴삭기', 'DF20 덤프트럭', '850GT 로더', '950GT 로더', 'PRO850 로더'])[1 + floor(random() * 5)::INTEGER];
-                WHEN '기술 서비스' THEN
-                    random_product := (ARRAY['방수 컨설팅', '시공 기술 지원', '품질 검사', '현장 진단'])[1 + floor(random() * 4)::INTEGER];
-                WHEN '유지보수' THEN
-                    random_product := (ARRAY['장비 점검', '보수 공사', 'A/S 서비스', '정기 점검'])[1 + floor(random() * 4)::INTEGER];
-                ELSE
-                    -- 매칭되지 않는 경우 기본 제품 설정
-                    random_product := '린코트 20kg';
-                    random_category := '린코트 제품'; -- 카테고리도 기본값으로 재설정
+                WHEN '제품 매출' THEN
+                    random_quantity := (RANDOM() * 50)::INTEGER + 1;
+                    random_unit_price := (RANDOM() * 500000 + 50000)::NUMERIC;
+                WHEN '건설기계 매출' THEN
+                    random_quantity := (RANDOM() * 5)::INTEGER + 1;
+                    random_unit_price := (RANDOM() * 50000000 + 10000000)::NUMERIC;
+                WHEN '무역 매출' THEN
+                    random_quantity := (RANDOM() * 20)::INTEGER + 1;
+                    random_unit_price := (RANDOM() * 2000000 + 200000)::NUMERIC;
+                WHEN '온라인 매출' THEN
+                    random_quantity := (RANDOM() * 100)::INTEGER + 1;
+                    random_unit_price := (RANDOM() * 100000 + 10000)::NUMERIC;
+                ELSE -- 기타 매출
+                    random_quantity := (RANDOM() * 10)::INTEGER + 1;
+                    random_unit_price := (RANDOM() * 1000000 + 100000)::NUMERIC;
             END CASE;
             
-            -- 제품명 유효성 검증
-            IF random_product IS NULL OR random_product = '' THEN
-                random_product := '린코트 20kg';
-            END IF;
-            
-            -- 랜덤 지역 및 고객 유형 (안전한 인덱스 계산)
-            random_region := regions[1 + floor(random() * array_length(regions, 1))::INTEGER];
-            random_customer_type := customer_types[1 + floor(random() * array_length(customer_types, 1))::INTEGER];
-            
-            -- 기본값 설정
-            IF random_region IS NULL OR random_region = '' THEN
-                random_region := '서울';
-            END IF;
-            IF random_customer_type IS NULL OR random_customer_type = '' THEN
-                random_customer_type := '일반';
-            END IF;
-            
-            -- 카테고리에 따른 수량 및 단가 설정
-            CASE random_category
-                WHEN '린코트 제품' THEN
-                    random_quantity := (random() * 50 + 1)::INTEGER; -- 1-50개
-                    random_unit_price := (random() * 50000 + 80000)::NUMERIC; -- 8만-13만원
-                WHEN '린하드 제품' THEN
-                    random_quantity := (random() * 30 + 1)::INTEGER; -- 1-30개
-                    random_unit_price := (random() * 40000 + 90000)::NUMERIC; -- 9만-13만원
-                WHEN '린씰 제품' THEN
-                    random_quantity := (random() * 40 + 1)::INTEGER; -- 1-40개
-                    random_unit_price := (random() * 30000 + 70000)::NUMERIC; -- 7만-10만원
-                WHEN '건설장비 판매' THEN
-                    random_quantity := 1; -- 장비는 1대씩
-                    random_unit_price := (random() * 20000000 + 50000000)::NUMERIC; -- 5천만-7천만원
-                WHEN '기술 서비스' THEN
-                    random_quantity := (random() * 10 + 1)::INTEGER; -- 1-10건
-                    random_unit_price := (random() * 500000 + 500000)::NUMERIC; -- 50만-100만원
-                WHEN '유지보수' THEN
-                    random_quantity := (random() * 5 + 1)::INTEGER; -- 1-5건
-                    random_unit_price := (random() * 200000 + 300000)::NUMERIC; -- 30만-50만원
-                ELSE
-                    random_quantity := (random() * 20 + 1)::INTEGER;
-                    random_unit_price := (random() * 100000 + 50000)::NUMERIC;
-            END CASE;
-            
-            -- 매출 계산 (수량 * 단가)
             random_revenue := random_quantity * random_unit_price;
             
-            -- 데이터 삽입
             INSERT INTO revenue_data (
-                date,
-                category,
-                product_name,
-                revenue,
-                quantity,
-                unit_price,
-                region,
-                customer_type,
-                notes,
-                created_at,
-                updated_at
+                date, category, product_name, revenue, quantity, unit_price, 
+                region, customer_type, notes
             ) VALUES (
                 current_date_iter,
                 random_category,
@@ -170,27 +146,23 @@ BEGIN
                 random_unit_price,
                 random_region,
                 random_customer_type,
-                CASE 
-                    WHEN random() < 0.3 THEN 
-                        (ARRAY['정기 고객', '신규 고객', '재주문', '대량 주문', '급주문', '특별 할인', '프로모션 적용'])[1 + (random() * 7)::INTEGER]
-                    ELSE NULL
-                END,
-                current_date_iter + (random() * INTERVAL '1 day'),
-                current_date_iter + (random() * INTERVAL '1 day')
+                '테스트 데이터 - ' || random_category || ' (' || random_product || ')'
             );
         END LOOP;
         
         current_date_iter := current_date_iter + INTERVAL '1 day';
     END LOOP;
-    
-    RAISE NOTICE '매출 데이터 생성 완료: % ~ %', start_date, end_date;
-END $$;
+END;
+$$ LANGUAGE plpgsql;
 
--- 4. 생성된 데이터 확인 쿼리
+-- 4. 테스트 데이터 생성 실행
+SELECT generate_revenue_test_data('2024-01-01', '2024-12-31');
+
+-- 생성된 데이터 확인
 SELECT 
-    '총 매출 데이터 건수' as 구분,
+    '전체 데이터 건수' as 구분,
     COUNT(*)::TEXT as 값
-FROM revenue_data
+FROM revenue_data 
 
 UNION ALL
 
@@ -224,3 +196,15 @@ FROM revenue_data
 WHERE date >= '2024-01-01'
 GROUP BY TO_CHAR(date, 'YYYY-MM'), category
 ORDER BY 월 DESC, 카테고리;
+
+-- 6. 제품별 매출 통계 확인
+SELECT 
+    category as 카테고리,
+    product_name as 제품명,
+    COUNT(*) as 거래건수,
+    SUM(quantity) as 총수량,
+    TO_CHAR(AVG(unit_price), 'FM999,999,999') || '원' as 평균단가,
+    TO_CHAR(SUM(revenue), 'FM999,999,999') || '원' as 총매출
+FROM revenue_data 
+GROUP BY category, product_name
+ORDER BY category, SUM(revenue) DESC;
