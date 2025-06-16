@@ -1,4 +1,3 @@
-
 import React, { memo } from 'react';
 import { Shield, Palette, Star, Zap, Leaf, Edit, Trash2, EyeOff, Eye } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/image';
@@ -28,25 +27,29 @@ interface ProductCardProps {
 }
 
 const iconMap = {
-  shield: Shield,
-  palette: Palette,
-  star: Star,
-  zap: Zap,
-  leaf: Leaf,
+  'Shield': Shield,
+  'Palette': Palette,
+  'Star': Star,
+  'Zap': Zap,
+  'Leaf': Leaf
 } as const;
 
-const ProductCard = memo(({ 
-  product, 
-  index, 
-  isHidden, 
-  isAdmin, 
-  onEdit, 
-  onDelete, 
-  onToggleHide, 
-  onViewDetail 
+const ProductCard = memo(({
+  product,
+  index,
+  isHidden,
+  isAdmin,
+  onEdit,
+  onDelete,
+  onToggleHide,
+  onViewDetail
 }: ProductCardProps) => {
   const IconComponent = iconMap[product.icon as keyof typeof iconMap];
-  
+
+  if (!IconComponent) {
+    console.warn(`Unknown icon type: ${product.icon}`);
+  }
+
   const getImageUrl = (imagePath: string) => {
     if (imagePath.includes('://') || imagePath.startsWith('@')) return imagePath;
     return `/images/${imagePath}`;
@@ -63,11 +66,11 @@ const ProductCard = memo(({
           width={800}
           height={800}
         />
-        <div className="absolute top-3 sm:top-4 left-3 sm:left-4 bg-white p-1.5 sm:p-2 rounded-full">
-          {IconComponent && (
+        {product.icon && IconComponent && (
+          <div className="absolute top-3 sm:top-4 left-3 sm:left-4 bg-white p-1.5 sm:p-2 rounded-full">
             <IconComponent className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" aria-hidden="true" />
-          )}
-        </div>
+          </div>
+        )}
         {isAdmin && (
           <div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2">
             <button

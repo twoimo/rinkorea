@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '../integrations/supabase/client';
 import { SupabaseClient } from '@supabase/supabase-js';
@@ -51,7 +50,7 @@ export const useProductsOptimized = () => {
       const { data, error: fetchError } = await (supabase as unknown as SupabaseClient)
         .from('product_introduction_hidden')
         .select('product_id');
-      
+
       if (!fetchError && data) {
         setHiddenProductIds(data.map((h: { product_id: string }) => h.product_id));
       }
@@ -63,13 +62,13 @@ export const useProductsOptimized = () => {
   const toggleProductVisibility = useCallback(async (productId: string) => {
     try {
       const isHidden = hiddenProductIds.includes(productId);
-      
+
       if (isHidden) {
         const { error } = await (supabase as unknown as SupabaseClient)
           .from('product_introduction_hidden')
           .delete()
           .eq('product_id', productId);
-        
+
         if (!error) {
           setHiddenProductIds(prev => prev.filter(id => id !== productId));
         }
@@ -77,7 +76,7 @@ export const useProductsOptimized = () => {
         const { error } = await (supabase as unknown as SupabaseClient)
           .from('product_introduction_hidden')
           .insert([{ product_id: productId }]);
-        
+
         if (!error) {
           setHiddenProductIds(prev => [...prev, productId]);
         }
@@ -89,22 +88,35 @@ export const useProductsOptimized = () => {
 
   const createProduct = useCallback(async (productData: Partial<Product>) => {
     try {
+      console.log('Creating product with data:', productData);
       const insertPayload = {
         ...productData,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        is_active: true
+        is_active: true,
+        features: Array.isArray(productData.features) ? productData.features : [],
+        detail_images: Array.isArray(productData.detail_images) ? productData.detail_images : []
       };
-      
+
+      console.log('Insert payload:', insertPayload);
+
       const { data, error } = await (supabase as unknown as SupabaseClient)
         .from('product_introductions')
         .insert([insertPayload])
         .select('*');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
 
-      if (data) {
-        const newProduct = { ...data[0], detail_images: data[0].detail_images || [] };
+      if (data && data[0]) {
+        console.log('Created product:', data[0]);
+        const newProduct = {
+          ...data[0],
+          features: data[0].features || [],
+          detail_images: data[0].detail_images || []
+        };
         setProducts(prev => [...prev, newProduct]);
         return { data: newProduct };
       }
@@ -169,7 +181,7 @@ export const useProductsOptimized = () => {
       await Promise.all([fetchProducts(), fetchHiddenProducts()]);
       setLoading(false);
     };
-    
+
     loadData();
   }, [fetchProducts, fetchHiddenProducts]);
 

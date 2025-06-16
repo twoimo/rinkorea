@@ -117,7 +117,21 @@ const ProductForm = memo(({ product, onSave, onClose, loading, error, success }:
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSave(formValues);
+    console.log('Form values before submit:', formValues);
+
+    try {
+      const payload = {
+        ...formValues,
+        features: Array.isArray(formValues.features) ? formValues.features : [],
+        detail_images: Array.isArray(formValues.detail_images) ? formValues.detail_images : [],
+        is_active: true
+      };
+      console.log('Submitting payload:', payload);
+
+      await onSave(payload);
+    } catch (err) {
+      console.error('Error saving product:', err);
+    }
   }, [formValues, onSave]);
 
   const handleAddFeature = useCallback(() => {
@@ -156,179 +170,189 @@ const ProductForm = memo(({ product, onSave, onClose, loading, error, success }:
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto relative">
-        <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-          <h2 className="text-xl sm:text-2xl font-bold">
-            {product ? '제품 수정' : '제품 추가'}
-          </h2>
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-6xl max-h-[90vh] overflow-y-auto relative">
+        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center">
+          <h2 className="text-xl font-semibold">{product ? '제품 수정' : '새 제품 추가'}</h2>
           <button
-            className="text-gray-400 hover:text-gray-700 touch-manipulation"
+            type="button"
             onClick={onClose}
-            aria-label="닫기"
+            className="p-1 hover:bg-gray-100 rounded-full"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
-        <form className="p-6 space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label className="block text-sm font-medium mb-2" htmlFor="product-name">제품명</label>
-            <input
-              id="product-name"
-              type="text"
-              className="w-full border border-gray-300 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
-              value={formValues.name || ''}
-              onChange={e => setFormValues(prev => ({ ...prev, name: e.target.value }))}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2" htmlFor="product-description">설명</label>
-            <textarea
-              id="product-description"
-              className="w-full border border-gray-300 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base min-h-[80px]"
-              value={formValues.description || ''}
-              onChange={e => setFormValues(prev => ({ ...prev, description: e.target.value }))}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2" htmlFor="product-image">이미지 URL 또는 파일명</label>
-            <input
-              id="product-image"
-              type="text"
-              className="w-full border border-gray-300 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
-              value={formValues.image_url || ''}
-              onChange={e => setFormValues(prev => ({ ...prev, image_url: e.target.value }))}
-              placeholder="예: https://example.com/image.jpg 또는 image.jpg"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2" htmlFor="product-icon">아이콘</label>
-            <select
-              id="product-icon"
-              value={formValues.icon || ''}
-              onChange={e => setFormValues(prev => ({ ...prev, icon: e.target.value }))}
-              className="w-full border border-gray-300 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
-              required
-            >
-              <option value="">아이콘 선택</option>
-              <option value="shield">Shield</option>
-              <option value="palette">Palette</option>
-              <option value="star">Star</option>
-              <option value="zap">Zap</option>
-              <option value="leaf">Leaf</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">주요 특징</label>
-            <div className="space-y-2">
-              <div className="flex gap-2">
+        <form className="p-6" onSubmit={handleSubmit}>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">제품명</label>
                 <input
                   type="text"
-                  className="flex-1 border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
-                  value={newFeature}
-                  onChange={e => setNewFeature(e.target.value)}
-                  placeholder="새로운 특징을 입력하세요"
+                  className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                  value={formValues.name}
+                  onChange={e => setFormValues(prev => ({ ...prev, name: e.target.value }))}
+                  required
                 />
-                <button
-                  type="button"
-                  onClick={handleAddFeature}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <Plus className="w-5 h-5" />
-                </button>
               </div>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={(e) => handleDragEnd(e, 'features')}
-              >
-                <SortableContext
-                  items={formValues.features || []}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <ul className="space-y-2">
-                    {formValues.features?.map((feature, index) => (
-                      <SortableItem
-                        key={feature}
-                        id={feature}
-                        onRemove={() => handleRemoveFeature(index)}
-                      >
-                        {feature}
-                      </SortableItem>
-                    ))}
-                  </ul>
-                </SortableContext>
-              </DndContext>
+              <div>
+                <label className="block text-sm font-medium mb-2">설명</label>
+                <textarea
+                  className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base resize-none min-h-[200px]"
+                  value={formValues.description}
+                  onChange={e => setFormValues(prev => ({ ...prev, description: e.target.value }))}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">이미지 URL 또는 파일명</label>
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                  value={formValues.image_url}
+                  onChange={e => setFormValues(prev => ({ ...prev, image_url: e.target.value }))}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">아이콘</label>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setFormValues(prev => ({ ...prev, icon: '' }))}
+                    className={`p-2 rounded-lg border ${!formValues.icon
+                      ? 'border-blue-500 bg-blue-50 text-blue-600'
+                      : 'border-gray-300 hover:border-blue-500'
+                      }`}
+                  >
+                    선택 안함
+                  </button>
+                  {['Shield', 'Palette', 'Star', 'Zap', 'Leaf'].map(icon => (
+                    <button
+                      key={icon}
+                      type="button"
+                      onClick={() => setFormValues(prev => ({ ...prev, icon }))}
+                      className={`p-2 rounded-lg border ${formValues.icon === icon
+                        ? 'border-blue-500 bg-blue-50 text-blue-600'
+                        : 'border-gray-300 hover:border-blue-500'
+                        }`}
+                    >
+                      {icon}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">상세 이미지 URL 또는 파일명</label>
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  className="flex-1 border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
-                  value={newImage}
-                  onChange={e => setNewImage(e.target.value)}
-                  placeholder="새로운 이미지 URL 또는 파일명을 입력하세요"
-                />
-                <button
-                  type="button"
-                  onClick={handleAddImage}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <Plus className="w-5 h-5" />
-                </button>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">주요 특징</label>
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      className="flex-1 border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                      value={newFeature}
+                      onChange={e => setNewFeature(e.target.value)}
+                      placeholder="새로운 특징을 입력하세요"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddFeature}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      <Plus className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={(e) => handleDragEnd(e, 'features')}
+                  >
+                    <SortableContext
+                      items={formValues.features || []}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <ul className="space-y-2">
+                        {formValues.features?.map((feature, index) => (
+                          <SortableItem
+                            key={feature}
+                            id={feature}
+                            onRemove={() => handleRemoveFeature(index)}
+                          >
+                            {feature}
+                          </SortableItem>
+                        ))}
+                      </ul>
+                    </SortableContext>
+                  </DndContext>
+                </div>
               </div>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={(e) => handleDragEnd(e, 'detail_images')}
-              >
-                <SortableContext
-                  items={formValues.detail_images || []}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <ul className="space-y-2">
-                    {formValues.detail_images?.map((image, index) => (
-                      <SortableItem
-                        key={image}
-                        id={image}
-                        onRemove={() => handleRemoveImage(index)}
-                      >
-                        {image}
-                      </SortableItem>
-                    ))}
-                  </ul>
-                </SortableContext>
-              </DndContext>
+              <div>
+                <label className="block text-sm font-medium mb-2">상세 이미지 URL 또는 파일명</label>
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      className="flex-1 border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                      value={newImage}
+                      onChange={e => setNewImage(e.target.value)}
+                      placeholder="새로운 이미지 URL 또는 파일명을 입력하세요"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddImage}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      <Plus className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={(e) => handleDragEnd(e, 'detail_images')}
+                  >
+                    <SortableContext
+                      items={formValues.detail_images || []}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <ul className="space-y-2">
+                        {formValues.detail_images?.map((image, index) => (
+                          <SortableItem
+                            key={image}
+                            id={image}
+                            onRemove={() => handleRemoveImage(index)}
+                          >
+                            {image}
+                          </SortableItem>
+                        ))}
+                      </ul>
+                    </SortableContext>
+                  </DndContext>
+                </div>
+              </div>
             </div>
           </div>
           {error && (
-            <div className="mt-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg" role="alert">
+            <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-lg">
               {error}
             </div>
           )}
           {success && (
-            <div className="mt-2 text-sm text-green-700 bg-green-50 p-3 rounded-lg" role="alert">
+            <div className="mt-4 p-3 bg-green-50 text-green-600 rounded-lg">
               {success}
             </div>
           )}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          <div className="mt-6 flex justify-end gap-3">
             <button
               type="button"
-              className="flex-1 px-4 py-2.5 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition-colors touch-manipulation"
               onClick={onClose}
-              disabled={loading}
+              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
             >
               취소
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2.5 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors touch-manipulation"
               disabled={loading}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
               {loading ? '저장 중...' : '저장'}
             </button>
