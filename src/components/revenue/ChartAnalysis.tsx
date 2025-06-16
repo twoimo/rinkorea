@@ -585,7 +585,7 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                                 </div>
                             </div>
 
-                            <div className="h-80">
+                            <div className="h-96">
                                 <RevenueChart
                                     data={getProcessedData(chart)}
                                     config={{
@@ -629,7 +629,7 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                         {/* 제품별 월별 매출 트렌드 */}
                         <div className="bg-gray-50 rounded-lg p-4">
                             <h4 className="font-semibold mb-4">월별 매출 트렌드</h4>
-                            <div className="h-64">
+                            <div className="h-96">
                                 <RevenueChart
                                     data={getProcessedData({
                                         id: 'product-trend',
