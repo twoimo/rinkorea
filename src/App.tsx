@@ -25,6 +25,7 @@ const Auth = lazy(() => import("./pages/Auth"));
 const Shop = lazy(() => import("./pages/Shop"));
 const Profile = lazy(() => import("./pages/Profile"));
 const AdminDangerZone = lazy(() => import("./pages/AdminDangerZone"));
+const RevenueManagement = lazy(() => import("./pages/RevenueManagement"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Configure QueryClient with optimized settings for mobile
@@ -112,6 +113,7 @@ const App = () => {
                       <Route path="/shop" element={<Shop />} />
                       <Route path="/profile" element={<Profile />} />
                       <Route path="/admin/danger" element={<AdminDangerZone />} />
+                      <Route path="/revenue-management" element={<RevenueManagement />} />
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </Suspense>

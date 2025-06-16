@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, User, LogOut, Settings, AlertTriangle } from 'lucide-react';
+import { Menu, X, User, LogOut, Settings, AlertTriangle, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -137,14 +137,24 @@ const Header = () => {
                 {isUserMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                     {isAdmin && (
-                      <Link
-                        to="/admin/danger"
-                        className="flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors font-semibold border-b border-gray-100"
-                        onClick={() => setIsUserMenuOpen(false)}
-                      >
-                        <AlertTriangle className="w-4 h-4 mr-3" />
-                        관리자 위험구역
-                      </Link>
+                      <>
+                        <Link
+                          to="/revenue-management"
+                          className="flex items-center px-4 py-2 text-sm text-blue-700 hover:bg-blue-50 transition-colors font-semibold border-b border-gray-100"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          <BarChart3 className="w-4 h-4 mr-3" />
+                          매출 관리
+                        </Link>
+                        <Link
+                          to="/admin/danger"
+                          className="flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors font-semibold border-b border-gray-100"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          <AlertTriangle className="w-4 h-4 mr-3" />
+                          관리자 위험구역
+                        </Link>
+                      </>
                     )}
                     <Link
                       to="/profile"
@@ -218,14 +228,24 @@ const Header = () => {
                       {isAdmin ? '관리자 계정' : '환영합니다!'}
                     </div>
                     {isAdmin && (
-                      <Link
-                        to="/admin/danger"
-                        className="flex items-center px-4 py-3 text-base text-red-700 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors touch-manipulation"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <AlertTriangle className="w-5 h-5 mr-3" />
-                        관리자 위험구역
-                      </Link>
+                      <>
+                        <Link
+                          to="/revenue-management"
+                          className="flex items-center px-4 py-3 text-base text-blue-700 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors touch-manipulation"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <BarChart3 className="w-5 h-5 mr-3" />
+                          매출 관리
+                        </Link>
+                        <Link
+                          to="/admin/danger"
+                          className="flex items-center px-4 py-3 text-base text-red-700 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors touch-manipulation"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <AlertTriangle className="w-5 h-5 mr-3" />
+                          관리자 위험구역
+                        </Link>
+                      </>
                     )}
                     <Link
                       to="/profile"

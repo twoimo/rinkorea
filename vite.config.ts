@@ -20,7 +20,13 @@ export default defineConfig(({ mode }) => ({
     },
   },
   optimizeDeps: {
-    include: ['@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
+    include: [
+      '@dnd-kit/core',
+      '@dnd-kit/sortable',
+      '@dnd-kit/utilities',
+      'papaparse',
+      'recharts'
+    ],
   },
   build: {
     commonjsOptions: {
