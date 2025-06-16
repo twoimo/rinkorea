@@ -36,6 +36,22 @@ interface ProductAnalysis {
     avgUnitPrice: number;
     transactionCount: number;
     growth: number;
+    monthlyData: {
+        month: string;
+        revenue: number;
+        quantity: number;
+        avgPrice: number;
+    }[];
+    customerSegments: {
+        segment: string;
+        revenue: number;
+        percentage: number;
+    }[];
+    seasonalTrends: {
+        season: string;
+        revenue: number;
+        growth: number;
+    }[];
 }
 
 const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
@@ -171,7 +187,21 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                 totalQuantity: 500,
                 avgUnitPrice: 30000,
                 transactionCount: 45,
-                growth: 12.5
+                growth: 12.5,
+                monthlyData: [
+                    { month: '2022-01', revenue: 1000000, quantity: 100, avgPrice: 10000 },
+                    { month: '2022-02', revenue: 2000000, quantity: 200, avgPrice: 10000 }
+                ],
+                customerSegments: [
+                    { segment: '기업', revenue: 10000000, percentage: 66.7 },
+                    { segment: '개인', revenue: 5000000, percentage: 33.3 }
+                ],
+                seasonalTrends: [
+                    { season: '봄', revenue: 5000000, growth: 10 },
+                    { season: '여름', revenue: 5000000, growth: 20 },
+                    { season: '가을', revenue: 3000000, growth: -10 },
+                    { season: '겨울', revenue: 2000000, growth: -20 }
+                ]
             },
             {
                 product_name: 'RIN-SEAL PLUS',
@@ -180,7 +210,21 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                 totalQuantity: 400,
                 avgUnitPrice: 30000,
                 transactionCount: 38,
-                growth: 8.3
+                growth: 8.3,
+                monthlyData: [
+                    { month: '2022-01', revenue: 800000, quantity: 80, avgPrice: 10000 },
+                    { month: '2022-02', revenue: 1600000, quantity: 160, avgPrice: 10000 }
+                ],
+                customerSegments: [
+                    { segment: '기업', revenue: 8000000, percentage: 66.7 },
+                    { segment: '개인', revenue: 4000000, percentage: 33.3 }
+                ],
+                seasonalTrends: [
+                    { season: '봄', revenue: 3000000, growth: 10 },
+                    { season: '여름', revenue: 4000000, growth: 20 },
+                    { season: '가을', revenue: 2000000, growth: -10 },
+                    { season: '겨울', revenue: 3000000, growth: -20 }
+                ]
             },
             {
                 product_name: '950GT',
@@ -189,7 +233,21 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                 totalQuantity: 10,
                 avgUnitPrice: 2500000,
                 transactionCount: 15,
-                growth: 15.7
+                growth: 15.7,
+                monthlyData: [
+                    { month: '2022-01', revenue: 10000000, quantity: 4, avgPrice: 2500000 },
+                    { month: '2022-02', revenue: 15000000, quantity: 6, avgPrice: 2500000 }
+                ],
+                customerSegments: [
+                    { segment: '기업', revenue: 20000000, percentage: 80 },
+                    { segment: '개인', revenue: 5000000, percentage: 20 }
+                ],
+                seasonalTrends: [
+                    { season: '봄', revenue: 5000000, growth: 10 },
+                    { season: '여름', revenue: 10000000, growth: 20 },
+                    { season: '가을', revenue: 5000000, growth: -10 },
+                    { season: '겨울', revenue: 5000000, growth: -20 }
+                ]
             },
             {
                 product_name: 'RIN-HARD PLUS',
@@ -198,7 +256,21 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                 totalQuantity: 300,
                 avgUnitPrice: 28333,
                 transactionCount: 32,
-                growth: -2.1
+                growth: -2.1,
+                monthlyData: [
+                    { month: '2022-01', revenue: 4000000, quantity: 200, avgPrice: 20000 },
+                    { month: '2022-02', revenue: 4500000, quantity: 250, avgPrice: 18000 }
+                ],
+                customerSegments: [
+                    { segment: '기업', revenue: 5000000, percentage: 58.8 },
+                    { segment: '개인', revenue: 3500000, percentage: 41.2 }
+                ],
+                seasonalTrends: [
+                    { season: '봄', revenue: 2000000, growth: 10 },
+                    { season: '여름', revenue: 3000000, growth: 20 },
+                    { season: '가을', revenue: 2000000, growth: -10 },
+                    { season: '겨울', revenue: 1500000, growth: -20 }
+                ]
             },
             {
                 product_name: '850GT',
@@ -207,7 +279,21 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                 totalQuantity: 8,
                 avgUnitPrice: 2250000,
                 transactionCount: 12,
-                growth: 20.4
+                growth: 20.4,
+                monthlyData: [
+                    { month: '2022-01', revenue: 9000000, quantity: 4, avgPrice: 2250000 },
+                    { month: '2022-02', revenue: 9000000, quantity: 4, avgPrice: 2250000 }
+                ],
+                customerSegments: [
+                    { segment: '기업', revenue: 15000000, percentage: 83.3 },
+                    { segment: '개인', revenue: 3000000, percentage: 16.7 }
+                ],
+                seasonalTrends: [
+                    { season: '봄', revenue: 4500000, growth: 10 },
+                    { season: '여름', revenue: 4500000, growth: 20 },
+                    { season: '가을', revenue: 4500000, growth: -10 },
+                    { season: '겨울', revenue: 4500000, growth: -20 }
+                ]
             }
         ];
         // Sort by revenue in descending order and take top 5
@@ -665,27 +751,104 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                                     .filter(p => p.product_name === selectedProduct)
                                     .map((product, index) => (
                                         <div key={index} className="space-y-2">
-                                            <div className="flex justify-between items-center p-3 bg-white rounded border">
-                                                <span className="text-gray-600">총 매출</span>
-                                                <span className="font-semibold text-lg">{formatCurrency(product.totalRevenue)}</span>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div className="flex justify-between items-center p-3 bg-white rounded border">
+                                                    <span className="text-gray-600">총 매출</span>
+                                                    <span className="font-semibold text-lg">{formatCurrency(product.totalRevenue)}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center p-3 bg-white rounded border">
+                                                    <span className="text-gray-600">총 판매량</span>
+                                                    <span className="font-semibold">{formatNumber(product.totalQuantity)}개</span>
+                                                </div>
+                                                <div className="flex justify-between items-center p-3 bg-white rounded border">
+                                                    <span className="text-gray-600">평균 단가</span>
+                                                    <span className="font-semibold">{formatCurrency(product.avgUnitPrice)}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center p-3 bg-white rounded border">
+                                                    <span className="text-gray-600">거래 건수</span>
+                                                    <span className="font-semibold">{product.transactionCount}건</span>
+                                                </div>
                                             </div>
-                                            <div className="flex justify-between items-center p-3 bg-white rounded border">
-                                                <span className="text-gray-600">총 판매량</span>
-                                                <span className="font-semibold">{formatNumber(product.totalQuantity)}개</span>
+                                            <div className="p-3 bg-white rounded border">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-gray-600">성장률</span>
+                                                    <span className={`font-semibold text-lg ${product.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                        {product.growth >= 0 ? '+' : ''}{product.growth.toFixed(1)}%
+                                                    </span>
+                                                </div>
+                                                <div className="mt-2 pt-2 border-t">
+                                                    <div className="text-sm text-gray-500">전월 대비 성과</div>
+                                                    <div className="grid grid-cols-3 gap-2 mt-2">
+                                                        <div className="text-center">
+                                                            <div className="text-xs text-gray-500">매출 변화</div>
+                                                            <div className={`text-sm font-medium ${product.monthlyData[0].revenue >= product.monthlyData[1].revenue ? 'text-green-600' : 'text-red-600'}`}>
+                                                                {((product.monthlyData[0].revenue - product.monthlyData[1].revenue) / product.monthlyData[1].revenue * 100).toFixed(1)}%
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-center">
+                                                            <div className="text-xs text-gray-500">수량 변화</div>
+                                                            <div className={`text-sm font-medium ${product.monthlyData[0].quantity >= product.monthlyData[1].quantity ? 'text-green-600' : 'text-red-600'}`}>
+                                                                {((product.monthlyData[0].quantity - product.monthlyData[1].quantity) / product.monthlyData[1].quantity * 100).toFixed(1)}%
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-center">
+                                                            <div className="text-xs text-gray-500">단가 변화</div>
+                                                            <div className={`text-sm font-medium ${product.monthlyData[0].avgPrice >= product.monthlyData[1].avgPrice ? 'text-green-600' : 'text-red-600'}`}>
+                                                                {((product.monthlyData[0].avgPrice - product.monthlyData[1].avgPrice) / product.monthlyData[1].avgPrice * 100).toFixed(1)}%
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="flex justify-between items-center p-3 bg-white rounded border">
-                                                <span className="text-gray-600">평균 단가</span>
-                                                <span className="font-semibold">{formatCurrency(product.avgUnitPrice)}</span>
+                                        </div>
+                                    ))}
+                            </div>
+                        </div>
+
+                        {/* 고객 세그먼트 분석 */}
+                        <div className="bg-gray-50 rounded-lg p-4">
+                            <h4 className="font-semibold mb-4">고객 세그먼트 분석</h4>
+                            <div className="space-y-3">
+                                {productAnalysisData
+                                    .filter(p => p.product_name === selectedProduct)
+                                    .map(product => product.customerSegments)
+                                    .flat()
+                                    .map((segment, index) => (
+                                        <div key={index} className="flex items-center p-3 bg-white rounded border">
+                                            <div className="flex-1">
+                                                <div className="text-sm font-medium">{segment.segment}</div>
+                                                <div className="text-xs text-gray-500">{formatCurrency(segment.revenue)}</div>
                                             </div>
-                                            <div className="flex justify-between items-center p-3 bg-white rounded border">
-                                                <span className="text-gray-600">거래 건수</span>
-                                                <span className="font-semibold">{product.transactionCount}건</span>
+                                            <div className="w-24 text-right">
+                                                <div className="text-sm font-medium">{segment.percentage.toFixed(1)}%</div>
+                                                <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                                                    <div
+                                                        className="bg-blue-600 h-1.5 rounded-full"
+                                                        style={{ width: `${segment.percentage}%` }}
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className="flex justify-between items-center p-3 bg-white rounded border">
-                                                <span className="text-gray-600">성장률</span>
-                                                <span className={`font-semibold text-lg ${product.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                                    {product.growth >= 0 ? '+' : ''}{product.growth.toFixed(1)}%
-                                                </span>
+                                        </div>
+                                    ))}
+                            </div>
+                        </div>
+
+                        {/* 계절성 트렌드 */}
+                        <div className="bg-gray-50 rounded-lg p-4">
+                            <h4 className="font-semibold mb-4">계절성 트렌드</h4>
+                            <div className="space-y-3">
+                                {productAnalysisData
+                                    .filter(p => p.product_name === selectedProduct)
+                                    .map(product => product.seasonalTrends)
+                                    .flat()
+                                    .map((season, index) => (
+                                        <div key={index} className="flex items-center p-3 bg-white rounded border">
+                                            <div className="flex-1">
+                                                <div className="text-sm font-medium">{season.season}</div>
+                                                <div className="text-xs text-gray-500">{formatCurrency(season.revenue)}</div>
+                                            </div>
+                                            <div className={`text-sm font-medium ${season.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                {season.growth >= 0 ? '+' : ''}{season.growth.toFixed(1)}%
                                             </div>
                                         </div>
                                     ))}
