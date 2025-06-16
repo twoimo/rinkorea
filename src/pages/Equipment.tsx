@@ -308,7 +308,7 @@ const Equipment = () => {
             </section>
 
             {/* Partnership Section - 모바일 최적화 */}
-            <section className="py-12 md:py-20">
+            <section className="py-12 md:py-20 bg-gray-50">
                 <div className="container mx-auto px-4">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
                         <div className="w-full md:w-1/2">
