@@ -30,7 +30,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden group relative w-full h-full flex flex-col">
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div className="relative w-full h-[210px] sm:h-[260px] overflow-hidden">
         <img
           src={getImageUrl(project.image)}
           alt={project.title}
