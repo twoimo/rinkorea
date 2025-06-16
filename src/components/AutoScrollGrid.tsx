@@ -150,14 +150,14 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
         >
             <div
                 ref={rowRef}
-                className="flex gap-8 transition-transform duration-1000 ease-linear will-change-transform cursor-grab active:cursor-grabbing touch-pan-x"
+                className="flex gap-4 sm:gap-8 transition-transform duration-1000 ease-linear will-change-transform cursor-grab active:cursor-grabbing touch-pan-x"
                 onMouseDown={handleDragStart}
                 onTouchStart={handleDragStart}
             >
                 {repeatedItems.map((item, index) => (
                     <div
                         key={`item-${index}`}
-                        className="flex-shrink-0 w-[500px] transform transition-all duration-300 hover:scale-105 select-none"
+                        className="flex-shrink-0 w-[280px] sm:w-[400px] h-[480px] sm:h-[600px] transform transition-all duration-300 hover:scale-105 select-none"
                     >
                         {renderItem(item)}
                     </div>
