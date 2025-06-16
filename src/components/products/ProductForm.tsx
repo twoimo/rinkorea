@@ -1,6 +1,23 @@
-
 import React, { useState, useCallback, memo } from 'react';
-import { X } from 'lucide-react';
+import { X, Plus, GripVertical, Trash2 } from 'lucide-react';
+import type { DragEndEvent } from '@dnd-kit/core';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import type { SortableContextProps } from '@dnd-kit/sortable';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface Product {
   id: string;
@@ -21,6 +38,47 @@ interface ProductFormProps {
   success: string | null;
 }
 
+interface SortableItemProps {
+  id: string;
+  children: React.ReactNode;
+  onRemove: () => void;
+}
+
+const SortableItem = ({ id, children, onRemove }: SortableItemProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <li ref={setNodeRef} style={style} className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg">
+      <button
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing"
+      >
+        <GripVertical className="w-5 h-5 text-gray-400" />
+      </button>
+      <span className="flex-1">{children}</span>
+      <button
+        type="button"
+        onClick={onRemove}
+        className="p-1 text-red-600 hover:text-red-700"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+    </li>
+  );
+};
+
 const ProductForm = memo(({ product, onSave, onClose, loading, error, success }: ProductFormProps) => {
   const [formValues, setFormValues] = useState<Partial<Product>>({
     name: product?.name || '',
@@ -31,19 +89,69 @@ const ProductForm = memo(({ product, onSave, onClose, loading, error, success }:
     detail_images: product?.detail_images || []
   });
 
+  const [newFeature, setNewFeature] = useState('');
+  const [newImage, setNewImage] = useState('');
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = useCallback((event: DragEndEvent, type: 'features' | 'detail_images') => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setFormValues(prev => {
+        const oldIndex = prev[type]?.findIndex(item => item === active.id) ?? -1;
+        const newIndex = prev[type]?.findIndex(item => item === over.id) ?? -1;
+
+        return {
+          ...prev,
+          [type]: arrayMove(prev[type] || [], oldIndex, newIndex)
+        };
+      });
+    }
+  }, []);
+
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     await onSave(formValues);
   }, [formValues, onSave]);
 
-  const handleFeaturesChange = useCallback((value: string) => {
-    const features = value.split(',').map(f => f.trim()).filter(f => f);
-    setFormValues(prev => ({ ...prev, features }));
+  const handleAddFeature = useCallback(() => {
+    if (newFeature.trim()) {
+      setFormValues(prev => ({
+        ...prev,
+        features: [...(prev.features || []), newFeature.trim()]
+      }));
+      setNewFeature('');
+    }
+  }, [newFeature]);
+
+  const handleRemoveFeature = useCallback((index: number) => {
+    setFormValues(prev => ({
+      ...prev,
+      features: prev.features?.filter((_, i) => i !== index) || []
+    }));
   }, []);
 
-  const handleDetailImagesChange = useCallback((value: string) => {
-    const detail_images = value.split(',').map(f => f.trim()).filter(f => f);
-    setFormValues(prev => ({ ...prev, detail_images }));
+  const handleAddImage = useCallback(() => {
+    if (newImage.trim()) {
+      setFormValues(prev => ({
+        ...prev,
+        detail_images: [...(prev.detail_images || []), newImage.trim()]
+      }));
+      setNewImage('');
+    }
+  }, [newImage]);
+
+  const handleRemoveImage = useCallback((index: number) => {
+    setFormValues(prev => ({
+      ...prev,
+      detail_images: prev.detail_images?.filter((_, i) => i !== index) || []
+    }));
   }, []);
 
   return (
@@ -53,8 +161,8 @@ const ProductForm = memo(({ product, onSave, onClose, loading, error, success }:
           <h2 className="text-xl sm:text-2xl font-bold">
             {product ? '제품 수정' : '제품 추가'}
           </h2>
-          <button 
-            className="text-gray-400 hover:text-gray-700 touch-manipulation" 
+          <button
+            className="text-gray-400 hover:text-gray-700 touch-manipulation"
             onClick={onClose}
             aria-label="닫기"
           >
@@ -64,33 +172,33 @@ const ProductForm = memo(({ product, onSave, onClose, loading, error, success }:
         <form className="p-6 space-y-4" onSubmit={handleSubmit}>
           <div>
             <label className="block text-sm font-medium mb-2" htmlFor="product-name">제품명</label>
-            <input 
+            <input
               id="product-name"
-              type="text" 
-              className="w-full border border-gray-300 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base" 
-              value={formValues.name || ''} 
-              onChange={e => setFormValues(prev => ({ ...prev, name: e.target.value }))} 
+              type="text"
+              className="w-full border border-gray-300 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+              value={formValues.name || ''}
+              onChange={e => setFormValues(prev => ({ ...prev, name: e.target.value }))}
               required
             />
           </div>
           <div>
             <label className="block text-sm font-medium mb-2" htmlFor="product-description">설명</label>
-            <textarea 
+            <textarea
               id="product-description"
-              className="w-full border border-gray-300 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base min-h-[80px]" 
-              value={formValues.description || ''} 
-              onChange={e => setFormValues(prev => ({ ...prev, description: e.target.value }))} 
+              className="w-full border border-gray-300 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base min-h-[80px]"
+              value={formValues.description || ''}
+              onChange={e => setFormValues(prev => ({ ...prev, description: e.target.value }))}
               required
             />
           </div>
           <div>
             <label className="block text-sm font-medium mb-2" htmlFor="product-image">이미지 URL 또는 파일명</label>
-            <input 
+            <input
               id="product-image"
-              type="text" 
-              className="w-full border border-gray-300 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base" 
-              value={formValues.image_url || ''} 
-              onChange={e => setFormValues(prev => ({ ...prev, image_url: e.target.value }))} 
+              type="text"
+              className="w-full border border-gray-300 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+              value={formValues.image_url || ''}
+              onChange={e => setFormValues(prev => ({ ...prev, image_url: e.target.value }))}
               placeholder="예: https://example.com/image.jpg 또는 image.jpg"
               required
             />
@@ -113,24 +221,90 @@ const ProductForm = memo(({ product, onSave, onClose, loading, error, success }:
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2" htmlFor="product-features">주요 특징 (쉼표로 구분)</label>
-            <textarea
-              id="product-features"
-              className="w-full border border-gray-300 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base min-h-[80px]"
-              value={formValues.features?.join(', ') || ''} 
-              onChange={e => handleFeaturesChange(e.target.value)}
-              placeholder="특징을 쉼표로 구분하여 입력하세요"
-            />
+            <label className="block text-sm font-medium mb-2">주요 특징</label>
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  className="flex-1 border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                  value={newFeature}
+                  onChange={e => setNewFeature(e.target.value)}
+                  placeholder="새로운 특징을 입력하세요"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddFeature}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Plus className="w-5 h-5" />
+                </button>
+              </div>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={(e) => handleDragEnd(e, 'features')}
+              >
+                <SortableContext
+                  items={formValues.features || []}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <ul className="space-y-2">
+                    {formValues.features?.map((feature, index) => (
+                      <SortableItem
+                        key={feature}
+                        id={feature}
+                        onRemove={() => handleRemoveFeature(index)}
+                      >
+                        {feature}
+                      </SortableItem>
+                    ))}
+                  </ul>
+                </SortableContext>
+              </DndContext>
+            </div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2" htmlFor="product-detail-images">상세 이미지 URL 또는 파일명 (쉼표로 구분)</label>
-            <textarea
-              id="product-detail-images"
-              className="w-full border border-gray-300 px-3 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base min-h-[80px]"
-              value={formValues.detail_images?.join(', ') || ''} 
-              onChange={e => handleDetailImagesChange(e.target.value)}
-              placeholder="예: detail1.jpg, https://example.com/detail2.jpg"
-            />
+            <label className="block text-sm font-medium mb-2">상세 이미지 URL 또는 파일명</label>
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  className="flex-1 border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                  value={newImage}
+                  onChange={e => setNewImage(e.target.value)}
+                  placeholder="새로운 이미지 URL 또는 파일명을 입력하세요"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddImage}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Plus className="w-5 h-5" />
+                </button>
+              </div>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={(e) => handleDragEnd(e, 'detail_images')}
+              >
+                <SortableContext
+                  items={formValues.detail_images || []}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <ul className="space-y-2">
+                    {formValues.detail_images?.map((image, index) => (
+                      <SortableItem
+                        key={image}
+                        id={image}
+                        onRemove={() => handleRemoveImage(index)}
+                      >
+                        {image}
+                      </SortableItem>
+                    ))}
+                  </ul>
+                </SortableContext>
+              </DndContext>
+            </div>
           </div>
           {error && (
             <div className="mt-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg" role="alert">
@@ -143,17 +317,17 @@ const ProductForm = memo(({ product, onSave, onClose, loading, error, success }:
             </div>
           )}
           <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <button 
-              type="button" 
-              className="flex-1 px-4 py-2.5 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition-colors touch-manipulation" 
-              onClick={onClose} 
+            <button
+              type="button"
+              className="flex-1 px-4 py-2.5 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition-colors touch-manipulation"
+              onClick={onClose}
               disabled={loading}
             >
               취소
             </button>
-            <button 
-              type="submit" 
-              className="flex-1 px-4 py-2.5 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors touch-manipulation" 
+            <button
+              type="submit"
+              className="flex-1 px-4 py-2.5 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors touch-manipulation"
               disabled={loading}
             >
               {loading ? '저장 중...' : '저장'}
