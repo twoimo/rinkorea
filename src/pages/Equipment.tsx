@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { Settings, Wrench, Award, Star, Plus, Edit, Trash2, X, EyeOff, Eye } from 'lucide-react';
+import { Settings, Wrench, Award, Star, Plus, Edit, Trash2, X, EyeOff, Eye, GripVertical } from 'lucide-react';
 import { supabase } from '../integrations/supabase/client';
 import { useUserRole } from '../hooks/useUserRole';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
-import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { arrayMove } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface Equipment {
     id: string;
@@ -21,6 +22,39 @@ interface Equipment {
     created_at?: string;
     updated_at?: string;
 }
+
+interface SortableItemProps {
+    id: string;
+    children: React.ReactNode;
+}
+
+const SortableItem = ({ id, children }: SortableItemProps) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+    } = useSortable({ id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    };
+
+    return (
+        <li ref={setNodeRef} style={style} className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg">
+            <button
+                {...attributes}
+                {...listeners}
+                className="cursor-grab active:cursor-grabbing"
+            >
+                <GripVertical className="w-5 h-5 text-gray-400" />
+            </button>
+            <span className="flex-1">{children}</span>
+        </li>
+    );
+};
 
 const Equipment = () => {
     const [equipment, setEquipment] = useState<Equipment[]>([]);
@@ -361,7 +395,7 @@ const Equipment = () => {
                                         <p className="text-gray-600 mb-4 text-sm md:text-base">{item.description}</p>
                                         <div className="space-y-2">
                                             <h4 className="font-semibold text-gray-900">주요 특징:</h4>
-                                            <ul className="space-y-1">
+                                            <ul className="space-y-2">
                                                 {item.features.map((feature, featureIndex) => (
                                                     <li key={featureIndex} className="flex items-center text-gray-600 text-sm md:text-base">
                                                         <Star className="w-3 h-3 md:w-4 md:h-4 text-blue-600 mr-2 flex-shrink-0" />
@@ -435,7 +469,7 @@ const Equipment = () => {
                                         <p className="text-gray-600 mb-4 text-sm md:text-base">{item.description}</p>
                                         <div className="space-y-2">
                                             <h4 className="font-semibold text-gray-900">주요 특징:</h4>
-                                            <ul className="space-y-1">
+                                            <ul className="space-y-2">
                                                 {item.features.map((feature, featureIndex) => (
                                                     <li key={featureIndex} className="flex items-center text-gray-600 text-sm md:text-base">
                                                         <Star className="w-3 h-3 md:w-4 md:h-4 text-blue-600 mr-2 flex-shrink-0" />
@@ -553,19 +587,18 @@ const Equipment = () => {
                                             >
                                                 <ul className="space-y-2">
                                                     {formValues.features?.map((feature, index) => (
-                                                        <li
-                                                            key={feature}
-                                                            className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
-                                                        >
-                                                            <span className="flex-1">{feature}</span>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleRemoveFeature(index)}
-                                                                className="text-red-600 hover:text-red-700"
-                                                            >
-                                                                <X className="w-4 h-4" />
-                                                            </button>
-                                                        </li>
+                                                        <SortableItem key={feature} id={feature}>
+                                                            <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                                                                <span className="flex-1">{feature}</span>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleRemoveFeature(index)}
+                                                                    className="text-red-600 hover:text-red-700"
+                                                                >
+                                                                    <X className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+                                                        </SortableItem>
                                                     ))}
                                                 </ul>
                                             </SortableContext>
