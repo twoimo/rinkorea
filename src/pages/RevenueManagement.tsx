@@ -26,7 +26,8 @@ const RevenueManagement = () => {
         getChartData,
         addBulkRevenueData,
         updateRevenueData,
-        deleteRevenueData
+        deleteRevenueData,
+        deleteSelectedRevenueData
     } = useRevenue();
 
     const [activeTab, setActiveTab] = useState<'dashboard' | 'charts' | 'input' | 'manage'>('dashboard');
@@ -433,6 +434,7 @@ const RevenueManagement = () => {
                             loading={loading}
                             onEdit={updateRevenueData}
                             onDelete={deleteRevenueData}
+                            onBulkDelete={deleteSelectedRevenueData}
                             onRefresh={() => fetchRevenueData(dateRange)}
                         />
                     )}

@@ -8,6 +8,7 @@ interface DataTableProps {
     loading: boolean;
     onEdit: (id: string, data: Partial<RevenueData>) => Promise<{ success?: boolean; error?: unknown }>;
     onDelete: (id: string) => Promise<{ success?: boolean; error?: unknown }>;
+    onBulkDelete: (ids: string[]) => Promise<{ success?: boolean; error?: unknown }>;
     onRefresh: () => void;
 }
 
@@ -17,12 +18,14 @@ const DataTable: React.FC<DataTableProps> = ({
     loading,
     onEdit,
     onDelete,
+    onBulkDelete,
     onRefresh
 }) => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editingData, setEditingData] = useState<Partial<RevenueData>>({});
     const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
     const [showResetDialog, setShowResetDialog] = useState(false);
+    const [resetConfirmText, setResetConfirmText] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
     const [filterCategory, setFilterCategory] = useState('');
@@ -390,8 +393,8 @@ const DataTable: React.FC<DataTableProps> = ({
                                         key={pageNum}
                                         onClick={() => setCurrentPage(pageNum)}
                                         className={`px-3 py-2 border rounded text-sm transition-colors ${currentPage === pageNum
-                                                ? 'bg-blue-600 text-white border-blue-600'
-                                                : 'hover:bg-gray-50'
+                                            ? 'bg-blue-600 text-white border-blue-600'
+                                            : 'hover:bg-gray-50'
                                             }`}
                                     >
                                         {pageNum}
@@ -488,10 +491,7 @@ const DataTable: React.FC<DataTableProps> = ({
                                 placeholder="데이터 삭제"
                                 className="w-full border rounded-lg px-3 py-2"
                                 onChange={(e) => {
-                                    const confirmButton = document.getElementById('confirm-reset-button') as HTMLButtonElement;
-                                    if (confirmButton) {
-                                        confirmButton.disabled = e.target.value !== '데이터 삭제';
-                                    }
+                                    setResetConfirmText(e.target.value);
                                 }}
                             />
                         </div>
@@ -504,19 +504,21 @@ const DataTable: React.FC<DataTableProps> = ({
                                 취소
                             </button>
                             <button
-                                id="confirm-reset-button"
                                 onClick={async () => {
-                                    // 모든 데이터 삭제 로직
+                                    // Use bulk delete function to prevent network resource exhaustion
                                     try {
-                                        const deletePromises = data.map(item => onDelete(item.id));
-                                        await Promise.all(deletePromises);
-                                        setShowResetDialog(false);
-                                        onRefresh();
+                                        const allIds = data.map(item => item.id);
+                                        const result = await onBulkDelete(allIds);
+                                        if (result.success) {
+                                            setShowResetDialog(false);
+                                            setResetConfirmText('');
+                                            onRefresh();
+                                        }
                                     } catch (error) {
                                         console.error('데이터 초기화 실패:', error);
                                     }
                                 }}
-                                disabled={true}
+                                disabled={resetConfirmText !== '데이터 삭제'}
                                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 모든 데이터 삭제

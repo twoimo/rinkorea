@@ -3,6 +3,32 @@ import { supabase } from '@/integrations/supabase/client';
 import { RevenueData, RevenueCategory, ChartData, RevenueStats } from '@/types/revenue';
 import { useAuth } from '@/contexts/AuthContext';
 
+// 재시도 유틸리티 함수
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+const retryWithBackoff = async <T>(
+    fn: () => Promise<T>,
+    maxRetries: number = 3,
+    baseDelay: number = 1000
+): Promise<T> => {
+    let lastError: Error;
+
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            return await fn();
+        } catch (error) {
+            lastError = error as Error;
+            if (i === maxRetries - 1) break;
+
+            // 백오프 지연 (1초, 2초, 4초)
+            const delayMs = baseDelay * Math.pow(2, i);
+            await delay(delayMs);
+        }
+    }
+
+    throw lastError;
+};
+
 export const useRevenue = () => {
     const [revenueData, setRevenueData] = useState<RevenueData[]>([]);
     const [categories, setCategories] = useState<RevenueCategory[]>([]);
@@ -232,19 +258,80 @@ export const useRevenue = () => {
         }
     };
 
-    // 데이터 삭제
+    // 배치 데이터 삭제 (안전한 삭제를 위한 함수)
+    const deleteBulkRevenueData = async (ids: string[]) => {
+        try {
+            if (ids.length === 0) return { success: true };
+
+            // 단일 쿼리로 여러 ID 삭제 (더 효율적)
+            const { error } = await retryWithBackoff(async () => {
+                return await supabase
+                    .from('revenue_data')
+                    .delete()
+                    .in('id', ids);
+            });
+
+            if (error) throw error;
+            await fetchRevenueData();
+            return { success: true };
+        } catch (error) {
+            console.error('배치 데이터 삭제 실패:', error);
+            return { error };
+        }
+    };
+
+    // 개선된 단일 데이터 삭제 (재시도 로직 포함)
     const deleteRevenueData = async (id: string) => {
         try {
-            const { error } = await supabase
-                .from('revenue_data')
-                .delete()
-                .eq('id', id);
+            const { error } = await retryWithBackoff(async () => {
+                return await supabase
+                    .from('revenue_data')
+                    .delete()
+                    .eq('id', id);
+            });
 
             if (error) throw error;
             await fetchRevenueData();
             return { success: true };
         } catch (error) {
             console.error('데이터 삭제 실패:', error);
+            return { error };
+        }
+    };
+
+    // 선택된 항목들을 순차적으로 삭제 (네트워크 부하 방지)
+    const deleteSelectedRevenueData = async (ids: string[]) => {
+        try {
+            if (ids.length === 0) return { success: true };
+
+            // 10개씩 배치로 나누어 처리
+            const batchSize = 10;
+            const batches = [];
+
+            for (let i = 0; i < ids.length; i += batchSize) {
+                batches.push(ids.slice(i, i + batchSize));
+            }
+
+            // 각 배치를 순차적으로 처리 (동시 요청 방지)
+            for (const batch of batches) {
+                await retryWithBackoff(async () => {
+                    const { error } = await supabase
+                        .from('revenue_data')
+                        .delete()
+                        .in('id', batch);
+
+                    if (error) throw error;
+                    return { success: true };
+                });
+
+                // 배치 간 짧은 지연
+                await delay(100);
+            }
+
+            await fetchRevenueData();
+            return { success: true };
+        } catch (error) {
+            console.error('선택 데이터 삭제 실패:', error);
             return { error };
         }
     };
@@ -269,6 +356,8 @@ export const useRevenue = () => {
         addRevenueData,
         addBulkRevenueData,
         updateRevenueData,
-        deleteRevenueData
+        deleteRevenueData,
+        deleteBulkRevenueData,
+        deleteSelectedRevenueData
     };
 };

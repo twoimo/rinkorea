@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BarChart3, TrendingUp, PieChart, AreaChart, Settings, Plus, X, Eye, EyeOff, Maximize2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BarChart3, TrendingUp, PieChart, AreaChart, Plus, X, Eye, EyeOff, Maximize2 } from 'lucide-react';
 import { ChartData, RevenueCategory } from '@/types/revenue';
 import RevenueChart from './RevenueChart';
 
@@ -21,11 +21,37 @@ interface ChartConfig {
     visible: boolean;
 }
 
+// 확장된 ChartData 타입 (total 속성 포함)
+interface ExtendedChartData extends ChartData {
+    total?: number;
+}
+
 const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
     data,
     categories,
     categoryColors
 }) => {
+    // localStorage에서 차트 가시성 상태 로드
+    const loadChartVisibility = (): Record<string, boolean> => {
+        try {
+            const saved = localStorage.getItem('chartVisibility');
+            return saved ? JSON.parse(saved) : {};
+        } catch {
+            return {};
+        }
+    };
+
+    // localStorage에 차트 가시성 상태 저장
+    const saveChartVisibility = (visibility: Record<string, boolean>) => {
+        try {
+            localStorage.setItem('chartVisibility', JSON.stringify(visibility));
+        } catch {
+            // localStorage 사용 불가능한 경우 무시
+        }
+    };
+
+    const savedVisibility = loadChartVisibility();
+
     const [charts, setCharts] = useState<ChartConfig[]>([
         {
             id: 'overview',
@@ -33,7 +59,7 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
             title: '전체 매출 추이',
             timeRange: 'monthly',
             selectedCategories: ['total'],
-            visible: true
+            visible: savedVisibility['overview'] !== false // 기본값은 true
         },
         {
             id: 'category-pie',
@@ -41,7 +67,7 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
             title: '카테고리별 매출 비중',
             timeRange: 'monthly',
             selectedCategories: categories.map(c => c.name),
-            visible: true
+            visible: savedVisibility['category-pie'] !== false
         },
         {
             id: 'category-trend',
@@ -49,7 +75,7 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
             title: '카테고리별 매출 트렌드',
             timeRange: 'monthly',
             selectedCategories: categories.map(c => c.name),
-            visible: true
+            visible: savedVisibility['category-trend'] !== false
         },
         {
             id: 'growth-analysis',
@@ -57,7 +83,7 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
             title: '월별 성장률 분석',
             timeRange: 'monthly',
             selectedCategories: ['total'],
-            visible: true
+            visible: savedVisibility['growth-analysis'] !== false
         },
         {
             id: 'top-products',
@@ -65,7 +91,7 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
             title: '주요 제품 매출 분석',
             timeRange: 'monthly',
             selectedCategories: categories.slice(0, 5).map(c => c.name),
-            visible: true
+            visible: savedVisibility['top-products'] !== false
         },
         {
             id: 'seasonal-pattern',
@@ -73,7 +99,7 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
             title: '계절별 매출 패턴',
             timeRange: 'monthly',
             selectedCategories: ['total'],
-            visible: true
+            visible: savedVisibility['seasonal-pattern'] !== false
         }
     ]);
 
@@ -84,6 +110,15 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
         timeRange: 'monthly',
         selectedCategories: []
     });
+
+    // 차트 가시성 변경 시 localStorage에 저장
+    useEffect(() => {
+        const visibility = charts.reduce((acc, chart) => {
+            acc[chart.id] = chart.visible;
+            return acc;
+        }, {} as Record<string, boolean>);
+        saveChartVisibility(visibility);
+    }, [charts]);
 
     const chartTypeOptions = [
         { value: 'line', label: '선 그래프', icon: TrendingUp },
@@ -134,7 +169,7 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
         updateChart(id, { visible: !charts.find(c => c.id === id)?.visible });
     };
 
-    const getProcessedData = (chart: ChartConfig) => {
+    const getProcessedData = (chart: ChartConfig): ExtendedChartData[] => {
         // useRevenue 훅의 getChartData 함수를 사용하여 시간 범위별 데이터 처리
         if (!data || data.length === 0) return [];
 
@@ -147,8 +182,14 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
         // 시간 범위에 따른 데이터 재그룹화
         switch (chart.timeRange) {
             case 'daily': {
-                // 일별 데이터는 그대로 사용
-                return processedData;
+                // 일별 데이터는 그대로 사용하되 total 계산
+                return processedData.map(item => {
+                    const total = categories.reduce((sum, cat) => {
+                        const value = item[cat.name];
+                        return sum + (typeof value === 'number' ? value : 0);
+                    }, 0);
+                    return { ...item, total };
+                });
             }
             case 'weekly': {
                 // 주별로 그룹화
@@ -159,25 +200,28 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                     const weekKey = weekStart.toISOString().split('T')[0];
 
                     if (!acc[weekKey]) {
-                        acc[weekKey] = { date: weekKey, total: 0 };
+                        acc[weekKey] = { date: weekKey, total: 0 } as ExtendedChartData;
                         categories.forEach(cat => {
-                            acc[weekKey][cat.name] = 0;
+                            (acc[weekKey] as any)[cat.name] = 0;
                         });
                     }
 
                     // 각 카테고리별 값 합산
                     categories.forEach(cat => {
                         if (typeof item[cat.name] === 'number') {
-                            acc[weekKey][cat.name] = (acc[weekKey][cat.name] as number) + (item[cat.name] as number);
+                            (acc[weekKey] as any)[cat.name] = ((acc[weekKey] as any)[cat.name] || 0) + (item[cat.name] as number);
                         }
                     });
 
-                    if (typeof item.total === 'number') {
-                        acc[weekKey].total = (acc[weekKey].total as number) + (item.total as number);
-                    }
+                    // total 계산
+                    const total = categories.reduce((sum, cat) => {
+                        const value = item[cat.name];
+                        return sum + (typeof value === 'number' ? value : 0);
+                    }, 0);
+                    acc[weekKey].total = (acc[weekKey].total || 0) + total;
 
                     return acc;
-                }, {} as Record<string, ChartData>);
+                }, {} as Record<string, ExtendedChartData>);
 
                 return Object.values(weeklyData).sort((a, b) => a.date.localeCompare(b.date));
             }
@@ -188,31 +232,97 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                     const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 
                     if (!acc[monthKey]) {
-                        acc[monthKey] = { date: monthKey, total: 0 };
+                        acc[monthKey] = { date: monthKey, total: 0 } as ExtendedChartData;
                         categories.forEach(cat => {
-                            acc[monthKey][cat.name] = 0;
+                            (acc[monthKey] as any)[cat.name] = 0;
                         });
                     }
 
                     // 각 카테고리별 값 합산
                     categories.forEach(cat => {
                         if (typeof item[cat.name] === 'number') {
-                            acc[monthKey][cat.name] = (acc[monthKey][cat.name] as number) + (item[cat.name] as number);
+                            (acc[monthKey] as any)[cat.name] = ((acc[monthKey] as any)[cat.name] || 0) + (item[cat.name] as number);
                         }
                     });
 
-                    if (typeof item.total === 'number') {
-                        acc[monthKey].total = (acc[monthKey].total as number) + (item.total as number);
-                    }
+                    // total 계산
+                    const total = categories.reduce((sum, cat) => {
+                        const value = item[cat.name];
+                        return sum + (typeof value === 'number' ? value : 0);
+                    }, 0);
+                    acc[monthKey].total = (acc[monthKey].total || 0) + total;
 
                     return acc;
-                }, {} as Record<string, ChartData>);
+                }, {} as Record<string, ExtendedChartData>);
 
                 return Object.values(monthlyData).sort((a, b) => a.date.localeCompare(b.date));
             }
             default:
-                return processedData;
+                return processedData.map(item => {
+                    const total = categories.reduce((sum, cat) => {
+                        const value = item[cat.name];
+                        return sum + (typeof value === 'number' ? value : 0);
+                    }, 0);
+                    return { ...item, total };
+                });
         }
+    };
+
+    // 범례가 많을 때 접을 수 있는 기능
+    const [expandedLegends, setExpandedLegends] = useState<Record<string, boolean>>({});
+
+    const toggleLegendExpansion = (chartId: string) => {
+        setExpandedLegends(prev => ({
+            ...prev,
+            [chartId]: !prev[chartId]
+        }));
+    };
+
+    const renderCategoryCheckboxes = (chart: ChartConfig, isInModal = false) => {
+        const maxVisibleItems = isInModal ? 10 : 6;
+        const allCategories = [
+            { id: 'total', name: 'total', color: '#3b82f6' },
+            ...categories.map(cat => ({ id: cat.id, name: cat.name, color: cat.color }))
+        ];
+
+        const isExpanded = expandedLegends[chart.id];
+        const visibleCategories = isExpanded ? allCategories : allCategories.slice(0, maxVisibleItems);
+        const hasMore = allCategories.length > maxVisibleItems;
+
+        return (
+            <div className="space-y-2">
+                <div className="flex flex-wrap gap-2">
+                    {visibleCategories.map(category => (
+                        <label key={category.id} className="flex items-center gap-1 text-sm">
+                            <input
+                                type="checkbox"
+                                checked={chart.selectedCategories.includes(category.name)}
+                                onChange={(e) => {
+                                    const newCategories = e.target.checked
+                                        ? [...chart.selectedCategories, category.name]
+                                        : chart.selectedCategories.filter(c => c !== category.name);
+                                    updateChart(chart.id, { selectedCategories: newCategories });
+                                }}
+                                className="rounded"
+                            />
+                            <span
+                                className="inline-block w-3 h-3 rounded mr-1"
+                                style={{ backgroundColor: category.color }}
+                            ></span>
+                            {category.name === 'total' ? '전체' : category.name}
+                        </label>
+                    ))}
+                </div>
+                {hasMore && !isInModal && (
+                    <button
+                        onClick={() => toggleLegendExpansion(chart.id)}
+                        className="text-xs text-blue-600 hover:text-blue-800"
+                    >
+                        {isExpanded ? `접기 (${allCategories.length - maxVisibleItems}개 숨김)` : `더보기 (${allCategories.length - maxVisibleItems}개 더)`}
+                    </button>
+                )}
+            </div>
+        );
     };
 
     return (
@@ -313,43 +423,7 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                         {/* 차트별 카테고리 선택 */}
                         <div className="mt-4 pt-4 border-t">
                             <div className="text-sm text-gray-600 mb-2">표시 카테고리:</div>
-                            <div className="flex flex-wrap gap-2">
-                                <label className="flex items-center gap-1 text-sm">
-                                    <input
-                                        type="checkbox"
-                                        checked={chart.selectedCategories.includes('total')}
-                                        onChange={(e) => {
-                                            const newCategories = e.target.checked
-                                                ? [...chart.selectedCategories.filter(c => c !== 'total'), 'total']
-                                                : chart.selectedCategories.filter(c => c !== 'total');
-                                            updateChart(chart.id, { selectedCategories: newCategories });
-                                        }}
-                                        className="rounded"
-                                    />
-                                    <span className="inline-block w-3 h-3 rounded bg-blue-500 mr-1"></span>
-                                    전체
-                                </label>
-                                {categories.map(category => (
-                                    <label key={category.id} className="flex items-center gap-1 text-sm">
-                                        <input
-                                            type="checkbox"
-                                            checked={chart.selectedCategories.includes(category.name)}
-                                            onChange={(e) => {
-                                                const newCategories = e.target.checked
-                                                    ? [...chart.selectedCategories, category.name]
-                                                    : chart.selectedCategories.filter(c => c !== category.name);
-                                                updateChart(chart.id, { selectedCategories: newCategories });
-                                            }}
-                                            className="rounded"
-                                        />
-                                        <span
-                                            className="inline-block w-3 h-3 rounded mr-1"
-                                            style={{ backgroundColor: category.color }}
-                                        ></span>
-                                        {category.name}
-                                    </label>
-                                ))}
-                            </div>
+                            {renderCategoryCheckboxes(chart)}
                         </div>
                     </div>
                 ))}
