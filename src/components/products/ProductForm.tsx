@@ -27,15 +27,26 @@ interface Product {
   icon: string;
   features: string[];
   detail_images?: string[];
+  is_active: boolean;
+}
+
+interface ProductFormData {
+  name: string;
+  description: string;
+  image_url: string;
+  icon: string;
+  features: string[];
+  detail_images?: string[];
+  is_active: boolean;
 }
 
 interface ProductFormProps {
-  product?: Product | null;
-  onSave: (formData: Partial<Product>) => Promise<void>;
+  product?: Product;
+  onSave: (product: ProductFormData) => Promise<void>;
   onClose: () => void;
-  loading: boolean;
-  error: string | null;
-  success: string | null;
+  loading?: boolean;
+  formError?: string;
+  success?: boolean;
 }
 
 interface SortableItemProps {
@@ -79,15 +90,18 @@ const SortableItem = ({ id, children, onRemove }: SortableItemProps) => {
   );
 };
 
-const ProductForm = memo(({ product, onSave, onClose, loading, error, success }: ProductFormProps) => {
-  const [formValues, setFormValues] = useState<Partial<Product>>({
+const ProductForm = memo(({ product, onSave, onClose, loading, formError, success }: ProductFormProps) => {
+  const [formValues, setFormValues] = useState<ProductFormData>({
     name: product?.name || '',
     description: product?.description || '',
     image_url: product?.image_url || '',
     icon: product?.icon || '',
     features: product?.features || [],
-    detail_images: product?.detail_images || []
+    detail_images: product?.detail_images || [],
+    is_active: product?.is_active ?? true
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [newFeature, setNewFeature] = useState('');
   const [newImage, setNewImage] = useState('');
@@ -117,7 +131,8 @@ const ProductForm = memo(({ product, onSave, onClose, loading, error, success }:
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form values before submit:', formValues);
+    setIsSubmitting(true);
+    setSubmitError(null);
 
     try {
       const payload = {
@@ -129,10 +144,14 @@ const ProductForm = memo(({ product, onSave, onClose, loading, error, success }:
       console.log('Submitting payload:', payload);
 
       await onSave(payload);
+      onClose();
     } catch (err) {
       console.error('Error saving product:', err);
+      setSubmitError(err instanceof Error ? err.message : '제품 저장 중 오류가 발생했습니다.');
+    } finally {
+      setIsSubmitting(false);
     }
-  }, [formValues, onSave]);
+  }, [formValues, onSave, onClose]);
 
   const handleAddFeature = useCallback(() => {
     if (newFeature.trim()) {
@@ -331,14 +350,9 @@ const ProductForm = memo(({ product, onSave, onClose, loading, error, success }:
               </div>
             </div>
           </div>
-          {error && (
+          {submitError && (
             <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-lg">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="mt-4 p-3 bg-green-50 text-green-600 rounded-lg">
-              {success}
+              {submitError}
             </div>
           )}
           <div className="mt-6 flex justify-end gap-3">
