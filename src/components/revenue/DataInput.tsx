@@ -304,16 +304,16 @@ const DataInput: React.FC<DataInputProps> = ({
                         <table className="w-full border-collapse border border-gray-300">
                             <thead>
                                 <tr className="bg-gray-50">
-                                    <th className="border border-gray-300 px-3 py-2 text-left text-sm font-medium">날짜</th>
-                                    <th className="border border-gray-300 px-3 py-2 text-left text-sm font-medium">카테고리</th>
-                                    <th className="border border-gray-300 px-3 py-2 text-left text-sm font-medium">제품명</th>
-                                    <th className="border border-gray-300 px-3 py-2 text-left text-sm font-medium">수량</th>
-                                    <th className="border border-gray-300 px-3 py-2 text-left text-sm font-medium">단가</th>
-                                    <th className="border border-gray-300 px-3 py-2 text-left text-sm font-medium">매출</th>
-                                    <th className="border border-gray-300 px-3 py-2 text-left text-sm font-medium">지역</th>
-                                    <th className="border border-gray-300 px-3 py-2 text-left text-sm font-medium">고객유형</th>
-                                    <th className="border border-gray-300 px-3 py-2 text-left text-sm font-medium">비고</th>
-                                    <th className="border border-gray-300 px-3 py-2 text-center text-sm font-medium">작업</th>
+                                    <th className="border border-gray-300 px-2 py-1 text-left text-sm font-medium min-w-[90px]">날짜</th>
+                                    <th className="border border-gray-300 px-2 py-1 text-left text-sm font-medium min-w-[100px]">카테고리</th>
+                                    <th className="border border-gray-300 px-2 py-1 text-left text-sm font-medium min-w-[120px]">제품명</th>
+                                    <th className="border border-gray-300 px-2 py-1 text-left text-sm font-medium min-w-[70px]">수량</th>
+                                    <th className="border border-gray-300 px-2 py-1 text-left text-sm font-medium min-w-[80px]">단가</th>
+                                    <th className="border border-gray-300 px-2 py-1 text-left text-sm font-medium min-w-[80px]">매출</th>
+                                    <th className="border border-gray-300 px-2 py-1 text-left text-sm font-medium min-w-[80px]">지역</th>
+                                    <th className="border border-gray-300 px-2 py-1 text-left text-sm font-medium min-w-[90px]">고객유형</th>
+                                    <th className="border border-gray-300 px-2 py-1 text-left text-sm font-medium min-w-[100px]">비고</th>
+                                    <th className="border border-gray-300 px-2 py-1 text-center text-sm font-medium min-w-[60px]">작업</th>
                                 </tr>
                             </thead>
                             <tbody>
