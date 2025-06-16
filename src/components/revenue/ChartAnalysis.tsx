@@ -210,7 +210,9 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                 growth: 20.4
             }
         ];
-        setProductAnalysisData(mockProductData);
+        // Sort by revenue in descending order and take top 5
+        const sortedProducts = [...mockProductData].sort((a, b) => b.totalRevenue - a.totalRevenue).slice(0, 5);
+        setProductAnalysisData(sortedProducts);
     };
 
     const chartTypeOptions = [
