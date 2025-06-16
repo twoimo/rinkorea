@@ -5,11 +5,13 @@ import { RevenueStats } from '@/types/revenue';
 interface RevenueDashboardProps {
     stats: RevenueStats | null;
     loading: boolean;
+    error?: string | null; // 에러 상태 추가
 }
 
 const RevenueDashboard: React.FC<RevenueDashboardProps> = ({
     stats,
-    loading
+    loading,
+    error
 }) => {
     const formatCurrency = (value: number) => {
         return new Intl.NumberFormat('ko-KR', {
@@ -42,8 +44,46 @@ const RevenueDashboard: React.FC<RevenueDashboardProps> = ({
         );
     }
 
+    // 에러 상태 처리
+    if (error) {
+        return (
+            <div className="bg-white rounded-lg border p-6">
+                <div className="text-center py-8">
+                    <div className="flex items-center justify-center mb-4">
+                        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                            <span className="text-red-600 text-xl">⚠️</span>
+                        </div>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        데이터 로딩 문제
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                        {error}
+                    </p>
+                    <div className="text-sm text-gray-500 space-y-1">
+                        <p>• 브라우저 콘솔을 확인해보세요 (F12)</p>
+                        <p>• 데이터베이스 연결 상태를 확인해보세요</p>
+                        <p>• 관리자 권한이 있는지 확인해보세요</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     if (!stats) {
-        return null; // 빈 상태는 메인 페이지에서 처리하도록 null 반환
+        return (
+            <div className="bg-white rounded-lg border p-6">
+                <div className="text-center py-8">
+                    <DollarSign className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        매출 데이터가 없습니다
+                    </h3>
+                    <p className="text-gray-600">
+                        데이터 입력 탭에서 매출 정보를 추가해보세요
+                    </p>
+                </div>
+            </div>
+        );
     }
 
     const statCards = [

@@ -34,12 +34,17 @@ export const useRevenue = () => {
     const [categories, setCategories] = useState<RevenueCategory[]>([]);
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState<RevenueStats | null>(null);
+    const [error, setError] = useState<string | null>(null);
     const { user } = useAuth();
 
     // 매출 데이터 조회
     const fetchRevenueData = useCallback(async (dateRange?: { start: string; end: string }) => {
         try {
             setLoading(true);
+            setError(null);
+
+            console.log('🔍 매출 데이터 조회 시작:', { dateRange, user: user?.id });
+
             let query = supabase
                 .from('revenue_data')
                 .select('*')
@@ -52,12 +57,35 @@ export const useRevenue = () => {
             }
 
             const { data, error } = await query;
-            if (error) throw error;
 
-            setRevenueData(data || []);
-            calculateStats(data || []);
+            console.log('📊 매출 데이터 조회 결과:', {
+                dataCount: data?.length || 0,
+                error: error?.message,
+                firstItem: data?.[0]
+            });
+
+            if (error) {
+                console.error('❌ 매출 데이터 조회 에러:', error);
+                setError(`데이터 조회 실패: ${error.message}`);
+                setRevenueData([]);
+                setStats(null);
+                return;
+            }
+
+            const resultData = data || [];
+            setRevenueData(resultData);
+            calculateStats(resultData);
+
+            if (resultData.length === 0) {
+                console.warn('⚠️ 매출 데이터가 없습니다');
+                setError('매출 데이터가 없습니다. 데이터를 추가해주세요.');
+            }
+
         } catch (error) {
-            console.error('매출 데이터 조회 실패:', error);
+            console.error('💥 매출 데이터 조회 실패:', error);
+            setError('데이터 로딩 중 오류가 발생했습니다.');
+            setRevenueData([]);
+            setStats(null);
         } finally {
             setLoading(false);
         }
@@ -66,16 +94,44 @@ export const useRevenue = () => {
     // 카테고리 조회
     const fetchCategories = useCallback(async () => {
         try {
+            console.log('🏷️ 카테고리 데이터 조회 시작');
+
             const { data, error } = await supabase
                 .from('revenue_categories')
                 .select('*')
                 .eq('is_active', true)
                 .order('name');
 
-            if (error) throw error;
+            console.log('📋 카테고리 조회 결과:', {
+                categoriesCount: data?.length || 0,
+                error: error?.message,
+                categories: data?.map(c => c.name)
+            });
+
+            if (error) {
+                console.error('❌ 카테고리 조회 에러:', error);
+                // 카테고리 조회 실패시 기본 카테고리 설정
+                setCategories([
+                    { id: '1', name: '제품 매출', color: '#3B82F6', is_active: true, created_at: new Date().toISOString() },
+                    { id: '2', name: '건설기계 매출', color: '#EF4444', is_active: true, created_at: new Date().toISOString() },
+                    { id: '3', name: '무역 매출', color: '#10B981', is_active: true, created_at: new Date().toISOString() },
+                    { id: '4', name: '온라인 매출', color: '#F59E0B', is_active: true, created_at: new Date().toISOString() },
+                    { id: '5', name: '기타 매출', color: '#8B5CF6', is_active: true, created_at: new Date().toISOString() }
+                ]);
+                return;
+            }
+
             setCategories(data || []);
         } catch (error) {
-            console.error('카테고리 조회 실패:', error);
+            console.error('💥 카테고리 조회 실패:', error);
+            // 에러시 기본 카테고리 설정
+            setCategories([
+                { id: '1', name: '제품 매출', color: '#3B82F6', is_active: true, created_at: new Date().toISOString() },
+                { id: '2', name: '건설기계 매출', color: '#EF4444', is_active: true, created_at: new Date().toISOString() },
+                { id: '3', name: '무역 매출', color: '#10B981', is_active: true, created_at: new Date().toISOString() },
+                { id: '4', name: '온라인 매출', color: '#F59E0B', is_active: true, created_at: new Date().toISOString() },
+                { id: '5', name: '기타 매출', color: '#8B5CF6', is_active: true, created_at: new Date().toISOString() }
+            ]);
         }
     }, []);
 
@@ -338,18 +394,21 @@ export const useRevenue = () => {
 
     useEffect(() => {
         const loadInitialData = async () => {
-            await fetchRevenueData();
+            console.log('🚀 매출 관리 시스템 초기화 시작');
             await fetchCategories();
+            await fetchRevenueData();
+            console.log('✅ 매출 관리 시스템 초기화 완료');
         };
 
         loadInitialData();
-    }, [fetchRevenueData, fetchCategories]); // fetchRevenueData와 fetchCategories는 안정적인 함수이므로 의존성에서 제외
+    }, [fetchRevenueData, fetchCategories]);
 
     return {
         revenueData,
         categories,
         loading,
         stats,
+        error, // 에러 상태 추가
         fetchRevenueData,
         fetchCategories,
         getChartData,

@@ -257,15 +257,14 @@ BEGIN
         random_value := random();
         IF random_value < 0.6 THEN
             random_category := '제품 매출';
+        ELSIF random_value < 0.7 THEN
+            random_category := '건설기계 매출';
+        ELSIF random_value < 0.8 THEN
+            random_category := '무역 매출';
+        ELSIF random_value < 0.9 THEN
+            random_category := '온라인 매출';
         ELSE
-            -- 나머지 카테고리 중에서 균등하게 선택
-            category_idx := 1 + floor(random() * 4)::INTEGER; -- 0~3 범위로 제한
-            CASE category_idx
-                WHEN 1 THEN random_category := '건설기계 매출';
-                WHEN 2 THEN random_category := '무역 매출';
-                WHEN 3 THEN random_category := '온라인 매출';
-                ELSE random_category := '기타 매출';
-            END CASE;
+            random_category := '기타 매출';
         END IF;
         
         -- 카테고리가 설정되지 않은 경우 기본값 설정 (안전장치)
@@ -330,9 +329,16 @@ BEGIN
                 END CASE;
                 
             ELSE
+                -- 안전장치: 알 수 없는 카테고리인 경우 기본값 설정
                 random_product := 'RIN-COAT';
-                random_category := '제품 매출'; -- 안전장치
+                random_category := '제품 매출';
         END CASE;
+        
+        -- 제품이 설정되지 않은 경우 기본값 설정 (추가 안전장치)
+        IF random_product IS NULL THEN
+            random_product := 'RIN-COAT';
+            random_category := '제품 매출';
+        END IF;
         
         -- 제품별 매출 범위 설정
         CASE random_category
@@ -395,6 +401,11 @@ BEGIN
             END CASE;
         END IF;
         
+        -- 지역이 설정되지 않은 경우 기본값 설정 (안전장치)
+        IF random_region IS NULL THEN
+            random_region := '서울';
+        END IF;
+        
         -- 고객 유형 선택 - 수정된 로직
         customer_idx := 1 + floor(random() * 4)::INTEGER;
         CASE customer_idx
@@ -404,8 +415,20 @@ BEGIN
             ELSE random_customer_type := '직판';
         END CASE;
         
-        -- 디버그: 변수 값 확인 (필요시 활성화)
-        -- RAISE NOTICE '데이터 %: 카테고리=%, 제품=%, 지역=%, 고객유형=%', i, random_category, random_product, random_region, random_customer_type;
+        -- 고객 유형이 설정되지 않은 경우 기본값 설정 (안전장치)
+        IF random_customer_type IS NULL THEN
+            random_customer_type := '일반';
+        END IF;
+        
+        -- 최종 검증: 필수 필드가 모두 설정되었는지 확인
+        IF random_category IS NULL OR random_product IS NULL OR random_region IS NULL OR random_customer_type IS NULL THEN
+            RAISE NOTICE '데이터 %: 필수 필드 누락 - 카테고리=%, 제품=%, 지역=%, 고객유형=%', i, random_category, random_product, random_region, random_customer_type;
+            -- 기본값으로 설정
+            random_category := COALESCE(random_category, '제품 매출');
+            random_product := COALESCE(random_product, 'RIN-COAT');
+            random_region := COALESCE(random_region, '서울');
+            random_customer_type := COALESCE(random_customer_type, '일반');
+        END IF;
         
         -- 데이터 삽입
         INSERT INTO revenue_data (
@@ -717,7 +740,7 @@ SELECT
     -- 매출은 아래에서 계산
     0 as revenue,
     
-    -- 지역: 서울/경기 비중 높게 설정
+    -- 지역: 서울/경기가 더 높은 확률로 설정
     CASE 
         WHEN random() < 0.35 THEN '서울'
         WHEN random() < 0.60 THEN '경기'

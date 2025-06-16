@@ -103,6 +103,7 @@ const RevenueManagement = () => {
         categories,
         loading,
         stats,
+        error, // 에러 상태 추가
         fetchRevenueData,
         getChartData,
         addBulkRevenueData,
@@ -260,6 +261,21 @@ const RevenueManagement = () => {
                     {/* 탭 네비게이션 */}
                     <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
 
+                    {/* 에러 상태 표시 */}
+                    {error && !loading && (
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                            <div className="flex items-center">
+                                <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                                    <span className="text-red-600 text-sm">⚠️</span>
+                                </div>
+                                <div>
+                                    <h4 className="text-red-800 font-medium">데이터 로딩 오류</h4>
+                                    <p className="text-red-700 text-sm">{error}</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* 필터 및 제어 패널 - 모바일 최적화 */}
                     <div className="bg-white rounded-lg border p-3 sm:p-6 mb-4 sm:mb-8">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -302,7 +318,7 @@ const RevenueManagement = () => {
                     <Suspense fallback={<LoadingSpinner />}>
                         {activeTab === 'dashboard' && (
                             <div className="space-y-6 sm:space-y-8">
-                                <RevenueDashboard stats={stats} loading={loading} />
+                                <RevenueDashboard stats={stats} loading={loading} error={error} />
 
                                 {/* 기본 차트 */}
                                 {chartData.length > 0 && (
@@ -359,7 +375,7 @@ const RevenueManagement = () => {
                     </Suspense>
 
                     {/* 데이터가 없을 때 안내 */}
-                    {revenueData.length === 0 && !loading && (
+                    {revenueData.length === 0 && !loading && !error && (
                         <div className="bg-white rounded-lg border p-8 sm:p-12 text-center">
                             <Coins className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-gray-400" />
                             <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">매출 데이터가 없습니다</h3>
