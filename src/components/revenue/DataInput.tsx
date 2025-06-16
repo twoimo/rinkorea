@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { Upload, Download, Plus, X, Save, FileSpreadsheet } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Upload, Download, Plus, X, Save, FileSpreadsheet, ChevronDown } from 'lucide-react';
 import { RevenueData, RevenueCategory } from '@/types/revenue';
 import * as Papa from 'papaparse';
 
@@ -8,6 +8,162 @@ interface DataInputProps {
     onDataSubmit: (data: Omit<RevenueData, 'id' | 'created_at' | 'updated_at' | 'created_by'>[]) => Promise<{ success?: boolean; error?: unknown }>;
     loading: boolean;
 }
+
+// 카테고리별 제품 목록 정의
+const CATEGORY_PRODUCTS: Record<string, string[]> = {
+    '제품 매출': [
+        'RIN-COAT',
+        'RIN-SEAL PLUS',
+        'RIN-HARD PLUS',
+        'RIN-ONE COAT',
+        'RIN-ONE COAT(RK-61)',
+        'RIN-HARD ACE',
+        'RIN-HARD PLUS(LI)',
+        'RIN-CRETE',
+        '고성능 침투성 방수제'
+    ],
+    '건설기계 매출': [
+        '950GT',
+        '850GT',
+        'Falcon',
+        'D1688',
+        'Leopard-D1325'
+    ],
+    '무역 매출': [
+        '수출용 방수재',
+        '수입 장비 부품',
+        '해외 기술 라이선스'
+    ],
+    '온라인 매출': [
+        '온라인 방수재 패키지',
+        '디지털 기술 상담',
+        '온라인 교육 과정'
+    ],
+    '기타 매출': [
+        '기술 컨설팅',
+        '시공 서비스',
+        '품질 검사',
+        'A/S 서비스',
+        '교육 프로그램'
+    ]
+};
+
+// 제품명 콤보박스 컴포넌트
+interface ProductComboboxProps {
+    value: string;
+    category: string;
+    onChange: (value: string) => void;
+    placeholder?: string;
+    className?: string;
+}
+
+const ProductCombobox: React.FC<ProductComboboxProps> = ({
+    value,
+    category,
+    onChange,
+    placeholder = "제품명",
+    className = ""
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [inputValue, setInputValue] = useState(value);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    // value prop이 변경될 때 내부 상태 동기화
+    useEffect(() => {
+        setInputValue(value);
+    }, [value]);
+
+    // 카테고리에 해당하는 제품 목록 가져오기
+    const availableProducts = CATEGORY_PRODUCTS[category] || [];
+
+    // 입력값에 따른 필터링된 제품 목록
+    const filteredProducts = availableProducts.filter(product =>
+        product.toLowerCase().includes(inputValue.toLowerCase())
+    );
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        setInputValue(newValue);
+        onChange(newValue);
+        setIsOpen(true);
+    };
+
+    const handleSelectProduct = (product: string) => {
+        setInputValue(product);
+        onChange(product);
+        setIsOpen(false);
+        inputRef.current?.blur();
+    };
+
+    const handleInputFocus = () => {
+        if (availableProducts.length > 0) {
+            setIsOpen(true);
+        }
+    };
+
+    const handleInputBlur = () => {
+        // 약간의 딜레이를 주어 드롭다운 클릭을 처리할 수 있게 함
+        setTimeout(() => setIsOpen(false), 150);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setIsOpen(true);
+        } else if (e.key === 'Escape') {
+            setIsOpen(false);
+            inputRef.current?.blur();
+        }
+    };
+
+    return (
+        <div className="relative">
+            <div className="relative">
+                <input
+                    ref={inputRef}
+                    type="text"
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    onFocus={handleInputFocus}
+                    onBlur={handleInputBlur}
+                    onKeyDown={handleKeyDown}
+                    placeholder={placeholder}
+                    className={`w-full px-2 py-1 text-sm border-0 focus:ring-1 focus:ring-blue-500 pr-8 ${className}`}
+                />
+                {availableProducts.length > 0 && (
+                    <button
+                        type="button"
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
+                    >
+                        <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                )}
+            </div>
+
+            {isOpen && availableProducts.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                    {filteredProducts.length > 0 ? (
+                        filteredProducts.map((product, index) => (
+                            <button
+                                key={index}
+                                type="button"
+                                onClick={() => handleSelectProduct(product)}
+                                className="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 hover:text-blue-700 focus:bg-blue-50 focus:text-blue-700 focus:outline-none"
+                            >
+                                {product}
+                            </button>
+                        ))
+                    ) : (
+                        <div className="px-3 py-2 text-sm text-gray-500">
+                            해당하는 제품이 없습니다
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+};
 
 const DataInput: React.FC<DataInputProps> = ({
     categories,
@@ -267,12 +423,12 @@ const DataInput: React.FC<DataInputProps> = ({
                                             </select>
                                         </td>
                                         <td className="border border-gray-300 p-1">
-                                            <input
-                                                type="text"
+                                            <ProductCombobox
                                                 value={row.product_name || ''}
-                                                onChange={(e) => updateTableData(index, 'product_name', e.target.value)}
-                                                className="w-full px-2 py-1 text-sm border-0 focus:ring-1 focus:ring-blue-500"
+                                                category={row.category || ''}
+                                                onChange={(value) => updateTableData(index, 'product_name', value)}
                                                 placeholder="제품명"
+                                                className="w-full px-2 py-1 text-sm border-0 focus:ring-1 focus:ring-blue-500"
                                             />
                                         </td>
                                         <td className="border border-gray-300 p-1">

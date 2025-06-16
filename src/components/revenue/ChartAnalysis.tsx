@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart3, TrendingUp, PieChart, AreaChart, Plus, X, Eye, EyeOff, Maximize2 } from 'lucide-react';
+import { BarChart3, TrendingUp, PieChart, AreaChart, Plus, X, Eye, EyeOff, Maximize2, Package, Target } from 'lucide-react';
 import { ChartData, RevenueCategory } from '@/types/revenue';
 import RevenueChart from './RevenueChart';
 
@@ -19,11 +19,23 @@ interface ChartConfig {
     timeRange: TimeRange;
     selectedCategories: string[];
     visible: boolean;
+    productFilter?: string; // 제품별 필터 추가
 }
 
 // 확장된 ChartData 타입 (total 속성 포함)
 interface ExtendedChartData extends ChartData {
     total?: number;
+}
+
+// 제품별 데이터 타입
+interface ProductAnalysis {
+    product_name: string;
+    category: string;
+    totalRevenue: number;
+    totalQuantity: number;
+    avgUnitPrice: number;
+    transactionCount: number;
+    growth: number;
 }
 
 const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
@@ -94,12 +106,28 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
             visible: savedVisibility['top-products'] !== false
         },
         {
+            id: 'product-performance',
+            type: 'bar',
+            title: '제품별 성과 비교',
+            timeRange: 'monthly',
+            selectedCategories: categories.map(c => c.name),
+            visible: savedVisibility['product-performance'] !== false
+        },
+        {
             id: 'seasonal-pattern',
             type: 'line',
             title: '계절별 매출 패턴',
             timeRange: 'monthly',
             selectedCategories: ['total'],
             visible: savedVisibility['seasonal-pattern'] !== false
+        },
+        {
+            id: 'product-trend-analysis',
+            type: 'area',
+            title: '제품별 트렌드 분석',
+            timeRange: 'monthly',
+            selectedCategories: ['제품 매출'],
+            visible: savedVisibility['product-trend-analysis'] !== false
         }
     ]);
 
@@ -111,6 +139,11 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
         selectedCategories: []
     });
 
+    // 제품 분석 탭 상태
+    const [activeAnalysisTab, setActiveAnalysisTab] = useState<'charts' | 'products'>('charts');
+    const [selectedProduct, setSelectedProduct] = useState<string>('');
+    const [productAnalysisData, setProductAnalysisData] = useState<ProductAnalysis[]>([]);
+
     // 차트 가시성 변경 시 localStorage에 저장
     useEffect(() => {
         const visibility = charts.reduce((acc, chart) => {
@@ -119,6 +152,66 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
         }, {} as Record<string, boolean>);
         saveChartVisibility(visibility);
     }, [charts]);
+
+    // 제품 분석 데이터 생성
+    useEffect(() => {
+        if (data && data.length > 0) {
+            generateProductAnalysis();
+        }
+    }, [data]);
+
+    const generateProductAnalysis = () => {
+        // 원본 매출 데이터에서 제품별 분석 생성 (실제 구현에서는 useRevenue 훅에서 제품별 데이터를 가져와야 함)
+        // 여기서는 예시 데이터 생성
+        const mockProductData: ProductAnalysis[] = [
+            {
+                product_name: 'RIN-COAT',
+                category: '제품 매출',
+                totalRevenue: 15000000,
+                totalQuantity: 500,
+                avgUnitPrice: 30000,
+                transactionCount: 45,
+                growth: 12.5
+            },
+            {
+                product_name: 'RIN-SEAL PLUS',
+                category: '제품 매출',
+                totalRevenue: 12000000,
+                totalQuantity: 400,
+                avgUnitPrice: 30000,
+                transactionCount: 38,
+                growth: 8.3
+            },
+            {
+                product_name: '950GT',
+                category: '건설기계 매출',
+                totalRevenue: 25000000,
+                totalQuantity: 10,
+                avgUnitPrice: 2500000,
+                transactionCount: 15,
+                growth: 15.7
+            },
+            {
+                product_name: 'RIN-HARD PLUS',
+                category: '제품 매출',
+                totalRevenue: 8500000,
+                totalQuantity: 300,
+                avgUnitPrice: 28333,
+                transactionCount: 32,
+                growth: -2.1
+            },
+            {
+                product_name: '850GT',
+                category: '건설기계 매출',
+                totalRevenue: 18000000,
+                totalQuantity: 8,
+                avgUnitPrice: 2250000,
+                transactionCount: 12,
+                growth: 20.4
+            }
+        ];
+        setProductAnalysisData(mockProductData);
+    };
 
     const chartTypeOptions = [
         { value: 'line', label: '선 그래프', icon: TrendingUp },
@@ -142,7 +235,8 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
             title: newChart.title,
             timeRange: newChart.timeRange as TimeRange,
             selectedCategories: newChart.selectedCategories || [],
-            visible: true
+            visible: true,
+            productFilter: newChart.productFilter
         };
 
         setCharts(prev => [...prev, chart]);
@@ -202,14 +296,16 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                     if (!acc[weekKey]) {
                         acc[weekKey] = { date: weekKey, total: 0 } as ExtendedChartData;
                         categories.forEach(cat => {
-                            (acc[weekKey] as any)[cat.name] = 0;
+                            (acc[weekKey] as Record<string, number | string>)[cat.name] = 0;
                         });
                     }
 
                     // 각 카테고리별 값 합산
                     categories.forEach(cat => {
                         if (typeof item[cat.name] === 'number') {
-                            (acc[weekKey] as any)[cat.name] = ((acc[weekKey] as any)[cat.name] || 0) + (item[cat.name] as number);
+                            const currentData = acc[weekKey] as Record<string, number | string>;
+                            const currentValue = typeof currentData[cat.name] === 'number' ? currentData[cat.name] : 0;
+                            currentData[cat.name] = (currentValue as number) + (item[cat.name] as number);
                         }
                     });
 
@@ -234,14 +330,16 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                     if (!acc[monthKey]) {
                         acc[monthKey] = { date: monthKey, total: 0 } as ExtendedChartData;
                         categories.forEach(cat => {
-                            (acc[monthKey] as any)[cat.name] = 0;
+                            (acc[monthKey] as Record<string, number | string>)[cat.name] = 0;
                         });
                     }
 
                     // 각 카테고리별 값 합산
                     categories.forEach(cat => {
                         if (typeof item[cat.name] === 'number') {
-                            (acc[monthKey] as any)[cat.name] = ((acc[monthKey] as any)[cat.name] || 0) + (item[cat.name] as number);
+                            const currentData = acc[monthKey] as Record<string, number | string>;
+                            const currentValue = typeof currentData[cat.name] === 'number' ? currentData[cat.name] : 0;
+                            currentData[cat.name] = (currentValue as number) + (item[cat.name] as number);
                         }
                     });
 
@@ -325,6 +423,19 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
         );
     };
 
+    const formatCurrency = (value: number) => {
+        return new Intl.NumberFormat('ko-KR', {
+            style: 'currency',
+            currency: 'KRW',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(value);
+    };
+
+    const formatNumber = (value: number) => {
+        return new Intl.NumberFormat('ko-KR').format(value);
+    };
+
     return (
         <div className="space-y-6">
             {/* 헤더 */}
@@ -343,91 +454,244 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                     </button>
                 </div>
 
+                {/* 분석 탭 선택 */}
+                <div className="flex gap-2 mb-4">
+                    <button
+                        onClick={() => setActiveAnalysisTab('charts')}
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeAnalysisTab === 'charts'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                    >
+                        <BarChart3 className="w-4 h-4 inline mr-2" />
+                        차트 분석
+                    </button>
+                    <button
+                        onClick={() => setActiveAnalysisTab('products')}
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeAnalysisTab === 'products'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                    >
+                        <Package className="w-4 h-4 inline mr-2" />
+                        제품별 분석
+                    </button>
+                </div>
+
                 {/* 차트 관리 패널 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {charts.map(chart => (
-                        <div key={chart.id} className="border rounded-lg p-4 bg-gray-50">
-                            <div className="flex items-center justify-between mb-2">
-                                <h3 className="font-medium text-gray-900">{chart.title}</h3>
-                                <div className="flex items-center gap-1">
+                {activeAnalysisTab === 'charts' && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {charts.map(chart => (
+                            <div key={chart.id} className="border rounded-lg p-4 bg-gray-50">
+                                <div className="flex items-center justify-between mb-2">
+                                    <h3 className="font-medium text-gray-900">{chart.title}</h3>
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={() => toggleChartVisibility(chart.id)}
+                                            className="p-1 text-gray-500 hover:text-gray-700"
+                                            title={chart.visible ? '숨기기' : '보이기'}
+                                        >
+                                            {chart.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                                        </button>
+                                        <button
+                                            onClick={() => removeChart(chart.id)}
+                                            className="p-1 text-red-500 hover:text-red-700"
+                                            title="삭제"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="text-sm text-gray-600 space-y-1">
+                                    <div>유형: {chartTypeOptions.find(opt => opt.value === chart.type)?.label}</div>
+                                    <div>기간: {timeRangeOptions.find(opt => opt.value === chart.timeRange)?.label}</div>
+                                    <div>카테고리: {chart.selectedCategories.length}개</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* 제품별 분석 패널 */}
+                {activeAnalysisTab === 'products' && (
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                            {productAnalysisData.map((product, index) => (
+                                <div key={index} className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg p-4 border border-blue-200">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h3 className="font-semibold text-gray-900 truncate">{product.product_name}</h3>
+                                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                            {product.category}
+                                        </span>
+                                    </div>
+                                    <div className="space-y-2 text-sm">
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">매출:</span>
+                                            <span className="font-medium">{formatCurrency(product.totalRevenue)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">판매량:</span>
+                                            <span className="font-medium">{formatNumber(product.totalQuantity)}개</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">평균단가:</span>
+                                            <span className="font-medium">{formatCurrency(product.avgUnitPrice)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">성장률:</span>
+                                            <span className={`font-medium ${product.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                {product.growth >= 0 ? '+' : ''}{product.growth.toFixed(1)}%
+                                            </span>
+                                        </div>
+                                    </div>
                                     <button
-                                        onClick={() => toggleChartVisibility(chart.id)}
-                                        className="p-1 text-gray-500 hover:text-gray-700"
-                                        title={chart.visible ? '숨기기' : '보이기'}
+                                        onClick={() => setSelectedProduct(product.product_name)}
+                                        className="w-full mt-3 px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                                     >
-                                        {chart.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                                        상세 분석
                                     </button>
-                                    <button
-                                        onClick={() => removeChart(chart.id)}
-                                        className="p-1 text-red-500 hover:text-red-700"
-                                        title="삭제"
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* 차트 그리드 */}
+            {activeAnalysisTab === 'charts' && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {charts.filter(chart => chart.visible).map(chart => (
+                        <div key={chart.id} className="bg-white rounded-lg border p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-lg font-semibold">{chart.title}</h3>
+                                <div className="flex items-center gap-2">
+                                    <select
+                                        value={chart.timeRange}
+                                        onChange={(e) => updateChart(chart.id, { timeRange: e.target.value as TimeRange })}
+                                        className="text-sm border rounded px-2 py-1"
                                     >
-                                        <X className="w-4 h-4" />
+                                        {timeRangeOptions.map(option => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <button
+                                        className="p-1 text-gray-500 hover:text-gray-700"
+                                        title="전체화면"
+                                    >
+                                        <Maximize2 className="w-4 h-4" />
                                     </button>
                                 </div>
                             </div>
-                            <div className="text-sm text-gray-600 space-y-1">
-                                <div>유형: {chartTypeOptions.find(opt => opt.value === chart.type)?.label}</div>
-                                <div>기간: {timeRangeOptions.find(opt => opt.value === chart.timeRange)?.label}</div>
-                                <div>카테고리: {chart.selectedCategories.length}개</div>
+
+                            <div className="h-80">
+                                <RevenueChart
+                                    data={getProcessedData(chart)}
+                                    config={{
+                                        id: chart.id,
+                                        type: chart.type,
+                                        title: '',
+                                        dataKey: chart.selectedCategories.includes('total') ? 'total' : chart.selectedCategories[0] || 'total',
+                                        categories: chart.selectedCategories,
+                                        aggregation: 'sum',
+                                        position: { row: 1, col: 1, rowSpan: 1, colSpan: 1 }
+                                    }}
+                                    categories={chart.selectedCategories}
+                                    categoryColors={categoryColors}
+                                />
+                            </div>
+
+                            {/* 차트별 카테고리 선택 */}
+                            <div className="mt-4 pt-4 border-t">
+                                <div className="text-sm text-gray-600 mb-2">표시 카테고리:</div>
+                                {renderCategoryCheckboxes(chart)}
                             </div>
                         </div>
                     ))}
                 </div>
-            </div>
+            )}
 
-            {/* 차트 그리드 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {charts.filter(chart => chart.visible).map(chart => (
-                    <div key={chart.id} className="bg-white rounded-lg border p-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold">{chart.title}</h3>
-                            <div className="flex items-center gap-2">
-                                <select
-                                    value={chart.timeRange}
-                                    onChange={(e) => updateChart(chart.id, { timeRange: e.target.value as TimeRange })}
-                                    className="text-sm border rounded px-2 py-1"
-                                >
-                                    {timeRangeOptions.map(option => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                <button
-                                    className="p-1 text-gray-500 hover:text-gray-700"
-                                    title="전체화면"
-                                >
-                                    <Maximize2 className="w-4 h-4" />
-                                </button>
+            {/* 제품별 상세 분석 */}
+            {activeAnalysisTab === 'products' && selectedProduct && (
+                <div className="bg-white rounded-lg border p-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xl font-bold">{selectedProduct} 상세 분석</h3>
+                        <button
+                            onClick={() => setSelectedProduct('')}
+                            className="p-2 text-gray-500 hover:text-gray-700"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* 제품별 월별 매출 트렌드 */}
+                        <div className="bg-gray-50 rounded-lg p-4">
+                            <h4 className="font-semibold mb-4">월별 매출 트렌드</h4>
+                            <div className="h-64">
+                                <RevenueChart
+                                    data={getProcessedData({
+                                        id: 'product-trend',
+                                        type: 'line',
+                                        title: '',
+                                        timeRange: 'monthly',
+                                        selectedCategories: ['total'],
+                                        visible: true,
+                                        productFilter: selectedProduct
+                                    })}
+                                    config={{
+                                        id: 'product-trend',
+                                        type: 'line',
+                                        title: '',
+                                        dataKey: 'total',
+                                        categories: ['total'],
+                                        aggregation: 'sum',
+                                        position: { row: 1, col: 1, rowSpan: 1, colSpan: 1 }
+                                    }}
+                                    categories={['total']}
+                                    categoryColors={{ total: '#3B82F6' }}
+                                />
                             </div>
                         </div>
 
-                        <div className="h-80">
-                            <RevenueChart
-                                data={getProcessedData(chart)}
-                                config={{
-                                    id: chart.id,
-                                    type: chart.type,
-                                    title: '',
-                                    dataKey: chart.selectedCategories.includes('total') ? 'total' : chart.selectedCategories[0] || 'total',
-                                    categories: chart.selectedCategories,
-                                    aggregation: 'sum',
-                                    position: { row: 1, col: 1, rowSpan: 1, colSpan: 1 }
-                                }}
-                                categories={chart.selectedCategories}
-                                categoryColors={categoryColors}
-                            />
-                        </div>
-
-                        {/* 차트별 카테고리 선택 */}
-                        <div className="mt-4 pt-4 border-t">
-                            <div className="text-sm text-gray-600 mb-2">표시 카테고리:</div>
-                            {renderCategoryCheckboxes(chart)}
+                        {/* 제품별 성과 지표 */}
+                        <div className="bg-gray-50 rounded-lg p-4">
+                            <h4 className="font-semibold mb-4">성과 지표</h4>
+                            <div className="space-y-3">
+                                {productAnalysisData
+                                    .filter(p => p.product_name === selectedProduct)
+                                    .map((product, index) => (
+                                        <div key={index} className="space-y-2">
+                                            <div className="flex justify-between items-center p-3 bg-white rounded border">
+                                                <span className="text-gray-600">총 매출</span>
+                                                <span className="font-semibold text-lg">{formatCurrency(product.totalRevenue)}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center p-3 bg-white rounded border">
+                                                <span className="text-gray-600">총 판매량</span>
+                                                <span className="font-semibold">{formatNumber(product.totalQuantity)}개</span>
+                                            </div>
+                                            <div className="flex justify-between items-center p-3 bg-white rounded border">
+                                                <span className="text-gray-600">평균 단가</span>
+                                                <span className="font-semibold">{formatCurrency(product.avgUnitPrice)}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center p-3 bg-white rounded border">
+                                                <span className="text-gray-600">거래 건수</span>
+                                                <span className="font-semibold">{product.transactionCount}건</span>
+                                            </div>
+                                            <div className="flex justify-between items-center p-3 bg-white rounded border">
+                                                <span className="text-gray-600">성장률</span>
+                                                <span className={`font-semibold text-lg ${product.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                    {product.growth >= 0 ? '+' : ''}{product.growth.toFixed(1)}%
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                            </div>
                         </div>
                     </div>
-                ))}
-            </div>
+                </div>
+            )}
 
             {/* 차트 추가 모달 */}
             {isAddingChart && (
