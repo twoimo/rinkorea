@@ -25,7 +25,16 @@ const CATEGORY_PRODUCTS: Record<string, string[]> = {
     '건설기계 매출': [
         '950GT',
         '850GT',
-        'Falcon'
+        'Falcon',
+        'D1688',
+        'Leopard-D1325',
+        'DF20',
+        'DF23',
+        'DF23R',
+        'DF26RE',
+        'Flying Fish Grinder',
+        'PRO850',
+        'PRO950'
     ],
     '무역 매출': [
         '수출용 방수재',
