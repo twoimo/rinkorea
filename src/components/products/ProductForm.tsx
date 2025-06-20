@@ -18,27 +18,7 @@ import {
   verticalListSortingStrategy
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  image_url: string;
-  icon: string;
-  features: string[];
-  detail_images?: string[];
-  is_active: boolean;
-}
-
-interface ProductFormData {
-  name: string;
-  description: string;
-  image_url: string;
-  icon: string;
-  features: string[];
-  detail_images?: string[];
-  is_active: boolean;
-}
+import { Product, ProductFormData } from '@/types/product';
 
 interface ProductFormProps {
   product?: Product;

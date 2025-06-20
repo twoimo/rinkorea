@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { Settings, Wrench, Award, Star, Plus, Edit, Trash2, X, EyeOff, Eye, GripVertical } from 'lucide-react';
-import { supabase } from '../integrations/supabase/client';
-import { useUserRole } from '../hooks/useUserRole';
+import { supabase } from '@/integrations/supabase/client';
+import { useUserRole } from '@/hooks/useUserRole';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';

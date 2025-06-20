@@ -1,19 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '../integrations/supabase/client';
 import { SupabaseClient } from '@supabase/supabase-js';
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  image_url: string;
-  icon: string;
-  features: string[];
-  is_active?: boolean;
-  created_at?: string;
-  updated_at?: string;
-  detail_images?: string[];
-}
+import { Product } from '@/types/product';
 
 export const useProductsOptimized = () => {
   const [products, setProducts] = useState<Product[]>([]);

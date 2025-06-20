@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import ShopHero from '../components/shop/ShopHero';
-import ShopControls from '../components/shop/ShopControls';
-import ShopProductGrid from '../components/shop/ShopProductGrid';
-import ShopProductForm from '../components/shop/ShopProductForm';
-import ShopDeleteModal from '../components/shop/ShopDeleteModal';
-import { supabase } from '../integrations/supabase/client';
-import { useUserRole } from '../hooks/useUserRole';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import ShopHero from '@/components/shop/ShopHero';
+import ShopControls from '@/components/shop/ShopControls';
+import ShopProductGrid from '@/components/shop/ShopProductGrid';
+import ShopProductForm from '@/components/shop/ShopProductForm';
+import ShopDeleteModal from '@/components/shop/ShopDeleteModal';
+import { supabase } from '@/integrations/supabase/client';
+import { useUserRole } from '@/hooks/useUserRole';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 interface Product {

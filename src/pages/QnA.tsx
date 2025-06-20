@@ -1,28 +1,28 @@
 
 import React, { useState } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import QnAStats from '../components/qna/QnAStats';
-import QnAFilters from '../components/qna/QnAFilters';
-import QnAForm from '../components/qna/QnAForm';
-import QnAEditForm from '../components/qna/QnAEditForm';
-import QnAItem from '../components/qna/QnAItem';
-import QnAHero from '../components/qna/QnAHero';
-import QnAEmptyState from '../components/qna/QnAEmptyState';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import QnAStats from '@/components/qna/QnAStats';
+import QnAFilters from '@/components/qna/QnAFilters';
+import QnAForm from '@/components/qna/QnAForm';
+import QnAEditForm from '@/components/qna/QnAEditForm';
+import QnAItem from '@/components/qna/QnAItem';
+import QnAHero from '@/components/qna/QnAHero';
+import QnAEmptyState from '@/components/qna/QnAEmptyState';
 import { useInquiries } from '@/hooks/useInquiries';
 import { useAuth } from '@/contexts/AuthContext';
 
 const QnA = () => {
   const { user } = useAuth();
-  const { 
-    inquiries, 
-    loading, 
-    refetch, 
-    createInquiry, 
-    updateInquiry, 
-    deleteInquiry 
+  const {
+    inquiries,
+    loading,
+    refetch,
+    createInquiry,
+    updateInquiry,
+    deleteInquiry
   } = useInquiries();
-  
+
   const [showForm, setShowForm] = useState(false);
   const [editingInquiry, setEditingInquiry] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -30,7 +30,7 @@ const QnA = () => {
 
   const filteredInquiries = inquiries.filter(inquiry => {
     const matchesSearch = inquiry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         inquiry.content.toLowerCase().includes(searchTerm.toLowerCase());
+      inquiry.content.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = selectedStatus === '전체' || inquiry.status === selectedStatus;
     return matchesSearch && matchesStatus;
   });

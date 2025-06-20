@@ -1,14 +1,6 @@
 
 import React, { memo } from 'react';
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  image_url: string;
-  icon: string;
-  features: string[];
-}
+import { Product } from '@/types/product';
 
 interface DeleteConfirmModalProps {
   product: Product;

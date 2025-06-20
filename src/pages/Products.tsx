@@ -1,31 +1,19 @@
 
 import React, { useState, useCallback, memo, Suspense } from 'react';
 import { Plus } from 'lucide-react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import { useUserRole } from '../hooks/useUserRole';
-import { useProductsOptimized } from '../hooks/useProductsOptimized';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import { useUserRole } from '@/hooks/useUserRole';
+import { useProductsOptimized } from '@/hooks/useProductsOptimized';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Product } from '@/types/product';
 
 // Lazy load components for better performance
-const ProductCard = React.lazy(() => import('../components/products/ProductCard'));
-const ProductForm = React.lazy(() => import('../components/products/ProductForm'));
-const ProductDetailModal = React.lazy(() => import('../components/products/ProductDetailModal'));
-const DeleteConfirmModal = React.lazy(() => import('../components/products/DeleteConfirmModal'));
-const ProductBenefits = React.lazy(() => import('../components/products/ProductBenefits'));
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  image_url: string;
-  icon: string;
-  features: string[];
-  is_active?: boolean;
-  created_at?: string;
-  updated_at?: string;
-  detail_images?: string[];
-}
+const ProductCard = React.lazy(() => import('@/components/products/ProductCard'));
+const ProductForm = React.lazy(() => import('@/components/products/ProductForm'));
+const ProductDetailModal = React.lazy(() => import('@/components/products/ProductDetailModal'));
+const DeleteConfirmModal = React.lazy(() => import('@/components/products/DeleteConfirmModal'));
+const ProductBenefits = React.lazy(() => import('@/components/products/ProductBenefits'));
 
 const LoadingFallback = memo(() => (
   <div className="flex items-center justify-center p-4">

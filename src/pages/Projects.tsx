@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { useProjects, type Project } from '@/hooks/useProjects';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
@@ -110,9 +110,9 @@ const Projects = () => {
     <div className="min-h-screen bg-white">
       <Header />
 
-      <ProjectsHero 
-        isAdmin={isAdmin} 
-        onAddProject={() => openForm()} 
+      <ProjectsHero
+        isAdmin={isAdmin}
+        onAddProject={() => openForm()}
       />
 
       <ProjectsGrid

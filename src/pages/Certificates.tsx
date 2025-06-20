@@ -1,15 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import ImageModal from '../components/ImageModal';
-import CertificateForm from '../components/certificates/CertificateForm';
-import DeleteConfirmModal from '../components/certificates/DeleteConfirmModal';
-import CertificateTypeCard from '../components/certificates/CertificateTypeCard';
-import CertificateSection from '../components/certificates/CertificateSection';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import ImageModal from '@/components/ImageModal';
+import CertificateForm from '@/components/certificates/CertificateForm';
+import DeleteConfirmModal from '@/components/certificates/DeleteConfirmModal';
+import CertificateTypeCard from '@/components/certificates/CertificateTypeCard';
+import CertificateSection from '@/components/certificates/CertificateSection';
 import { Award, FileText, Shield, Plus } from 'lucide-react';
-import { supabase } from '../integrations/supabase/client';
-import { useUserRole } from '../hooks/useUserRole';
+import { supabase } from '@/integrations/supabase/client';
+import { useUserRole } from '@/hooks/useUserRole';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 interface Certificate {

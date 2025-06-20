@@ -1,19 +1,7 @@
 import React, { memo } from 'react';
 import { Shield, Palette, Star, Zap, Leaf, Edit, Trash2, EyeOff, Eye } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/image';
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  image_url: string;
-  icon: string;
-  features: string[];
-  is_active?: boolean;
-  created_at?: string;
-  updated_at?: string;
-  detail_images?: string[];
-}
+import { Product } from '@/types/product';
 
 interface ProductCardProps {
   product: Product;
