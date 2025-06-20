@@ -5,7 +5,7 @@ import { useCounter } from '@/hooks/useCounter';
 const ProjectsStats: React.FC = () => {
   const projectCount = useCounter(1000);
   const satisfactionRate = useCounter(100);
-  const yearsOfExperience = useCounter(12);
+  const yearsOfExperience = useCounter(20);
 
   return (
     <section className="py-12 sm:py-20 bg-gray-50">
