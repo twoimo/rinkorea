@@ -55,18 +55,18 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     };
 
     return (
-        <Card className={`group hover:shadow-lg transition-all duration-200 ${!resource.is_active && isAdmin ? 'opacity-60 border-gray-300 bg-gray-50' : ''}`}>
-            <CardContent className="p-6">
+        <Card className={`group hover:shadow-lg transition-all duration-200 h-80 flex flex-col ${!resource.is_active && isAdmin ? 'opacity-60 border-gray-300 bg-gray-50' : ''}`}>
+            <CardContent className="p-6 flex-1 flex flex-col">
                 <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-3 flex-1 min-w-0">
                         {getFileIcon(resource.file_type)}
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                                <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 text-sm leading-tight">
                                     {resource.title}
                                 </h3>
                                 {!resource.is_active && isAdmin && (
-                                    <Badge variant="secondary" className="bg-gray-200 text-gray-600 text-xs">
+                                    <Badge variant="secondary" className="bg-gray-200 text-gray-600 text-xs flex-shrink-0">
                                         숨김
                                     </Badge>
                                 )}
@@ -78,7 +78,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                     </div>
 
                     {isAdmin && (
-                        <div className="flex items-center space-x-1">
+                        <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -112,30 +112,34 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                     )}
                 </div>
 
-                {resource.description && (
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                        {resource.description}
-                    </p>
-                )}
-
-                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                    <span>{resource.file_name}</span>
-                    {resource.file_size && (
-                        <span>{formatFileSize(resource.file_size)}</span>
+                <div className="flex-1 flex flex-col justify-between">
+                    {resource.description && (
+                        <p className="text-gray-600 text-sm mb-4 line-clamp-3 h-16 overflow-hidden">
+                            {resource.description}
+                        </p>
                     )}
-                </div>
 
-                <div className="flex items-center justify-between text-xs text-gray-400">
-                    <span>
-                        {formatDistanceToNow(new Date(resource.created_at), {
-                            addSuffix: true,
-                            locale: ko
-                        })}
-                    </span>
-                    <span className="flex items-center">
-                        <Download className="w-3 h-3 mr-1" />
-                        {resource.download_count}회
-                    </span>
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                            <span className="truncate flex-1 mr-2">{resource.file_name}</span>
+                            {resource.file_size && (
+                                <span className="flex-shrink-0">{formatFileSize(resource.file_size)}</span>
+                            )}
+                        </div>
+
+                        <div className="flex items-center justify-between text-xs text-gray-400">
+                            <span className="truncate">
+                                {formatDistanceToNow(new Date(resource.created_at), {
+                                    addSuffix: true,
+                                    locale: ko
+                                })}
+                            </span>
+                            <span className="flex items-center flex-shrink-0 ml-2">
+                                <Download className="w-3 h-3 mr-1" />
+                                {resource.download_count}회
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </CardContent>
 
