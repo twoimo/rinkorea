@@ -53,7 +53,7 @@ export const useResources = () => {
                 query = query.eq('is_active', true);
             }
 
-            query = query.order('created_at', { ascending: false });
+            query = query.order('created_at', { ascending: true });
 
             const { data, error } = await query;
 
