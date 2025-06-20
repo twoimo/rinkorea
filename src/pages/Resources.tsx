@@ -74,7 +74,7 @@ const Resources = () => {
             <main className="flex-1">
                 <ResourcesHero setShowForm={setShowForm} />
 
-                <section className="py-8 md:py-20">
+                <section className="py-6 md:py-12 lg:py-20">
                     <div className="container mx-auto px-4 max-w-7xl">
                         <ResourcesList
                             resources={resources}

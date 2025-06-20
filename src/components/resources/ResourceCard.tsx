@@ -10,6 +10,7 @@ import { ko } from 'date-fns/locale';
 
 interface ResourceCardProps {
     resource: Resource;
+    viewMode?: 'grid' | 'list';
     onDownload: (id: string, fileName: string, fileUrl: string) => void;
     onEdit?: (resource: Resource) => void;
     onDelete?: (id: string) => void;
@@ -18,6 +19,7 @@ interface ResourceCardProps {
 
 const ResourceCard: React.FC<ResourceCardProps> = ({
     resource,
+    viewMode = 'grid',
     onDownload,
     onEdit,
     onDelete,
@@ -46,13 +48,13 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     };
 
     const getFileIcon = (fileType: string | null) => {
-        if (!fileType) return <FileText className="w-5 h-5" />;
+        if (!fileType) return <FileText className="w-5 h-5 md:w-6 md:h-6" />;
 
-        if (fileType.includes('pdf')) return <span className="text-red-500">📄</span>;
-        if (fileType.includes('word')) return <span className="text-blue-500">📝</span>;
-        if (fileType.includes('excel')) return <span className="text-green-500">📊</span>;
-        if (fileType.includes('image')) return <span className="text-purple-500">🖼️</span>;
-        return <FileText className="w-5 h-5" />;
+        if (fileType.includes('pdf')) return <span className="text-red-500 text-lg md:text-xl">📄</span>;
+        if (fileType.includes('word')) return <span className="text-blue-500 text-lg md:text-xl">📝</span>;
+        if (fileType.includes('excel')) return <span className="text-green-500 text-lg md:text-xl">📊</span>;
+        if (fileType.includes('image')) return <span className="text-purple-500 text-lg md:text-xl">🖼️</span>;
+        return <FileText className="w-5 h-5 md:w-6 md:h-6" />;
     };
 
     const handleDownload = async () => {
@@ -74,36 +76,150 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
         }
     };
 
+    // 리스트 뷰 렌더링
+    if (viewMode === 'list') {
+        return (
+            <Card className={`group hover:shadow-lg transition-all duration-200 ${!resource.is_active && isAdmin ? 'opacity-60 border-gray-300 bg-gray-50' : ''}`}>
+                <CardContent className="p-4 md:p-6">
+                    <div className="flex flex-col sm:flex-row items-start gap-4">
+                        <div className="flex items-start space-x-3 flex-1 min-w-0 w-full sm:w-auto">
+                            <div className="flex-shrink-0">
+                                {getFileIcon(resource.file_type)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex flex-col sm:flex-row sm:items-start gap-2 mb-2">
+                                    <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors text-base md:text-lg break-words hyphens-auto">
+                                        {resource.title}
+                                    </h3>
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                        <Badge className={getCategoryColor(resource.category)}>
+                                            {resource.category}
+                                        </Badge>
+                                        {!resource.is_active && isAdmin && (
+                                            <Badge variant="secondary" className="bg-gray-200 text-gray-600 text-xs">
+                                                숨김
+                                            </Badge>
+                                        )}
+                                    </div>
+                                </div>
+                                {resource.description && (
+                                    <p className="text-gray-600 text-sm md:text-base mb-2 break-words hyphens-auto">
+                                        {resource.description}
+                                    </p>
+                                )}
+                                <div className="flex flex-col gap-1 text-sm text-gray-500">
+                                    <span className="break-all text-xs md:text-sm">{resource.file_name}</span>
+                                    <div className="flex items-center gap-3 text-xs">
+                                        {resource.file_size && (
+                                            <span>{formatFileSize(resource.file_size)}</span>
+                                        )}
+                                        <span className="flex items-center">
+                                            <Download className="w-3 h-3 mr-1" />
+                                            {resource.download_count}회
+                                        </span>
+                                        <span>
+                                            {formatDistanceToNow(new Date(resource.created_at), {
+                                                addSuffix: true,
+                                                locale: ko
+                                            })}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 w-full sm:w-auto flex-shrink-0">
+                            {isAdmin && (
+                                <div className="flex items-center space-x-1 mr-2">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => onToggleStatus?.(resource.id, !resource.is_active)}
+                                        className="h-10 w-10 p-0 touch-manipulation"
+                                        title={resource.is_active ? "자료 숨기기" : "자료 보이기"}
+                                    >
+                                        {resource.is_active ? (
+                                            <EyeOff className="w-4 h-4 text-gray-600" />
+                                        ) : (
+                                            <Eye className="w-4 h-4 text-gray-600" />
+                                        )}
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => onEdit?.(resource)}
+                                        className="h-10 w-10 p-0 touch-manipulation"
+                                    >
+                                        <Edit className="w-4 h-4 text-blue-600" />
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => onDelete?.(resource.id)}
+                                        className="h-10 w-10 p-0 touch-manipulation"
+                                    >
+                                        <Trash2 className="w-4 h-4 text-red-600" />
+                                    </Button>
+                                </div>
+                            )}
+                            <Button
+                                onClick={handleDownload}
+                                className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed h-10 flex-1 sm:w-auto sm:flex-none touch-manipulation"
+                                disabled={(!resource.is_active && !isAdmin) || isDownloading}
+                            >
+                                {isDownloading ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        <span className="hidden sm:inline">다운로드 중...</span>
+                                        <span className="sm:hidden">처리중...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Download className="w-4 h-4 mr-2" />
+                                        다운로드
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    // 그리드 뷰 렌더링 (기존 디자인 개선)
     return (
-        <Card className={`group hover:shadow-lg transition-all duration-200 h-80 flex flex-col ${!resource.is_active && isAdmin ? 'opacity-60 border-gray-300 bg-gray-50' : ''}`}>
-            <CardContent className="p-6 flex-1 flex flex-col">
+        <Card className={`group hover:shadow-lg transition-all duration-200 flex flex-col ${!resource.is_active && isAdmin ? 'opacity-60 border-gray-300 bg-gray-50' : ''}`}>
+            <CardContent className="p-4 md:p-6 flex-1 flex flex-col">
                 <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-3 flex-1 min-w-0">
                         {getFileIcon(resource.file_type)}
                         <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                                <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 text-sm leading-tight">
+                            <div className="flex flex-col gap-2 mb-2">
+                                <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 text-sm md:text-base leading-tight">
                                     {resource.title}
                                 </h3>
-                                {!resource.is_active && isAdmin && (
-                                    <Badge variant="secondary" className="bg-gray-200 text-gray-600 text-xs flex-shrink-0">
-                                        숨김
+                                <div className="flex items-center gap-2">
+                                    <Badge className={getCategoryColor(resource.category)}>
+                                        {resource.category}
                                     </Badge>
-                                )}
+                                    {!resource.is_active && isAdmin && (
+                                        <Badge variant="secondary" className="bg-gray-200 text-gray-600 text-xs">
+                                            숨김
+                                        </Badge>
+                                    )}
+                                </div>
                             </div>
-                            <Badge className={getCategoryColor(resource.category)}>
-                                {resource.category}
-                            </Badge>
                         </div>
                     </div>
 
                     {isAdmin && (
-                        <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
+                        <div className="flex flex-col space-y-1 flex-shrink-0 ml-2">
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => onToggleStatus?.(resource.id, !resource.is_active)}
-                                className="h-8 w-8 p-0"
+                                className="h-8 w-8 md:h-10 md:w-10 p-0 touch-manipulation"
                                 title={resource.is_active ? "자료 숨기기" : "자료 보이기"}
                             >
                                 {resource.is_active ? (
@@ -116,7 +232,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => onEdit?.(resource)}
-                                className="h-8 w-8 p-0"
+                                className="h-8 w-8 md:h-10 md:w-10 p-0 touch-manipulation"
                             >
                                 <Edit className="w-4 h-4 text-blue-600" />
                             </Button>
@@ -124,7 +240,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => onDelete?.(resource.id)}
-                                className="h-8 w-8 p-0"
+                                className="h-8 w-8 md:h-10 md:w-10 p-0 touch-manipulation"
                             >
                                 <Trash2 className="w-4 h-4 text-red-600" />
                             </Button>
@@ -134,16 +250,16 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
 
                 <div className="flex-1 flex flex-col justify-between">
                     {resource.description && (
-                        <p className="text-gray-600 text-sm mb-4 line-clamp-3 h-16 overflow-hidden">
+                        <p className="text-gray-600 text-sm mb-4 line-clamp-3 min-h-[3rem] overflow-hidden">
                             {resource.description}
                         </p>
                     )}
 
-                    <div className="space-y-3">
+                    <div className="space-y-3 mt-auto">
                         <div className="flex items-center justify-between text-sm text-gray-500">
                             <span className="truncate flex-1 mr-2">{resource.file_name}</span>
                             {resource.file_size && (
-                                <span className="flex-shrink-0">{formatFileSize(resource.file_size)}</span>
+                                <span className="flex-shrink-0 text-xs">{formatFileSize(resource.file_size)}</span>
                             )}
                         </div>
 
@@ -163,10 +279,10 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                 </div>
             </CardContent>
 
-            <CardFooter className="px-6 py-4 bg-gray-50 border-t">
+            <CardFooter className="px-4 md:px-6 py-4 bg-gray-50 border-t">
                 <Button
                     onClick={handleDownload}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed h-12 md:h-10 text-base md:text-sm touch-manipulation"
                     disabled={(!resource.is_active && !isAdmin) || isDownloading}
                 >
                     {isDownloading ? (
