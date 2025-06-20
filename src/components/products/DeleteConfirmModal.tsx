@@ -1,3 +1,4 @@
+
 import React, { memo } from 'react';
 import { Product } from '@/types/product';
 
@@ -9,7 +10,7 @@ interface DeleteConfirmModalProps {
 
 const DeleteConfirmModal = memo(({ product, onConfirm, onCancel }: DeleteConfirmModalProps) => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[110] p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg w-full max-w-md">
         <div className="p-6">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">제품 삭제</h2>
