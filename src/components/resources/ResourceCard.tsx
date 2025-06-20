@@ -1,5 +1,5 @@
-import React from 'react';
-import { Download, FileText, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
+import React, { useState } from 'react';
+import { Download, FileText, Edit, Trash2, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,6 +24,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     onToggleStatus
 }) => {
     const { isAdmin } = useUserRole();
+    const [isDownloading, setIsDownloading] = useState(false);
 
     const getCategoryColor = (category: string) => {
         const colors: Record<string, string> = {
@@ -52,6 +53,25 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
         if (fileType.includes('excel')) return <span className="text-green-500">📊</span>;
         if (fileType.includes('image')) return <span className="text-purple-500">🖼️</span>;
         return <FileText className="w-5 h-5" />;
+    };
+
+    const handleDownload = async () => {
+        if (isDownloading) {
+            console.log('Download already in progress, ignoring click');
+            return;
+        }
+
+        console.log('Download button clicked for resource:', resource.id);
+        setIsDownloading(true);
+
+        try {
+            await onDownload(resource.id, resource.file_name, resource.file_url);
+        } finally {
+            // 2초 후에 다운로드 상태 해제 (사용자가 너무 빨리 재클릭하는 것 방지)
+            setTimeout(() => {
+                setIsDownloading(false);
+            }, 2000);
+        }
     };
 
     return (
@@ -145,12 +165,21 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
 
             <CardFooter className="px-6 py-4 bg-gray-50 border-t">
                 <Button
-                    onClick={() => onDownload(resource.id, resource.file_name, resource.file_url)}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                    disabled={!resource.is_active && !isAdmin}
+                    onClick={handleDownload}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={(!resource.is_active && !isAdmin) || isDownloading}
                 >
-                    <Download className="w-4 h-4 mr-2" />
-                    다운로드
+                    {isDownloading ? (
+                        <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            다운로드 중...
+                        </>
+                    ) : (
+                        <>
+                            <Download className="w-4 h-4 mr-2" />
+                            다운로드
+                        </>
+                    )}
                 </Button>
             </CardFooter>
         </Card>

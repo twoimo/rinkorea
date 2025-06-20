@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -37,6 +37,10 @@ export const useResources = () => {
     const { toast } = useToast();
     const { user } = useAuth();
     const { isAdmin } = useUserRole();
+
+    // 중복 호출 방지를 위한 ref
+    const downloadingRef = useRef<Set<string>>(new Set());
+    const lastDownloadTime = useRef<Map<string, number>>(new Map());
 
     const fetchResources = useCallback(async () => {
         try {
@@ -91,67 +95,58 @@ export const useResources = () => {
     }, [fetchResources]);
 
     const downloadResource = async (resource: Resource) => {
-        console.log('Starting download for resource:', resource);
+        const now = Date.now();
+        const lastTime = lastDownloadTime.current.get(resource.id) || 0;
+
+        // 중복 방지: 이미 다운로드 중이거나 1초 이내 재호출 차단
+        if (downloadingRef.current.has(resource.id) || (now - lastTime < 1000)) {
+            console.log('Download blocked - already in progress or too soon:', resource.id);
+            return;
+        }
+
+        // 다운로드 시작 기록
+        downloadingRef.current.add(resource.id);
+        lastDownloadTime.current.set(resource.id, now);
 
         try {
-            // Update download count first
-            console.log('Updating download count from', resource.download_count, 'to', resource.download_count + 1);
+            console.log('Starting download for:', resource.id, 'current count:', resource.download_count);
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error: updateError } = await (supabase as any)
-                .from('resources')
-                .update({ download_count: resource.download_count + 1 })
-                .eq('id', resource.id);
-
-            if (updateError) {
-                console.error('Error updating download count:', updateError);
-                toast({
-                    title: "카운트 업데이트 실패",
-                    description: "다운로드 카운트 업데이트에 실패했습니다.",
-                    variant: "destructive"
-                });
-                // 카운트 업데이트 실패해도 다운로드는 진행
-            } else {
-                console.log('Download count updated successfully');
-            }
-
-            // Create download link
-            console.log('Creating download link for:', resource.file_url);
+            // Create download link first
             const link = document.createElement('a');
             link.href = resource.file_url;
             link.download = resource.file_name;
-            link.target = '_blank'; // 새 탭에서 열기
+            link.target = '_blank';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
 
-            // Log download (optional, may fail if table doesn't exist)
-            try {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                await (supabase as any)
-                    .from('resource_downloads')
-                    .insert({
-                        resource_id: resource.id,
-                        user_id: user?.id || null,
-                        downloaded_at: new Date().toISOString()
-                    });
-                console.log('Download logged successfully');
-            } catch (logError) {
-                console.warn('Download logging failed (table may not exist):', logError);
-                // 로그 실패는 무시
-            }
+            // 다운로드 로그만 삽입 (트리거가 자동으로 카운트 증가)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error: logError } = await (supabase as any)
+                .from('resource_downloads')
+                .insert({
+                    resource_id: resource.id,
+                    user_id: user?.id || null,
+                    downloaded_at: new Date().toISOString()
+                });
 
-            // Update local state immediately
-            console.log('Updating local state');
-            setAllResources(prev => {
-                const updated = prev.map(r =>
+            if (logError) {
+                console.error('Error logging download:', logError);
+                toast({
+                    title: "다운로드 로그 실패",
+                    description: "다운로드 기록에 실패했습니다.",
+                    variant: "destructive"
+                });
+            } else {
+                console.log('Download logged successfully, count should be auto-incremented by trigger');
+
+                // 즉시 로컬 상태 업데이트 (사용자 경험)
+                setAllResources(prev => prev.map(r =>
                     r.id === resource.id
                         ? { ...r, download_count: r.download_count + 1 }
                         : r
-                );
-                console.log('Local state updated');
-                return updated;
-            });
+                ));
+            }
 
             toast({
                 title: "다운로드 시작",
@@ -166,6 +161,12 @@ export const useResources = () => {
                 description: "파일 다운로드 중 오류가 발생했습니다.",
                 variant: "destructive"
             });
+        } finally {
+            // 다운로드 완료 후 잠시 후에 제거 (추가 보호)
+            setTimeout(() => {
+                downloadingRef.current.delete(resource.id);
+                console.log('Download lock removed for:', resource.id);
+            }, 2000);
         }
     };
 
@@ -178,18 +179,14 @@ export const useResources = () => {
     });
 
     const handleDownloadResource = async (resourceId: string, fileName: string, fileUrl: string) => {
-        console.log('Download attempt:', { resourceId, fileName });
-        console.log('All resources:', allResources.length);
+        console.log('Download requested for:', resourceId);
 
         // 전체 resources에서 찾기
         const resource = allResources.find(r => r.id === resourceId);
-        console.log('Found resource:', resource);
 
         if (resource) {
             await downloadResource(resource);
         } else {
-            console.error('Resource not found:', resourceId);
-            console.log('Available resource IDs:', allResources.map(r => r.id));
             toast({
                 title: "다운로드 실패",
                 description: "자료를 찾을 수 없습니다.",
