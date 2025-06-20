@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, FileText, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { FileText, Loader2, Link as LinkIcon } from 'lucide-react';
+import { Modal, ModalBody, ModalFooter, FormField, FormInput, FormTextarea, FormSelect, ActionButton } from '@/components/ui/modal';
 import { useToast } from '@/hooks/use-toast';
 import type { Resource, ResourceCategory } from '@/hooks/useResources';
 import type { CreateResourceData, UpdateResourceData } from '@/hooks/useResourcesAdmin';
@@ -92,6 +87,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
     });
 
     const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
         if (resource) {
@@ -105,7 +101,19 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
                 category: resource.category,
                 is_active: true // 기본값으로 설정
             });
+        } else {
+            setFormData({
+                title: '',
+                description: '',
+                file_name: '',
+                file_url: '',
+                file_size: 0,
+                file_type: '',
+                category: '',
+                is_active: true
+            });
         }
+        setErrors({});
     }, [resource]);
 
     const handleInputChange = (field: string, value: string | number | boolean) => {
@@ -113,6 +121,11 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
             ...prev,
             [field]: value
         }));
+
+        // 입력 시 해당 필드의 에러 제거
+        if (errors[field]) {
+            setErrors(prev => ({ ...prev, [field]: '' }));
+        }
     };
 
     // 파일 확장자에서 MIME 타입 추출
@@ -193,15 +206,29 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
         }
     };
 
+    const validateForm = () => {
+        const newErrors: Record<string, string> = {};
+
+        if (!formData.title.trim()) {
+            newErrors.title = '제목을 입력해주세요.';
+        }
+
+        if (!formData.file_url.trim()) {
+            newErrors.file_url = '파일 URL을 입력해주세요.';
+        }
+
+        if (!formData.category) {
+            newErrors.category = '카테고리를 선택해주세요.';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!formData.title.trim() || !formData.file_url.trim() || !formData.category) {
-            toast({
-                title: "입력 오류",
-                description: "제목, 파일 URL, 카테고리는 필수 입력 항목입니다.",
-                variant: "destructive"
-            });
+        if (!validateForm()) {
             return;
         }
 
@@ -221,164 +248,180 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10001] p-4">
-            <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                <CardHeader className="flex flex-row items-center justify-between px-4 md:px-6 py-4 md:py-6 sticky top-0 bg-white border-b z-10">
-                    <CardTitle className="text-lg md:text-xl">
-                        {resource ? '자료 수정' : '새 자료 등록'}
-                    </CardTitle>
-                    <Button variant="ghost" size="sm" onClick={onClose} className="h-10 w-10 p-0 touch-manipulation">
-                        <X className="w-5 h-5" />
-                    </Button>
-                </CardHeader>
+        <Modal
+            isOpen={true}
+            onClose={onClose}
+            title={resource ? '자료 수정' : '새 자료 등록'}
+            size="2xl"
+        >
+            <ModalBody>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* 기본 정보 */}
+                    <div className="space-y-4">
+                        <FormField label="제목" required error={errors.title}>
+                            <FormInput
+                                value={formData.title}
+                                onChange={(e) => handleInputChange('title', e.target.value)}
+                                placeholder="자료 제목을 입력하세요"
+                                error={!!errors.title}
+                            />
+                        </FormField>
 
-                <CardContent className="px-4 md:px-6 py-4 md:py-6">
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* 기본 정보 */}
-                        <div className="space-y-4">
-                            <div>
-                                <Label htmlFor="title" className="text-sm md:text-base font-medium">제목 *</Label>
-                                <Input
-                                    id="title"
-                                    type="text"
-                                    value={formData.title}
-                                    onChange={(e) => handleInputChange('title', e.target.value)}
-                                    placeholder="자료 제목을 입력하세요"
-                                    className="h-12 md:h-10 text-base md:text-sm mt-2"
-                                    required
-                                />
-                            </div>
+                        <FormField label="설명">
+                            <FormTextarea
+                                value={formData.description}
+                                onChange={(e) => handleInputChange('description', e.target.value)}
+                                placeholder="자료에 대한 설명을 입력하세요"
+                                rows={3}
+                            />
+                        </FormField>
 
-                            <div>
-                                <Label htmlFor="description" className="text-sm md:text-base font-medium">설명</Label>
-                                <Textarea
-                                    id="description"
-                                    value={formData.description}
-                                    onChange={(e) => handleInputChange('description', e.target.value)}
-                                    placeholder="자료에 대한 설명을 입력하세요"
-                                    rows={3}
-                                    className="text-base md:text-sm mt-2 min-h-[80px]"
-                                />
-                            </div>
+                        <FormField label="카테고리" required error={errors.category}>
+                            <FormSelect
+                                value={formData.category}
+                                onChange={(e) => handleInputChange('category', e.target.value)}
+                                error={!!errors.category}
+                            >
+                                <option value="">카테고리를 선택하세요</option>
+                                {categories.map((category) => (
+                                    <option key={category.id} value={category.name}>
+                                        {category.name}
+                                    </option>
+                                ))}
+                            </FormSelect>
+                        </FormField>
+                    </div>
 
-                            <div>
-                                <Label htmlFor="category" className="text-sm md:text-base font-medium">카테고리 *</Label>
-                                <Select
-                                    value={formData.category}
-                                    onValueChange={(value) => handleInputChange('category', value)}
-                                >
-                                    <SelectTrigger className="h-12 md:h-10 text-base md:text-sm mt-2">
-                                        <SelectValue placeholder="카테고리를 선택하세요" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {categories.map((category) => (
-                                            <SelectItem key={category.id} value={category.name}>
-                                                {category.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-
-                        {/* 파일 정보 */}
-                        <div className="space-y-4">
-                            <div>
-                                <Label htmlFor="file_url" className="text-sm md:text-base font-medium">파일 URL *</Label>
-                                <Input
-                                    id="file_url"
+                    {/* 파일 정보 */}
+                    <div className="space-y-4">
+                        <FormField label="파일 URL" required error={errors.file_url}>
+                            <div className="relative">
+                                <LinkIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <FormInput
                                     type="url"
                                     value={formData.file_url}
                                     onChange={(e) => handleFileUrlChange(e.target.value)}
                                     placeholder="https://example.com/file.pdf"
-                                    className="h-12 md:h-10 text-base md:text-sm mt-2"
-                                    required
+                                    className="pl-10"
+                                    error={!!errors.file_url}
                                 />
                             </div>
+                            <p className="text-xs text-gray-500 mt-1">
+                                파일의 직접 다운로드 링크를 입력하세요
+                            </p>
+                        </FormField>
 
-                            <div>
-                                <Label htmlFor="file_name" className="text-sm md:text-base font-medium">파일명</Label>
-                                <Input
-                                    id="file_name"
-                                    type="text"
-                                    value={formData.file_name}
-                                    onChange={(e) => handleInputChange('file_name', e.target.value)}
-                                    placeholder="파일명을 입력하세요"
-                                    className="h-12 md:h-10 text-base md:text-sm mt-2"
-                                />
-                            </div>
+                        <FormField label="파일명">
+                            <FormInput
+                                value={formData.file_name}
+                                onChange={(e) => handleInputChange('file_name', e.target.value)}
+                                placeholder="파일명을 입력하세요"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                                URL에서 자동으로 추출됩니다
+                            </p>
+                        </FormField>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <Label htmlFor="file_type" className="text-sm md:text-base font-medium">
-                                        파일 타입
-                                        {isAnalyzing && (
-                                            <Loader2 className="w-3 h-3 animate-spin inline ml-1" />
-                                        )}
-                                    </Label>
-                                    <Input
-                                        id="file_type"
-                                        type="text"
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField label="파일 타입">
+                                <div className="relative">
+                                    <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    {isAnalyzing && (
+                                        <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 animate-spin text-blue-500" />
+                                    )}
+                                    <FormInput
                                         value={formData.file_type}
                                         onChange={(e) => handleInputChange('file_type', e.target.value)}
                                         placeholder="자동으로 감지됩니다"
-                                        className="bg-gray-50 h-12 md:h-10 text-base md:text-sm mt-2"
+                                        className="pl-10 bg-gray-50"
                                         readOnly
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">
-                                        파일 URL 입력 시 자동으로 감지됩니다
-                                    </p>
                                 </div>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    파일 URL 입력 시 자동으로 감지됩니다
+                                </p>
+                            </FormField>
 
-                                <div>
-                                    <Label htmlFor="file_size" className="text-sm md:text-base font-medium">
-                                        파일 크기 (bytes)
-                                        {isAnalyzing && (
-                                            <Loader2 className="w-3 h-3 animate-spin inline ml-1" />
-                                        )}
-                                    </Label>
-                                    <Input
-                                        id="file_size"
+                            <FormField label="파일 크기 (bytes)">
+                                <div className="relative">
+                                    {isAnalyzing && (
+                                        <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 animate-spin text-blue-500" />
+                                    )}
+                                    <FormInput
                                         type="number"
                                         value={formData.file_size}
                                         onChange={(e) => handleInputChange('file_size', parseInt(e.target.value) || 0)}
                                         placeholder="자동으로 감지됩니다"
-                                        className="bg-gray-50 h-12 md:h-10 text-base md:text-sm mt-2"
+                                        className="bg-gray-50"
                                         readOnly={formData.file_size > 0}
                                         min="0"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">
-                                        {formData.file_size > 0
-                                            ? `${(formData.file_size / 1024 / 1024).toFixed(2)} MB`
-                                            : '파일 URL 입력 시 자동으로 감지됩니다'
-                                        }
-                                    </p>
                                 </div>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    {formData.file_size > 0
+                                        ? `${(formData.file_size / 1024 / 1024).toFixed(2)} MB`
+                                        : '파일 URL 입력 시 자동으로 감지됩니다'
+                                    }
+                                </p>
+                            </FormField>
+                        </div>
+                    </div>
+
+                    {/* 파일 정보 요약 */}
+                    {(formData.file_name && formData.file_type) && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <h4 className="text-sm font-medium text-blue-800 mb-2">파일 정보 요약</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-blue-700">
+                                <div>
+                                    <span className="font-medium">파일명:</span> {formData.file_name}
+                                </div>
+                                <div>
+                                    <span className="font-medium">타입:</span> {formData.file_type}
+                                </div>
+                                {formData.file_size > 0 && (
+                                    <div>
+                                        <span className="font-medium">크기:</span> {(formData.file_size / 1024 / 1024).toFixed(2)} MB
+                                    </div>
+                                )}
                             </div>
                         </div>
+                    )}
 
-                        {/* 제출 버튼 */}
-                        <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-6 border-t">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={onClose}
-                                className="w-full sm:w-auto h-12 md:h-10 text-base md:text-sm touch-manipulation"
-                            >
-                                취소
-                            </Button>
-                            <Button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full sm:w-auto h-12 md:h-10 text-base md:text-sm touch-manipulation"
-                            >
-                                {loading ? '처리중...' : (resource ? '수정' : '등록')}
-                            </Button>
-                        </div>
-                    </form>
-                </CardContent>
-            </Card>
-        </div>
+                    {/* 활성화 옵션 */}
+                    <FormField label="표시 설정">
+                        <label className="flex items-center">
+                            <input
+                                type="checkbox"
+                                checked={formData.is_active}
+                                onChange={(e) => handleInputChange('is_active', e.target.checked)}
+                                className="mr-3 rounded"
+                            />
+                            <span className="text-sm text-gray-700">자료 활성화 (체크 해제 시 숨김 처리)</span>
+                        </label>
+                    </FormField>
+                </form>
+            </ModalBody>
+
+            <ModalFooter>
+                <div className="flex flex-col sm:flex-row justify-end gap-3 w-full">
+                    <ActionButton
+                        type="button"
+                        variant="secondary"
+                        onClick={onClose}
+                        className="w-full sm:w-auto"
+                    >
+                        취소
+                    </ActionButton>
+                    <ActionButton
+                        onClick={handleSubmit}
+                        loading={loading}
+                        className="w-full sm:w-auto"
+                    >
+                        {resource ? '수정' : '등록'}
+                    </ActionButton>
+                </div>
+            </ModalFooter>
+        </Modal>
     );
 };
 

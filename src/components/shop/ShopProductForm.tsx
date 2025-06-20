@@ -1,213 +1,412 @@
-import React from 'react';
-import { X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Image as ImageIcon, Package } from 'lucide-react';
+import { Modal, ModalBody, ModalFooter, FormField, FormInput, FormTextarea, FormSelect, ActionButton } from '@/components/ui/modal';
+import { getImageUrl, handleImageError } from '@/lib/utils';
 
-interface Product {
-  id: string;
+interface ShopProduct {
+  id?: string;
   name: string;
-  description: string;
-  image_url: string;
+  description?: string;
   price: number;
-  original_price?: number;
-  discount?: number;
-  rating?: number;
-  reviews?: number;
-  naver_url?: string;
-  is_new?: boolean;
-  is_best?: boolean;
+  compare_price?: number;
+  image_url: string;
+  category: string;
   stock_quantity?: number;
-  sales?: number;
-  created_at?: string;
-  is_active?: boolean;
+  weight?: number;
+  dimensions?: string;
+  brand?: string;
+  is_featured: boolean;
+  is_active: boolean;
 }
 
 interface ShopProductFormProps {
-  editingProduct: Product | null;
-  formValues: Partial<Product>;
-  formLoading: boolean;
-  formError: string | null;
-  formSuccess: string | null;
+  isOpen: boolean;
+  product?: ShopProduct | null;
   onClose: () => void;
-  onSubmit: (e: React.FormEvent) => void;
-  onFormValueChange: (key: keyof Product, value: unknown) => void;
+  onSubmit: (product: Omit<ShopProduct, 'id'>) => Promise<void>;
+  isLoading?: boolean;
 }
 
-const ShopProductForm = ({
-  editingProduct,
-  formValues,
-  formLoading,
-  formError,
-  formSuccess,
+const ShopProductForm: React.FC<ShopProductFormProps> = ({
+  isOpen,
+  product,
   onClose,
   onSubmit,
-  onFormValueChange,
-}: ShopProductFormProps) => {
+  isLoading = false
+}) => {
+  const [formData, setFormData] = useState<Omit<ShopProduct, 'id'>>({
+    name: '',
+    description: '',
+    price: 0,
+    compare_price: undefined,
+    image_url: '',
+    category: '',
+    stock_quantity: undefined,
+    weight: undefined,
+    dimensions: '',
+    brand: '',
+    is_featured: false,
+    is_active: true
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (product) {
+      setFormData({
+        name: product.name || '',
+        description: product.description || '',
+        price: product.price || 0,
+        compare_price: product.compare_price,
+        image_url: product.image_url || '',
+        category: product.category || '',
+        stock_quantity: product.stock_quantity,
+        weight: product.weight,
+        dimensions: product.dimensions || '',
+        brand: product.brand || '',
+        is_featured: product.is_featured || false,
+        is_active: product.is_active !== false
+      });
+    } else {
+      setFormData({
+        name: '',
+        description: '',
+        price: 0,
+        compare_price: undefined,
+        image_url: '',
+        category: '',
+        stock_quantity: undefined,
+        weight: undefined,
+        dimensions: '',
+        brand: '',
+        is_featured: false,
+        is_active: true
+      });
+    }
+    setErrors({});
+  }, [product, isOpen]);
+
+  const handleInputChange = (field: keyof typeof formData, value: string | number | boolean | undefined) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+
+    // 입력 시 해당 필드의 에러 제거
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = '상품명을 입력해주세요.';
+    }
+
+    if (!formData.image_url.trim()) {
+      newErrors.image_url = '이미지 URL을 입력해주세요.';
+    }
+
+    if (!formData.category) {
+      newErrors.category = '카테고리를 선택해주세요.';
+    }
+
+    if (formData.price <= 0) {
+      newErrors.price = '가격은 0보다 큰 값을 입력해주세요.';
+    }
+
+    if (formData.compare_price !== undefined && formData.compare_price <= formData.price) {
+      newErrors.compare_price = '할인 전 가격은 현재 가격보다 높아야 합니다.';
+    }
+
+    if (formData.stock_quantity !== undefined && formData.stock_quantity < 0) {
+      newErrors.stock_quantity = '재고 수량은 0 이상이어야 합니다.';
+    }
+
+    if (formData.weight !== undefined && formData.weight <= 0) {
+      newErrors.weight = '무게는 0보다 큰 값을 입력해주세요.';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (validateForm()) {
+      // 빈 문자열을 undefined로 변환
+      const submitData = {
+        ...formData,
+        description: formData.description?.trim() || undefined,
+        dimensions: formData.dimensions?.trim() || undefined,
+        brand: formData.brand?.trim() || undefined,
+        compare_price: formData.compare_price || undefined,
+        stock_quantity: formData.stock_quantity || undefined,
+        weight: formData.weight || undefined,
+      };
+
+      await onSubmit(submitData);
+    }
+  };
+
+  const calculateDiscount = () => {
+    if (formData.compare_price && formData.compare_price > formData.price) {
+      const discount = ((formData.compare_price - formData.price) / formData.compare_price) * 100;
+      return Math.round(discount);
+    }
+    return 0;
+  };
+
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-[110] p-4 overflow-y-auto">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-lg my-4 sm:my-0 relative max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white px-6 py-4 border-b flex items-center justify-between">
-          <h2 className="text-xl font-bold">{editingProduct ? '상품 수정' : '상품 추가'}</h2>
-          <button
-            className="text-gray-400 hover:text-gray-700 p-1 touch-manipulation"
-            onClick={onClose}
-            aria-label="닫기"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={product ? '상품 수정' : '새 상품 등록'}
+      size="3xl"
+    >
+      <ModalBody>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* 기본 정보 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField label="상품명" required error={errors.name} className="md:col-span-2">
+              <div className="relative">
+                <Package className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <FormInput
+                  value={formData.name}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  placeholder="상품명을 입력하세요"
+                  className="pl-10"
+                  error={!!errors.name}
+                />
+              </div>
+            </FormField>
 
-        <form className="p-6 space-y-4" onSubmit={onSubmit}>
-          <div>
-            <label className="block text-sm font-medium mb-2">상품명</label>
-            <input
-              type="text"
-              className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
-              value={formValues.name || ''}
-              onChange={e => onFormValueChange('name', e.target.value)}
+            <FormField label="카테고리" required error={errors.category}>
+              <FormSelect
+                value={formData.category}
+                onChange={(e) => handleInputChange('category', e.target.value)}
+                error={!!errors.category}
+              >
+                <option value="">카테고리 선택</option>
+                <option value="방수제">방수제</option>
+                <option value="경화제">경화제</option>
+                <option value="코팅제">코팅제</option>
+                <option value="실란트">실란트</option>
+                <option value="접착제">접착제</option>
+                <option value="도구">도구</option>
+                <option value="기타">기타</option>
+              </FormSelect>
+            </FormField>
+
+            <FormField label="브랜드">
+              <FormInput
+                value={formData.brand || ''}
+                onChange={(e) => handleInputChange('brand', e.target.value)}
+                placeholder="브랜드명을 입력하세요 (선택사항)"
+              />
+            </FormField>
+          </div>
+
+          <FormField label="상품 설명">
+            <FormTextarea
+              value={formData.description || ''}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+              placeholder="상품에 대한 설명을 입력하세요"
+              rows={4}
             />
-          </div>
+          </FormField>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">설명</label>
-            <textarea
-              className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation min-h-[100px]"
-              value={formValues.description || ''}
-              onChange={e => onFormValueChange('description', e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">이미지 URL 또는 파일명</label>
-            <input
-              type="text"
-              className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
-              value={formValues.image_url || ''}
-              onChange={e => onFormValueChange('image_url', e.target.value)}
-              placeholder="예: image.jpg 또는 https://example.com/image.jpg"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              파일명만 입력하면 자동으로 /images/ 경로가 추가됩니다
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">판매가(원)</label>
-              <input
-                type="number"
-                className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
-                value={formValues.price || ''}
-                onChange={e => onFormValueChange('price', Number(e.target.value))}
+          {/* 이미지 */}
+          <FormField label="상품 이미지 URL" required error={errors.image_url}>
+            <div className="space-y-3">
+              <FormInput
+                value={formData.image_url}
+                onChange={(e) => handleInputChange('image_url', e.target.value)}
+                placeholder="이미지 URL을 입력하세요"
+                error={!!errors.image_url}
               />
+
+              {formData.image_url && (
+                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                  <ImageIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                  <img
+                    src={getImageUrl(formData.image_url)}
+                    alt="상품 이미지 미리보기"
+                    className="w-24 h-24 object-cover rounded border shadow-sm"
+                    onError={handleImageError}
+                  />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-700">이미지 미리보기</p>
+                    <p className="text-xs text-gray-500 mt-1">상품 이미지가 올바르게 표시되는지 확인하세요</p>
+                  </div>
+                </div>
+              )}
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">정가(원)</label>
-              <input
+          </FormField>
+
+          {/* 가격 정보 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField label="판매가격 (원)" required error={errors.price}>
+              <FormInput
                 type="number"
-                className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
-                value={formValues.original_price || ''}
-                onChange={e => onFormValueChange('original_price', Number(e.target.value))}
+                value={formData.price || ''}
+                onChange={(e) => handleInputChange('price', e.target.value ? parseFloat(e.target.value) : 0)}
+                placeholder="판매가격을 입력하세요"
+                min="0"
+                step="100"
+                error={!!errors.price}
               />
-            </div>
-          </div>
+            </FormField>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">할인율(%)</label>
-              <input
+            <FormField label="할인 전 가격 (원)" error={errors.compare_price}>
+              <FormInput
                 type="number"
-                className="w-full border border-gray-300 px-3 py-3 rounded-lg bg-gray-100 text-base"
-                value={formValues.discount || ''}
-                readOnly
-                tabIndex={-1}
+                value={formData.compare_price || ''}
+                onChange={(e) => handleInputChange('compare_price', e.target.value ? parseFloat(e.target.value) : undefined)}
+                placeholder="할인 전 가격 (선택사항)"
+                min="0"
+                step="100"
+                error={!!errors.compare_price}
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">재고</label>
-              <input
+              {calculateDiscount() > 0 && (
+                <p className="text-xs text-green-600 mt-1">
+                  할인율: {calculateDiscount()}% (₩{(formData.compare_price! - formData.price).toLocaleString()} 할인)
+                </p>
+              )}
+            </FormField>
+          </div>
+
+          {/* 상품 정보 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <FormField label="재고 수량" error={errors.stock_quantity}>
+              <FormInput
                 type="number"
-                className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
-                value={formValues.stock_quantity || ''}
-                onChange={e => onFormValueChange('stock_quantity', Number(e.target.value))}
+                value={formData.stock_quantity || ''}
+                onChange={(e) => handleInputChange('stock_quantity', e.target.value ? parseInt(e.target.value) : undefined)}
+                placeholder="재고 수량"
+                min="0"
+                error={!!errors.stock_quantity}
               />
-            </div>
-          </div>
+            </FormField>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">평점</label>
-              <input
+            <FormField label="무게 (kg)" error={errors.weight}>
+              <FormInput
                 type="number"
-                step="0.01"
-                className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
-                value={formValues.rating || ''}
-                onChange={e => onFormValueChange('rating', Number(e.target.value))}
+                value={formData.weight || ''}
+                onChange={(e) => handleInputChange('weight', e.target.value ? parseFloat(e.target.value) : undefined)}
+                placeholder="무게"
+                min="0"
+                step="0.1"
+                error={!!errors.weight}
               />
+            </FormField>
+
+            <FormField label="크기">
+              <FormInput
+                value={formData.dimensions || ''}
+                onChange={(e) => handleInputChange('dimensions', e.target.value)}
+                placeholder="예: 30×20×15cm"
+              />
+            </FormField>
+          </div>
+
+          {/* 상품 정보 요약 */}
+          {(formData.name && formData.price) && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="text-sm font-medium text-blue-800 mb-3">상품 정보 요약</h4>
+              <div className="space-y-2 text-sm text-blue-700">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">{formData.name}</span>
+                  <div className="text-right">
+                    {formData.compare_price && (
+                      <span className="line-through text-gray-500 mr-2">
+                        ₩{formData.compare_price.toLocaleString()}
+                      </span>
+                    )}
+                    <span className="font-bold text-lg">
+                      ₩{formData.price.toLocaleString()}
+                    </span>
+                    {calculateDiscount() > 0 && (
+                      <span className="ml-2 bg-red-100 text-red-800 text-xs px-2 py-1 rounded">
+                        {calculateDiscount()}% 할인
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-2 border-t border-blue-200">
+                  {formData.category && (
+                    <div><span className="font-medium">카테고리:</span> {formData.category}</div>
+                  )}
+                  {formData.brand && (
+                    <div><span className="font-medium">브랜드:</span> {formData.brand}</div>
+                  )}
+                  {formData.stock_quantity !== undefined && (
+                    <div><span className="font-medium">재고:</span> {formData.stock_quantity}개</div>
+                  )}
+                  {formData.weight && (
+                    <div><span className="font-medium">무게:</span> {formData.weight}kg</div>
+                  )}
+                </div>
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">리뷰 수</label>
-              <input
-                type="number"
-                className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
-                value={formValues.reviews || ''}
-                onChange={e => onFormValueChange('reviews', Number(e.target.value))}
-              />
+          )}
+
+          {/* 표시 옵션 */}
+          <FormField label="상품 설정">
+            <div className="space-y-3">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={formData.is_featured}
+                  onChange={(e) => handleInputChange('is_featured', e.target.checked)}
+                  className="mr-3 rounded"
+                />
+                <div>
+                  <span className="text-sm font-medium text-gray-700">추천 상품으로 표시</span>
+                  <p className="text-xs text-gray-500">메인 페이지와 상품 목록 상단에 표시됩니다</p>
+                </div>
+              </label>
+
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={formData.is_active}
+                  onChange={(e) => handleInputChange('is_active', e.target.checked)}
+                  className="mr-3 rounded"
+                />
+                <div>
+                  <span className="text-sm font-medium text-gray-700">상품 활성화</span>
+                  <p className="text-xs text-gray-500">체크 해제 시 상품이 숨김 처리됩니다</p>
+                </div>
+              </label>
             </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">네이버 스토어 URL</label>
-            <input
-              type="text"
-              className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
-              value={formValues.naver_url || ''}
-              onChange={e => onFormValueChange('naver_url', e.target.value)}
-            />
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-4">
-            <label className="inline-flex items-center gap-2 touch-manipulation">
-              <input
-                type="checkbox"
-                className="w-4 h-4"
-                checked={!!formValues.is_new}
-                onChange={e => onFormValueChange('is_new', e.target.checked)}
-              />
-              <span className="text-sm font-medium">신상품</span>
-            </label>
-            <label className="inline-flex items-center gap-2 touch-manipulation">
-              <input
-                type="checkbox"
-                className="w-4 h-4"
-                checked={!!formValues.is_best}
-                onChange={e => onFormValueChange('is_best', e.target.checked)}
-              />
-              <span className="text-sm font-medium">베스트</span>
-            </label>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <button
-              type="button"
-              className="w-full sm:w-auto px-6 py-3 rounded-lg bg-gray-200 text-gray-700 font-medium touch-manipulation"
-              onClick={onClose}
-              disabled={formLoading}
-            >
-              취소
-            </button>
-            <button
-              type="submit"
-              className="w-full sm:w-auto px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold disabled:opacity-50 touch-manipulation"
-              disabled={formLoading}
-            >
-              {formLoading ? '저장 중...' : '저장'}
-            </button>
-          </div>
-
-          {formError && <div className="mt-4 text-sm text-red-600 p-3 bg-red-50 rounded-lg">{formError}</div>}
-          {formSuccess && <div className="mt-4 text-sm text-green-700 p-3 bg-green-50 rounded-lg">{formSuccess}</div>}
+          </FormField>
         </form>
-      </div>
-    </div>
+      </ModalBody>
+
+      <ModalFooter>
+        <div className="flex flex-col sm:flex-row justify-end gap-3 w-full">
+          <ActionButton
+            type="button"
+            variant="secondary"
+            onClick={onClose}
+            className="w-full sm:w-auto"
+          >
+            취소
+          </ActionButton>
+          <ActionButton
+            onClick={handleSubmit}
+            loading={isLoading}
+            className="w-full sm:w-auto"
+          >
+            {product ? '수정' : '등록'}
+          </ActionButton>
+        </div>
+      </ModalFooter>
+    </Modal>
   );
 };
 

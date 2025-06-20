@@ -1,47 +1,49 @@
-import React, { useState, useCallback, memo } from 'react';
-import { X, Plus, GripVertical, Trash2 } from 'lucide-react';
-import type { DragEndEvent } from '@dnd-kit/core';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import type { SortableContextProps } from '@dnd-kit/sortable';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy
-} from '@dnd-kit/sortable';
+import React, { useState, useEffect } from 'react';
+import { Plus, Trash2, Upload, GripVertical, Image as ImageIcon } from 'lucide-react';
+import { Modal, ModalBody, ModalFooter, FormField, FormInput, FormTextarea, FormSelect, ActionButton } from '@/components/ui/modal';
+import { getImageUrl, handleImageError } from '@/lib/utils';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Product, ProductFormData } from '@/types/product';
 
-interface ProductFormProps {
-  product?: Product;
-  onSave: (product: ProductFormData) => Promise<void>;
-  onClose: () => void;
-  loading?: boolean;
-  formError?: string;
-  success?: boolean;
+interface Product {
+  id?: string;
+  name: string;
+  description: string;
+  main_image: string;
+  gallery_images: string[];
+  price?: number;
+  category: string;
+  features: string[];
+  applications: string[];
+  coverage: string;
+  specifications: Record<string, string>;
+  is_featured: boolean;
+  is_active: boolean;
 }
 
-interface SortableItemProps {
+interface ProductFormProps {
+  product?: Product | null;
+  onSubmit: (product: Omit<Product, 'id'>) => void;
+  onClose: () => void;
+  loading?: boolean;
+}
+
+interface SortableFeatureProps {
   id: string;
-  children: React.ReactNode;
+  feature: string;
   onRemove: () => void;
 }
 
-const SortableItem = ({ id, children, onRemove }: SortableItemProps) => {
+const SortableFeature: React.FC<SortableFeatureProps> = ({ id, feature, onRemove }) => {
   const {
     attributes,
     listeners,
     setNodeRef,
     transform,
     transition,
+    isDragging,
   } = useSortable({ id });
 
   const style = {
@@ -50,41 +52,53 @@ const SortableItem = ({ id, children, onRemove }: SortableItemProps) => {
   };
 
   return (
-    <li ref={setNodeRef} style={style} className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-2 p-3 bg-gray-50 rounded-lg border ${isDragging ? 'opacity-50 z-10' : ''
+        }`}
+    >
       <button
+        type="button"
+        className="text-gray-400 hover:text-gray-600 cursor-grab touch-manipulation"
         {...attributes}
         {...listeners}
-        className="cursor-grab active:cursor-grabbing"
       >
-        <GripVertical className="w-5 h-5 text-gray-400" />
+        <GripVertical className="w-4 h-4" />
       </button>
-      <span className="flex-1">{children}</span>
+      <span className="flex-1 text-sm text-gray-700">{feature}</span>
       <button
         type="button"
         onClick={onRemove}
-        className="p-1 text-red-600 hover:text-red-700"
+        className="text-red-500 hover:text-red-700 transition-colors p-1"
       >
         <Trash2 className="w-4 h-4" />
       </button>
-    </li>
+    </div>
   );
 };
 
-const ProductForm = memo(({ product, onSave, onClose, loading, formError, success }: ProductFormProps) => {
-  const [formValues, setFormValues] = useState<ProductFormData>({
-    name: product?.name || '',
-    description: product?.description || '',
-    image_url: product?.image_url || '',
-    icon: product?.icon || '',
-    features: product?.features || [],
-    detail_images: product?.detail_images || [],
-    is_active: product?.is_active ?? true
+const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, onClose, loading = false }) => {
+  const [formData, setFormData] = useState<Omit<Product, 'id'>>({
+    name: '',
+    description: '',
+    main_image: '',
+    gallery_images: [],
+    category: '',
+    features: [],
+    applications: [],
+    coverage: '',
+    specifications: {},
+    is_featured: false,
+    is_active: true,
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [newFeature, setNewFeature] = useState('');
-  const [newImage, setNewImage] = useState('');
+  const [newApplication, setNewApplication] = useState('');
+  const [newSpecKey, setNewSpecKey] = useState('');
+  const [newSpecValue, setNewSpecValue] = useState('');
+  const [newGalleryImage, setNewGalleryImage] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -93,270 +107,408 @@ const ProductForm = memo(({ product, onSave, onClose, loading, formError, succes
     })
   );
 
-  const handleDragEnd = useCallback((event: DragEndEvent, type: 'features' | 'detail_images') => {
+  useEffect(() => {
+    if (product) {
+      setFormData({
+        name: product.name,
+        description: product.description,
+        main_image: product.main_image,
+        gallery_images: product.gallery_images || [],
+        price: product.price,
+        category: product.category,
+        features: product.features || [],
+        applications: product.applications || [],
+        coverage: product.coverage || '',
+        specifications: product.specifications || {},
+        is_featured: product.is_featured || false,
+        is_active: product.is_active !== false,
+      });
+    }
+  }, [product]);
+
+  const handleInputChange = (field: string, value: string | number | boolean | string[] | Record<string, string> | undefined) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) newErrors.name = '제품명을 입력해주세요.';
+    if (!formData.description.trim()) newErrors.description = '제품 설명을 입력해주세요.';
+    if (!formData.main_image.trim()) newErrors.main_image = '메인 이미지 URL을 입력해주세요.';
+    if (!formData.category.trim()) newErrors.category = '카테고리를 선택해주세요.';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateForm()) {
+      onSubmit(formData);
+    }
+  };
+
+  const addFeature = () => {
+    if (newFeature.trim() && !formData.features.includes(newFeature.trim())) {
+      handleInputChange('features', [...formData.features, newFeature.trim()]);
+      setNewFeature('');
+    }
+  };
+
+  const removeFeature = (index: number) => {
+    handleInputChange('features', formData.features.filter((_, i) => i !== index));
+  };
+
+  const addApplication = () => {
+    if (newApplication.trim() && !formData.applications.includes(newApplication.trim())) {
+      handleInputChange('applications', [...formData.applications, newApplication.trim()]);
+      setNewApplication('');
+    }
+  };
+
+  const removeApplication = (index: number) => {
+    handleInputChange('applications', formData.applications.filter((_, i) => i !== index));
+  };
+
+  const addSpecification = () => {
+    if (newSpecKey.trim() && newSpecValue.trim()) {
+      handleInputChange('specifications', {
+        ...formData.specifications,
+        [newSpecKey.trim()]: newSpecValue.trim()
+      });
+      setNewSpecKey('');
+      setNewSpecValue('');
+    }
+  };
+
+  const removeSpecification = (key: string) => {
+    const newSpecs = { ...formData.specifications };
+    delete newSpecs[key];
+    handleInputChange('specifications', newSpecs);
+  };
+
+  const addGalleryImage = () => {
+    if (newGalleryImage.trim() && !formData.gallery_images.includes(newGalleryImage.trim())) {
+      handleInputChange('gallery_images', [...formData.gallery_images, newGalleryImage.trim()]);
+      setNewGalleryImage('');
+    }
+  };
+
+  const removeGalleryImage = (index: number) => {
+    handleInputChange('gallery_images', formData.gallery_images.filter((_, i) => i !== index));
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      setFormValues(prev => {
-        const oldIndex = prev[type]?.findIndex(item => item === active.id) ?? -1;
-        const newIndex = prev[type]?.findIndex(item => item === over.id) ?? -1;
+      const oldIndex = formData.features.findIndex(item => item === active.id);
+      const newIndex = formData.features.findIndex(item => item === over.id);
 
-        return {
-          ...prev,
-          [type]: arrayMove(prev[type] || [], oldIndex, newIndex)
-        };
-      });
+      handleInputChange('features', arrayMove(formData.features, oldIndex, newIndex));
     }
-  }, []);
-
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitError(null);
-
-    try {
-      const payload = {
-        ...formValues,
-        features: Array.isArray(formValues.features) ? formValues.features : [],
-        detail_images: Array.isArray(formValues.detail_images) ? formValues.detail_images : [],
-        is_active: true
-      };
-      console.log('Submitting payload:', payload);
-
-      await onSave(payload);
-      onClose();
-    } catch (err) {
-      console.error('Error saving product:', err);
-      setSubmitError(err instanceof Error ? err.message : '제품 저장 중 오류가 발생했습니다.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [formValues, onSave, onClose]);
-
-  const handleAddFeature = useCallback(() => {
-    if (newFeature.trim()) {
-      setFormValues(prev => ({
-        ...prev,
-        features: [...(prev.features || []), newFeature.trim()]
-      }));
-      setNewFeature('');
-    }
-  }, [newFeature]);
-
-  const handleRemoveFeature = useCallback((index: number) => {
-    setFormValues(prev => ({
-      ...prev,
-      features: prev.features?.filter((_, i) => i !== index) || []
-    }));
-  }, []);
-
-  const handleAddImage = useCallback(() => {
-    if (newImage.trim()) {
-      setFormValues(prev => ({
-        ...prev,
-        detail_images: [...(prev.detail_images || []), newImage.trim()]
-      }));
-      setNewImage('');
-    }
-  }, [newImage]);
-
-  const handleRemoveImage = useCallback((index: number) => {
-    setFormValues(prev => ({
-      ...prev,
-      detail_images: prev.detail_images?.filter((_, i) => i !== index) || []
-    }));
-  }, []);
+  };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[110] p-4">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-6xl max-h-[90vh] overflow-y-auto relative">
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold">{product ? '제품 수정' : '새 제품 추가'}</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded-full"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-        <form className="p-6" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">제품명</label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
-                  value={formValues.name}
-                  onChange={e => setFormValues(prev => ({ ...prev, name: e.target.value }))}
-                  required
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={product ? '제품 수정' : '새 제품 추가'}
+      size="4xl"
+      maxHeight="max-h-[95vh]"
+    >
+      <ModalBody>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* 기본 정보 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField label="제품명" required error={errors.name}>
+              <FormInput
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                placeholder="제품명을 입력하세요"
+                error={!!errors.name}
+              />
+            </FormField>
+
+            <FormField label="카테고리" required error={errors.category}>
+              <FormSelect
+                value={formData.category}
+                onChange={(e) => handleInputChange('category', e.target.value)}
+                error={!!errors.category}
+              >
+                <option value="">카테고리 선택</option>
+                <option value="waterproofing">방수제</option>
+                <option value="hardener">경화제</option>
+                <option value="coating">코팅제</option>
+                <option value="sealant">실란트</option>
+                <option value="adhesive">접착제</option>
+                <option value="primer">프라이머</option>
+                <option value="others">기타</option>
+              </FormSelect>
+            </FormField>
+          </div>
+
+          <FormField label="제품 설명" required error={errors.description}>
+            <FormTextarea
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+              placeholder="제품에 대한 상세한 설명을 입력하세요"
+              rows={4}
+              error={!!errors.description}
+            />
+          </FormField>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField label="가격 (원)" error={errors.price}>
+              <FormInput
+                type="number"
+                value={formData.price || ''}
+                onChange={(e) => handleInputChange('price', e.target.value ? parseFloat(e.target.value) : undefined)}
+                placeholder="가격을 입력하세요"
+                min="0"
+                step="100"
+              />
+            </FormField>
+
+            <FormField label="시공면적 (㎡)" error={errors.coverage}>
+              <FormInput
+                value={formData.coverage}
+                onChange={(e) => handleInputChange('coverage', e.target.value)}
+                placeholder="예: 18L당 약 60㎡"
+              />
+            </FormField>
+          </div>
+
+          {/* 이미지 관리 */}
+          <div className="space-y-4">
+            <FormField label="메인 이미지 URL" required error={errors.main_image}>
+              <div className="space-y-3">
+                <FormInput
+                  value={formData.main_image}
+                  onChange={(e) => handleInputChange('main_image', e.target.value)}
+                  placeholder="메인 이미지 URL을 입력하세요"
+                  error={!!errors.main_image}
                 />
+                {formData.main_image && (
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <ImageIcon className="w-5 h-5 text-gray-400" />
+                    <img
+                      src={getImageUrl(formData.main_image)}
+                      alt="메인 이미지 미리보기"
+                      className="w-16 h-16 object-cover rounded border"
+                      onError={handleImageError}
+                    />
+                    <span className="text-sm text-gray-600">메인 이미지 미리보기</span>
+                  </div>
+                )}
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">설명</label>
-                <textarea
-                  className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base resize-none min-h-[200px]"
-                  value={formValues.description}
-                  onChange={e => setFormValues(prev => ({ ...prev, description: e.target.value }))}
-                  required
+            </FormField>
+
+            <FormField label="갤러리 이미지">
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <FormInput
+                    value={newGalleryImage}
+                    onChange={(e) => setNewGalleryImage(e.target.value)}
+                    placeholder="갤러리 이미지 URL 입력"
+                    className="flex-1"
+                  />
+                  <ActionButton type="button" onClick={addGalleryImage} size="sm">
+                    <Plus className="w-4 h-4" />
+                  </ActionButton>
+                </div>
+                {formData.gallery_images.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {formData.gallery_images.map((url, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={getImageUrl(url)}
+                          alt={`갤러리 이미지 ${index + 1}`}
+                          className="w-full h-20 object-cover rounded border"
+                          onError={handleImageError}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeGalleryImage(index)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </FormField>
+          </div>
+
+          {/* 특징 관리 */}
+          <FormField label="제품 특징">
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <FormInput
+                  value={newFeature}
+                  onChange={(e) => setNewFeature(e.target.value)}
+                  placeholder="새로운 특징 입력"
+                  className="flex-1"
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
                 />
+                <ActionButton type="button" onClick={addFeature} size="sm">
+                  <Plus className="w-4 h-4" />
+                </ActionButton>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">이미지 URL 또는 파일명</label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
-                  value={formValues.image_url}
-                  onChange={e => setFormValues(prev => ({ ...prev, image_url: e.target.value }))}
-                  required
+
+              {formData.features.length > 0 && (
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                  <SortableContext items={formData.features} strategy={verticalListSortingStrategy}>
+                    <div className="space-y-2">
+                      {formData.features.map((feature, index) => (
+                        <SortableFeature
+                          key={feature}
+                          id={feature}
+                          feature={feature}
+                          onRemove={() => removeFeature(index)}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              )}
+            </div>
+          </FormField>
+
+          {/* 적용분야 */}
+          <FormField label="적용분야">
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <FormInput
+                  value={newApplication}
+                  onChange={(e) => setNewApplication(e.target.value)}
+                  placeholder="적용분야 입력"
+                  className="flex-1"
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addApplication())}
                 />
+                <ActionButton type="button" onClick={addApplication} size="sm">
+                  <Plus className="w-4 h-4" />
+                </ActionButton>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">아이콘</label>
+
+              {formData.applications.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setFormValues(prev => ({ ...prev, icon: '' }))}
-                    className={`p-2 rounded-lg border ${!formValues.icon
-                      ? 'border-blue-500 bg-blue-50 text-blue-600'
-                      : 'border-gray-300 hover:border-blue-500'
-                      }`}
-                  >
-                    선택 안함
-                  </button>
-                  {['Shield', 'Palette', 'Star', 'Zap', 'Leaf'].map(icon => (
-                    <button
-                      key={icon}
-                      type="button"
-                      onClick={() => setFormValues(prev => ({ ...prev, icon }))}
-                      className={`p-2 rounded-lg border ${formValues.icon === icon
-                        ? 'border-blue-500 bg-blue-50 text-blue-600'
-                        : 'border-gray-300 hover:border-blue-500'
-                        }`}
-                    >
-                      {icon}
-                    </button>
+                  {formData.applications.map((app, index) => (
+                    <div key={index} className="flex items-center gap-2 bg-blue-50 px-3 py-2 rounded-lg">
+                      <span className="text-sm text-blue-800">{app}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeApplication(index)}
+                        className="text-blue-600 hover:text-blue-800 transition-colors"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
                   ))}
                 </div>
-              </div>
+              )}
             </div>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">주요 특징</label>
-                <div className="space-y-2">
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      className="flex-1 border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
-                      value={newFeature}
-                      onChange={e => setNewFeature(e.target.value)}
-                      placeholder="새로운 특징을 입력하세요"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddFeature}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <Plus className="w-5 h-5" />
-                    </button>
-                  </div>
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={(e) => handleDragEnd(e, 'features')}
-                  >
-                    <SortableContext
-                      items={formValues.features || []}
-                      strategy={verticalListSortingStrategy}
-                    >
-                      <ul className="space-y-2">
-                        {formValues.features?.map((feature, index) => (
-                          <SortableItem
-                            key={feature}
-                            id={feature}
-                            onRemove={() => handleRemoveFeature(index)}
-                          >
-                            {feature}
-                          </SortableItem>
-                        ))}
-                      </ul>
-                    </SortableContext>
-                  </DndContext>
+          </FormField>
+
+          {/* 제품 사양 */}
+          <FormField label="제품 사양">
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-2">
+                <FormInput
+                  value={newSpecKey}
+                  onChange={(e) => setNewSpecKey(e.target.value)}
+                  placeholder="사양명 (예: 용량)"
+                />
+                <div className="flex gap-2">
+                  <FormInput
+                    value={newSpecValue}
+                    onChange={(e) => setNewSpecValue(e.target.value)}
+                    placeholder="값 (예: 18L)"
+                    className="flex-1"
+                  />
+                  <ActionButton type="button" onClick={addSpecification} size="sm">
+                    <Plus className="w-4 h-4" />
+                  </ActionButton>
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">상세 이미지 URL 또는 파일명</label>
-                <div className="space-y-2">
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      className="flex-1 border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
-                      value={newImage}
-                      onChange={e => setNewImage(e.target.value)}
-                      placeholder="새로운 이미지 URL 또는 파일명을 입력하세요"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddImage}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <Plus className="w-5 h-5" />
-                    </button>
-                  </div>
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={(e) => handleDragEnd(e, 'detail_images')}
-                  >
-                    <SortableContext
-                      items={formValues.detail_images || []}
-                      strategy={verticalListSortingStrategy}
-                    >
-                      <ul className="space-y-2">
-                        {formValues.detail_images?.map((image, index) => (
-                          <SortableItem
-                            key={image}
-                            id={image}
-                            onRemove={() => handleRemoveImage(index)}
-                          >
-                            {image}
-                          </SortableItem>
-                        ))}
-                      </ul>
-                    </SortableContext>
-                  </DndContext>
+
+              {Object.entries(formData.specifications).length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {Object.entries(formData.specifications).map(([key, value]) => (
+                    <div key={key} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg">
+                      <div className="flex-1">
+                        <span className="text-sm font-medium text-gray-700">{key}:</span>
+                        <span className="text-sm text-gray-600 ml-2">{value}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeSpecification(key)}
+                        className="text-red-500 hover:text-red-700 transition-colors ml-2"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
                 </div>
+              )}
+            </div>
+          </FormField>
+
+          {/* 옵션 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField label="표시 옵션">
+              <div className="space-y-3">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_featured}
+                    onChange={(e) => handleInputChange('is_featured', e.target.checked)}
+                    className="mr-3 rounded"
+                  />
+                  <span className="text-sm text-gray-700">추천 제품으로 표시</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_active}
+                    onChange={(e) => handleInputChange('is_active', e.target.checked)}
+                    className="mr-3 rounded"
+                  />
+                  <span className="text-sm text-gray-700">제품 활성화</span>
+                </label>
               </div>
-            </div>
-          </div>
-          {submitError && (
-            <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-lg">
-              {submitError}
-            </div>
-          )}
-          <div className="mt-6 flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-            >
-              취소
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-            >
-              {loading ? '저장 중...' : '저장'}
-            </button>
+            </FormField>
           </div>
         </form>
-      </div>
-    </div>
-  );
-});
+      </ModalBody>
 
-ProductForm.displayName = 'ProductForm';
+      <ModalFooter>
+        <div className="flex flex-col sm:flex-row justify-end gap-3 w-full">
+          <ActionButton
+            type="button"
+            variant="secondary"
+            onClick={onClose}
+            className="w-full sm:w-auto"
+          >
+            취소
+          </ActionButton>
+          <ActionButton
+            onClick={handleSubmit}
+            loading={loading}
+            className="w-full sm:w-auto"
+          >
+            {product ? '수정' : '추가'}
+          </ActionButton>
+        </div>
+      </ModalFooter>
+    </Modal>
+  );
+};
 
 export default ProductForm;

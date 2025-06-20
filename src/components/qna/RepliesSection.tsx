@@ -17,13 +17,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isA
   const [replyText, setReplyText] = React.useState('');
   const [editingId, setEditingId] = React.useState(null);
 
-  React.useEffect(() => {
-    if (canView) {
-      loadReplies();
-    }
-  }, [inquiryId, canView]);
-
-  const loadReplies = async () => {
+  const loadReplies = React.useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -36,7 +30,13 @@ const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isA
     } finally {
       setLoading(false);
     }
-  };
+  }, [inquiryId, getReplies]);
+
+  React.useEffect(() => {
+    if (canView) {
+      loadReplies();
+    }
+  }, [canView, loadReplies]);
 
   const handleCreateReply = async () => {
     if (!replyText.trim()) return;
