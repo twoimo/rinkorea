@@ -182,6 +182,7 @@ const Equipment = () => {
                 setFormSuccess(editingEquipment ? '기계가 수정되었습니다.' : '기계가 추가되었습니다.');
                 setTimeout(() => {
                     closeForm();
+                    window.location.reload();
                 }, 1500);
             }
         } catch (error) {
@@ -423,7 +424,7 @@ const Equipment = () => {
             </section>
 
             {/* Tab Navigation */}
-            <section className="bg-white border-b border-gray-200 sticky top-0 z-40">
+            <section className="bg-white border-b border-gray-200 sticky top-0 z-50">
                 <div className="container mx-auto px-4">
                     <div className="flex justify-center">
                         <div className="flex space-x-8 md:space-x-12">
@@ -493,7 +494,7 @@ const Equipment = () => {
 
             {/* Equipment Form Modal - 모바일 최적화 */}
             {showForm && (
-                <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[120] p-4">
                     <div className="bg-white rounded-lg shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto relative">
                         <div className="sticky top-0 bg-white border-b border-gray-200 p-4 md:p-6">
                             <button
@@ -642,7 +643,7 @@ const Equipment = () => {
 
             {/* Delete Confirmation Modal - 모바일 최적화 */}
             {showDeleteConfirm && deleteTarget && (
-                <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[120] p-4">
                     <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
                         <div className="p-6 md:p-8">
                             <h2 className="text-xl md:text-2xl font-bold mb-4">기계 삭제</h2>
