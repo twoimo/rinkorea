@@ -55,15 +55,22 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     };
 
     return (
-        <Card className={`group hover:shadow-lg transition-all duration-200 ${!resource.is_active && isAdmin ? 'opacity-60 border-gray-300' : ''}`}>
+        <Card className={`group hover:shadow-lg transition-all duration-200 ${!resource.is_active && isAdmin ? 'opacity-60 border-gray-300 bg-gray-50' : ''}`}>
             <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-3">
                         {getFileIcon(resource.file_type)}
                         <div className="flex-1">
-                            <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-1">
-                                {resource.title}
-                            </h3>
+                            <div className="flex items-center gap-2 mb-1">
+                                <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                    {resource.title}
+                                </h3>
+                                {!resource.is_active && isAdmin && (
+                                    <Badge variant="secondary" className="bg-gray-200 text-gray-600 text-xs">
+                                        숨김
+                                    </Badge>
+                                )}
+                            </div>
                             <Badge className={getCategoryColor(resource.category)}>
                                 {resource.category}
                             </Badge>
@@ -77,11 +84,12 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                 size="sm"
                                 onClick={() => onToggleStatus?.(resource.id, !resource.is_active)}
                                 className="h-8 w-8 p-0"
+                                title={resource.is_active ? "자료 숨기기" : "자료 보이기"}
                             >
                                 {resource.is_active ? (
-                                    <Eye className="w-4 h-4 text-green-600" />
+                                    <EyeOff className="w-4 h-4 text-gray-600" />
                                 ) : (
-                                    <EyeOff className="w-4 h-4 text-gray-400" />
+                                    <Eye className="w-4 h-4 text-gray-600" />
                                 )}
                             </Button>
                             <Button

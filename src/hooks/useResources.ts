@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
 
 export interface Resource {
     id: string;
@@ -35,18 +36,24 @@ export const useResources = () => {
     const [selectedCategory, setSelectedCategory] = useState('all');
     const { toast } = useToast();
     const { user } = useAuth();
+    const { isAdmin } = useUserRole();
 
     const fetchResources = useCallback(async () => {
         try {
             setLoading(true);
 
-            // Build the query
+            // Build the query - 관리자는 모든 자료, 일반 사용자는 활성화된 자료만
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const query = (supabase as any)
+            let query = (supabase as any)
                 .from('resources')
-                .select('*')
-                .eq('is_active', true)
-                .order('created_at', { ascending: false });
+                .select('*');
+
+            // 관리자가 아닌 경우에만 is_active=true 필터 적용
+            if (!isAdmin) {
+                query = query.eq('is_active', true);
+            }
+
+            query = query.order('created_at', { ascending: false });
 
             const { data, error } = await query;
 
@@ -77,7 +84,7 @@ export const useResources = () => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [isAdmin]);
 
     useEffect(() => {
         fetchResources();
