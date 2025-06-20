@@ -13,28 +13,68 @@ const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isA
   const { getReplies, createReply, updateReply, deleteReply } = useInquiries();
   const [replies, setReplies] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
   const [replyText, setReplyText] = React.useState('');
   const [editingId, setEditingId] = React.useState(null);
 
   React.useEffect(() => {
     if (canView) {
-      setLoading(true);
-      getReplies(inquiryId).then(setReplies).finally(() => setLoading(false));
+      loadReplies();
     }
-  }, [inquiryId, canView, getReplies]);
+  }, [inquiryId, canView]);
+
+  const loadReplies = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getReplies(inquiryId);
+      setReplies(data || []);
+    } catch (err) {
+      console.error('Error loading replies:', err);
+      setError('답변을 불러오는데 실패했습니다.');
+      setReplies([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCreateReply = async () => {
     if (!replyText.trim()) return;
     try {
       await createReply(inquiryId, replyText);
       setReplyText('');
-      const updatedReplies = await getReplies(inquiryId);
-      setReplies(updatedReplies);
+      await loadReplies();
       if (onRefetch) {
         await onRefetch();
       }
     } catch (error) {
       console.error('Error creating reply:', error);
+      setError('답변 등록에 실패했습니다.');
+    }
+  };
+
+  const handleUpdateReply = async (replyId: string, content: string) => {
+    try {
+      await updateReply(replyId, content);
+      setEditingId(null);
+      setReplyText('');
+      await loadReplies();
+    } catch (error) {
+      console.error('Error updating reply:', error);
+      setError('답변 수정에 실패했습니다.');
+    }
+  };
+
+  const handleDeleteReply = async (replyId: string) => {
+    try {
+      await deleteReply(replyId);
+      await loadReplies();
+      if (onRefetch) {
+        await onRefetch();
+      }
+    } catch (error) {
+      console.error('Error deleting reply:', error);
+      setError('답변 삭제에 실패했습니다.');
     }
   };
 
@@ -44,6 +84,16 @@ const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isA
     <div className="mt-4 md:mt-6">
       {loading ? (
         <div className="text-gray-400 text-sm md:text-base">답변 불러오는 중...</div>
+      ) : error ? (
+        <div className="text-red-500 text-sm md:text-base">
+          {error}
+          <button
+            onClick={loadReplies}
+            className="ml-2 text-blue-600 hover:underline"
+          >
+            다시 시도
+          </button>
+        </div>
       ) : (
         <>
           {replies.length === 0 ? (
@@ -98,13 +148,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isA
                       {editingId === reply.id ? (
                         <>
                           <button
-                            onClick={async () => {
-                              await updateReply(reply.id, replyText);
-                              setEditingId(null);
-                              setReplyText('');
-                              const updatedReplies = await getReplies(inquiryId);
-                              setReplies(updatedReplies);
-                            }}
+                            onClick={() => handleUpdateReply(reply.id, replyText)}
                             className="text-blue-600 text-xs px-2 py-1 hover:bg-blue-100 rounded"
                           >
                             저장
@@ -125,14 +169,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isA
                             수정
                           </button>
                           <button
-                            onClick={async () => {
-                              await deleteReply(reply.id);
-                              const updatedReplies = await getReplies(inquiryId);
-                              setReplies(updatedReplies);
-                              if (onRefetch) {
-                                await onRefetch();
-                              }
-                            }}
+                            onClick={() => handleDeleteReply(reply.id)}
                             className="text-red-600 text-xs px-2 py-1 hover:bg-red-100 rounded"
                           >
                             삭제
