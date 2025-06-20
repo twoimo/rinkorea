@@ -21,7 +21,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isA
       setLoading(true);
       getReplies(inquiryId).then(setReplies).finally(() => setLoading(false));
     }
-  }, [inquiryId, canView]);
+  }, [inquiryId, canView, getReplies]);
 
   const handleCreateReply = async () => {
     if (!replyText.trim()) return;

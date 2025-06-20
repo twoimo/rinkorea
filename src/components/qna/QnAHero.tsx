@@ -4,7 +4,7 @@ import { Plus, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface QnAHeroProps {
-  user: any;
+  user: { id: string } | null;
   setShowForm: (show: boolean) => void;
 }
 

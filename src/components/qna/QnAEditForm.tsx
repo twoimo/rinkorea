@@ -20,7 +20,7 @@ interface Inquiry {
 interface QnAEditFormProps {
   inquiry: Inquiry;
   onClose: () => void;
-  onSave: (id: string, data: any) => Promise<{ data?: any; error?: any }>;
+  onSave: (id: string, data: { name: string; email: string; phone: string; title: string; content: string; is_private: boolean }) => Promise<{ data?: Inquiry; error?: Error }>;
   onRefetch: () => Promise<void>;
 }
 
@@ -48,7 +48,7 @@ const QnAEditForm: React.FC<QnAEditFormProps> = ({
       content: editFormData.content,
       is_private: editFormData.is_private
     });
-    
+
     if (!result.error) {
       await onRefetch();
       onClose();

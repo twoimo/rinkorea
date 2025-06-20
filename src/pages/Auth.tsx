@@ -167,8 +167,11 @@ const Auth = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 flex items-center justify-center"
+                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 flex items-center justify-center cursor-pointer transition-colors"
                 aria-label={isLogin ? '로그인' : '회원가입'}
+                onClick={(e) => {
+                  console.log('로그인/회원가입 버튼 클릭됨', { isLogin, loading });
+                }}
               >
                 {loading ? (
                   "처리 중..."
@@ -183,11 +186,13 @@ const Auth = () => {
 
             <div className="mt-6 text-center">
               <button
+                type="button"
                 onClick={() => {
+                  console.log('모드 전환 버튼 클릭됨');
                   setIsLogin(!isLogin);
                   setPassword(''); // 모드 변경 시 비밀번호 초기화
                 }}
-                className="text-blue-600 hover:text-blue-700 text-sm"
+                className="text-blue-600 hover:text-blue-700 text-sm cursor-pointer transition-colors"
                 aria-label={isLogin ? '회원가입으로 전환' : '로그인으로 전환'}
               >
                 {isLogin ? '계정이 없으신가요? 회원가입' : '이미 계정이 있으신가요? 로그인'}

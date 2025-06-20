@@ -5,7 +5,7 @@ import { MessageCircle, Plus } from 'lucide-react';
 interface QnAEmptyStateProps {
   searchTerm: string;
   selectedStatus: string;
-  user: any;
+  user: { id: string } | null;
   setShowForm: (show: boolean) => void;
 }
 

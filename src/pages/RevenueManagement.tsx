@@ -7,7 +7,7 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { useRevenue } from '@/hooks/useRevenue';
 import RevenueDashboard from '@/components/revenue/RevenueDashboard';
 import { GridLayout, ChartConfig } from '@/types/revenue';
-import AdminOnly from '@/components/AdminOnly';
+
 import RevenueChart from '@/components/revenue/RevenueChart';
 
 // Lazy load 컴포넌트들 - 초기 로딩 성능 개선
@@ -225,7 +225,7 @@ const RevenueManagement = () => {
         setActiveTab(tab as 'dashboard' | 'charts' | 'input' | 'manage');
     }, []);
 
-    if (roleLoading) {
+    if (roleLoading || !isAdmin) {
         return (
             <div className="min-h-screen bg-gray-50">
                 <Header />
@@ -238,163 +238,161 @@ const RevenueManagement = () => {
     }
 
     return (
-        <AdminOnly>
-            <div className="min-h-screen bg-gray-50">
-                <Header />
+        <div className="min-h-screen bg-gray-50">
+            <Header />
 
-                {/* Hero Section - 모바일 최적화 */}
-                <section className="bg-gradient-to-r from-blue-900 to-purple-900 text-white py-8 sm:py-12">
-                    <div className="container mx-auto px-4">
-                        <div className="text-center">
-                            <div className="flex items-center justify-center mb-4">
-                                <Coins className="w-8 h-8 sm:w-12 sm:h-12 mr-2 sm:mr-3" />
-                                <h1 className="text-2xl sm:text-4xl font-bold">매출 관리</h1>
+            {/* Hero Section - 모바일 최적화 */}
+            <section className="bg-gradient-to-r from-blue-900 to-purple-900 text-white py-8 sm:py-12">
+                <div className="container mx-auto px-4">
+                    <div className="text-center">
+                        <div className="flex items-center justify-center mb-4">
+                            <Coins className="w-8 h-8 sm:w-12 sm:h-12 mr-2 sm:mr-3" />
+                            <h1 className="text-2xl sm:text-4xl font-bold">매출 관리</h1>
+                        </div>
+                        <p className="text-sm sm:text-xl max-w-2xl mx-auto px-4">
+                            데이터 기반의 매출 분석과 시각화로 비즈니스 인사이트를 얻어보세요
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <main className="container mx-auto px-4 py-4 sm:py-8 pb-20">
+                {/* 탭 네비게이션 */}
+                <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
+
+                {/* 에러 상태 표시 */}
+                {error && !loading && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                        <div className="flex items-center">
+                            <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                                <span className="text-red-600 text-sm">⚠️</span>
                             </div>
-                            <p className="text-sm sm:text-xl max-w-2xl mx-auto px-4">
-                                데이터 기반의 매출 분석과 시각화로 비즈니스 인사이트를 얻어보세요
-                            </p>
+                            <div>
+                                <h4 className="text-red-800 font-medium">데이터 로딩 오류</h4>
+                                <p className="text-red-700 text-sm">{error}</p>
+                            </div>
                         </div>
                     </div>
-                </section>
+                )}
 
-                <main className="container mx-auto px-4 py-4 sm:py-8 pb-20">
-                    {/* 탭 네비게이션 */}
-                    <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
+                {/* 필터 및 제어 패널 - 모바일 최적화 */}
+                <div className="bg-white rounded-lg border p-3 sm:p-6 mb-4 sm:mb-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                            {/* 빠른 기간 선택 버튼들 */}
+                            <QuickDateButtons onDateRangeChange={setQuickDateRange} />
 
-                    {/* 에러 상태 표시 */}
-                    {error && !loading && (
-                        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                            <div className="flex items-center">
-                                <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-3">
-                                    <span className="text-red-600 text-sm">⚠️</span>
-                                </div>
-                                <div>
-                                    <h4 className="text-red-800 font-medium">데이터 로딩 오류</h4>
-                                    <p className="text-red-700 text-sm">{error}</p>
-                                </div>
+                            {/* 날짜 선택 */}
+                            <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                                <span className="font-medium text-gray-700 text-sm sm:text-base">기간:</span>
+                                <input
+                                    type="date"
+                                    value={dateRange.start}
+                                    onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+                                    className="border rounded px-2 py-1 text-sm"
+                                />
+                                <span className="text-gray-500">~</span>
+                                <input
+                                    type="date"
+                                    value={dateRange.end}
+                                    onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+                                    className="border rounded px-2 py-1 text-sm"
+                                />
                             </div>
                         </div>
-                    )}
 
-                    {/* 필터 및 제어 패널 - 모바일 최적화 */}
-                    <div className="bg-white rounded-lg border p-3 sm:p-6 mb-4 sm:mb-8">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                                {/* 빠른 기간 선택 버튼들 */}
-                                <QuickDateButtons onDateRangeChange={setQuickDateRange} />
-
-                                {/* 날짜 선택 */}
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-                                    <span className="font-medium text-gray-700 text-sm sm:text-base">기간:</span>
-                                    <input
-                                        type="date"
-                                        value={dateRange.start}
-                                        onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-                                        className="border rounded px-2 py-1 text-sm"
-                                    />
-                                    <span className="text-gray-500">~</span>
-                                    <input
-                                        type="date"
-                                        value={dateRange.end}
-                                        onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-                                        className="border rounded px-2 py-1 text-sm"
-                                    />
-                                </div>
-                            </div>
-
-                            <button
-                                onClick={exportToCSV}
-                                disabled={revenueData.length === 0}
-                                className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
-                            >
-                                <Download className="w-4 h-4" />
-                                데이터 내보내기
-                            </button>
-                        </div>
+                        <button
+                            onClick={exportToCSV}
+                            disabled={revenueData.length === 0}
+                            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                        >
+                            <Download className="w-4 h-4" />
+                            데이터 내보내기
+                        </button>
                     </div>
+                </div>
 
-                    {/* 탭 컨텐츠 - Suspense로 lazy loading */}
-                    <Suspense fallback={<LoadingSpinner />}>
-                        {activeTab === 'dashboard' && (
-                            <div className="space-y-6 sm:space-y-8">
-                                <RevenueDashboard stats={stats} loading={loading} error={error} />
+                {/* 탭 컨텐츠 - Suspense로 lazy loading */}
+                <Suspense fallback={<LoadingSpinner />}>
+                    {activeTab === 'dashboard' && (
+                        <div className="space-y-6 sm:space-y-8">
+                            <RevenueDashboard stats={stats} loading={loading} error={error} />
 
-                                {/* 기본 차트 */}
-                                {chartData.length > 0 && (
-                                    <div className="bg-white rounded-lg border p-4 sm:p-6">
-                                        <h3 className="text-lg font-semibold mb-4">월별 매출 추이</h3>
-                                        <div className="h-64 sm:h-96">
-                                            <RevenueChart
-                                                data={chartData}
-                                                config={{
-                                                    id: 'overview-chart',
-                                                    type: 'line',
-                                                    title: '',
-                                                    dataKey: 'total',
-                                                    categories: ['total'],
-                                                    aggregation: 'sum',
-                                                    position: { row: 1, col: 1, rowSpan: 1, colSpan: 1 }
-                                                }}
-                                                categories={['total']}
-                                                categoryColors={{ total: '#3B82F6' }}
-                                            />
-                                        </div>
+                            {/* 기본 차트 */}
+                            {chartData.length > 0 && (
+                                <div className="bg-white rounded-lg border p-4 sm:p-6">
+                                    <h3 className="text-lg font-semibold mb-4">월별 매출 추이</h3>
+                                    <div className="h-64 sm:h-96">
+                                        <RevenueChart
+                                            data={chartData}
+                                            config={{
+                                                id: 'overview-chart',
+                                                type: 'line',
+                                                title: '',
+                                                dataKey: 'total',
+                                                categories: ['total'],
+                                                aggregation: 'sum',
+                                                position: { row: 1, col: 1, rowSpan: 1, colSpan: 1 }
+                                            }}
+                                            categories={['total']}
+                                            categoryColors={{ total: '#3B82F6' }}
+                                        />
                                     </div>
-                                )}
-                            </div>
-                        )}
-
-                        {activeTab === 'charts' && (
-                            <ChartAnalysis
-                                data={chartData}
-                                categories={categories}
-                                categoryColors={categoryColors}
-                            />
-                        )}
-
-                        {activeTab === 'input' && (
-                            <DataInput
-                                categories={categories}
-                                onDataSubmit={addBulkRevenueData}
-                                loading={loading}
-                            />
-                        )}
-
-                        {activeTab === 'manage' && (
-                            <DataTable
-                                data={revenueData}
-                                categories={categories}
-                                loading={loading}
-                                onEdit={updateRevenueData}
-                                onDelete={deleteRevenueData}
-                                onBulkDelete={deleteSelectedRevenueData}
-                                onRefresh={() => fetchRevenueData(dateRange)}
-                            />
-                        )}
-                    </Suspense>
-
-                    {/* 데이터가 없을 때 안내 */}
-                    {revenueData.length === 0 && !loading && !error && (
-                        <div className="bg-white rounded-lg border p-8 sm:p-12 text-center">
-                            <Coins className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-gray-400" />
-                            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">매출 데이터가 없습니다</h3>
-                            <p className="text-gray-600 mb-6 text-sm sm:text-base">
-                                데이터 입력 탭에서 매출 정보를 추가하여 분석을 시작해보세요.
-                            </p>
-                            <button
-                                onClick={() => setActiveTab('input')}
-                                className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm sm:text-base"
-                            >
-                                데이터 입력하기
-                            </button>
+                                </div>
+                            )}
                         </div>
                     )}
-                </main>
 
-                <Footer />
-            </div>
-        </AdminOnly>
+                    {activeTab === 'charts' && (
+                        <ChartAnalysis
+                            data={chartData}
+                            categories={categories}
+                            categoryColors={categoryColors}
+                        />
+                    )}
+
+                    {activeTab === 'input' && (
+                        <DataInput
+                            categories={categories}
+                            onDataSubmit={addBulkRevenueData}
+                            loading={loading}
+                        />
+                    )}
+
+                    {activeTab === 'manage' && (
+                        <DataTable
+                            data={revenueData}
+                            categories={categories}
+                            loading={loading}
+                            onEdit={updateRevenueData}
+                            onDelete={deleteRevenueData}
+                            onBulkDelete={deleteSelectedRevenueData}
+                            onRefresh={() => fetchRevenueData(dateRange)}
+                        />
+                    )}
+                </Suspense>
+
+                {/* 데이터가 없을 때 안내 */}
+                {revenueData.length === 0 && !loading && !error && (
+                    <div className="bg-white rounded-lg border p-8 sm:p-12 text-center">
+                        <Coins className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-gray-400" />
+                        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">매출 데이터가 없습니다</h3>
+                        <p className="text-gray-600 mb-6 text-sm sm:text-base">
+                            데이터 입력 탭에서 매출 정보를 추가하여 분석을 시작해보세요.
+                        </p>
+                        <button
+                            onClick={() => setActiveTab('input')}
+                            className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm sm:text-base"
+                        >
+                            데이터 입력하기
+                        </button>
+                    </div>
+                )}
+            </main>
+
+            <Footer />
+        </div>
     );
 };
 

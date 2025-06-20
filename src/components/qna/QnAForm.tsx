@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface QnAFormProps {
   onClose: () => void;
-  onSave: (formData: any) => Promise<{ data?: any; error?: any }>;
+  onSave: (formData: { name: string; email: string; phone: string; title: string; content: string; is_private: boolean }) => Promise<{ data?: unknown; error?: Error }>;
   onRefetch: () => Promise<void>;
 }
 

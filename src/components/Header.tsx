@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useProfile } from '@/hooks/useProfile';
-import { OptimizedImage } from '@/components/ui/image';
+
 import { cn } from '@/lib/utils';
 
 const Header = () => {
@@ -46,6 +46,7 @@ const Header = () => {
     { name: '시험성적서/인증', path: '/certificates' },
     { name: '고객상담', path: '/qna' },
     { name: '공지사항', path: '/news' },
+    { name: '자료실', path: '/resources' },
     { name: '연락처', path: '/contact' },
   ];
 
@@ -75,19 +76,16 @@ const Header = () => {
 
   return (
     <header className={cn(
-      "sticky top-0 z-50 transition-colors duration-200",
+      "sticky top-0 z-[100] transition-colors duration-200",
       shouldBeTransparent ? "bg-transparent" : "bg-white shadow-md"
     )}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           <Link to="/" className="flex items-center">
-            <OptimizedImage
+            <img
               src={shouldBeTransparent ? "/images/rin-korea-logo-white.png" : "/images/rin-korea-logo-black.png"}
               alt="린코리아 로고"
               className="h-8 sm:h-10 w-auto transition-all duration-200"
-              loadingClassName="bg-transparent"
-              errorClassName="bg-transparent"
-              skipOptimization
             />
           </Link>
 
@@ -135,7 +133,7 @@ const Header = () => {
                   </span>
                 </button>
                 {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-[110]">
                     {isAdmin && (
                       <>
                         <Link
@@ -175,17 +173,24 @@ const Header = () => {
                 )}
               </div>
             ) : (
-              <Link
-                to="/auth"
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('로그인 버튼 클릭됨');
+                  navigate('/auth');
+                }}
                 className={cn(
-                  "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                  "px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer relative z-10 touch-manipulation",
                   shouldBeTransparent
                     ? "bg-white/20 text-white hover:bg-white/30"
                     : "bg-blue-600 hover:bg-blue-700 text-white"
                 )}
+                style={{ pointerEvents: 'auto' }}
               >
                 로그인
-              </Link>
+              </button>
             )}
           </div>
 
@@ -206,7 +211,7 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="xl:hidden border-t bg-white fixed inset-x-0 top-[4rem] sm:top-[5rem] bottom-0 z-40">
+          <div className="xl:hidden border-t bg-white fixed inset-x-0 top-[4rem] sm:top-[5rem] bottom-0 z-[90]">
             <nav className="h-full overflow-y-auto pb-20">
               {navItems.map((item) => (
                 <Link
@@ -267,13 +272,20 @@ const Header = () => {
                     </button>
                   </div>
                 ) : (
-                  <Link
-                    to="/auth"
-                    className="block bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg text-base font-medium transition-colors text-center mx-2 touch-manipulation"
-                    onClick={() => setIsMenuOpen(false)}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('모바일 로그인 버튼 클릭됨');
+                      navigate('/auth');
+                      setIsMenuOpen(false);
+                    }}
+                    className="block bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg text-base font-medium transition-colors text-center mx-2 touch-manipulation cursor-pointer w-full relative z-10"
+                    style={{ pointerEvents: 'auto' }}
                   >
                     로그인
-                  </Link>
+                  </button>
                 )}
               </div>
             </nav>
@@ -284,7 +296,7 @@ const Header = () => {
       {/* Backdrop for user menu */}
       {isUserMenuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-25 z-40"
+          className="fixed inset-0 bg-black bg-opacity-25 z-[80]"
           onClick={() => setIsUserMenuOpen(false)}
         />
       )}

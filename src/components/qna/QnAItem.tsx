@@ -21,9 +21,9 @@ interface Inquiry {
 
 interface QnAItemProps {
   inquiry: Inquiry;
-  user: any;
+  user: { id: string } | null;
   onEdit: (id: string) => void;
-  onDelete: (id: string) => Promise<any>;
+  onDelete: (id: string) => Promise<{ error?: Error; success?: boolean }>;
   onRefetch: () => Promise<void>;
 }
 

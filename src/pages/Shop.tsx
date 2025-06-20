@@ -48,7 +48,7 @@ const Shop = () => {
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
   const [hiddenProductIds, setHiddenProductIds] = useState<string[]>([]);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
-  
+
   const gridOptions = [
     { value: 2, label: '2 x 2' },
     { value: 3, label: '3 x 3' },
@@ -90,7 +90,7 @@ const Shop = () => {
       setLoading(false);
     };
     fetchProducts();
-    
+
     const fetchGrid = async () => {
       setGridLoading(true);
       const { data, error } = await (supabase as unknown as SupabaseClient)
@@ -175,18 +175,18 @@ const Shop = () => {
     setFormValues(product ? { ...product } : {});
     setShowForm(true);
   };
-  
+
   const closeForm = () => {
     setShowForm(false);
     setEditingProduct(null);
     setFormValues({});
   };
-  
+
   const openDeleteConfirm = (product: Product) => {
     setDeleteTarget(product);
     setShowDeleteConfirm(true);
   };
-  
+
   const closeDeleteConfirm = () => {
     setDeleteTarget(null);
     setShowDeleteConfirm(false);
@@ -340,7 +340,7 @@ const Shop = () => {
     return getSortedProducts().filter(p => !hiddenProductIds.includes(p.id));
   };
 
-  const handleFormValueChange = (key: keyof Product, value: any) => {
+  const handleFormValueChange = (key: keyof Product, value: unknown) => {
     setFormValues(v => ({ ...v, [key]: value }));
   };
 

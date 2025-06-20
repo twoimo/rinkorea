@@ -10,7 +10,7 @@ interface QnAFiltersProps {
   setSelectedStatus: (status: string) => void;
   showForm: boolean;
   setShowForm: (show: boolean) => void;
-  user: any;
+  user: { id: string } | null;
 }
 
 const QnAFilters: React.FC<QnAFiltersProps> = ({

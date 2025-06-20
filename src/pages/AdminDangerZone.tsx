@@ -20,9 +20,7 @@ const AdminDangerZone = () => {
     const [confirmNews, setConfirmNews] = useState('');
     const [confirmUsers, setConfirmUsers] = useState('');
     const [confirmNotice, setConfirmNotice] = useState('');
-    const [confirmProduct, setConfirmProduct] = useState('');
-    const [confirmOrder, setConfirmOrder] = useState('');
-    const [confirmUser, setConfirmUser] = useState('');
+
     const [modal, setModal] = useState<{ open: boolean; action: null | (() => void); message: string }>({ open: false, action: null, message: '' });
     const [backupSize, setBackupSize] = useState<number | null>(null);
     const [importing, setImporting] = useState(false);
@@ -204,11 +202,15 @@ const AdminDangerZone = () => {
     const backupWarning = backupSize && backupSize > 400 * MB
         ? '⚠️ 데이터 용량이 400MB를 초과했습니다. Supabase 무료 플랜(500MB) 임박! 백업을 강력히 권장합니다.'
         : '';
-    const backupSizeText = backupSize !== null
-        ? backupSize > MB
-            ? `${(backupSize / MB).toFixed(2)} MB`
-            : `${(backupSize / 1024).toFixed(2)} KB`
-        : '';
+
+    let backupSizeText = '';
+    if (backupSize !== null) {
+        if (backupSize > MB) {
+            backupSizeText = `${(backupSize / MB).toFixed(2)} MB`;
+        } else {
+            backupSizeText = `${(backupSize / 1024).toFixed(2)} KB`;
+        }
+    }
 
     if (roleLoading || !isAdmin) return null;
     return (
@@ -221,28 +223,28 @@ const AdminDangerZone = () => {
                     <div className="bg-white p-6 rounded shadow border border-yellow-200">
                         <h2 className="text-lg font-bold text-yellow-700 mb-2">고객상담 게시판 비밀글 처리</h2>
                         <p className="mb-2 text-sm text-gray-700">모든 공개 문의글을 비밀글로 변경합니다.</p>
-                        <input type="text" className="border px-2 py-1 rounded mr-2" placeholder='"private" 입력' value={confirmQnA} onChange={e => setConfirmQnA(e.target.value)} />
+                        <input type="text" className="border px-2 py-1 rounded mr-2" placeholder='"private" 입력' value={confirmQnA} onChange={(e) => setConfirmQnA(e.target.value)} />
                         <button onClick={() => openModal('정말로 모든 문의글을 비밀글 처리하시겠습니까?', handleMakeAllPrivate)} disabled={loading} className="bg-yellow-600 text-white px-4 py-2 rounded disabled:opacity-50">비밀글 처리</button>
                     </div>
                     {/* 고객상담 초기화 */}
                     <div className="bg-white p-6 rounded shadow border border-red-200">
                         <h2 className="text-lg font-bold text-red-700 mb-2">고객상담 게시판 초기화</h2>
                         <p className="mb-2 text-sm text-gray-700">모든 문의글과 답변이 영구 삭제됩니다. 복구 불가!</p>
-                        <input type="text" className="border px-2 py-1 rounded mr-2" placeholder='"qna" 입력' value={confirmQnA} onChange={e => setConfirmQnA(e.target.value)} />
+                        <input type="text" className="border px-2 py-1 rounded mr-2" placeholder='"qna" 입력' value={confirmQnA} onChange={(e) => setConfirmQnA(e.target.value)} />
                         <button onClick={() => openModal('정말로 고객상담 게시판을 초기화하시겠습니까?', handleResetQnA)} disabled={loading} className="bg-red-600 text-white px-4 py-2 rounded disabled:opacity-50">초기화</button>
                     </div>
                     {/* 공지사항 초기화 */}
                     <div className="bg-white p-6 rounded shadow border border-red-200">
                         <h2 className="text-lg font-bold text-red-700 mb-2">공지사항 초기화</h2>
                         <p className="mb-2 text-sm text-gray-700">모든 공지사항이 영구 삭제됩니다. 복구 불가!</p>
-                        <input type="text" className="border px-2 py-1 rounded mr-2" placeholder='"notice" 입력' value={confirmNotice} onChange={e => setConfirmNotice(e.target.value)} />
+                        <input type="text" className="border px-2 py-1 rounded mr-2" placeholder='"notice" 입력' value={confirmNotice} onChange={(e) => setConfirmNotice(e.target.value)} />
                         <button onClick={() => openModal('정말로 공지사항을 초기화하시겠습니까?', handleResetNews)} disabled={loading} className="bg-red-600 text-white px-4 py-2 rounded disabled:opacity-50">초기화</button>
                     </div>
                     {/* 사용자 계정 삭제 */}
                     <div className="bg-white p-6 rounded shadow border border-red-200">
                         <h2 className="text-lg font-bold text-red-700 mb-2">관리자 제외 사용자 계정 전체 삭제</h2>
                         <p className="mb-2 text-sm text-gray-700">관리자 계정을 제외한 모든 사용자 계정이 영구 삭제됩니다. 복구 불가!</p>
-                        <input type="text" className="border px-2 py-1 rounded mr-2" placeholder='"users" 입력' value={confirmUsers} onChange={e => setConfirmUsers(e.target.value)} />
+                        <input type="text" className="border px-2 py-1 rounded mr-2" placeholder='"users" 입력' value={confirmUsers} onChange={(e) => setConfirmUsers(e.target.value)} />
                         <button onClick={() => openModal('정말로 모든 사용자 계정을 삭제하시겠습니까?', handleDeleteUsers)} disabled={loading} className="bg-red-600 text-white px-4 py-2 rounded disabled:opacity-50">전체 삭제</button>
                     </div>
                     {/* 데이터 백업/복원 */}
@@ -277,7 +279,17 @@ const AdminDangerZone = () => {
                             <div className="text-lg font-bold text-red-700 mb-4">경고</div>
                             <div className="mb-6 text-gray-800">{modal.message}</div>
                             <div className="flex gap-4 justify-center">
-                                <button onClick={() => { modal.action && modal.action(); closeModal(); }} className="bg-red-600 text-white px-4 py-2 rounded">확인</button>
+                                <button
+                                    onClick={() => {
+                                        if (modal.action) {
+                                            modal.action();
+                                        }
+                                        closeModal();
+                                    }}
+                                    className="bg-red-600 text-white px-4 py-2 rounded"
+                                >
+                                    확인
+                                </button>
                                 <button onClick={closeModal} className="bg-gray-300 text-gray-700 px-4 py-2 rounded">취소</button>
                             </div>
                         </div>

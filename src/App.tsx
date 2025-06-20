@@ -20,6 +20,7 @@ const Projects = lazy(() => import("./pages/Projects"));
 const Certificates = lazy(() => import("./pages/Certificates"));
 const QnA = lazy(() => import("./pages/QnA"));
 const News = lazy(() => import("./pages/News"));
+const Resources = lazy(() => import("./pages/Resources"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Shop = lazy(() => import("./pages/Shop"));
@@ -108,6 +109,7 @@ const App = () => {
                       <Route path="/certificates" element={<Certificates />} />
                       <Route path="/qna" element={<QnA />} />
                       <Route path="/news" element={<News />} />
+                      <Route path="/resources" element={<Resources />} />
                       <Route path="/contact" element={<Contact />} />
                       <Route path="/auth" element={<Auth />} />
                       <Route path="/shop" element={<Shop />} />
