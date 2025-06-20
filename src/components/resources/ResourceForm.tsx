@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { X, Upload, FileText } from 'lucide-react';
+import { X, FileText, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import type { Resource, ResourceCategory } from '@/hooks/useResources';
@@ -18,6 +17,60 @@ interface ResourceFormProps {
     onClose: () => void;
     loading?: boolean;
 }
+
+// 파일 확장자와 MIME 타입 매핑
+const FILE_TYPE_MAP: Record<string, string> = {
+    // Documents
+    'pdf': 'application/pdf',
+    'doc': 'application/msword',
+    'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'xls': 'application/vnd.ms-excel',
+    'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'ppt': 'application/vnd.ms-powerpoint',
+    'pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'txt': 'text/plain',
+    'rtf': 'application/rtf',
+
+    // Images
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'png': 'image/png',
+    'gif': 'image/gif',
+    'bmp': 'image/bmp',
+    'webp': 'image/webp',
+    'svg': 'image/svg+xml',
+
+    // Archives
+    'zip': 'application/zip',
+    'rar': 'application/x-rar-compressed',
+    '7z': 'application/x-7z-compressed',
+    'tar': 'application/x-tar',
+    'gz': 'application/gzip',
+
+    // Videos
+    'mp4': 'video/mp4',
+    'avi': 'video/x-msvideo',
+    'mov': 'video/quicktime',
+    'wmv': 'video/x-ms-wmv',
+    'flv': 'video/x-flv',
+    'webm': 'video/webm',
+
+    // Audio
+    'mp3': 'audio/mpeg',
+    'wav': 'audio/wav',
+    'flac': 'audio/flac',
+    'aac': 'audio/aac',
+    'ogg': 'audio/ogg',
+
+    // Others
+    'json': 'application/json',
+    'xml': 'application/xml',
+    'csv': 'text/csv',
+    'html': 'text/html',
+    'css': 'text/css',
+    'js': 'application/javascript',
+    'ts': 'application/typescript'
+};
 
 const ResourceForm: React.FC<ResourceFormProps> = ({
     resource,
@@ -38,7 +91,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
         is_active: true
     });
 
-    const [isDragOver, setIsDragOver] = useState(false);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
 
     useEffect(() => {
         if (resource) {
@@ -50,7 +103,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
                 file_size: resource.file_size || 0,
                 file_type: resource.file_type || '',
                 category: resource.category,
-                is_active: resource.is_active
+                is_active: true // 기본값으로 설정
             });
         }
     }, [resource]);
@@ -62,7 +115,57 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
         }));
     };
 
-    const handleFileUrlChange = (url: string) => {
+    // 파일 확장자에서 MIME 타입 추출
+    const getFileTypeFromExtension = (fileName: string): string => {
+        const extension = fileName.split('.').pop()?.toLowerCase();
+        return extension ? FILE_TYPE_MAP[extension] || 'application/octet-stream' : '';
+    };
+
+    // 파일 크기 가져오기 (HTTP HEAD 요청)
+    const getFileSize = async (url: string): Promise<number> => {
+        try {
+            const response = await fetch(url, { method: 'HEAD' });
+            const contentLength = response.headers.get('content-length');
+            return contentLength ? parseInt(contentLength, 10) : 0;
+        } catch (error) {
+            console.warn('파일 크기를 가져올 수 없습니다:', error);
+            return 0;
+        }
+    };
+
+    // 파일 정보 자동 분석
+    const analyzeFile = async (url: string, fileName: string) => {
+        setIsAnalyzing(true);
+
+        try {
+            // 파일 타입 자동 설정
+            const fileType = getFileTypeFromExtension(fileName);
+            handleInputChange('file_type', fileType);
+
+            // 파일 크기 자동 가져오기
+            const fileSize = await getFileSize(url);
+            handleInputChange('file_size', fileSize);
+
+            if (fileSize === 0) {
+                toast({
+                    title: "파일 정보 분석",
+                    description: "파일 크기를 자동으로 가져올 수 없습니다. 필요시 수동으로 입력해주세요.",
+                    variant: "default"
+                });
+            }
+        } catch (error) {
+            console.error('파일 분석 오류:', error);
+            toast({
+                title: "파일 분석 실패",
+                description: "파일 정보를 자동으로 분석할 수 없습니다.",
+                variant: "destructive"
+            });
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
+    const handleFileUrlChange = async (url: string) => {
         setFormData(prev => ({
             ...prev,
             file_url: url
@@ -76,33 +179,18 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
                 const fileName = pathname.split('/').pop() || '';
                 if (fileName) {
                     handleInputChange('file_name', fileName);
+                    // 파일 정보 자동 분석
+                    await analyzeFile(url, fileName);
                 }
             } catch (error) {
                 console.error('URL 파싱 오류:', error);
             }
+        } else {
+            // URL이 비어있으면 파일 정보도 초기화
+            handleInputChange('file_name', '');
+            handleInputChange('file_type', '');
+            handleInputChange('file_size', 0);
         }
-    };
-
-    const handleDragOver = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragOver(true);
-    };
-
-    const handleDragLeave = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragOver(false);
-    };
-
-    const handleDrop = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragOver(false);
-
-        // 실제 파일 업로드는 구현하지 않고, 안내 메시지만 표시
-        toast({
-            title: "파일 업로드 안내",
-            description: "파일을 먼저 서버에 업로드한 후 URL을 입력해주세요.",
-            variant: "default"
-        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -218,55 +306,51 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <Label htmlFor="file_type">파일 타입</Label>
+                                    <Label htmlFor="file_type">
+                                        파일 타입
+                                        {isAnalyzing && (
+                                            <Loader2 className="w-3 h-3 animate-spin inline ml-1" />
+                                        )}
+                                    </Label>
                                     <Input
                                         id="file_type"
                                         type="text"
                                         value={formData.file_type}
                                         onChange={(e) => handleInputChange('file_type', e.target.value)}
-                                        placeholder="예: application/pdf"
+                                        placeholder="자동으로 감지됩니다"
+                                        className="bg-gray-50"
+                                        readOnly
                                     />
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        파일 URL 입력 시 자동으로 감지됩니다
+                                    </p>
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="file_size">파일 크기 (bytes)</Label>
+                                    <Label htmlFor="file_size">
+                                        파일 크기 (bytes)
+                                        {isAnalyzing && (
+                                            <Loader2 className="w-3 h-3 animate-spin inline ml-1" />
+                                        )}
+                                    </Label>
                                     <Input
                                         id="file_size"
                                         type="number"
                                         value={formData.file_size}
                                         onChange={(e) => handleInputChange('file_size', parseInt(e.target.value) || 0)}
-                                        placeholder="0"
+                                        placeholder="자동으로 감지됩니다"
+                                        className="bg-gray-50"
+                                        readOnly={formData.file_size > 0}
                                         min="0"
                                     />
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        {formData.file_size > 0
+                                            ? `${(formData.file_size / 1024 / 1024).toFixed(2)} MB`
+                                            : '파일 URL 입력 시 자동으로 감지됩니다'
+                                        }
+                                    </p>
                                 </div>
                             </div>
-                        </div>
-
-                        {/* 파일 업로드 영역 (시각적 안내용) */}
-                        <div
-                            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${isDragOver ? 'border-blue-400 bg-blue-50' : 'border-gray-300'
-                                }`}
-                            onDragOver={handleDragOver}
-                            onDragLeave={handleDragLeave}
-                            onDrop={handleDrop}
-                        >
-                            <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                            <div className="text-gray-600">
-                                <p className="mb-2">파일을 여기에 드래그하거나</p>
-                                <p className="text-sm text-gray-500">
-                                    파일을 먼저 서버에 업로드한 후 위의 URL 필드에 입력해주세요
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* 활성화 상태 */}
-                        <div className="flex items-center space-x-2">
-                            <Switch
-                                id="is_active"
-                                checked={formData.is_active}
-                                onCheckedChange={(checked) => handleInputChange('is_active', checked)}
-                            />
-                            <Label htmlFor="is_active">자료 활성화</Label>
                         </div>
 
                         {/* 제출 버튼 */}
