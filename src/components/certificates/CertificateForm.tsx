@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { useIsMobile } from '../../hooks/use-mobile';
@@ -50,19 +49,19 @@ const CertificateForm: React.FC<CertificateFormProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[110] p-4">
       <div className={`bg-white rounded-lg shadow-lg relative w-full ${isMobile ? 'max-h-[90vh] overflow-y-auto' : 'max-w-lg'}`}>
         <div className="sticky top-0 bg-white border-b p-4 sm:p-6 flex items-center justify-between">
           <h2 className="text-xl sm:text-2xl font-bold">{certificate ? '인증서 수정' : '인증서 추가'}</h2>
-          <button 
-            className="text-gray-400 hover:text-gray-700 p-2 touch-manipulation" 
+          <button
+            className="text-gray-400 hover:text-gray-700 p-2 touch-manipulation"
             onClick={onClose}
             aria-label="닫기"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">이름</label>

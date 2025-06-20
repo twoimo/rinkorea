@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { X, Plus, Save } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -15,7 +14,7 @@ interface ProjectFormProps {
 const ProjectForm: React.FC<ProjectFormProps> = ({ isOpen, editingProject, onClose, onSuccess }) => {
   const { projects, createProject, updateProject } = useProjects();
   const isMobile = useIsMobile();
-  
+
   const [formValues, setFormValues] = useState({
     title: '',
     location: '',
@@ -116,12 +115,11 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ isOpen, editingProject, onClo
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
-      <div className={`bg-white rounded-lg shadow-lg relative ${
-        isMobile 
-          ? 'w-full max-h-[90vh] overflow-y-auto' 
-          : 'w-full max-w-4xl max-h-[90vh]'
-      }`}>
+    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[110] p-4">
+      <div className={`bg-white rounded-lg shadow-lg relative ${isMobile
+        ? 'w-full max-h-[90vh] overflow-y-auto'
+        : 'w-full max-w-4xl max-h-[90vh]'
+        }`}>
         <div className="sticky top-0 bg-white border-b p-4 sm:p-6 flex items-center justify-between">
           <h2 className="text-xl sm:text-2xl font-bold">
             {editingProject ? '프로젝트 수정' : '프로젝트 추가'}
@@ -134,7 +132,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ isOpen, editingProject, onClo
             <X className="w-6 h-6" />
           </button>
         </div>
-        
+
         <ScrollArea className="flex-1 overflow-hidden">
           <form className="p-4 sm:p-6" onSubmit={handleFormSave}>
             <div className={`${isMobile ? 'space-y-4' : 'grid grid-cols-2 gap-6'}`}>

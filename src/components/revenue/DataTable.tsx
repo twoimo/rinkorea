@@ -294,8 +294,8 @@ const Pagination = React.memo(({
                                 key={index}
                                 onClick={() => onPageChange(page as number)}
                                 className={`px-3 py-2 border rounded text-sm transition-colors ${currentPage === page
-                                        ? 'bg-blue-600 text-white border-blue-600'
-                                        : 'hover:bg-gray-50'
+                                    ? 'bg-blue-600 text-white border-blue-600'
+                                    : 'hover:bg-gray-50'
                                     }`}
                             >
                                 {page}
@@ -605,7 +605,7 @@ const DataTable: React.FC<DataTableProps> = ({
 
             {/* 삭제 확인 모달 */}
             {deleteConfirmId && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[110] p-4">
                     <div className="bg-white rounded-lg p-6 w-full max-w-md">
                         <h3 className="text-lg font-semibold mb-4">데이터 삭제</h3>
                         <p className="text-gray-600 mb-6">
@@ -631,7 +631,7 @@ const DataTable: React.FC<DataTableProps> = ({
 
             {/* 데이터 초기화 확인 모달 */}
             {showResetDialog && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[110] p-4">
                     <div className="bg-white rounded-lg p-6 w-full max-w-md">
                         <div className="flex items-center mb-4">
                             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">

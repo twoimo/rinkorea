@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { X } from 'lucide-react';
 
@@ -14,8 +13,8 @@ const ImageModal = ({ isOpen, onClose, imageSrc, imageAlt, imageTitle }: ImageMo
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="relative max-w-4xl max-h-full bg-white rounded-lg overflow-hidden" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black bg-opacity-75 z-[110] flex items-center justify-center p-4" onClick={onClose}>
+      <div className="relative max-w-7xl max-h-full w-full h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between p-4 border-b">
           <h3 className="text-lg font-semibold text-gray-900">{imageTitle}</h3>
           <button
@@ -26,7 +25,7 @@ const ImageModal = ({ isOpen, onClose, imageSrc, imageAlt, imageTitle }: ImageMo
           </button>
         </div>
         <div className="p-4">
-          <img 
+          <img
             src={imageSrc}
             alt={imageAlt}
             className="w-full h-auto max-h-[70vh] object-contain rounded"

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { X, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -25,7 +24,7 @@ const NewsForm: React.FC<NewsFormProps> = ({ onClose, onSave, initialData, isEdi
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title.trim() || !formData.content.trim()) {
       toast({
         title: "필수 항목을 입력해주세요",
@@ -47,8 +46,8 @@ const NewsForm: React.FC<NewsFormProps> = ({ onClose, onSave, initialData, isEdi
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center justify-center z-50 p-0 md:p-4">
-      <div className="bg-white rounded-t-2xl md:rounded-xl w-full md:max-w-4xl md:w-full h-[90vh] md:max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center justify-center z-[110] p-0 md:p-4">
+      <div className="bg-white rounded-t-2xl md:rounded-xl w-full md:max-w-3xl lg:max-w-4xl md:w-full h-[92vh] md:max-h-[85vh] overflow-hidden flex flex-col">
         {/* Header - 모바일 최적화 */}
         <div className="p-4 md:p-6 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center justify-between">
@@ -63,7 +62,7 @@ const NewsForm: React.FC<NewsFormProps> = ({ onClose, onSave, initialData, isEdi
             </button>
           </div>
         </div>
-        
+
         {/* Form - 스크롤 가능한 영역 */}
         <div className="flex-1 overflow-y-auto">
           <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4 md:space-y-6">
@@ -80,7 +79,7 @@ const NewsForm: React.FC<NewsFormProps> = ({ onClose, onSave, initialData, isEdi
                 required
               />
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 내용 <span className="text-red-500">*</span>
@@ -88,13 +87,13 @@ const NewsForm: React.FC<NewsFormProps> = ({ onClose, onSave, initialData, isEdi
               <textarea
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                rows={10}
+                rows={12}
                 className="w-full px-3 md:px-4 py-3 text-sm md:text-base border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
                 placeholder="공지사항 내용을 입력하세요"
                 required
               />
             </div>
-            
+
             <div className="flex items-center">
               <input
                 type="checkbox"

@@ -274,7 +274,7 @@ const AdminDangerZone = () => {
                 </div>
                 {/* 경고/확인 모달 */}
                 {modal.open && (
-                    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+                    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[110]">
                         <div className="bg-white rounded-lg shadow-lg p-8 max-w-xs w-full text-center">
                             <div className="text-lg font-bold text-red-700 mb-4">경고</div>
                             <div className="mb-6 text-gray-800">{modal.message}</div>

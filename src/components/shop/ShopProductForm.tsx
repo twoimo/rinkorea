@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { X } from 'lucide-react';
 
@@ -43,7 +42,7 @@ const ShopProductForm = ({
   onFormValueChange,
 }: ShopProductFormProps) => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-[110] p-4 overflow-y-auto">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-lg my-4 sm:my-0 relative max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white px-6 py-4 border-b flex items-center justify-between">
           <h2 className="text-xl font-bold">{editingProduct ? '상품 수정' : '상품 추가'}</h2>
