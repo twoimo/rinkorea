@@ -14,7 +14,7 @@ const About = () => {
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-6">회사소개</h1>
             <p className="text-xl max-w-2xl mx-auto">
-              건설재료 제조 전문 기업 린코리아는 혁신적인 기술과 품질로 <br />
+              건설재료 제조 전문 기업 린코리아는 혁신적인 기술과 품질로 <br className="hidden sm:block" />
               건설업계의 새로운 기준을 제시합니다.
             </p>
           </div>
