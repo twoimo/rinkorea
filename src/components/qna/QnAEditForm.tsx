@@ -56,7 +56,7 @@ const QnAEditForm: React.FC<QnAEditFormProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120] p-4">
       <div className="bg-white rounded-xl p-4 md:p-6 shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center mb-4 md:mb-6">
           <div className="bg-blue-100 p-2 rounded-lg mr-3">

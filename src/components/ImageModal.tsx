@@ -14,7 +14,7 @@ const ImageModal = ({ isOpen, onClose, imageSrc, imageAlt, imageTitle }: ImageMo
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black bg-opacity-75 z-[120] flex items-center justify-center p-4" onClick={onClose}>
       <div className="relative max-w-4xl max-h-full bg-white rounded-lg overflow-hidden" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between p-4 border-b">
           <h3 className="text-lg font-semibold text-gray-900">{imageTitle}</h3>

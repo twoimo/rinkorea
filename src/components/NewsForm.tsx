@@ -47,7 +47,7 @@ const NewsForm: React.FC<NewsFormProps> = ({ onClose, onSave, initialData, isEdi
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center justify-center z-50 p-0 md:p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center justify-center z-[120] p-0 md:p-4">
       <div className="bg-white rounded-t-2xl md:rounded-xl w-full md:max-w-4xl md:w-full h-[90vh] md:max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header - 모바일 최적화 */}
         <div className="p-4 md:p-6 border-b border-gray-200 flex-shrink-0">

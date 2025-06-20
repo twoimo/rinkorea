@@ -24,7 +24,7 @@ const ShopDeleteModal = ({
   onCancel,
 }: ShopDeleteModalProps) => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120] p-4">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-sm text-center p-6">
         <div className="text-lg font-bold text-red-700 mb-4">상품 삭제</div>
         <div className="mb-6 text-gray-800">
