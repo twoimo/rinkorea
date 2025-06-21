@@ -297,6 +297,186 @@ bun run build
 - **전화**: +82-032-571-1023
 - **주소**: 인천광역시 서구 백범로 707 (주안국가산업단지)
 
+---
+
+## 🚀 향후 계획: AI/LLM 포트폴리오 개발
+
+> **개발 기간**: 2025년 6월 20일 ~ 7월 13일 (24일)  
+> **목표**: MiDS AI/LLM Engineer 포지션을 위한 실무형 AI 플랫폼 구축
+
+### 🎯 **개발 목표**
+
+기존 린코리아 웹사이트에 **최신 AI/LLM 기술을 통합**하여 **실제 비즈니스 가치를 창출하는 AI 플랫폼**으로 확장합니다.
+
+### 🔥 **핵심 AI 기능 (4대 시스템)**
+
+#### 1️⃣ **AI 고객 상담 챗봇**
+```
+🤖 다중 LLM 지원 (OpenAI GPT-4, Anthropic Claude, Google Gemini)
+🔍 RAG 기반 제품 정보 검색 (Vector DB + LangChain)
+🌐 실시간 스트리밍 채팅 (Server-Sent Events)
+🗣️ 다국어 자동 번역 (한/영/중/인도네시아어)
+```
+
+#### 2️⃣ **지능형 Q&A 자동화**
+```
+🕸️ LangGraph 워크플로우 엔진
+📋 문의 자동 분류 및 긴급도 평가
+🤖 컨텍스트 기반 자동 답변 생성
+👨‍💼 인간 전문가 에스컬레이션 시스템
+```
+
+#### 3️⃣ **스마트 견적 시스템**
+```
+📊 AI 기반 프로젝트 조건 분석
+🎯 최적 제품 조합 추천
+📄 자동 견적서 PDF 생성
+💰 ML 기반 가격 예측 모델
+```
+
+#### 4️⃣ **문서 지능 검색 엔진**
+```
+🔍 PDF/이미지 OCR + 의미 기반 검색
+📚 문서 요약 및 Q&A
+🧠 실시간 검색 결과 개선
+📁 카탈로그, 인증서 지능 관리
+```
+
+### 🛠️ **기술 스택 확장**
+
+#### **AI/ML Framework**
+```typescript
+// Backend (Next.js API Routes)
+- LangChain.js: AI 체인 및 워크플로우
+- OpenAI SDK: GPT-4 챗봇 및 임베딩
+- Anthropic SDK: Claude 3.5 Sonnet
+- Google AI SDK: Gemini Pro
+- Vector DB: 메모리 벡터 스토어 / Pinecone 연동
+
+// Frontend (React + TypeScript)
+- Server-Sent Events: 실시간 스트리밍
+- React Streaming: 점진적 UI 업데이트
+- PDF Generation: 클라이언트 사이드 PDF 생성
+```
+
+#### **인프라 및 배포**
+```yaml
+# Vercel 전용 아키텍처
+Platform: Vercel (Serverless Functions)
+Domain: ai.rinkorea.com
+Database: Supabase (기존 활용)
+Monitoring: Vercel Analytics
+CDN: Vercel Edge Network
+```
+
+### 📅 **개발 로드맵**
+
+#### **Week 1 (6/20-6/26): Next.js AI 챗봇**
+- ✅ Vercel 환경 구축 + 다중 LLM API Routes
+- ✅ SSE 스트리밍 실시간 채팅 시스템
+- ✅ LangChain.js RAG 검색 엔진
+- ✅ React 채팅 UI 컴포넌트
+
+#### **Week 2 (6/27-7/3): Edge Functions 워크플로우**
+- ✅ JavaScript 기반 워크플로우 상태 머신
+- ✅ API Routes Q&A 자동화 시스템
+- ✅ Supabase 연동 에스컬레이션
+- ✅ Vercel Analytics 성능 모니터링
+
+#### **Week 3 (7/4-7/10): 스마트 견적 시스템**
+- ✅ AI 견적 생성 API Routes
+- ✅ 클라이언트 사이드 PDF 생성
+- ✅ 제품 추천 알고리즘
+- ✅ 실시간 가격 업데이트
+
+#### **Week 4 (7/11-7/13): 완성 & 배포**
+- ✅ 브라우저 기반 문서 처리
+- ✅ Vercel 최적화 + 성능 테스트
+- ✅ ai.rinkorea.com 완전 배포
+- ✅ MiDS 포트폴리오 완성
+
+### 🏆 **예상 성과 지표**
+
+#### **기술적 성과**
+```
+📈 응답 정확도: 87%+ (RAG 기반)
+⚡ 응답 속도: 평균 2초 이내
+🌍 다국어 지원: 4개 언어
+👥 동시 사용자: 150명+
+🔄 Q&A 자동화율: 73%
+📊 견적 생성 시간: 평균 45초
+```
+
+#### **비즈니스 임팩트**
+```
+⏰ Q&A 처리 시간: 70% 단축
+📋 견적서 생성 시간: 90% 단축
+😊 고객 만족도: 30% 향상
+🚀 업무 효율성: 50% 개선
+```
+
+### 🎨 **핵심 차별화 요소**
+
+#### **1. 실무 중심 포트폴리오**
+- 토이 프로젝트가 아닌 **실제 운영 시스템**
+- B2B 건설/화학 도메인 특화 AI 솔루션
+- 확장 가능한 서버리스 아키텍처
+
+#### **2. 최신 기술 스택 완전 활용**
+- **다중 LLM 지능형 선택**: 작업별 최적 AI 자동 선택
+- **Edge Functions 워크플로우**: 글로벌 성능 최적화
+- **SSE 스트리밍**: WebSocket보다 나은 사용자 경험
+
+#### **3. MiDS 요구사항 100% 충족**
+```
+✅ Python/JavaScript LLM 서비스 개발
+✅ LangChain, LangGraph 프레임워크
+✅ Vector DB + RAG 시스템 구축
+✅ 클라우드 네이티브 아키텍처
+✅ 자연어처리 + 추천 시스템
+```
+
+### 🌐 **최종 AI 플랫폼 구성**
+
+```
+ai.rinkorea.com (Vercel)
+├── 🤖 다중 LLM 채팅 시스템
+├── 🔄 지능형 Q&A 자동화
+├── 💰 스마트 견적 생성
+├── 🔍 문서 AI 검색 엔진
+├── 📊 실시간 성능 모니터링
+└── 📱 모바일 최적화 UI
+
+rinkorea.com (카페24 - 기존 유지)
+└── 🔗 AI 서비스 연결 버튼
+```
+
+### 📚 **상세 개발 가이드**
+
+자세한 구현 방법과 코드는 `roadmaps/` 폴더의 가이드 문서들을 참조하세요:
+
+1. **`Quick_Start_Guide.md`** - Vercel에서 즉시 시작하기
+2. **`Deployment_Strategy_Final.md`** - 최종 배포 전략
+3. **`Multi_LLM_Setup.md`** - 다중 LLM 시스템 구축
+4. **주차별 상세 가이드** - Week1~4 단계별 구현
+
+### 🎯 **성공 목표 (7월 13일)**
+
+**완성될 ai.rinkorea.com:**
+- ✅ **3개 LLM 지원** 실시간 AI 상담
+- ✅ **워크플로우 자동화** Q&A 시스템  
+- ✅ **AI 견적 생성** PDF 출력
+- ✅ **문서 지능 검색** 시맨틱 검색
+- ✅ **성능 모니터링** 실시간 대시보드
+
+**MiDS 포트폴리오 어필 포인트:**
+🔥 **실무급 AI 플랫폼** (실제 비즈니스 연동)  
+🔥 **최신 기술 스택** (Vercel + Next.js 14 + 다중 LLM)  
+🔥 **완성도 높은 UX** (SSE 스트리밍 + 모바일 최적화)  
+🔥 **확장 가능한 아키텍처** (서버리스 + 마이크로서비스)
+
+---
+
 ## 📄 라이센스
 
 이 프로젝트는 린코리아의 소유이며, 상업적 목적으로 사용됩니다.
