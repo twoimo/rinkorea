@@ -268,7 +268,7 @@ Project Settings → Domains → Add ai.rinkorea.com
    └── AI 서비스로 리다이렉션 링크
 ```
 
-### **MiDS 포트폴리오 어필 포인트**
+### **MIDAS 포트폴리오 어필 포인트**
 1. **최신 기술 스택**: Next.js 14 + Edge Functions
 2. **다중 LLM 시스템**: 3개 주요 API 통합
 3. **실제 비즈니스 적용**: 운영 중인 사이트 연동
