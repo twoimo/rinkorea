@@ -302,13 +302,17 @@ bun run build
 ## 🚀 향후 계획: AI/LLM 포트폴리오 개발
 
 > **개발 기간**: 2025년 6월 20일 ~ 7월 13일 (24일)  
-> **목표**: MIDAS AI/LLM Engineer 포지션을 위한 실무형 AI 플랫폼 구축
+> **목표**: AI/LLM Engineer 포지션 및 금융공학연구소 포지션 어필
 
 ### 🎯 **개발 목표**
 
 기존 린코리아 웹사이트에 **최신 AI/LLM 기술을 통합**하여 **실제 비즈니스 가치를 창출하는 AI 플랫폼**으로 확장합니다.
 
-### 🔥 **핵심 AI 기능 (4대 시스템)**
+**🔥 핵심 전문성 증명:**
+- **AI/LLM 개발**: 일반 AI/LLM 개발 역량 + 실무 적용 능력
+- **금융 도메인**: 금융 도메인 특화 + 기계학습 방법론 + LLM 솔루션
+
+### 🔥 **핵심 AI 기능 (5대 시스템)**
 
 #### 1️⃣ **AI 고객 상담 챗봇**
 ```
@@ -342,6 +346,15 @@ bun run build
 📁 카탈로그, 인증서 지능 관리
 ```
 
+#### 5️⃣ **📈 금융 AI 분석 시스템** ⭐ **NEW (금융 특화)**
+```
+💹 매출 데이터 시계열 분석 + 예측 모델
+🤖 LLM 기반 재무 보고서 자동 생성
+📊 기계학습 기반 리스크 평가 모델
+🔍 금융 지표 이상 탐지 시스템
+💰 투자 포트폴리오 최적화 알고리즘
+```
+
 ### 🛠️ **기술 스택 확장**
 
 #### **AI/ML Framework**
@@ -353,10 +366,25 @@ bun run build
 - Google AI SDK: Gemini Pro
 - Vector DB: 메모리 벡터 스토어 / Pinecone 연동
 
-// Frontend (React + TypeScript)
-- Server-Sent Events: 실시간 스트리밍
-- React Streaming: 점진적 UI 업데이트
-- PDF Generation: 클라이언트 사이드 PDF 생성
+// 🔥 금융 AI 추가 (금융 특화)
+- TensorFlow.js: 브라우저 기반 ML 모델
+- D3.js: 금융 데이터 시각화
+- Recharts: 실시간 차트 및 대시보드
+- Statistics.js: 금융 통계 분석
+```
+
+#### **금융 도메인 확장**
+```yaml
+# 금융 데이터 처리
+Financial Data: 매출, 수익, 비용 분석
+Time Series: ARIMA, LSTM 시계열 예측
+Risk Models: VaR, CVaR 리스크 계산
+Portfolio: 마르코위츠 포트폴리오 최적화
+
+# 기계학습 방법론
+ML Models: Random Forest, XGBoost, Neural Networks
+Feature Engineering: 금융 지표 생성 및 선택
+Model Validation: Cross-validation, Backtesting
 ```
 
 #### **인프라 및 배포**
@@ -364,12 +392,12 @@ bun run build
 # Vercel 전용 아키텍처
 Platform: Vercel (Serverless Functions)
 Domain: ai.rinkorea.com
-Database: Supabase (기존 활용)
-Monitoring: Vercel Analytics
+Database: Supabase (기존 + 금융 데이터 확장)
+Monitoring: Vercel Analytics + 금융 모델 성능 추적
 CDN: Vercel Edge Network
 ```
 
-### 📅 **개발 로드맵**
+### 📅 **개발 로드맵 (금융 AI 확장)**
 
 #### **Week 1 (6/20-6/26): Next.js AI 챗봇**
 - ✅ Vercel 환경 구축 + 다중 LLM API Routes
@@ -383,21 +411,21 @@ CDN: Vercel Edge Network
 - ✅ Supabase 연동 에스컬레이션
 - ✅ Vercel Analytics 성능 모니터링
 
-#### **Week 3 (7/4-7/10): 스마트 견적 시스템**
+#### **Week 3 (7/4-7/10): 스마트 견적 + 금융 AI** ⭐
 - ✅ AI 견적 생성 API Routes
 - ✅ 클라이언트 사이드 PDF 생성
-- ✅ 제품 추천 알고리즘
-- ✅ 실시간 가격 업데이트
+- ✅ **금융 데이터 시계열 분석 모델** (금융 특화)
+- ✅ **LLM 기반 재무 리포트 생성** (금융 특화)
 
 #### **Week 4 (7/11-7/13): 완성 & 배포**
 - ✅ 브라우저 기반 문서 처리
-- ✅ Vercel 최적화 + 성능 테스트
+- ✅ **금융 대시보드 + ML 모델 시각화** (금융 특화)
 - ✅ ai.rinkorea.com 완전 배포
-- ✅ MIDAS 포트폴리오 완성
+- ✅ **AI/LLM + 금융 특화 통합 포트폴리오 완성**
 
 ### 🏆 **예상 성과 지표**
 
-#### **기술적 성과**
+#### **기술적 성과 (AI/LLM + 금융 도메인)**
 ```
 📈 응답 정확도: 87%+ (RAG 기반)
 ⚡ 응답 속도: 평균 2초 이내
@@ -405,6 +433,10 @@ CDN: Vercel Edge Network
 👥 동시 사용자: 150명+
 🔄 Q&A 자동화율: 73%
 📊 견적 생성 시간: 평균 45초
+
+💹 금융 예측 정확도: 85%+ (시계열 모델)
+📊 리스크 계산 속도: 실시간 처리
+🤖 재무 보고서 생성: 자동화 90%
 ```
 
 #### **비즈니스 임팩트**
@@ -413,27 +445,39 @@ CDN: Vercel Edge Network
 📋 견적서 생성 시간: 90% 단축
 😊 고객 만족도: 30% 향상
 🚀 업무 효율성: 50% 개선
+
+💰 재무 분석 시간: 80% 단축
+📈 투자 의사결정 속도: 3배 향상
+🔍 리스크 감지 정확도: 40% 개선
 ```
 
 ### 🎨 **핵심 차별화 요소**
 
 #### **1. 실무 중심 포트폴리오**
 - 토이 프로젝트가 아닌 **실제 운영 시스템**
-- B2B 건설/화학 도메인 특화 AI 솔루션
+- **B2B 건설/화학** + **금융 도메인** 이중 전문성
 - 확장 가능한 서버리스 아키텍처
 
 #### **2. 최신 기술 스택 완전 활용**
 - **다중 LLM 지능형 선택**: 작업별 최적 AI 자동 선택
 - **Edge Functions 워크플로우**: 글로벌 성능 최적화
 - **SSE 스트리밍**: WebSocket보다 나은 사용자 경험
+- **브라우저 ML**: TensorFlow.js 실시간 금융 모델
 
-#### **3. MIDAS 요구사항 100% 충족**
+#### **3. AI/LLM + 금융 도메인 요구사항 100% 충족**
 ```
 ✅ Python/JavaScript LLM 서비스 개발
 ✅ LangChain, LangGraph 프레임워크
 ✅ Vector DB + RAG 시스템 구축
 ✅ 클라우드 네이티브 아키텍처
 ✅ 자연어처리 + 추천 시스템
+
+🔥 금융 도메인 추가 (금융 특화)
+✅ 금융 데이터 + 기계학습 방법론
+✅ 대형언어모델(LLM) 솔루션 개발
+✅ 시계열 분석 + 예측 모델
+✅ 리스크 평가 + 포트폴리오 최적화
+✅ 수학/통계/금융공학 백그라운드 증명
 ```
 
 ### 🌐 **최종 AI 플랫폼 구성**
@@ -445,7 +489,12 @@ ai.rinkorea.com (Vercel)
 ├── 💰 스마트 견적 생성
 ├── 🔍 문서 AI 검색 엔진
 ├── 📊 실시간 성능 모니터링
-└── 📱 모바일 최적화 UI
+├── 📱 모바일 최적화 UI
+└── 💹 금융 AI 분석 시스템 ⭐ NEW
+    ├── 매출 예측 대시보드
+    ├── LLM 재무 보고서 생성
+    ├── ML 리스크 평가 모델
+    └── 투자 포트폴리오 시각화
 
 rinkorea.com (카페24 - 기존 유지)
 └── 🔗 AI 서비스 연결 버튼
@@ -458,7 +507,8 @@ rinkorea.com (카페24 - 기존 유지)
 1. **`Quick_Start_Guide.md`** - Vercel에서 즉시 시작하기
 2. **`Deployment_Strategy_Final.md`** - 최종 배포 전략
 3. **`Multi_LLM_Setup.md`** - 다중 LLM 시스템 구축
-4. **주차별 상세 가이드** - Week1~4 단계별 구현
+4. **`Financial_AI_Guide.md`** ⭐ - 금융 AI 시스템 구축 (신규)
+5. **주차별 상세 가이드** - Week1~4 단계별 구현
 
 ### 🎯 **성공 목표 (7월 13일)**
 
@@ -468,14 +518,18 @@ rinkorea.com (카페24 - 기존 유지)
 - ✅ **AI 견적 생성** PDF 출력
 - ✅ **문서 지능 검색** 시맨틱 검색
 - ✅ **성능 모니터링** 실시간 대시보드
+- ✅ **💹 금융 AI 분석** 시계열 예측 + LLM 리포트
 
-**MIDAS 포트폴리오 어필 포인트:**
+**포트폴리오 어필 포인트:**
 🔥 **실무급 AI 플랫폼** (실제 비즈니스 연동)  
 🔥 **최신 기술 스택** (Vercel + Next.js 14 + 다중 LLM)  
 🔥 **완성도 높은 UX** (SSE 스트리밍 + 모바일 최적화)  
-🔥 **확장 가능한 아키텍처** (서버리스 + 마이크로서비스)
+🔥 **확장 가능한 아키텍처** (서버리스 + 마이크로서비스)  
+🔥 **🆕 금융 도메인 전문성** (기계학습 + LLM + 금융공학)
 
----
+**🎯 통합 목표 달성:**
+- **AI/LLM 개발**: 일반 AI/LLM 개발 역량 + 실무 적용
+- **금융 도메인**: 금융 특화 + 기계학습 방법론 + LLM 솔루션
 
 ## 📄 라이센스
 
