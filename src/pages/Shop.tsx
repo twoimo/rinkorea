@@ -254,7 +254,7 @@ const Shop = () => {
       if (result.error) {
         setFormError(result.error.message);
       } else {
-        setFormSuccess('저장되었습니다.');
+        setFormSuccess(t('saved_success', '저장되었습니다.'));
         await refreshProducts();
         setTimeout(() => {
           setShowForm(false);

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { BarChart3, TrendingUp, PieChart, AreaChart, Plus, X, Eye, EyeOff, Maximize2, Package, Target } from 'lucide-react';
 import { ChartData, RevenueCategory } from '@/types/revenue';
 import RevenueChart from './RevenueChart';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ChartAnalysisProps {
     data: ChartData[];
@@ -59,6 +60,8 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
     categories,
     categoryColors
 }) => {
+    const { t } = useLanguage();
+
     // localStorage에서 차트 가시성 상태 로드
     const loadChartVisibility = (): Record<string, boolean> => {
         try {
@@ -577,7 +580,7 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                                         <button
                                             onClick={() => toggleChartVisibility(chart.id)}
                                             className="p-1 text-gray-500 hover:text-gray-700"
-                                            title={chart.visible ? '숨기기' : '보이기'}
+                                            title={chart.visible ? t('hide', '숨기기') : t('show', '보이기')}
                                         >
                                             {chart.visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                                         </button>

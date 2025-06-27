@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,6 +14,7 @@ const Profile = () => {
   const { user, signOut } = useAuth();
   const { profile, loading, updateProfile } = useProfile();
   const { role, isAdmin, loading: roleLoading } = useUserRole();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
 

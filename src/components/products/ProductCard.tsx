@@ -33,7 +33,7 @@ const ProductCard = memo(({
   onToggleHide,
   onViewDetail
 }: ProductCardProps) => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const IconComponent = iconMap[product.icon as keyof typeof iconMap];
 
   if (!IconComponent) {
@@ -76,10 +76,10 @@ const ProductCard = memo(({
                 onToggleHide(product);
               }}
               className={`p-2 rounded-full shadow-lg transition-colors ${isHidden
-                  ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  : 'bg-white text-blue-600 hover:bg-blue-50'
+                ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-white text-blue-600 hover:bg-blue-50'
                 }`}
-              title={isHidden ? "표시하기" : "숨기기"}
+              title={isHidden ? t('product_card_show', '표시하기') : t('product_card_hide', '숨기기')}
             >
               {isHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
             </button>
@@ -89,7 +89,7 @@ const ProductCard = memo(({
                 onEdit(product);
               }}
               className="p-2 bg-white text-green-600 rounded-full hover:bg-green-50 shadow-lg transition-colors"
-              title="편집"
+              title={t('product_card_edit', '편집')}
             >
               <Edit className="w-4 h-4" />
             </button>
@@ -99,7 +99,7 @@ const ProductCard = memo(({
                 onDelete(product);
               }}
               className="p-2 bg-white text-red-600 rounded-full hover:bg-red-50 shadow-lg transition-colors"
-              title="삭제"
+              title={t('product_card_delete', '삭제')}
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -139,7 +139,7 @@ const ProductCard = memo(({
           onClick={() => onViewDetail(product)}
           className="w-full bg-blue-600 text-white py-2 sm:py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm sm:text-base touch-manipulation"
         >
-          자세히 보기
+          {t('product_card_view_detail', '자세히 보기')}
         </button>
       </div>
     </div>

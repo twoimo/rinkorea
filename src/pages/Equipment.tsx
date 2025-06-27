@@ -558,17 +558,17 @@ const Equipment = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('equipment_form_category', '카테고리')}</label>
                                     <select
                                         value={formValues.category || ''}
                                         onChange={(e) => setFormValues({ ...formValues, category: e.target.value })}
                                         className="w-full px-3 py-3 md:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
                                         required
                                     >
-                                        <option value="">선택하세요</option>
-                                        <option value="premium">최신형 콘크리트 연삭기</option>
-                                        <option value="professional">콘크리트 연삭기</option>
-                                        <option value="diatool">다이아툴</option>
+                                        <option value="">{t('select', '선택하세요')}</option>
+                                        <option value="premium">{t('equipment_category_premium', '최신형 콘크리트 연삭기')}</option>
+                                        <option value="professional">{t('equipment_category_professional', '콘크리트 연삭기')}</option>
+                                        <option value="diatool">{t('equipment_category_diatool', '다이아툴')}</option>
                                     </select>
                                 </div>
                                 <div>
@@ -631,14 +631,14 @@ const Equipment = () => {
                                         onClick={closeForm}
                                         className="w-full sm:w-auto px-6 py-3 text-gray-600 hover:text-gray-800 touch-manipulation"
                                     >
-                                        취소
+                                        {t('cancel', '취소')}
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={formLoading}
                                         className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 touch-manipulation"
                                     >
-                                        {formLoading ? '저장 중...' : '저장'}
+                                        {formLoading ? t('saving', '저장 중...') : t('save', '저장')}
                                     </button>
                                 </div>
                             </form>
