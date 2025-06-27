@@ -96,7 +96,7 @@ const QnAItem: React.FC<QnAItemProps> = ({ inquiry, user, onEdit, onDelete, onRe
               )}
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">{inquiry.title}</h3>
-            <div className="flex items-center text-sm text-gray-500 space-x-4">
+            <div className="flex items-center text-sm text-gray-500 space-x-4 flex-wrap">
               <div className="flex items-center">
                 <User className="w-4 h-4 mr-1" />
                 <span>{inquiry.profiles?.name || inquiry.name || t('anonymous', '익명')}</span>
@@ -105,43 +105,33 @@ const QnAItem: React.FC<QnAItemProps> = ({ inquiry, user, onEdit, onDelete, onRe
                 <Calendar className="w-4 h-4 mr-1" />
                 <span>{formatDate(inquiry.created_at)}</span>
               </div>
-            </div>
 
-            {/* 관리자 전용 연락처 정보 */}
-            {isAdmin && (inquiry.email || inquiry.phone) && (
-              <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <div className="text-xs font-medium text-yellow-800 mb-2">
-                  <Shield className="w-3 h-3 inline mr-1" />
-                  관리자 전용 연락처 정보
+              {/* 관리자 전용 연락처 정보 - 같은 행에 표시 */}
+              {isAdmin && inquiry.email && (
+                <div className="flex items-center px-2 py-1 bg-yellow-100 rounded text-yellow-800">
+                  <Mail className="w-3 h-3 mr-1" />
+                  <span className="font-mono text-xs">{inquiry.email}</span>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(inquiry.email || '')}
+                    className="ml-1 text-xs px-1 py-0.5 bg-yellow-200 text-yellow-900 rounded hover:bg-yellow-300 transition-colors"
+                  >
+                    복사
+                  </button>
                 </div>
-                <div className="flex flex-col space-y-1 text-sm text-yellow-700">
-                  {inquiry.email && (
-                    <div className="flex items-center">
-                      <Mail className="w-3 h-3 mr-2" />
-                      <span className="font-mono">{inquiry.email}</span>
-                      <button
-                        onClick={() => navigator.clipboard.writeText(inquiry.email || '')}
-                        className="ml-2 text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 transition-colors"
-                      >
-                        복사
-                      </button>
-                    </div>
-                  )}
-                  {inquiry.phone && (
-                    <div className="flex items-center">
-                      <Phone className="w-3 h-3 mr-2" />
-                      <span className="font-mono">{inquiry.phone}</span>
-                      <button
-                        onClick={() => navigator.clipboard.writeText(inquiry.phone || '')}
-                        className="ml-2 text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 transition-colors"
-                      >
-                        복사
-                      </button>
-                    </div>
-                  )}
+              )}
+              {isAdmin && inquiry.phone && (
+                <div className="flex items-center px-2 py-1 bg-yellow-100 rounded text-yellow-800">
+                  <Phone className="w-3 h-3 mr-1" />
+                  <span className="font-mono text-xs">{inquiry.phone}</span>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(inquiry.phone || '')}
+                    className="ml-1 text-xs px-1 py-0.5 bg-yellow-200 text-yellow-900 rounded hover:bg-yellow-300 transition-colors"
+                  >
+                    복사
+                  </button>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           {canEdit && (
