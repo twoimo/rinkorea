@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { Resource } from '@/hooks/useResources';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -26,6 +27,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     onToggleStatus
 }) => {
     const { isAdmin } = useUserRole();
+    const { t } = useLanguage();
     const [isDownloading, setIsDownloading] = useState(false);
 
     const getCategoryColor = (category: string) => {
@@ -76,6 +78,12 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
         }
     };
 
+    const handleDelete = () => {
+        if (onDelete && confirm(t('resources_delete_confirm', '정말로 이 자료를 삭제하시겠습니까?'))) {
+            onDelete(resource.id);
+        }
+    };
+
     // 리스트 뷰 렌더링
     if (viewMode === 'list') {
         return (
@@ -97,7 +105,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                         </Badge>
                                         {!resource.is_active && isAdmin && (
                                             <Badge variant="secondary" className="bg-gray-200 text-gray-600 text-xs">
-                                                숨김
+                                                {t('hidden', '숨김')}
                                             </Badge>
                                         )}
                                     </div>
@@ -115,7 +123,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                         )}
                                         <span className="flex items-center">
                                             <Download className="w-3 h-3 mr-1" />
-                                            {resource.download_count}회
+                                            {resource.download_count}{t('download_count_suffix', '회')}
                                         </span>
                                         <span>
                                             {formatDistanceToNow(new Date(resource.created_at), {
@@ -136,7 +144,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                         size="sm"
                                         onClick={() => onToggleStatus?.(resource.id, !resource.is_active)}
                                         className="h-10 w-10 p-0 touch-manipulation"
-                                        title={resource.is_active ? "자료 숨기기" : "자료 보이기"}
+                                        title={resource.is_active ? t('hide', '자료 숨기기') : t('show', '자료 보이기')}
                                     >
                                         {resource.is_active ? (
                                             <EyeOff className="w-4 h-4 text-gray-600" />
@@ -149,14 +157,16 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                         size="sm"
                                         onClick={() => onEdit?.(resource)}
                                         className="h-10 w-10 p-0 touch-manipulation"
+                                        title={t('edit', '수정')}
                                     >
                                         <Edit className="w-4 h-4 text-blue-600" />
                                     </Button>
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() => onDelete?.(resource.id)}
+                                        onClick={handleDelete}
                                         className="h-10 w-10 p-0 touch-manipulation"
+                                        title={t('delete', '삭제')}
                                     >
                                         <Trash2 className="w-4 h-4 text-red-600" />
                                     </Button>
@@ -170,13 +180,13 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                 {isDownloading ? (
                                     <>
                                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                        <span className="hidden sm:inline">다운로드 중...</span>
-                                        <span className="sm:hidden">처리중...</span>
+                                        <span className="hidden sm:inline">{t('downloading', '다운로드 중...')}</span>
+                                        <span className="sm:hidden">{t('processing', '처리중...')}</span>
                                     </>
                                 ) : (
                                     <>
                                         <Download className="w-4 h-4 mr-2" />
-                                        다운로드
+                                        {t('resources_download', '다운로드')}
                                     </>
                                 )}
                             </Button>
@@ -205,7 +215,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                     </Badge>
                                     {!resource.is_active && isAdmin && (
                                         <Badge variant="secondary" className="bg-gray-200 text-gray-600 text-xs">
-                                            숨김
+                                            {t('hidden', '숨김')}
                                         </Badge>
                                     )}
                                 </div>
@@ -220,7 +230,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                 size="sm"
                                 onClick={() => onToggleStatus?.(resource.id, !resource.is_active)}
                                 className="h-8 w-8 md:h-10 md:w-10 p-0 touch-manipulation"
-                                title={resource.is_active ? "자료 숨기기" : "자료 보이기"}
+                                title={resource.is_active ? t('hide', '자료 숨기기') : t('show', '자료 보이기')}
                             >
                                 {resource.is_active ? (
                                     <EyeOff className="w-4 h-4 text-gray-600" />
@@ -233,14 +243,16 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                 size="sm"
                                 onClick={() => onEdit?.(resource)}
                                 className="h-8 w-8 md:h-10 md:w-10 p-0 touch-manipulation"
+                                title={t('edit', '수정')}
                             >
                                 <Edit className="w-4 h-4 text-blue-600" />
                             </Button>
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => onDelete?.(resource.id)}
+                                onClick={handleDelete}
                                 className="h-8 w-8 md:h-10 md:w-10 p-0 touch-manipulation"
+                                title={t('delete', '삭제')}
                             >
                                 <Trash2 className="w-4 h-4 text-red-600" />
                             </Button>
@@ -272,7 +284,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                             </span>
                             <span className="flex items-center flex-shrink-0 ml-2">
                                 <Download className="w-3 h-3 mr-1" />
-                                {resource.download_count}회
+                                {resource.download_count}{t('download_count_suffix', '회')}
                             </span>
                         </div>
                     </div>
@@ -288,12 +300,12 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                     {isDownloading ? (
                         <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            다운로드 중...
+                            {t('downloading', '다운로드 중...')}
                         </>
                     ) : (
                         <>
                             <Download className="w-4 h-4 mr-2" />
-                            다운로드
+                            {t('resources_download', '다운로드')}
                         </>
                     )}
                 </Button>

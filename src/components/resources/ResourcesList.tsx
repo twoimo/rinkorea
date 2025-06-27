@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import ResourceCard from './ResourceCard';
 import type { Resource, ResourceCategory } from '@/hooks/useResources';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ResourcesListProps {
     resources: Resource[];
@@ -26,6 +27,7 @@ const ResourcesList: React.FC<ResourcesListProps> = ({
     onDelete,
     onToggleStatus
 }) => {
+    const { t } = useLanguage();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -58,7 +60,7 @@ const ResourcesList: React.FC<ResourcesListProps> = ({
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                         <Input
                             type="text"
-                            placeholder="자료명, 설명, 파일명으로 검색..."
+                            placeholder={t('search_resources', '자료명, 설명, 파일명으로 검색...')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-10 text-base md:text-sm h-12 md:h-10"
@@ -71,10 +73,10 @@ const ResourcesList: React.FC<ResourcesListProps> = ({
                             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                                 <SelectTrigger className="w-full h-12 md:h-10 text-base md:text-sm">
                                     <Filter className="w-4 h-4 mr-2 flex-shrink-0" />
-                                    <SelectValue placeholder="카테고리" />
+                                    <SelectValue placeholder={t('resources_form_category', '카테고리')} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">전체 카테고리</SelectItem>
+                                    <SelectItem value="all">{t('all_categories', '전체 카테고리')}</SelectItem>
                                     {categories.map((category) => (
                                         <SelectItem key={category.id} value={category.name}>
                                             {category.name}
@@ -92,7 +94,7 @@ const ResourcesList: React.FC<ResourcesListProps> = ({
                                 className="rounded-r-none flex-1 sm:flex-none h-12 md:h-10 text-base md:text-sm touch-manipulation"
                             >
                                 <Grid className="w-4 h-4 mr-2 sm:mr-0" />
-                                <span className="sm:hidden">격자</span>
+                                <span className="sm:hidden">{t('grid_view', '격자')}</span>
                             </Button>
                             <Button
                                 variant={viewMode === 'list' ? 'default' : 'ghost'}
@@ -101,7 +103,7 @@ const ResourcesList: React.FC<ResourcesListProps> = ({
                                 className="rounded-l-none flex-1 sm:flex-none h-12 md:h-10 text-base md:text-sm touch-manipulation"
                             >
                                 <List className="w-4 h-4 mr-2 sm:mr-0" />
-                                <span className="sm:hidden">목록</span>
+                                <span className="sm:hidden">{t('list_view', '목록')}</span>
                             </Button>
                         </div>
                     </div>
@@ -109,9 +111,9 @@ const ResourcesList: React.FC<ResourcesListProps> = ({
 
                 {/* 결과 카운트 */}
                 <div className="mt-4 text-sm text-gray-600">
-                    총 {filteredResources.length}개의 자료가 있습니다
+                    {t('total_resources_count', '총 {{count}}개의 자료가 있습니다', { count: filteredResources.length })}
                     {searchTerm && (
-                        <span> ('{searchTerm}' 검색 결과)</span>
+                        <span> ({t('search_results_for', "'{{term}' 검색 결과", { term: searchTerm })})</span>
                     )}
                 </div>
             </div>
@@ -121,8 +123,8 @@ const ResourcesList: React.FC<ResourcesListProps> = ({
                 <div className="text-center py-12 md:py-20">
                     <div className="text-gray-400 mb-4">
                         <Filter className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4" />
-                        <h3 className="text-lg md:text-xl font-semibold mb-2">자료가 없습니다</h3>
-                        <p className="text-sm md:text-base">검색 조건을 변경하거나 다른 카테고리를 확인해보세요.</p>
+                        <h3 className="text-lg md:text-xl font-semibold mb-2">{t('no_resources_found', '자료가 없습니다')}</h3>
+                        <p className="text-sm md:text-base">{t('try_different_filter', '검색 조건을 변경하거나 다른 카테고리를 확인해보세요.')}</p>
                     </div>
                 </div>
             ) : (

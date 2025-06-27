@@ -309,8 +309,23 @@ const translations = {
         resources_file_type_doc: 'DOC',
         resources_file_type_image: '이미지',
         resources_file_type_other: '기타',
+        search_resources: '자료 검색...',
+        all_categories: '전체 카테고리',
+        download_count: '다운로드',
+        hide: '숨기기',
+        show: '보이기',
+        grid_view: '격자',
+        list_view: '목록',
+        total_resources_count: '총 {{count}}개의 자료가 있습니다',
+        search_results_for: "'{{term}' 검색 결과",
+        no_resources_found: '자료가 없습니다',
+        try_different_filter: '검색 조건을 변경하거나 다른 카테고리를 확인해보세요.',
+        hidden: '숨김',
+        download_count_suffix: '회',
+        downloading: '다운로드 중...',
+        processing: '처리중...',
 
-        // Shop
+        // Shop Page
         shop_delete_title: '제품 삭제',
 
         // Shop Additional
@@ -640,8 +655,23 @@ const translations = {
         resources_file_type_doc: 'DOC',
         resources_file_type_image: 'Image',
         resources_file_type_other: 'Other',
+        search_resources: 'Search resources...',
+        all_categories: 'All Categories',
+        download_count: 'Downloads',
+        hide: 'Hide',
+        show: 'Show',
+        grid_view: 'Grid View',
+        list_view: 'List View',
+        total_resources_count: 'Total {{count}} resources found',
+        search_results_for: "'{{term}' Search Results",
+        no_resources_found: 'No resources found',
+        try_different_filter: 'Try different filters or explore different categories',
+        hidden: 'Hidden',
+        download_count_suffix: 'times',
+        downloading: 'Downloading...',
+        processing: 'Processing...',
 
-        // Shop
+        // Shop Page
         shop_delete_title: 'Delete Product',
 
         // Shop Additional
@@ -992,12 +1022,27 @@ const translations = {
         resources_file_type_doc: 'DOC',
         resources_file_type_image: '图片',
         resources_file_type_other: '其他',
+        search_resources: '搜索资料...',
+        all_categories: '全部类别',
+        download_count: '下载次数',
+        hide: '隐藏',
+        show: '显示',
+        grid_view: '网格',
+        list_view: '列表',
+        total_resources_count: '共有{{count}}个资料',
+        search_results_for: "'{{term}}'搜索结果",
+        no_resources_found: '没有找到资料',
+        try_different_filter: '尝试更改搜索条件或查看其他类别。',
+        hidden: '已隐藏',
+        download_count_suffix: '次',
+        downloading: '下载中...',
+        processing: '处理中...',
 
-        // Shop
+        // Shop Page
         shop_delete_title: '删除产品',
 
         // Shop Additional
-        shop_sort_popularity: '热门',
+        shop_sort_popularity: '人气',
         shop_sort_discount: '折扣',
         shop_sort_sales: '销量',
         shop_sort_reviews: '评论',
