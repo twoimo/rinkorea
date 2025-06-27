@@ -1,10 +1,10 @@
-
 import React, { useState, useCallback, memo, Suspense } from 'react';
 import { Plus } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useProductsOptimized } from '@/hooks/useProductsOptimized';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Product } from '@/types/product';
 
@@ -25,6 +25,7 @@ LoadingFallback.displayName = 'LoadingFallback';
 
 const Products = memo(() => {
   const { isAdmin } = useUserRole();
+  const { t } = useLanguage();
   const {
     visibleProducts,
     hiddenProductIds,
@@ -100,15 +101,15 @@ const Products = memo(() => {
       if (result?.error) {
         setFormError(result.error.message || 'An error occurred');
       } else {
-        setFormSuccess(editingProduct ? '제품이 수정되었습니다.' : '제품이 추가되었습니다.');
+        setFormSuccess(editingProduct ? t('products_save_success', '제품이 수정되었습니다.') : t('products_add_success', '제품이 추가되었습니다.'));
         setTimeout(handleCloseForm, 1500);
       }
     } catch (err) {
-      setFormError('오류가 발생했습니다.');
+      setFormError(t('products_error_occurred', '오류가 발생했습니다.'));
     } finally {
       setFormLoading(false);
     }
-  }, [editingProduct, updateProduct, createProduct, handleCloseForm]);
+  }, [editingProduct, updateProduct, createProduct, handleCloseForm, t]);
 
   const handleDelete = useCallback(async () => {
     if (!deleteTarget) return;

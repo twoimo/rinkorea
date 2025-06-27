@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useProjects, type Project } from '@/hooks/useProjects';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -17,6 +17,7 @@ const Projects = () => {
   const { projects, loading, deleteProject } = useProjects();
   const { isAdmin } = useUserRole();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const isMobile = useIsMobile();
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState<string | null>(null);
@@ -83,19 +84,19 @@ const Projects = () => {
   };
 
   const handleDeleteProject = async (id: string) => {
-    if (!window.confirm('정말로 이 프로젝트를 삭제하시겠습니까?')) return;
+    if (!window.confirm(t('projects_delete_confirm', '정말로 이 프로젝트를 삭제하시겠습니까?'))) return;
 
     const { error } = await deleteProject(id);
     if (error) {
       toast({
-        title: 'Error',
-        description: '프로젝트 삭제에 실패했습니다.',
+        title: t('error', 'Error'),
+        description: t('projects_delete_error', '프로젝트 삭제에 실패했습니다.'),
         variant: 'destructive'
       });
     } else {
       toast({
-        title: 'Success',
-        description: '프로젝트가 삭제되었습니다.'
+        title: t('success', 'Success'),
+        description: t('projects_delete_success', '프로젝트가 삭제되었습니다.')
       });
     }
   };

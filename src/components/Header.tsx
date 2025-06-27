@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, LogOut, Settings, AlertTriangle, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useProfile } from '@/hooks/useProfile';
+import { LanguageSelector } from '@/components/ui/language-selector';
 
 import { cn } from '@/lib/utils';
 
@@ -15,6 +17,7 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { t } = useLanguage();
   const { toast } = useToast();
   const { isAdmin } = useUserRole();
   const { profile } = useProfile();
@@ -37,30 +40,30 @@ const Header = () => {
   }, [isHomePage]);
 
   const navItems = [
-    { name: '홈', path: '/' },
-    { name: '회사소개', path: '/about' },
-    { name: '제품소개', path: '/products' },
-    { name: '건설기계소개', path: '/equipment' },
-    { name: '온라인 스토어', path: '/shop' },
-    { name: '시공사례', path: '/projects' },
-    { name: '시험성적서/인증', path: '/certificates' },
-    { name: '고객상담', path: '/qna' },
-    { name: '공지사항', path: '/news' },
-    { name: '자료실', path: '/resources' },
-    { name: '연락처', path: '/contact' },
+    { name: t('home'), path: '/' },
+    { name: t('about'), path: '/about' },
+    { name: t('products'), path: '/products' },
+    { name: t('equipment'), path: '/equipment' },
+    { name: t('shop'), path: '/shop' },
+    { name: t('projects'), path: '/projects' },
+    { name: t('certificates'), path: '/certificates' },
+    { name: t('qna'), path: '/qna' },
+    { name: t('news'), path: '/news' },
+    { name: t('resources'), path: '/resources' },
+    { name: t('contact'), path: '/contact' },
   ];
 
   const handleSignOut = async () => {
     const { error } = await signOut();
     if (error) {
       toast({
-        title: "로그아웃 실패",
+        title: t('error', '로그아웃 실패'),
         description: "다시 시도해주세요.",
         variant: "destructive"
       });
     } else {
       toast({
-        title: "로그아웃 완료",
+        title: t('success', '로그아웃 완료'),
         description: "안전하게 로그아웃되었습니다."
       });
       navigate('/');
@@ -114,6 +117,12 @@ const Header = () => {
 
           {/* Desktop User Menu */}
           <div className="hidden lg:flex items-center space-x-4">
+            {/* Language Selector */}
+            <LanguageSelector
+              className="mr-2"
+              isTransparent={shouldBeTransparent}
+            />
+
             {user ? (
               <div className="relative">
                 <button
@@ -129,7 +138,7 @@ const Header = () => {
                 >
                   <User className="w-4 h-4 mr-2" />
                   <span className="hidden xl:inline">
-                    {isAdmin ? '관리자' : (profile?.name || '사용자')}
+                    {isAdmin ? t('admin') : (profile?.name || t('user'))}
                   </span>
                 </button>
                 {isUserMenuOpen && (
@@ -142,7 +151,7 @@ const Header = () => {
                           onClick={() => setIsUserMenuOpen(false)}
                         >
                           <BarChart3 className="w-4 h-4 mr-3" />
-                          매출 관리
+                          {t('revenue_management')}
                         </Link>
                         <Link
                           to="/admin/danger"
@@ -150,7 +159,7 @@ const Header = () => {
                           onClick={() => setIsUserMenuOpen(false)}
                         >
                           <AlertTriangle className="w-4 h-4 mr-3" />
-                          관리자 위험구역
+                          {t('admin_danger_zone')}
                         </Link>
                       </>
                     )}
@@ -160,14 +169,14 @@ const Header = () => {
                       onClick={() => setIsUserMenuOpen(false)}
                     >
                       <Settings className="w-4 h-4 mr-3" />
-                      프로필 설정
+                      {t('profile_settings')}
                     </Link>
                     <button
                       onClick={handleSignOut}
                       className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       <LogOut className="w-4 h-4 mr-3" />
-                      로그아웃
+                      {t('logout')}
                     </button>
                   </div>
                 )}
@@ -189,7 +198,7 @@ const Header = () => {
                 )}
                 style={{ pointerEvents: 'auto' }}
               >
-                로그인
+                {t('login')}
               </button>
             )}
           </div>
@@ -225,12 +234,20 @@ const Header = () => {
                 </Link>
               ))}
 
+              {/* Mobile Language Selector */}
+              <div className="px-4 py-3 border-t mt-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">Language:</span>
+                  <LanguageSelector />
+                </div>
+              </div>
+
               {/* Mobile User Section */}
               <div className="pt-4 border-t mt-4 mx-2">
                 {user ? (
                   <div className="space-y-3">
                     <div className="px-4 py-2 text-sm text-gray-600 font-medium">
-                      {isAdmin ? '관리자 계정' : '환영합니다!'}
+                      {isAdmin ? t('admin_account') : t('welcome')}
                     </div>
                     {isAdmin && (
                       <>
@@ -240,7 +257,7 @@ const Header = () => {
                           onClick={() => setIsMenuOpen(false)}
                         >
                           <BarChart3 className="w-5 h-5 mr-3" />
-                          매출 관리
+                          {t('revenue_management')}
                         </Link>
                         <Link
                           to="/admin/danger"
@@ -248,7 +265,7 @@ const Header = () => {
                           onClick={() => setIsMenuOpen(false)}
                         >
                           <AlertTriangle className="w-5 h-5 mr-3" />
-                          관리자 위험구역
+                          {t('admin_danger_zone')}
                         </Link>
                       </>
                     )}
@@ -258,7 +275,7 @@ const Header = () => {
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <Settings className="w-5 h-5 mr-3" />
-                      프로필 설정
+                      {t('profile_settings')}
                     </Link>
                     <button
                       onClick={() => {
@@ -268,7 +285,7 @@ const Header = () => {
                       className="w-full flex items-center px-4 py-3 text-base text-gray-700 hover:text-blue-900 hover:bg-gray-50 rounded-lg transition-colors touch-manipulation"
                     >
                       <LogOut className="w-5 h-5 mr-3" />
-                      로그아웃
+                      {t('logout')}
                     </button>
                   </div>
                 ) : (
@@ -284,7 +301,7 @@ const Header = () => {
                     className="block bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg text-base font-medium transition-colors text-center mx-2 touch-manipulation cursor-pointer w-full relative z-10"
                     style={{ pointerEvents: 'auto' }}
                   >
-                    로그인
+                    {t('login')}
                   </button>
                 )}
               </div>

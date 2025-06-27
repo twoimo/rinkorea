@@ -1,52 +1,55 @@
 import React from 'react';
 import { Shield, Leaf, Award, CheckCircle, Factory, Zap } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const FeaturesSection = () => {
+  const { t } = useLanguage();
+
   const features = [
     {
       icon: <Shield className="w-6 h-6 sm:w-8 sm:h-8" />,
-      title: "불연재 인증",
-      description: "안전한 순수 무기질 세라믹 코팅제",
+      title: t('feature_fire_resistant_title'),
+      description: t('feature_fire_resistant_desc'),
       color: "from-blue-500 to-blue-600",
       bgColor: "bg-blue-50",
       textColor: "text-blue-600"
     },
     {
       icon: <Leaf className="w-6 h-6 sm:w-8 sm:h-8" />,
-      title: "친환경 마감 공법",
-      description: "환경을 생각하는 친환경적인 1액형 신소재 세라믹 코팅마감",
+      title: t('feature_eco_friendly_title'),
+      description: t('feature_eco_friendly_desc'),
       color: "from-green-500 to-green-600",
       bgColor: "bg-green-50",
       textColor: "text-green-600"
     },
     {
       icon: <Award className="w-6 h-6 sm:w-8 sm:h-8" />,
-      title: "우수한 품질",
-      description: "다양한 시험성적서와 인증, 1000여 곳 이상의 현장 적용을 통해 검증된 품질",
+      title: t('feature_quality_title'),
+      description: t('feature_quality_desc'),
       color: "from-orange-500 to-orange-600",
       bgColor: "bg-orange-50",
       textColor: "text-orange-600"
     },
     {
       icon: <Factory className="w-6 h-6 sm:w-8 sm:h-8" />,
-      title: "산업용 적용",
-      description: "다양한 건설 현장에서 검증된 신뢰성",
+      title: t('feature_industrial_title'),
+      description: t('feature_industrial_desc'),
       color: "from-gray-500 to-gray-600",
       bgColor: "bg-gray-50",
       textColor: "text-gray-600"
     },
     {
       icon: <Zap className="w-6 h-6 sm:w-8 sm:h-8" />,
-      title: "공기 단축",
-      description: "콘크리트 폴리싱의 단계를 획기적으로 단축시켜 간편하고 신속한 시공 가능",
+      title: t('feature_time_saving_title'),
+      description: t('feature_time_saving_desc'),
       color: "from-yellow-500 to-yellow-600",
       bgColor: "bg-yellow-50",
       textColor: "text-yellow-600"
     },
     {
       icon: <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8" />,
-      title: "검증된 성능",
-      description: "엄격한 품질 테스트를 통과한 제품",
+      title: t('feature_verified_title'),
+      description: t('feature_verified_desc'),
       color: "from-purple-500 to-purple-600",
       bgColor: "bg-purple-50",
       textColor: "text-purple-600"
@@ -66,11 +69,11 @@ const FeaturesSection = () => {
         {/* Section Header */}
         <div className="text-center mb-12 sm:mb-16 max-w-3xl mx-auto">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-4 sm:mb-6 leading-tight">
-            린코리아만의
-            <span className="text-red-600"> 특별함</span>
+            {t('features_title')}
+            <span className="text-red-600"> {t('features_title_highlight')}</span>
           </h2>
           <p className="text-lg sm:text-xl text-gray-600 leading-relaxed px-4">
-            최고 품질의 세라믹 코팅제로 안전하고 친환경적인 건설환경을 만들어갑니다
+            {t('features_subtitle')}
           </p>
         </div>
 

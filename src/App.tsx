@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import { StagewiseToolbar } from "@stagewise/toolbar-react";
 import { ReactPlugin } from "@stagewise-plugins/react";
 import { createPortal } from "react-dom";
@@ -97,30 +98,32 @@ const App = () => {
             <Toaster />
             <Sonner />
             <AuthProvider>
-              <BrowserRouter>
-                <div className="min-h-screen flex flex-col bg-background">
-                  <Suspense fallback={<PageLoader />}>
-                    <Routes>
-                      <Route path="/" element={<Index />} />
-                      <Route path="/about" element={<About />} />
-                      <Route path="/products" element={<Products />} />
-                      <Route path="/equipment" element={<Equipment />} />
-                      <Route path="/projects" element={<Projects />} />
-                      <Route path="/certificates" element={<Certificates />} />
-                      <Route path="/qna" element={<QnA />} />
-                      <Route path="/news" element={<News />} />
-                      <Route path="/resources" element={<Resources />} />
-                      <Route path="/contact" element={<Contact />} />
-                      <Route path="/auth" element={<Auth />} />
-                      <Route path="/shop" element={<Shop />} />
-                      <Route path="/profile" element={<Profile />} />
-                      <Route path="/admin/danger" element={<AdminDangerZone />} />
-                      <Route path="/revenue-management" element={<RevenueManagement />} />
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </Suspense>
-                </div>
-              </BrowserRouter>
+              <LanguageProvider>
+                <BrowserRouter>
+                  <div className="min-h-screen flex flex-col bg-background">
+                    <Suspense fallback={<PageLoader />}>
+                      <Routes>
+                        <Route path="/" element={<Index />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/products" element={<Products />} />
+                        <Route path="/equipment" element={<Equipment />} />
+                        <Route path="/projects" element={<Projects />} />
+                        <Route path="/certificates" element={<Certificates />} />
+                        <Route path="/qna" element={<QnA />} />
+                        <Route path="/news" element={<News />} />
+                        <Route path="/resources" element={<Resources />} />
+                        <Route path="/contact" element={<Contact />} />
+                        <Route path="/auth" element={<Auth />} />
+                        <Route path="/shop" element={<Shop />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/admin/danger" element={<AdminDangerZone />} />
+                        <Route path="/revenue-management" element={<RevenueManagement />} />
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </Suspense>
+                  </div>
+                </BrowserRouter>
+              </LanguageProvider>
             </AuthProvider>
           </div>
         </TooltipProvider>

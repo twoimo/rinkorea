@@ -3,6 +3,20 @@ import { supabase } from '../integrations/supabase/client';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Product } from '@/types/product';
 
+// 언어별 컬럼을 포함한 전체 선택 쿼리
+const SELECT_COLUMNS = `
+  *,
+  name_ko,
+  name_en, 
+  name_zh,
+  description_ko,
+  description_en,
+  description_zh,
+  features_ko,
+  features_en,
+  features_zh
+`;
+
 export const useProductsOptimized = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [hiddenProductIds, setHiddenProductIds] = useState<string[]>([]);
@@ -14,7 +28,7 @@ export const useProductsOptimized = () => {
       setError(null);
       const { data, error: fetchError } = await (supabase as unknown as SupabaseClient)
         .from('product_introductions')
-        .select('*')
+        .select(SELECT_COLUMNS)
         .eq('is_active', true)
         .order('created_at', { ascending: true });
 
@@ -91,7 +105,7 @@ export const useProductsOptimized = () => {
       const { data, error } = await (supabase as unknown as SupabaseClient)
         .from('product_introductions')
         .insert([insertPayload])
-        .select('*');
+        .select(SELECT_COLUMNS);
 
       if (error) {
         console.error('Supabase error:', error);
@@ -125,7 +139,7 @@ export const useProductsOptimized = () => {
         .from('product_introductions')
         .update(payload)
         .eq('id', productId)
-        .select('*');
+        .select(SELECT_COLUMNS);
 
       if (error) throw error;
 

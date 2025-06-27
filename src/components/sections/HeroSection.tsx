@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 const HeroSection = () => {
   const { isAdmin } = useUserRole();
+  const { t } = useLanguage();
   const [youtubeLink, setYoutubeLink] = useState('https://www.youtube.com/embed/W6ACoEMN3-0?autoplay=1&mute=1&controls=0&loop=1&playlist=W6ACoEMN3-0&showinfo=0&rel=0&modestbranding=1');
   const [editLink, setEditLink] = useState('');
   const [loading, setLoading] = useState(false);
@@ -61,10 +63,10 @@ const HeroSection = () => {
         setResult('error:' + error.message);
       } else {
         setYoutubeLink(embedUrl);
-        setResult('success:유튜브 링크가 저장되었습니다.');
+        setResult('success:' + t('hero_save_success'));
       }
     } catch (e) {
-      setResult('error:' + (e.message || e));
+      setResult('error:' + ((e as Error).message || e));
     }
     setLoading(false);
   };
@@ -103,10 +105,10 @@ const HeroSection = () => {
             <div className="mb-8">
               <div className="flex flex-nowrap gap-2 sm:gap-4">
                 <div className="bg-yellow-400 text-black px-2 sm:px-3 py-2 rounded-full text-xs sm:text-sm font-bold tracking-wider shadow-lg text-left whitespace-nowrap">
-                  특허 제10-2312833호
+                  {t('hero_patent')}
                 </div>
                 <div className="bg-yellow-400 text-black px-2 sm:px-3 py-2 rounded-full text-xs sm:text-sm font-bold tracking-wider shadow-lg text-left whitespace-nowrap">
-                  상표 제40-1678504호
+                  {t('hero_trademark')}
                 </div>
               </div>
             </div>
@@ -114,11 +116,11 @@ const HeroSection = () => {
             {/* Main Heading */}
             <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-6 sm:mb-8 leading-tight">
               <span className="text-white drop-shadow-2xl block">
-                친환경 불연재(1액형)
+                {t('hero_title_line1')}
               </span>
               <div className="h-2 sm:h-4"></div>
               <span className="text-blue-400 drop-shadow-2xl block">
-                신소재 세라믹 코팅제
+                {t('hero_title_line2')}
               </span>
             </h1>
 
@@ -128,21 +130,21 @@ const HeroSection = () => {
                 to="/contact"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 sm:px-8 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg touch-manipulation text-base sm:text-lg"
               >
-                제품 문의하기
+                {t('hero_inquiry_btn')}
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 to="/shop"
                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-4 sm:px-8 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg touch-manipulation text-base sm:text-lg"
               >
-                제품 구매하기
+                {t('hero_purchase_btn')}
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 to="/projects"
                 className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-6 py-4 sm:px-8 rounded-lg font-semibold transition-colors flex items-center justify-center shadow-lg touch-manipulation text-base sm:text-lg"
               >
-                시공사례 보기
+                {t('hero_projects_btn')}
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
@@ -156,25 +158,25 @@ const HeroSection = () => {
           <div className="absolute top-24 right-4 z-20 bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-xl shadow-xl max-w-xs sm:max-w-md border">
             <div className="mb-3 font-bold text-gray-900 flex items-center gap-2 text-sm sm:text-base">
               <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" style={{ display: loading ? 'inline' : 'none' }} />
-              메인 유튜브 영상 링크 수정
+              {t('hero_admin_youtube_edit')}
             </div>
             <input
               type="text"
               className="border border-gray-300 px-3 py-2 rounded-lg w-full text-xs sm:text-sm focus:ring-2 focus:ring-blue-400 mb-2"
               value={editLink}
               onChange={e => setEditLink(e.target.value)}
-              placeholder="유튜브 영상 주소 입력"
+              placeholder={t('hero_youtube_placeholder')}
               disabled={loading}
             />
             <div className="text-xs text-gray-600 mb-3 font-mono break-all">
-              변환된 embed 주소: <span>{embedPreview}</span>
+              {t('hero_embed_preview')} <span>{embedPreview}</span>
             </div>
             <button
               onClick={handleSaveYoutubeLink}
               disabled={loading || !editLink}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg disabled:opacity-50 transition-colors font-semibold text-sm touch-manipulation"
             >
-              {loading ? (<span className="flex items-center gap-2 justify-center"><Loader2 className="w-4 h-4 animate-spin" /> 저장 중...</span>) : '저장'}
+              {loading ? (<span className="flex items-center gap-2 justify-center"><Loader2 className="w-4 h-4 animate-spin" /> {t('hero_saving')}</span>) : t('hero_save_btn')}
             </button>
             {result && (
               <div className={`flex items-center gap-2 text-xs mt-2 ${result.startsWith('success:') ? 'text-green-700' : 'text-red-600'}`}>

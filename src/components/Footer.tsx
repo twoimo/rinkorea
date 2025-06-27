@@ -1,58 +1,61 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { OptimizedImage } from '@/components/ui/image';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Footer = () => {
+  const { t } = useLanguage();
+
   return (
     <footer className="bg-gray-900 text-white mt-auto w-full">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold text-white">회사 정보</h3>
+            <h3 className="text-xl font-bold text-white">{t('footer_company_info')}</h3>
             <div className="space-y-2">
               <p className="text-gray-300 flex items-center">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                인천광역시 서구 백범로 707 <br /> (주안국가산업단지)
+                {t('footer_address')}
               </p>
               <p className="text-gray-300 flex items-center">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                사업자등록번호: 747-42-00526
+                {t('footer_business_number')}
               </p>
             </div>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold text-white">메뉴 안내</h3>
+            <h3 className="text-xl font-bold text-white">{t('footer_quick_links')}</h3>
             <ul className="space-y-3">
               <li>
                 <Link to="/about" className="text-gray-300 hover:text-white transition-colors flex items-center group">
                   <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-white transition-colors"></span>
-                  회사소개
+                  {t('about')}
                 </Link>
               </li>
               <li>
                 <Link to="/products" className="text-gray-300 hover:text-white transition-colors flex items-center group">
                   <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-white transition-colors"></span>
-                  제품소개
+                  {t('products')}
                 </Link>
               </li>
               <li>
                 <Link to="/projects" className="text-gray-300 hover:text-white transition-colors flex items-center group">
                   <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-white transition-colors"></span>
-                  시공사례
+                  {t('projects')}
                 </Link>
               </li>
               <li>
                 <Link to="/contact" className="text-gray-300 hover:text-white transition-colors flex items-center group">
                   <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-white transition-colors"></span>
-                  고객센터
+                  {t('contact')}
                 </Link>
               </li>
             </ul>
@@ -60,7 +63,7 @@ const Footer = () => {
 
           {/* Contact Info */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold text-white">고객센터</h3>
+            <h3 className="text-xl font-bold text-white">{t('footer_customer_service')}</h3>
             <div className="space-y-2">
               <p className="text-gray-300 flex items-center">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,7 +82,7 @@ const Footer = () => {
 
           {/* Social Links */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold text-white">소셜 미디어</h3>
+            <h3 className="text-xl font-bold text-white">{t('footer_social_media')}</h3>
             <div className="flex space-x-6">
               <a
                 href="https://www.instagram.com/rinkorea_kr"
@@ -129,7 +132,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-700 mt-12 pt-8 text-center">
           <p className="text-gray-400 text-sm">
-            © 2025 린코리아. All rights reserved.
+            {t('footer_copyright')}
           </p>
         </div>
       </div>

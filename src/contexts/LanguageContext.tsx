@@ -1,0 +1,639 @@
+import React, { createContext, useContext, useEffect, useState } from 'react';
+
+export type Language = 'ko' | 'en' | 'zh';
+
+interface LanguageContextType {
+    language: Language;
+    setLanguage: (lang: Language) => void;
+    t: (key: string, fallback?: string) => string;
+}
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+// 기본 번역 데이터
+const translations = {
+    ko: {
+        // Navigation
+        home: '홈',
+        about: '회사소개',
+        products: '제품소개',
+        equipment: '건설기계소개',
+        shop: '온라인 스토어',
+        projects: '시공사례',
+        certificates: '시험성적서/인증',
+        qna: '고객상담',
+        news: '공지사항',
+        resources: '자료실',
+        contact: '연락처',
+
+        // User menu
+        admin: '관리자',
+        user: '사용자',
+        revenue_management: '매출 관리',
+        admin_danger_zone: '관리자 위험구역',
+        profile_settings: '프로필 설정',
+        login: '로그인',
+        logout: '로그아웃',
+        welcome: '환영합니다!',
+        admin_account: '관리자 계정',
+
+        // Hero Section
+        hero_patent: '특허 제10-2312833호',
+        hero_trademark: '상표 제40-1678504호',
+        hero_title_line1: '친환경 불연재(1액형)',
+        hero_title_line2: '신소재 세라믹 코팅제',
+        hero_inquiry_btn: '제품 문의하기',
+        hero_purchase_btn: '제품 구매하기',
+        hero_projects_btn: '시공사례 보기',
+        hero_admin_youtube_edit: '메인 유튜브 영상 링크 수정',
+        hero_youtube_placeholder: '유튜브 영상 주소 입력',
+        hero_embed_preview: '변환된 embed 주소:',
+        hero_save_btn: '저장',
+        hero_saving: '저장 중...',
+        hero_save_success: '유튜브 링크가 저장되었습니다.',
+
+        // Features Section
+        features_title: '린코리아만의',
+        features_title_highlight: '특별함',
+        features_subtitle: '최고 품질의 세라믹 코팅제로 안전하고 친환경적인 건설환경을 만들어갑니다',
+
+        // Feature items
+        feature_fire_resistant_title: '불연재 인증',
+        feature_fire_resistant_desc: '안전한 순수 무기질 세라믹 코팅제',
+        feature_eco_friendly_title: '친환경 마감 공법',
+        feature_eco_friendly_desc: '환경을 생각하는 친환경적인 1액형 신소재 세라믹 코팅마감',
+        feature_quality_title: '우수한 품질',
+        feature_quality_desc: '다양한 시험성적서와 인증, 1000여 곳 이상의 현장 적용을 통해 검증된 품질',
+        feature_industrial_title: '산업용 적용',
+        feature_industrial_desc: '다양한 건설 현장에서 검증된 신뢰성',
+        feature_time_saving_title: '공기 단축',
+        feature_time_saving_desc: '콘크리트 폴리싱의 단계를 획기적으로 단축시켜 간편하고 신속한 시공 가능',
+        feature_verified_title: '검증된 성능',
+        feature_verified_desc: '엄격한 품질 테스트를 통과한 제품',
+
+        // Footer
+        footer_company_info: '회사 정보',
+        footer_address: '인천광역시 서구 백범로 707 (주안국가산업단지)',
+        footer_business_number: '사업자등록번호: 747-42-00526',
+        footer_quick_links: '메뉴 안내',
+        footer_customer_service: '고객센터',
+        footer_social_media: '소셜 미디어',
+        footer_copyright: '© 2025 린코리아. All rights reserved.',
+
+        // About Page
+        about_hero_title: '회사소개',
+        about_hero_subtitle: '건설재료 제조 전문 기업 린코리아는 혁신적인 기술과 품질로 건설업계의 새로운 기준을 제시합니다.',
+        about_intro_title: '린코리아 소개',
+        about_intro_description: '린코리아는 건설재료와 건설기계 분야에서 혁신적인 솔루션을 제공하는 전문 기업으로 성장해왔습니다. 최고의 품질과 기술력으로 고객의 성공을 위한 최적의 파트너가 되겠습니다.',
+        about_vision: '비전',
+        about_vision_desc: '건설업계의 혁신을 선도하는 글로벌 기업',
+        about_mission: '미션',
+        about_mission_desc: '최고의 품질과 기술로 고객 가치 창출',
+        about_core_values: '핵심가치',
+        about_core_values_desc: '신뢰, 혁신, 지속가능성',
+        about_business_title: '사업 영역',
+        about_business_subtitle: '린코리아는 건설재료와 건설기계 두 가지 핵심 사업을 통해 건설업계의 발전을 이끌어가고 있습니다.',
+        about_materials_title: '건설재료사업부',
+        about_materials_subtitle: '핵심 사업 영역',
+        about_materials_desc: '콘크리트 표면마감 1액형 세라믹코팅제(불연재), 방열도료, 특수목적코팅제 등 최고 품질의 제품을 생산하는 린코리아의 핵심 사업부입니다.',
+        about_equipment_title: '건설기계사업부',
+        about_equipment_subtitle: 'Shanghai JS Floor Systems 공식 파트너',
+        about_equipment_desc: 'Shanghai JS Floor Systems의 공식 파트너사로서 한국 공식 판매업체 및 서비스센터를 운영하고 있습니다. 세계적인 공사 현장에서 사용되는 콘크리트 연삭기 및 연마기 시장의 선두주자입니다.',
+        about_location_title: '오시는 길',
+        about_address_label: '주소',
+        about_phone_label: '전화',
+        about_email_label: '이메일',
+
+        // Projects Page
+        projects_hero_title: '시공사례',
+        projects_hero_subtitle: '린코리아의 혁신적인 세라믹 코팅 기술이 적용된 다양한 프로젝트 사례를 확인해보세요.',
+        projects_add_btn: '프로젝트 추가',
+        projects_no_projects: '등록된 프로젝트가 없습니다.',
+        projects_admin_add: '새 프로젝트 추가',
+        projects_form_title_add: '프로젝트 추가',
+        projects_form_title_edit: '프로젝트 수정',
+        projects_form_name: '프로젝트명',
+        projects_form_location: '위치',
+        projects_form_description: '설명',
+        projects_form_image: '이미지 URL',
+        projects_form_features: '특징',
+        projects_form_category: '카테고리',
+        projects_form_add_feature: '새로운 특징을 입력하세요',
+        projects_delete_confirm: '정말로 이 프로젝트를 삭제하시겠습니까?',
+        projects_delete_title: '프로젝트 삭제',
+        projects_saving: '저장 중...',
+        projects_view_detail: '자세히 보기',
+        projects_delete_error: '프로젝트 삭제에 실패했습니다.',
+        projects_delete_success: '프로젝트가 삭제되었습니다.',
+
+        // Products Page
+        products_hero_title: '제품소개',
+        products_hero_subtitle: '린코리아의 혁신적인 제품군을 만나보세요. 최고 품질과 기술력으로 안전한 건설환경을 만들어갑니다.',
+        products_add_btn: '제품 추가',
+        products_form_title_add: '제품 추가',
+        products_form_title_edit: '제품 수정',
+        products_form_name: '제품명',
+        products_form_description: '설명',
+        products_form_image: '이미지 URL',
+        products_form_features: '특징',
+        products_form_price: '가격',
+        products_form_category: '카테고리',
+        products_form_add_feature: '새로운 특징을 입력하세요',
+        products_delete_confirm: '정말로 이 제품을 삭제하시겠습니까?',
+        products_delete_title: '제품 삭제',
+        products_saving: '저장 중...',
+        products_save_success: '제품이 수정되었습니다.',
+        products_add_success: '제품이 추가되었습니다.',
+        products_error_occurred: '오류가 발생했습니다.',
+        products_view_detail: '자세히 보기',
+
+        // Equipment Page
+        equipment_hero_title: '건설기계소개',
+        equipment_hero_subtitle: '최첨단 기술의 콘크리트 연삭기로 최고의 품질과 효율성을 제공합니다.',
+        equipment_add_btn: '기계 추가',
+        equipment_partnership_title: 'Shanghai JS Floor Systems 공식 파트너',
+        equipment_partnership_desc: 'Shanghai JS Floor Systems의 공식 파트너사로서 한국 공식 판매업체 및 서비스센터를 운영하고 있습니다. 세계적인 공사 현장에서 사용되는 콘크리트 연삭기 시장의 선두주자입니다.',
+        equipment_partnership_contact: '한국 공식판매 & 공식서비스센터(AS)\n주소: 인천\n문의전화: 032-571-1023',
+        equipment_construction_tab: '건설기계',
+        equipment_diatool_tab: '다이아툴',
+        equipment_premium_title: '최신형 콘크리트 연삭기',
+        equipment_premium_subtitle: '최첨단 기술이 적용된 프리미엄 연삭기 라인업',
+        equipment_professional_title: '콘크리트 연삭기',
+        equipment_professional_subtitle: '전문가를 위한 고성능 연삭기 시리즈',
+        equipment_diatool_title: '다이아툴',
+        equipment_diatool_subtitle: '고품질 다이아몬드 공구 및 액세서리',
+        equipment_diatool_empty: '다이아툴 제품이 준비 중입니다.',
+        equipment_diatool_add: '다이아툴 추가',
+        equipment_features_label: '주요 특징:',
+        equipment_edit_modal_title: '기계 수정',
+        equipment_add_modal_title: '기계 추가',
+        equipment_delete_modal_title: '기계 삭제',
+        equipment_delete_confirm: '정말로 기계를 삭제하시겠습니까?',
+        equipment_form_name: '이름',
+        equipment_form_description: '설명',
+        equipment_form_image: '이미지 URL',
+        equipment_form_icon: '아이콘',
+        equipment_form_category: '카테고리',
+        equipment_form_features: '특징',
+        equipment_form_add_feature: '새로운 특징을 입력하세요',
+        equipment_saving: '저장 중...',
+
+        // Common
+        loading: '로딩 중...',
+        error: '오류',
+        success: '성공',
+        cancel: '취소',
+        confirm: '확인',
+        save: '저장',
+        edit: '편집',
+        delete: '삭제',
+        add: '추가',
+        search: '검색',
+        filter: '필터',
+        reset: '재설정',
+
+        // Language names
+        korean: '한국어',
+        english: 'English',
+        chinese: '中文',
+    },
+    en: {
+        // Navigation
+        home: 'Home',
+        about: 'About Us',
+        products: 'Products',
+        equipment: 'Equipment',
+        shop: 'Online Store',
+        projects: 'Projects',
+        certificates: 'Certificates',
+        qna: 'Q&A',
+        news: 'News',
+        resources: 'Resources',
+        contact: 'Contact',
+
+        // User menu
+        admin: 'Admin',
+        user: 'User',
+        revenue_management: 'Revenue Management',
+        admin_danger_zone: 'Admin Danger Zone',
+        profile_settings: 'Profile Settings',
+        login: 'Login',
+        logout: 'Logout',
+        welcome: 'Welcome!',
+        admin_account: 'Admin Account',
+
+        // Hero Section
+        hero_patent: 'Patent No. 10-2312833',
+        hero_trademark: 'Trademark No. 40-1678504',
+        hero_title_line1: 'Eco-friendly Fire-resistant',
+        hero_title_line2: 'New Ceramic Coating Material',
+        hero_inquiry_btn: 'Product Inquiry',
+        hero_purchase_btn: 'Purchase Products',
+        hero_projects_btn: 'View Projects',
+        hero_admin_youtube_edit: 'Edit Main YouTube Video Link',
+        hero_youtube_placeholder: 'Enter YouTube video URL',
+        hero_embed_preview: 'Converted embed URL:',
+        hero_save_btn: 'Save',
+        hero_saving: 'Saving...',
+        hero_save_success: 'YouTube link has been saved.',
+
+        // Features Section
+        features_title: 'What Makes',
+        features_title_highlight: 'RIN Korea Special',
+        features_subtitle: 'Creating a safe and eco-friendly construction environment with the highest quality ceramic coating materials',
+
+        // Feature items
+        feature_fire_resistant_title: 'Fire-resistant Certification',
+        feature_fire_resistant_desc: 'Safe pure inorganic ceramic coating material',
+        feature_eco_friendly_title: 'Eco-friendly Finishing Method',
+        feature_eco_friendly_desc: 'Environmentally friendly one-component new ceramic coating finish',
+        feature_quality_title: 'Excellent Quality',
+        feature_quality_desc: 'Quality verified through various test reports and certifications, applied in over 1,000 sites',
+        feature_industrial_title: 'Industrial Application',
+        feature_industrial_desc: 'Reliability proven in various construction sites',
+        feature_time_saving_title: 'Time Saving',
+        feature_time_saving_desc: 'Dramatically shortens concrete polishing steps for simple and rapid construction',
+        feature_verified_title: 'Verified Performance',
+        feature_verified_desc: 'Products that have passed rigorous quality testing',
+
+        // Footer
+        footer_company_info: 'Company Information',
+        footer_address: 'Incheon, Seo-gu, Baekbeom-ro 707 (Juan National Industrial Complex)',
+        footer_business_number: 'Business Registration Number: 747-42-00526',
+        footer_quick_links: 'Quick Links',
+        footer_customer_service: 'Customer Service',
+        footer_social_media: 'Social Media',
+        footer_copyright: '© 2025 RIN Korea. All rights reserved.',
+
+        // About Page
+        about_hero_title: 'About Us',
+        about_hero_subtitle: 'RIN Korea, a specialized construction materials manufacturing company, sets new standards in the construction industry with innovative technology and quality.',
+        about_intro_title: 'RIN Korea Introduction',
+        about_intro_description: 'RIN Korea has grown as a specialized company providing innovative solutions in the fields of construction materials and construction machinery. We will be the optimal partner for our customers\' success with the highest quality and technology.',
+        about_vision: 'Vision',
+        about_vision_desc: 'A global company leading innovation in the construction industry',
+        about_mission: 'Mission',
+        about_mission_desc: 'Creating customer value with the highest quality and technology',
+        about_core_values: 'Core Values',
+        about_core_values_desc: 'Trust, Innovation, Sustainability',
+        about_business_title: 'Business Areas',
+        about_business_subtitle: 'RIN Korea is leading the development of the construction industry through two core businesses: construction materials and construction machinery.',
+        about_materials_title: 'Construction Materials Division',
+        about_materials_subtitle: 'Core Business Area',
+        about_materials_desc: 'This is RIN Korea\'s core business division that produces the highest quality products such as concrete surface finishing one-component ceramic coatings (fire-resistant materials), heat-resistant paints, and special-purpose coatings.',
+        about_equipment_title: 'Construction Equipment Division',
+        about_equipment_subtitle: 'Shanghai JS Floor Systems Official Partner',
+        about_equipment_desc: 'As an official partner of Shanghai JS Floor Systems, we operate the official sales agency and service center in Korea. We are leaders in the concrete grinder and polisher market used at construction sites worldwide.',
+        about_location_title: 'Location',
+        about_address_label: 'Address',
+        about_phone_label: 'Phone',
+        about_email_label: 'Email',
+
+        // Projects Page
+        projects_hero_title: 'Projects',
+        projects_hero_subtitle: 'Discover various project cases where RIN Korea\'s innovative ceramic coating technology has been applied.',
+        projects_add_btn: 'Add Project',
+        projects_no_projects: 'No registered projects.',
+        projects_admin_add: 'Add New Project',
+        projects_form_title_add: 'Add Project',
+        projects_form_title_edit: 'Edit Project',
+        projects_form_name: 'Project Name',
+        projects_form_location: 'Location',
+        projects_form_description: 'Description',
+        projects_form_image: 'Image URL',
+        projects_form_features: 'Features',
+        projects_form_category: 'Category',
+        projects_form_add_feature: 'Enter a new feature',
+        projects_delete_confirm: 'Are you sure you want to delete this project?',
+        projects_delete_title: 'Delete Project',
+        projects_saving: 'Saving...',
+        projects_view_detail: 'View Details',
+
+        // Additional project translations
+        projects_various_title: 'Various Projects',
+        projects_various_desc: 'RIN Korea Project Cases',
+        projects_delete_error: 'Failed to delete project.',
+        projects_delete_success: 'Project has been deleted.',
+
+        // Equipment Page
+        equipment_hero_title: 'Equipment Introduction',
+        equipment_hero_subtitle: 'Providing the highest quality and efficiency with state-of-the-art concrete grinding technology.',
+        equipment_add_btn: 'Add Equipment',
+        equipment_partnership_title: 'Shanghai JS Floor Systems Official Partner',
+        equipment_partnership_desc: 'As an official partner of Shanghai JS Floor Systems, we operate the official sales agency and service center in Korea. We are leaders in the concrete grinder market used at world-class construction sites.',
+        equipment_partnership_contact: 'Korea Official Sales & Official Service Center (AS)\nAddress: Incheon\nInquiry Phone: 032-571-1023',
+        equipment_construction_tab: 'Construction Equipment',
+        equipment_diatool_tab: 'Diamond Tools',
+        equipment_premium_title: 'Latest Concrete Grinders',
+        equipment_premium_subtitle: 'Premium grinder lineup with cutting-edge technology',
+        equipment_professional_title: 'Concrete Grinders',
+        equipment_professional_subtitle: 'High-performance grinder series for professionals',
+        equipment_diatool_title: 'Diamond Tools',
+        equipment_diatool_subtitle: 'High-quality diamond tools and accessories',
+        equipment_diatool_empty: 'Diamond tool products are coming soon.',
+        equipment_diatool_add: 'Add Diamond Tool',
+        equipment_features_label: 'Key Features:',
+        equipment_edit_modal_title: 'Edit Equipment',
+        equipment_add_modal_title: 'Add Equipment',
+        equipment_delete_modal_title: 'Delete Equipment',
+        equipment_delete_confirm: 'Are you sure you want to delete this equipment?',
+        equipment_form_name: 'Name',
+        equipment_form_description: 'Description',
+        equipment_form_image: 'Image URL',
+        equipment_form_icon: 'Icon',
+        equipment_form_category: 'Category',
+        equipment_form_features: 'Features',
+        equipment_form_add_feature: 'Enter a new feature',
+        equipment_saving: 'Saving...',
+
+        // Common
+        loading: 'Loading...',
+        error: 'Error',
+        success: 'Success',
+        cancel: 'Cancel',
+        confirm: 'Confirm',
+        save: 'Save',
+        edit: 'Edit',
+        delete: 'Delete',
+        add: 'Add',
+        search: 'Search',
+        filter: 'Filter',
+        reset: 'Reset',
+        select: 'Please select',
+        none: 'None',
+
+        // Language names
+        korean: '한국어',
+        english: 'English',
+        chinese: '中文',
+    },
+    zh: {
+        // Navigation
+        home: '首页',
+        about: '关于我们',
+        products: '产品介绍',
+        equipment: '设备介绍',
+        shop: '在线商店',
+        projects: '施工案例',
+        certificates: '证书',
+        qna: '客户咨询',
+        news: '新闻公告',
+        resources: '资料库',
+        contact: '联系我们',
+
+        // User menu
+        admin: '管理员',
+        user: '用户',
+        revenue_management: '营收管理',
+        admin_danger_zone: '管理员危险区',
+        profile_settings: '个人资料设置',
+        login: '登录',
+        logout: '退出登录',
+        welcome: '欢迎！',
+        admin_account: '管理员账户',
+
+        // Hero Section
+        hero_patent: '专利号 10-2312833',
+        hero_trademark: '商标号 40-1678504',
+        hero_title_line1: '环保阻燃材料(单组分)',
+        hero_title_line2: '新型陶瓷涂料',
+        hero_inquiry_btn: '产品咨询',
+        hero_purchase_btn: '购买产品',
+        hero_projects_btn: '查看施工案例',
+        hero_admin_youtube_edit: '编辑主要YouTube视频链接',
+        hero_youtube_placeholder: '输入YouTube视频地址',
+        hero_embed_preview: '转换后的嵌入地址：',
+        hero_save_btn: '保存',
+        hero_saving: '保存中...',
+        hero_save_success: 'YouTube链接已保存。',
+
+        // Features Section
+        features_title: 'RIN Korea的',
+        features_title_highlight: '特色之处',
+        features_subtitle: '以最高品质的陶瓷涂料创造安全环保的建筑环境',
+
+        // Feature items
+        feature_fire_resistant_title: '阻燃认证',
+        feature_fire_resistant_desc: '安全的纯无机陶瓷涂料',
+        feature_eco_friendly_title: '环保施工工艺',
+        feature_eco_friendly_desc: '考虑环境的环保型单组分新型陶瓷涂料',
+        feature_quality_title: '优秀品质',
+        feature_quality_desc: '通过各种测试报告和认证，在1000多个现场应用中验证的品质',
+        feature_industrial_title: '工业应用',
+        feature_industrial_desc: '在各种建筑现场验证的可靠性',
+        feature_time_saving_title: '缩短工期',
+        feature_time_saving_desc: '大幅缩短混凝土抛光步骤，实现简便快速施工',
+        feature_verified_title: '验证性能',
+        feature_verified_desc: '通过严格质量测试的产品',
+
+        // Footer
+        footer_company_info: '公司信息',
+        footer_address: '仁川广域市西区白凡路707号 (注安国家产业园区)',
+        footer_business_number: '营业执照号码: 747-42-00526',
+        footer_quick_links: '快速链接',
+        footer_customer_service: '客户服务',
+        footer_social_media: '社交媒体',
+        footer_copyright: '© 2025 RIN Korea. 版权所有.',
+
+        // About Page
+        about_hero_title: '关于我们',
+        about_hero_subtitle: 'RIN Korea是建筑材料制造专业企业，以创新技术和品质为建筑行业树立新标准。',
+        about_intro_title: 'RIN Korea 介绍',
+        about_intro_description: 'RIN Korea在建筑材料和建筑机械领域提供创新解决方案，已发展成为专业企业。我们将以最高的品质和技术力成为客户成功的最佳合作伙伴。',
+        about_vision: '愿景',
+        about_vision_desc: '引领建筑行业创新的全球企业',
+        about_mission: '使命',
+        about_mission_desc: '以最高品质和技术创造客户价值',
+        about_core_values: '核心价值',
+        about_core_values_desc: '信任、创新、可持续性',
+        about_business_title: '业务领域',
+        about_business_subtitle: 'RIN Korea通过建筑材料和建筑机械两大核心业务引领建筑行业发展。',
+        about_materials_title: '建筑材料事业部',
+        about_materials_subtitle: '核心业务领域',
+        about_materials_desc: '生产混凝土表面装饰单组分陶瓷涂料(阻燃材料)、防热涂料、特殊用途涂料等最高品质产品的RIN Korea核心事业部。',
+        about_equipment_title: '建筑机械事业部',
+        about_equipment_subtitle: 'Shanghai JS Floor Systems 官方合作伙伴',
+        about_equipment_desc: '作为Shanghai JS Floor Systems的官方合作伙伴，运营韩国官方销售代理店和服务中心。是在全球建筑现场使用的混凝土研磨机和抛光机市场的领导者。',
+        about_location_title: '地址信息',
+        about_address_label: '地址',
+        about_phone_label: '电话',
+        about_email_label: '邮箱',
+
+        // Projects Page
+        projects_hero_title: '施工案例',
+        projects_hero_subtitle: '查看RIN Korea创新陶瓷涂料技术应用的各种项目案例。',
+        projects_add_btn: '添加项目',
+        projects_no_projects: '没有注册的项目。',
+        projects_admin_add: '添加新项目',
+        projects_form_title_add: '添加项目',
+        projects_form_title_edit: '编辑项目',
+        projects_form_name: '项目名称',
+        projects_form_location: '位置',
+        projects_form_description: '描述',
+        projects_form_image: '图片URL',
+        projects_form_features: '特征',
+        projects_form_category: '类别',
+        projects_form_add_feature: '输入新特征',
+        projects_delete_confirm: '确定要删除此项目吗？',
+        projects_delete_title: '删除项目',
+        projects_saving: '保存中...',
+        projects_view_detail: '查看详情',
+
+        // Additional project translations
+        projects_various_title: '各种项目',
+        projects_various_desc: 'RIN Korea项目案例',
+        projects_delete_error: '删除项目失败。',
+        projects_delete_success: '项目已删除。',
+
+        // Products Page
+        products_hero_title: '产品介绍',
+        products_hero_subtitle: '来看看RIN Korea的创新产品系列，为安全环保的建筑环境提供最高品质和效率。',
+        products_add_btn: '添加产品',
+        products_form_title_add: '添加产品',
+        products_form_title_edit: '编辑产品',
+        products_form_name: '产品名称',
+        products_form_description: '描述',
+        products_form_image: '图片URL',
+        products_form_features: '特征',
+        products_form_price: '价格',
+        products_form_category: '类别',
+        products_form_add_feature: '输入新特征',
+        products_delete_confirm: '确定要删除此产品吗？',
+        products_delete_title: '删除产品',
+        products_saving: '保存中...',
+        products_save_success: '产品已修改。',
+        products_add_success: '产品已添加。',
+        products_error_occurred: '发生错误。',
+        products_view_detail: '查看详情',
+
+        // Equipment Page
+        equipment_hero_title: '建筑设备介绍',
+        equipment_hero_subtitle: '以最先进的混凝土研磨技术提供最高品质和效率。',
+        equipment_add_btn: '添加设备',
+        equipment_partnership_title: 'Shanghai JS Floor Systems 官方合作伙伴',
+        equipment_partnership_desc: '作为Shanghai JS Floor Systems的官方合作伙伴，运营韩国官方销售代理店和服务中心。是在世界级建筑现场使用的混凝土研磨机市场的领导者。',
+        equipment_partnership_contact: '韩国官方销售 & 官方服务中心(AS)\n地址: 仁川\n咨询电话: 032-571-1023',
+        equipment_construction_tab: '建筑设备',
+        equipment_diatool_tab: '钻石工具',
+        equipment_premium_title: '最新型混凝土研磨机',
+        equipment_premium_subtitle: '应用最先进技术的高端研磨机产品线',
+        equipment_professional_title: '混凝土研磨机',
+        equipment_professional_subtitle: '专业人士专用高性能研磨机系列',
+        equipment_diatool_title: '钻石工具',
+        equipment_diatool_subtitle: '高品质钻石工具及配件',
+        equipment_diatool_empty: '钻石工具产品正在准备中。',
+        equipment_diatool_add: '添加钻石工具',
+        equipment_features_label: '主要特征:',
+        equipment_edit_modal_title: '编辑设备',
+        equipment_add_modal_title: '添加设备',
+        equipment_delete_modal_title: '删除设备',
+        equipment_delete_confirm: '确定要删除此设备吗？',
+        equipment_form_name: '名称',
+        equipment_form_description: '描述',
+        equipment_form_image: '图片URL',
+        equipment_form_icon: '图标',
+        equipment_form_category: '类别',
+        equipment_form_features: '特征',
+        equipment_form_add_feature: '输入新特征',
+        equipment_saving: '保存中...',
+
+        // Common
+        loading: '加载中...',
+        error: '错误',
+        success: '成功',
+        cancel: '取消',
+        confirm: '确认',
+        save: '保存',
+        edit: '编辑',
+        delete: '删除',
+        add: '添加',
+        search: '搜索',
+        filter: '筛选',
+        reset: '重置',
+        select: '请选择',
+        none: '无',
+
+        // Language names
+        korean: '한국어',
+        english: 'English',
+        chinese: '中文',
+    },
+};
+
+export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
+    const [language, setLanguageState] = useState<Language>(() => {
+        // 로컬 스토리지에서 저장된 언어 가져오기, 기본값은 한국어
+        const saved = localStorage.getItem('language');
+        return (saved as Language) || 'ko';
+    });
+
+    useEffect(() => {
+        // 언어 변경 시 로컬 스토리지에 저장
+        localStorage.setItem('language', language);
+    }, [language]);
+
+    const setLanguage = (lang: Language) => {
+        setLanguageState(lang);
+    };
+
+    const t = (key: string, fallback?: string): string => {
+        const keys = key.split('.');
+        let value: unknown = translations[language];
+
+        for (const k of keys) {
+            value = (value as Record<string, unknown>)?.[k];
+        }
+
+        return (value as string) || fallback || key;
+    };
+
+    const value = {
+        language,
+        setLanguage,
+        t,
+    };
+
+    return (
+        <LanguageContext.Provider value={value}>
+            {children}
+        </LanguageContext.Provider>
+    );
+};
+
+export const useLanguage = () => {
+    const context = useContext(LanguageContext);
+    if (context === undefined) {
+        throw new Error('useLanguage must be used within a LanguageProvider');
+    }
+    return context;
+};
+
+// 데이터베이스 컬럼에서 언어별 값을 가져오는 헬퍼 함수
+export const getLocalizedValue = (
+    data: Record<string, unknown> | null | undefined,
+    field: string,
+    language: Language,
+    fallback?: string
+): string => {
+    if (!data) return fallback || '';
+
+    // 언어별 컬럼명 생성 (예: name_ko, name_en, name_zh)
+    const localizedField = `${field}_${language}`;
+
+    // 언어별 값이 있으면 반환, 없으면 기본 필드 값 반환
+    return (data[localizedField] as string) || (data[field] as string) || fallback || '';
+};
+
+// 배열 필드를 위한 헬퍼 함수
+export const getLocalizedArray = (
+    data: Record<string, unknown> | null | undefined,
+    field: string,
+    language: Language,
+    fallback?: string[]
+): string[] => {
+    if (!data) return fallback || [];
+
+    const localizedField = `${field}_${language}`;
+
+    return (data[localizedField] as string[]) || (data[field] as string[]) || fallback || [];
+}; 

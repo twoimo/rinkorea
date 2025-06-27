@@ -1,6 +1,7 @@
 import React from 'react';
 import { ExternalLink, Calendar, MapPin, Edit2, Trash2, Eye, EyeOff } from 'lucide-react';
 import type { Project } from '@/hooks/useProjects';
+import { useLanguage, getLocalizedValue, getLocalizedArray } from '@/contexts/LanguageContext';
 
 interface ProjectCardProps {
   project: Project;
@@ -23,17 +24,25 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   onDelete,
   onToggleHide
 }) => {
+  const { language, t } = useLanguage();
+
   const getImageUrl = (imagePath: string) => {
     if (imagePath.includes('://') || imagePath.startsWith('@')) return imagePath;
     return `/images/${imagePath}`;
   };
+
+  // 언어별 데이터 가져오기
+  const localizedTitle = getLocalizedValue(project, 'title', language);
+  const localizedLocation = getLocalizedValue(project, 'location', language);
+  const localizedDescription = getLocalizedValue(project, 'description', language);
+  const localizedFeatures = getLocalizedArray(project, 'features', language);
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden group relative w-full h-full flex flex-col">
       <div className="relative w-full h-[210px] sm:h-[260px] overflow-hidden">
         <img
           src={getImageUrl(project.image)}
-          alt={project.title}
+          alt={localizedTitle}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 select-none pointer-events-none"
           loading="lazy"
           width={800}
@@ -70,20 +79,20 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         )}
       </div>
       <div className="p-4 sm:p-6 flex flex-col flex-1">
-        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 line-clamp-1">{project.title}</h3>
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 line-clamp-1">{localizedTitle}</h3>
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-600 mb-4">
           <div className="flex items-center gap-1">
             <MapPin className="w-4 h-4 flex-shrink-0" />
-            <span className="line-clamp-1">{project.location}</span>
+            <span className="line-clamp-1">{localizedLocation}</span>
           </div>
           <div className="flex items-center gap-1">
             <Calendar className="w-4 h-4 flex-shrink-0" />
             <span>{project.date}</span>
           </div>
         </div>
-        <p className="text-gray-600 mb-4 text-sm sm:text-base line-clamp-2">{project.description}</p>
+        <p className="text-gray-600 mb-4 text-sm sm:text-base line-clamp-2">{localizedDescription}</p>
         <div className="flex flex-wrap gap-2 mb-4">
-          {project.features.map((feature, index) => (
+          {localizedFeatures && localizedFeatures.map((feature, index) => (
             <span
               key={index}
               className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs sm:text-sm line-clamp-1"
@@ -99,7 +108,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm sm:text-base touch-manipulation"
           >
-            자세히 보기
+            {t('hero_projects_btn', '자세히 보기')}
             <ExternalLink className="w-4 h-4" />
           </a>
         </div>
