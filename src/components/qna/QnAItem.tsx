@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit, Trash2, MessageCircle, User, Calendar, Lock, Shield } from 'lucide-react';
+import { Edit, Trash2, MessageCircle, User, Calendar, Lock, Shield, Mail, Phone } from 'lucide-react';
 import { User as UserType } from '@supabase/supabase-js';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -16,6 +16,8 @@ interface Inquiry {
   created_at: string;
   user_id: string;
   name?: string;
+  email?: string;
+  phone?: string;
   admin_reply?: string | null;
   profiles?: {
     name: string;
@@ -104,6 +106,42 @@ const QnAItem: React.FC<QnAItemProps> = ({ inquiry, user, onEdit, onDelete, onRe
                 <span>{formatDate(inquiry.created_at)}</span>
               </div>
             </div>
+
+            {/* 관리자 전용 연락처 정보 */}
+            {isAdmin && (inquiry.email || inquiry.phone) && (
+              <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="text-xs font-medium text-yellow-800 mb-2">
+                  <Shield className="w-3 h-3 inline mr-1" />
+                  관리자 전용 연락처 정보
+                </div>
+                <div className="flex flex-col space-y-1 text-sm text-yellow-700">
+                  {inquiry.email && (
+                    <div className="flex items-center">
+                      <Mail className="w-3 h-3 mr-2" />
+                      <span className="font-mono">{inquiry.email}</span>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(inquiry.email || '')}
+                        className="ml-2 text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 transition-colors"
+                      >
+                        복사
+                      </button>
+                    </div>
+                  )}
+                  {inquiry.phone && (
+                    <div className="flex items-center">
+                      <Phone className="w-3 h-3 mr-2" />
+                      <span className="font-mono">{inquiry.phone}</span>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(inquiry.phone || '')}
+                        className="ml-2 text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 transition-colors"
+                      >
+                        복사
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {canEdit && (
