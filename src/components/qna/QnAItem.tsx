@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Edit, Trash2, MessageCircle, User, Calendar, Lock, Eye, ChevronDown, ChevronUp, Shield } from 'lucide-react';
+import React from 'react';
+import { Edit, Trash2, MessageCircle, User, Calendar, Lock, Shield } from 'lucide-react';
 import { User as UserType } from '@supabase/supabase-js';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -15,6 +15,7 @@ interface Inquiry {
   is_private: boolean;
   created_at: string;
   user_id: string;
+  name?: string;
   admin_reply?: string | null;
   profiles?: {
     name: string;
@@ -26,11 +27,10 @@ interface QnAItemProps {
   user: UserType | null;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
-  onRefetch: () => void;
+  onRefetch: () => Promise<void>;
 }
 
 const QnAItem: React.FC<QnAItemProps> = ({ inquiry, user, onEdit, onDelete, onRefetch }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
   const { isAdmin } = useUserRole();
   const { t } = useLanguage();
 
@@ -97,7 +97,7 @@ const QnAItem: React.FC<QnAItemProps> = ({ inquiry, user, onEdit, onDelete, onRe
             <div className="flex items-center text-sm text-gray-500 space-x-4">
               <div className="flex items-center">
                 <User className="w-4 h-4 mr-1" />
-                <span>{inquiry.profiles?.name || t('anonymous', '익명')}</span>
+                <span>{inquiry.profiles?.name || inquiry.name || t('anonymous', '익명')}</span>
               </div>
               <div className="flex items-center">
                 <Calendar className="w-4 h-4 mr-1" />
@@ -106,78 +106,57 @@ const QnAItem: React.FC<QnAItemProps> = ({ inquiry, user, onEdit, onDelete, onRe
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <Eye className="w-5 h-5" />
-            </button>
-            {canEdit && (
-              <>
-                <button
-                  onClick={() => onEdit(inquiry.id)}
-                  className="text-blue-600 hover:text-blue-700 transition-colors"
-                >
-                  <Edit className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => {
-                    if (confirm(t('qna_delete_confirm', '정말로 이 질문을 삭제하시겠습니까?'))) {
-                      onDelete(inquiry.id);
-                    }
-                  }}
-                  className="text-red-600 hover:text-red-700 transition-colors"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              </>
-            )}
-          </div>
+          {canEdit && (
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => onEdit(inquiry.id)}
+                className="text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                <Edit className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => {
+                  if (confirm(t('qna_delete_confirm', '정말로 이 질문을 삭제하시겠습니까?'))) {
+                    onDelete(inquiry.id);
+                  }
+                }}
+                className="text-red-600 hover:text-red-700 transition-colors"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+            </div>
+          )}
         </div>
 
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="w-full flex items-center justify-between text-left bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors"
-        >
-          <span className="text-sm font-medium text-gray-700">
-            {isExpanded ? t('hide_content', '내용 숨기기') : t('show_content', '내용 보기')}
-          </span>
-          {isExpanded ? (
-            <ChevronUp className="w-4 h-4 text-gray-500" />
-          ) : (
-            <ChevronDown className="w-4 h-4 text-gray-500" />
-          )}
-        </button>
+        {/* 질문 내용 */}
+        <div className="mt-4 space-y-4">
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="prose prose-sm max-w-none">
+              <p className="text-gray-700 whitespace-pre-wrap">{inquiry.content}</p>
+            </div>
+          </div>
 
-        {isExpanded && (
-          <div className="mt-4 space-y-4">
-            <div className="p-4 bg-gray-50 rounded-lg">
+          {/* 관리자 답변 (admin_reply 필드) */}
+          {inquiry.admin_reply && (
+            <div className="border-l-4 border-blue-500 bg-blue-50 p-4 rounded-lg ml-4">
+              <div className="flex items-center mb-2">
+                <Shield className="w-4 h-4 text-blue-600 mr-2" />
+                <span className="text-sm font-medium text-blue-800">관리자 답변</span>
+              </div>
               <div className="prose prose-sm max-w-none">
-                <p className="text-gray-700 whitespace-pre-wrap">{inquiry.content}</p>
+                <p className="text-blue-700 whitespace-pre-wrap">{inquiry.admin_reply}</p>
               </div>
             </div>
+          )}
 
-            {inquiry.admin_reply && (
-              <div className="border-l-4 border-blue-500 bg-blue-50 p-4 rounded-lg ml-4">
-                <div className="flex items-center mb-2">
-                  <Shield className="w-4 h-4 text-blue-600 mr-2" />
-                  <span className="text-sm font-medium text-blue-800">관리자 답변</span>
-                </div>
-                <div className="prose prose-sm max-w-none">
-                  <p className="text-blue-700 whitespace-pre-wrap">{inquiry.admin_reply}</p>
-                </div>
-              </div>
-            )}
-
-            <RepliesSection
-              inquiryId={inquiry.id}
-              canView={canView}
-              isAdmin={isAdmin}
-              onRefetch={onRefetch}
-            />
-          </div>
-        )}
+          {/* 답변 목록 및 관리자 답변 작성 폼 */}
+          <RepliesSection
+            inquiryId={inquiry.id}
+            canView={canView}
+            isAdmin={isAdmin}
+            onRefetch={onRefetch}
+          />
+        </div>
       </div>
     </div>
   );
