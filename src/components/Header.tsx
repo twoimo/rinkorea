@@ -115,8 +115,8 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Desktop User Menu */}
-          <div className="hidden lg:flex items-center space-x-4">
+          {/* Desktop User Menu and Language Selector */}
+          <div className="hidden lg:flex items-center space-x-3">
             {user ? (
               <div className="relative">
                 <button
@@ -196,63 +196,68 @@ const Header = () => {
               </button>
             )}
 
-            {/* Language Selector - moved to the right */}
+            {/* Language Selector */}
             <LanguageSelector
               isTransparent={shouldBeTransparent}
             />
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            className={cn(
-              "xl:hidden p-2 rounded-md transition-colors touch-manipulation",
-              shouldBeTransparent
-                ? "hover:bg-white/20 text-white"
-                : "hover:bg-gray-100 text-gray-700"
-            )}
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="메뉴 열기/닫기"
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {/* Mobile menu button and language selector */}
+          <div className="flex items-center space-x-2 xl:hidden">
+            <LanguageSelector
+              isTransparent={shouldBeTransparent}
+              className="touch-feedback"
+            />
+            <button
+              className={cn(
+                "p-2 rounded-md transition-colors touch-manipulation touch-feedback",
+                shouldBeTransparent
+                  ? "hover:bg-white/20 text-white"
+                  : "hover:bg-gray-100 text-gray-700"
+              )}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="메뉴 열기/닫기"
+            >
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="xl:hidden border-t bg-white fixed inset-x-0 top-[4rem] sm:top-[5rem] bottom-0 z-[90]">
-            <nav className="h-full overflow-y-auto pb-20">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  onClick={() => handleNavigation(item.path)}
-                  className={`block py-3 px-4 text-base font-medium transition-colors hover:text-blue-900 hover:bg-blue-50 rounded-lg mx-2 touch-manipulation ${location.pathname === item.path ? 'text-blue-900 bg-blue-50 font-semibold' : 'text-gray-700'
-                    }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-
-              {/* Mobile Language Selector */}
-              <div className="px-4 py-3 border-t mt-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-700">Language:</span>
-                  <LanguageSelector />
-                </div>
+          <div className="xl:hidden border-t bg-white fixed inset-x-0 top-[4rem] sm:top-[5rem] bottom-0 z-[90] overflow-hidden mobile-menu safe-area-inset-bottom">
+            <nav className="h-full overflow-y-auto pb-4 mobile-dropdown">
+              <div className="py-2">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.name}
+                    to={item.path}
+                    onClick={() => handleNavigation(item.path)}
+                    className={cn(
+                      "block py-3 px-4 text-base font-medium transition-colors rounded-lg mx-2 touch-manipulation touch-feedback",
+                      "hover-desktop-only hover:text-blue-900 hover:bg-blue-50",
+                      location.pathname === item.path
+                        ? 'text-blue-900 bg-blue-50 font-semibold'
+                        : 'text-gray-700'
+                    )}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
               </div>
 
               {/* Mobile User Section */}
-              <div className="pt-4 border-t mt-4 mx-2">
+              <div className="border-t mt-4 pt-4 mx-2 mobile-portrait-padding">
                 {user ? (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <div className="px-4 py-2 text-sm text-gray-600 font-medium">
-                      {isAdmin ? t('admin_account') : t('welcome')}
+                      {isAdmin ? t('admin_account') : t('welcome', `환영합니다, ${profile?.name || t('user')}님`)}
                     </div>
                     {isAdmin && (
                       <>
                         <Link
                           to="/revenue-management"
-                          className="flex items-center px-4 py-3 text-base text-blue-700 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors touch-manipulation"
+                          className="flex items-center px-4 py-3 text-base text-blue-700 rounded-lg transition-colors touch-manipulation touch-feedback hover-desktop-only hover:text-blue-900 hover:bg-blue-50"
                           onClick={() => setIsMenuOpen(false)}
                         >
                           <BarChart3 className="w-5 h-5 mr-3" />
@@ -260,7 +265,7 @@ const Header = () => {
                         </Link>
                         <Link
                           to="/admin/danger"
-                          className="flex items-center px-4 py-3 text-base text-red-700 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors touch-manipulation"
+                          className="flex items-center px-4 py-3 text-base text-red-700 rounded-lg transition-colors touch-manipulation touch-feedback hover-desktop-only hover:text-red-900 hover:bg-red-50"
                           onClick={() => setIsMenuOpen(false)}
                         >
                           <AlertTriangle className="w-5 h-5 mr-3" />
@@ -270,7 +275,7 @@ const Header = () => {
                     )}
                     <Link
                       to="/profile"
-                      className="flex items-center px-4 py-3 text-base text-gray-700 hover:text-blue-900 hover:bg-gray-50 rounded-lg transition-colors touch-manipulation"
+                      className="flex items-center px-4 py-3 text-base text-gray-700 rounded-lg transition-colors touch-manipulation touch-feedback hover-desktop-only hover:text-blue-900 hover:bg-gray-50"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <Settings className="w-5 h-5 mr-3" />
@@ -281,7 +286,7 @@ const Header = () => {
                         handleSignOut();
                         setIsMenuOpen(false);
                       }}
-                      className="w-full flex items-center px-4 py-3 text-base text-gray-700 hover:text-blue-900 hover:bg-gray-50 rounded-lg transition-colors touch-manipulation"
+                      className="w-full flex items-center px-4 py-3 text-base text-gray-700 rounded-lg transition-colors touch-manipulation touch-feedback hover-desktop-only hover:text-blue-900 hover:bg-gray-50"
                     >
                       <LogOut className="w-5 h-5 mr-3" />
                       {t('logout')}
@@ -297,17 +302,12 @@ const Header = () => {
                       navigate('/auth');
                       setIsMenuOpen(false);
                     }}
-                    className="block bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg text-base font-medium transition-colors text-center mx-2 touch-manipulation cursor-pointer w-full relative z-10"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg text-base font-medium transition-colors text-center touch-manipulation touch-feedback cursor-pointer relative z-10"
                     style={{ pointerEvents: 'auto' }}
                   >
                     {t('login')}
                   </button>
                 )}
-
-                {/* Language Selector - moved to the right */}
-                <LanguageSelector
-                  isTransparent={shouldBeTransparent}
-                />
               </div>
             </nav>
           </div>

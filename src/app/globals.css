@@ -119,3 +119,75 @@ body {
         scroll-behavior: smooth;
     }
 }
+
+/* 모바일 최적화 */
+@media (max-width: 1024px) {
+
+    /* 터치 최적화 */
+    .touch-manipulation {
+        touch-action: manipulation;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 모바일 메뉴 최적화 */
+    .mobile-menu {
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+
+    /* 터치 피드백 */
+    .touch-feedback:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+
+    /* 모바일 드롭다운 최적화 */
+    .mobile-dropdown {
+        max-height: calc(100vh - 8rem);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* 모바일 입력 최적화 */
+    input,
+    textarea,
+    select,
+    button {
+        font-size: 16px;
+        /* iOS 확대 방지 */
+    }
+
+    /* 모바일 호버 효과 비활성화 */
+    .hover-desktop-only:hover {
+        background-color: initial;
+        color: initial;
+    }
+}
+
+/* 모바일 세로 모드 최적화 */
+@media (max-width: 768px) and (orientation: portrait) {
+    .mobile-portrait-padding {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
+/* iOS Safe Area 지원 */
+@supports (padding: max(0px)) {
+    .safe-area-inset {
+        padding-left: max(1rem, env(safe-area-inset-left));
+        padding-right: max(1rem, env(safe-area-inset-right));
+    }
+
+    .safe-area-inset-top {
+        padding-top: max(0px, env(safe-area-inset-top));
+    }
+
+    .safe-area-inset-bottom {
+        padding-bottom: max(0px, env(safe-area-inset-bottom));
+    }
+}
