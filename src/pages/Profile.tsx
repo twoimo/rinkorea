@@ -51,7 +51,7 @@ const Profile = () => {
     }
     setPhone(value);
     if (value && !validatePhone(value)) {
-      setPhoneError('전화번호 형식이 올바르지 않습니다. 예: 010-1234-5678');
+      setPhoneError(t('profile_phone_error'));
     } else {
       setPhoneError('');
     }
@@ -83,32 +83,32 @@ const Profile = () => {
     // 프로필 저장
     if (isProfileChanged) {
       if (phone && !validatePhone(phone)) {
-        setPhoneError('전화번호 형식이 올바르지 않습니다. 예: 010-1234-5678');
+        setPhoneError(t('profile_phone_error'));
         setSavingAll(false);
         return;
       }
       const { error } = await updateProfile({ name, company, phone });
       if (error) {
-        toast({ title: '프로필 업데이트 실패', description: '다시 시도해주세요.', variant: 'destructive' });
+        toast({ title: t('profile_update_failed'), description: '다시 시도해주세요.', variant: 'destructive' });
         profileOk = false;
       } else {
-        toast({ title: '프로필 업데이트 완료', description: '프로필이 성공적으로 저장되었습니다.' });
+        toast({ title: 'Profile Update Complete', description: t('profile_update_success') });
       }
     }
     // 비밀번호 변경
     if (isPasswordChanged) {
       if (!currentPassword || !newPassword || !confirmPassword) {
-        setPasswordError('모든 항목을 입력해주세요.');
+        setPasswordError(t('profile_password_all_required'));
         setSavingAll(false);
         return;
       }
       if (newPassword !== confirmPassword) {
-        setPasswordError('새 비밀번호가 일치하지 않습니다.');
+        setPasswordError(t('profile_password_mismatch'));
         setSavingAll(false);
         return;
       }
       if (newPassword.length < 8) {
-        setPasswordError('비밀번호는 8자 이상이어야 합니다.');
+        setPasswordError(t('profile_password_min_length'));
         setSavingAll(false);
         return;
       }
@@ -117,16 +117,16 @@ const Profile = () => {
         password: currentPassword
       });
       if (signInError) {
-        setPasswordError('현재 비밀번호가 올바르지 않습니다.');
+        setPasswordError(t('profile_password_current_invalid'));
         setSavingAll(false);
         return;
       }
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) {
-        setPasswordError('비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
+        setPasswordError(t('profile_password_change_failed'));
         passwordOk = false;
       } else {
-        setPasswordSuccess('비밀번호가 성공적으로 변경되었습니다.');
+        setPasswordSuccess(t('profile_password_change_success'));
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
@@ -160,15 +160,15 @@ const Profile = () => {
       }
 
       toast({
-        title: "계정 탈퇴 완료",
-        description: "계정이 성공적으로 삭제되었습니다."
+        title: t('profile_delete_success'),
+        description: t('profile_delete_success')
       });
 
       navigate('/');
     } catch (error) {
       console.error('계정 탈퇴 중 오류 발생:', error);
       toast({
-        title: "계정 탈퇴 실패",
+        title: t('profile_delete_failed'),
         description: error instanceof Error ? error.message : "다시 시도해주세요.",
         variant: "destructive"
       });
@@ -185,7 +185,7 @@ const Profile = () => {
       <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="flex items-center justify-center py-20">
-          <div className="text-lg">로딩 중...</div>
+          <div className="text-lg">{t('loading', '로딩 중...')}</div>
         </div>
         <Footer />
       </div>
