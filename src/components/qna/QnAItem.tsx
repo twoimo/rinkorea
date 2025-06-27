@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Edit, Trash2, MessageCircle, User, Calendar, Lock, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import { User as UserType } from '@supabase/supabase-js';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -20,7 +21,7 @@ interface Inquiry {
 
 interface QnAItemProps {
   inquiry: Inquiry;
-  user: any;
+  user: UserType | null;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onRefetch: () => void;

@@ -43,7 +43,7 @@ export const useRevenue = () => {
             setLoading(true);
             setError(null);
 
-            console.log('🔍 매출 데이터 조회 시작:', { dateRange, user: user?.id });
+            console.log('🔍 매출 데이터 조회 시작:', { dateRange });
 
             let query = supabase
                 .from('revenue_data')

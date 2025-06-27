@@ -2,10 +2,17 @@ import React from 'react';
 import NewsForm from '../NewsForm';
 import { useLanguage } from '@/contexts/LanguageContext';
 
+interface NewsItem {
+  id: string;
+  title: string;
+  content: string;
+  published: boolean;
+}
+
 interface NewsModalManagerProps {
   showForm: boolean;
   editingNews: string | null;
-  editingNewsItem: any;
+  editingNewsItem: NewsItem | null;
   onCloseForm: () => void;
   onCloseEdit: () => void;
   onCreateNews: (newsData: { title: string; content: string; published: boolean }) => Promise<void>;
@@ -28,19 +35,19 @@ const NewsModalManager: React.FC<NewsModalManagerProps> = ({
       {/* 새 공지 추가 폼 */}
       {showForm && (
         <NewsForm
-          title={t('news_form_title_add', '새 공지 작성')}
           onClose={onCloseForm}
           onSave={onCreateNews}
+          isEdit={false}
         />
       )}
 
       {/* 공지 수정 폼 */}
       {editingNews && editingNewsItem && (
         <NewsForm
-          title={t('news_form_title_edit', '공지 수정')}
           initialData={editingNewsItem}
           onClose={onCloseEdit}
           onSave={onUpdateNews}
+          isEdit={true}
         />
       )}
     </>

@@ -1,9 +1,10 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
+import { User } from '@supabase/supabase-js';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface QnAHeroProps {
-  user: any;
+  user: User | null;
   setShowForm: (show: boolean) => void;
 }
 
