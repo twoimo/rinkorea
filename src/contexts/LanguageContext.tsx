@@ -181,6 +181,30 @@ const translations = {
         equipment_updated_success: '기계가 수정되었습니다.',
         equipment_added_success: '기계가 추가되었습니다.',
 
+        // Products Page
+        products_hero_title: 'Products',
+        products_hero_subtitle: 'Discover RIN Korea\'s innovative ceramic coating materials and eco-friendly construction materials.',
+
+        // News Page
+        news_hero_title: 'News',
+        news_hero_subtitle: 'Check the latest news and important announcements from RIN Korea.',
+
+        // QnA Page
+        qna_hero_title: 'Customer Service',
+        qna_hero_subtitle: 'If you have any questions, please feel free to contact us anytime. Our experts will respond quickly and accurately.',
+
+        // Resources Page
+        resources_hero_title: 'Resources',
+        resources_hero_subtitle: 'Check various materials such as RIN Korea\'s product catalogs, technical data, and certificates.',
+
+        // Shop Page
+        shop_hero_title: 'Online Store',
+        shop_hero_subtitle: 'You can order and purchase RIN Korea products online.',
+
+        // Certificates Page
+        certificates_hero_title: 'Certificates',
+        certificates_hero_subtitle: 'Check test reports and certifications that prove the quality and safety of RIN Korea products.',
+
         // Company Overview Section
         company_overview_title_reliable: '신뢰할 수 있는',
         company_overview_title_partner: '파트너',
@@ -393,6 +417,30 @@ const translations = {
         equipment_updated_success: 'Equipment has been updated.',
         equipment_added_success: 'Equipment has been added.',
 
+        // Products Page
+        products_hero_title: 'Products',
+        products_hero_subtitle: 'Discover RIN Korea\'s innovative ceramic coating materials and eco-friendly construction materials.',
+
+        // News Page
+        news_hero_title: 'News',
+        news_hero_subtitle: 'Check the latest news and important announcements from RIN Korea.',
+
+        // QnA Page
+        qna_hero_title: 'Customer Service',
+        qna_hero_subtitle: 'If you have any questions, please feel free to contact us anytime. Our experts will respond quickly and accurately.',
+
+        // Resources Page
+        resources_hero_title: 'Resources',
+        resources_hero_subtitle: 'Check various materials such as RIN Korea\'s product catalogs, technical data, and certificates.',
+
+        // Shop Page
+        shop_hero_title: 'Online Store',
+        shop_hero_subtitle: 'You can order and purchase RIN Korea products online.',
+
+        // Certificates Page
+        certificates_hero_title: 'Certificates',
+        certificates_hero_subtitle: 'Check test reports and certifications that prove the quality and safety of RIN Korea products.',
+
         // Company Overview Section
         company_overview_title_reliable: 'Reliable',
         company_overview_title_partner: 'Partner',
@@ -604,6 +652,30 @@ const translations = {
         equipment_saving: '保存中...',
         equipment_updated_success: '设备已更新。',
         equipment_added_success: '设备已添加。',
+
+        // Products Page
+        products_hero_title: 'Products',
+        products_hero_subtitle: 'Discover RIN Korea\'s innovative ceramic coating materials and eco-friendly construction materials.',
+
+        // News Page
+        news_hero_title: 'News',
+        news_hero_subtitle: 'Check the latest news and important announcements from RIN Korea.',
+
+        // QnA Page
+        qna_hero_title: 'Customer Service',
+        qna_hero_subtitle: 'If you have any questions, please feel free to contact us anytime. Our experts will respond quickly and accurately.',
+
+        // Resources Page
+        resources_hero_title: 'Resources',
+        resources_hero_subtitle: 'Check various materials such as RIN Korea\'s product catalogs, technical data, and certificates.',
+
+        // Shop Page
+        shop_hero_title: 'Online Store',
+        shop_hero_subtitle: 'You can order and purchase RIN Korea products online.',
+
+        // Certificates Page
+        certificates_hero_title: 'Certificates',
+        certificates_hero_subtitle: 'Check test reports and certifications that prove the quality and safety of RIN Korea products.',
 
         // Company Overview Section
         company_overview_title_reliable: '可靠的',
