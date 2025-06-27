@@ -204,13 +204,13 @@ const Profile = () => {
                 <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full mb-4">
                   <User className="w-6 h-6 sm:w-10 sm:h-10 text-blue-600" aria-hidden="true" />
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-bold mb-2">프로필 설정</h2>
-                <p className="text-sm sm:text-base text-gray-500">회원정보를 확인하고 수정할 수 있습니다.</p>
+                <h2 className="text-2xl sm:text-3xl font-bold mb-2">{t('profile_settings', '프로필 설정')}</h2>
+                <p className="text-sm sm:text-base text-gray-500">{t('profile_subtitle', '회원정보를 확인하고 수정할 수 있습니다.')}</p>
               </div>
 
               <form onSubmit={handleSaveAll} className="space-y-4 sm:space-y-6">
                 <div>
-                  <label className="block text-sm font-medium mb-1" htmlFor="name">이름</label>
+                  <label className="block text-sm font-medium mb-1" htmlFor="name">{t('profile_name', '이름')}</label>
                   <input
                     id="name"
                     type="text"
@@ -218,12 +218,12 @@ const Profile = () => {
                     value={name}
                     onChange={e => setName(e.target.value)}
                     autoComplete="name"
-                    aria-label="이름"
+                    aria-label={t('profile_name', '이름')}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1" htmlFor="email">이메일</label>
+                  <label className="block text-sm font-medium mb-1" htmlFor="email">{t('profile_email', '이메일')}</label>
                   <input
                     id="email"
                     type="email"
@@ -231,12 +231,12 @@ const Profile = () => {
                     value={user.email}
                     readOnly
                     disabled
-                    aria-label="이메일"
+                    aria-label={t('profile_email', '이메일')}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1" htmlFor="company">회사명</label>
+                  <label className="block text-sm font-medium mb-1" htmlFor="company">{t('profile_company', '회사명')}</label>
                   <input
                     id="company"
                     type="text"
@@ -244,12 +244,12 @@ const Profile = () => {
                     value={company}
                     onChange={e => setCompany(e.target.value)}
                     autoComplete="organization"
-                    aria-label="회사명"
+                    aria-label={t('profile_company', '회사명')}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1" htmlFor="phone">연락처</label>
+                  <label className="block text-sm font-medium mb-1" htmlFor="phone">{t('profile_phone', '연락처')}</label>
                   <input
                     id="phone"
                     type="text"
@@ -257,7 +257,7 @@ const Profile = () => {
                     value={phone}
                     onChange={handlePhoneChange}
                     autoComplete="tel"
-                    aria-label="연락처"
+                    aria-label={t('profile_phone', '연락처')}
                   />
                   {phoneError && <div className="text-xs text-red-600 mt-1">{phoneError}</div>}
                 </div>

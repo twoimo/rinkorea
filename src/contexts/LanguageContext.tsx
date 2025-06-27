@@ -470,6 +470,19 @@ const translations = {
         loading: '로딩 중...',
         saving: '저장 중...',
         saved_success: '저장되었습니다.',
+
+        // Company Overview Section
+        company_overview_title_reliable: '신뢰할 수 있는',
+        company_overview_title_partner: '파트너',
+        company_overview_description: '린코리아는 건설재료사업부와 2024년 신설된 건설기계사업부를 통해 종합적인 건설 솔루션을 제공합니다.',
+        company_overview_location_label: '본사 위치',
+        company_overview_location_value: '인천광역시 서구 백범로 707 (주안국가산업단지)\n천안 테크노파크 산업단지 입주예정 (2026~)',
+        company_overview_business_number_label: '사업자등록번호',
+        company_overview_business_number_value: '747-42-00526',
+        company_overview_business_division_label: '사업부문',
+        company_overview_business_division_value: '건설재료사업부 / 건설기계사업부',
+        company_overview_learn_more: '회사소개 자세히 보기',
+        company_overview_contact: '연락하기',
     },
     en: {
         // Navigation
@@ -914,6 +927,19 @@ const translations = {
         loading: 'Loading...',
         saving: 'Saving...',
         saved_success: 'Saved successfully.',
+
+        // Company Overview Section
+        company_overview_title_reliable: 'Reliable',
+        company_overview_title_partner: 'Partner',
+        company_overview_description: 'RIN Korea provides comprehensive construction solutions through its Construction Materials and Construction Machinery divisions.',
+        company_overview_location_label: 'Headquarters Location',
+        company_overview_location_value: 'Incheon, South Korea\nTechnopark Inju (expected completion: 2026)',
+        company_overview_business_number_label: 'Business Registration Number',
+        company_overview_business_number_value: '747-42-00526',
+        company_overview_business_division_label: 'Business Division',
+        company_overview_business_division_value: 'Construction Materials / Construction Machinery',
+        company_overview_learn_more: 'Learn More',
+        company_overview_contact: 'Contact Us',
     },
     zh: {
         // Navigation
@@ -1379,6 +1405,19 @@ const translations = {
         loading: '加载中...',
         saving: '保存中...',
         saved_success: '保存成功。',
+
+        // Company Overview Section
+        company_overview_title_reliable: '可靠的',
+        company_overview_title_partner: '合作伙伴',
+        company_overview_description: 'RIN Korea通过建筑材料和建筑机械两大核心业务，提供全面的建筑解决方案。',
+        company_overview_location_label: '总部位置',
+        company_overview_location_value: '韩国仁川\n仁川技术园区Inju (预计完成时间: 2026年)\n商业注册号: 747-42-00526\n业务部门: 建筑材料 / 建筑机械',
+        company_overview_business_number_label: '商业注册号',
+        company_overview_business_number_value: '747-42-00526',
+        company_overview_business_division_label: '业务部门',
+        company_overview_business_division_value: '建筑材料 / 建筑机械',
+        company_overview_learn_more: '了解更多',
+        company_overview_contact: '联系我们',
     },
 };
 

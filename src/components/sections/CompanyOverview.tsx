@@ -2,28 +2,31 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, FileText, Building2, ArrowRight, Phone, Mail } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/image';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const CompanyOverview = () => {
+  const { t } = useLanguage();
+
   const companyInfo = [
     {
       icon: <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />,
-      label: "본사 위치",
+      label: t('company_overview_location_label', '본사 위치'),
       value: <>
-        인천광역시 서구 백범로 707 (주안국가산업단지)<br />
-        천안 테크노파크 산업단지 입주예정 (2026~)
+        {t('company_overview_location_value', '인천광역시 서구 백범로 707 (주안국가산업단지)')}<br />
+        {t('company_overview_location_future', '천안 테크노파크 산업단지 입주예정 (2026~)')}
       </>,
       color: "text-blue-600"
     },
     {
       icon: <FileText className="w-5 h-5 sm:w-6 sm:h-6" />,
-      label: "사업자등록번호",
+      label: t('company_overview_business_number_label', '사업자등록번호'),
       value: "747-42-00526",
       color: "text-green-600"
     },
     {
       icon: <Building2 className="w-5 h-5 sm:w-6 sm:h-6" />,
-      label: "사업부문",
-      value: "건설재료사업부 / 건설기계사업부",
+      label: t('company_overview_business_division_label', '사업부문'),
+      value: t('company_overview_business_division_value', '건설재료사업부 / 건설기계사업부'),
       color: "text-orange-600"
     }
   ];
@@ -42,13 +45,12 @@ const CompanyOverview = () => {
           {/* Content */}
           <div className="order-2 lg:order-1">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-4 sm:mb-6 leading-tight">
-              신뢰할 수 있는
-              <span className="text-red-600"> 파트너</span>
+              {t('company_overview_title_reliable', '신뢰할 수 있는')}
+              <span className="text-red-600"> {t('company_overview_title_partner', '파트너')}</span>
             </h2>
 
             <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 leading-relaxed">
-              린코리아는 건설재료사업부와 2024년 신설된 건설기계사업부를 통해
-              종합적인 건설 솔루션을 제공합니다.
+              {t('company_overview_description', '린코리아는 건설재료사업부와 2024년 신설된 건설기계사업부를 통해 종합적인 건설 솔루션을 제공합니다.')}
             </p>
 
             {/* Company Info Cards */}
