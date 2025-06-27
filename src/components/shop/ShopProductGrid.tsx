@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { ShoppingCart, Star, Edit, Trash2, EyeOff, Eye } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Product {
   id: string;
@@ -44,6 +44,8 @@ const ShopProductGrid = ({
   onDeleteProduct,
   onToggleHide,
 }: ShopProductGridProps) => {
+  const { t } = useLanguage();
+
   const formatPrice = (price: number) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
@@ -103,7 +105,7 @@ const ShopProductGrid = ({
                     <span className="ml-1 text-sm font-medium text-gray-900">{product.rating}</span>
                   </div>
                   <span className="text-gray-300">|</span>
-                  <span className="text-sm text-gray-600">{product.reviews} 리뷰</span>
+                  <span className="text-sm text-gray-600">{product.reviews} {t('reviews', '리뷰')}</span>
                 </div>
               </div>
 
@@ -112,28 +114,27 @@ const ShopProductGrid = ({
                 <div className="flex flex-col">
                   {product.original_price && (
                     <del className="text-sm text-gray-400">
-                      {formatPrice(product.original_price)}원
+                      {formatPrice(product.original_price)}{t('currency_won', '원')}
                     </del>
                   )}
                   <span className="text-xl font-bold text-blue-600">
-                    {formatPrice(product.price)}원
+                    {formatPrice(product.price)}{t('currency_won', '원')}
                   </span>
                 </div>
                 <button
                   onClick={() => onProductClick(product.naver_url || '')}
-                  className={`w-full sm:w-auto px-4 py-3 sm:py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 hover:scale-105 touch-manipulation ${
-                    isSoldOut 
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                  className={`w-full sm:w-auto px-4 py-3 sm:py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 hover:scale-105 touch-manipulation ${isSoldOut
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-blue-600 hover:bg-blue-700 text-white'
-                  }`}
+                    }`}
                   disabled={isSoldOut}
-                  aria-label={isSoldOut ? '품절' : '제품 구매하기'}
+                  aria-label={isSoldOut ? t('shop_product_out_of_stock', '품절') : t('shop_product_buy_now', '제품 구매하기')}
                 >
                   {isSoldOut ? (
-                    <>품절</>
+                    <>{t('shop_product_out_of_stock', '품절')}</>
                   ) : (
                     <>
-                      구매하기
+                      {t('shop_product_buy_now', '구매하기')}
                       <ShoppingCart className="w-4 h-4" />
                     </>
                   )}
@@ -145,31 +146,30 @@ const ShopProductGrid = ({
             {isAdmin && (
               <div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex flex-col sm:flex-row gap-1 sm:gap-2 z-10">
                 <button
-                  className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow touch-manipulation ${
-                    formLoading ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+                  className={`bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow touch-manipulation ${formLoading ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                   onClick={() => onToggleHide(product)}
-                  title={isHidden ? '노출 해제' : '숨기기'}
+                  title={isHidden ? t('show', '노출 해제') : t('hide', '숨기기')}
                   disabled={formLoading}
-                  aria-label={isHidden ? '노출 해제' : '숨기기'}
+                  aria-label={isHidden ? t('show', '노출 해제') : t('hide', '숨기기')}
                 >
                   {isHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                 </button>
                 <button
                   className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow touch-manipulation"
                   onClick={() => onEditProduct(product)}
-                  title="수정"
+                  title={t('edit', '수정')}
                   disabled={formLoading}
-                  aria-label="수정"
+                  aria-label={t('edit', '수정')}
                 >
                   <Edit className="w-4 h-4" />
                 </button>
                 <button
                   className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-2 shadow touch-manipulation"
                   onClick={() => onDeleteProduct(product)}
-                  title="삭제"
+                  title={t('delete', '삭제')}
                   disabled={formLoading}
-                  aria-label="삭제"
+                  aria-label={t('delete', '삭제')}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>

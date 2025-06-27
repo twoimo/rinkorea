@@ -327,12 +327,13 @@ const translations = {
 
         // Shop Page
         shop_delete_title: '제품 삭제',
+        reviews: '리뷰',
+        currency_won: '원',
 
         // Shop Additional
         shop_sort_popularity: '인기도순',
         shop_sort_discount: '할인율순',
         shop_sort_sales: '누적 판매순',
-        shop_sort_reviews: '리뷰 많은순',
         shop_sort_rating: '평점 높은순',
 
         // Certificates Page
@@ -673,12 +674,13 @@ const translations = {
 
         // Shop Page
         shop_delete_title: 'Delete Product',
+        reviews: 'reviews',
+        currency_won: '',
 
         // Shop Additional
         shop_sort_popularity: 'Popularity',
         shop_sort_discount: 'Discount',
         shop_sort_sales: 'Sales',
-        shop_sort_reviews: 'Reviews',
         shop_sort_rating: 'Rating',
 
         // Certificates Page
@@ -1040,12 +1042,13 @@ const translations = {
 
         // Shop Page
         shop_delete_title: '删除产品',
+        reviews: '评论',
+        currency_won: '元',
 
         // Shop Additional
         shop_sort_popularity: '人气',
         shop_sort_discount: '折扣',
         shop_sort_sales: '销量',
-        shop_sort_reviews: '评论',
         shop_sort_rating: '评分',
 
         // Certificates Page
