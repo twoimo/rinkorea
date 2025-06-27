@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -34,11 +34,7 @@ export const useInquiries = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
-  useEffect(() => {
-    fetchInquiries();
-  }, [user]);
-
-  const fetchInquiries = async () => {
+  const fetchInquiries = useCallback(async () => {
     try {
       console.log('🔍 Fetching inquiries...');
       const { data, error } = await supabase
@@ -58,7 +54,11 @@ export const useInquiries = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchInquiries();
+  }, [fetchInquiries, user]);
 
   const createInquiry = async (inquiry: {
     name: string;
@@ -140,7 +140,8 @@ export const useInquiries = () => {
     }
   };
 
-  const getReplies = async (inquiryId: string): Promise<Reply[]> => {
+  const getReplies = useCallback(async (inquiryId: string): Promise<Reply[]> => {
+    console.log('🔍 Getting replies for inquiry:', inquiryId);
     const { data, error } = await supabase
       .from('replies')
       .select('*')
@@ -148,7 +149,7 @@ export const useInquiries = () => {
       .order('created_at', { ascending: true });
     if (error) throw error;
     return data || [];
-  };
+  }, []);
 
   const createReply = async (inquiryId: string, content: string): Promise<Reply | null> => {
     try {

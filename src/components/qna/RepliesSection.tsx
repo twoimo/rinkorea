@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { User } from 'lucide-react';
 import { useInquiries } from '@/hooks/useInquiries';
 
@@ -9,47 +9,71 @@ interface RepliesSectionProps {
   onRefetch?: () => Promise<void>;
 }
 
-const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isAdmin, onRefetch }) => {
+const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView, isAdmin, onRefetch }) => {
   const { getReplies, createReply, updateReply, deleteReply } = useInquiries();
   const [replies, setReplies] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
   const [editingId, setEditingId] = useState(null);
 
+  console.log('🔍 RepliesSection render:', {
+    inquiryId,
+    canView,
+    isAdmin,
+    repliesCount: replies.length,
+    initialLoading,
+    error
+  });
+
   const loadReplies = useCallback(async () => {
-    if (!canView || !inquiryId) return;
+    if (!canView || !inquiryId) {
+      console.log('❌ loadReplies skipped:', { canView, inquiryId });
+      return;
+    }
 
     try {
+      console.log('🔄 loadReplies starting for inquiry:', inquiryId);
       setError(null);
       const data = await getReplies(inquiryId);
+      console.log('✅ loadReplies success:', data?.length || 0, 'replies');
       setReplies(data || []);
     } catch (err) {
-      console.error('Error loading replies:', err);
+      console.error('❌ loadReplies error:', err);
       setError('답변을 불러오는데 실패했습니다.');
       setReplies([]);
     }
-  }, [getReplies, inquiryId, canView]);
+  }, [inquiryId, canView, getReplies]);
 
+  // 초기 로딩만 한 번 수행
   useEffect(() => {
-    setLoading(true);
-    loadReplies().finally(() => setLoading(false));
-  }, [loadReplies]);
+    if (initialLoading && canView && inquiryId) {
+      console.log('🔄 Initial load for inquiry:', inquiryId);
+      loadReplies().finally(() => {
+        console.log('✅ Initial load completed');
+        setInitialLoading(false);
+      });
+    }
+  }, [inquiryId, canView, initialLoading, loadReplies]);
+
+  const refreshReplies = useCallback(async () => {
+    await loadReplies();
+    if (onRefetch) {
+      await onRefetch();
+    }
+  }, [loadReplies, onRefetch]);
 
   const handleCreateReply = useCallback(async () => {
     if (!replyText.trim()) return;
     try {
       await createReply(inquiryId, replyText);
       setReplyText('');
-      await loadReplies();
-      if (onRefetch) {
-        await onRefetch();
-      }
+      await refreshReplies();
     } catch (error) {
       console.error('Error creating reply:', error);
       setError('답변 등록에 실패했습니다.');
     }
-  }, [replyText, createReply, inquiryId, loadReplies, onRefetch]);
+  }, [replyText, createReply, inquiryId, refreshReplies]);
 
   const handleUpdateReply = useCallback(async (replyId: string, content: string) => {
     try {
@@ -66,15 +90,12 @@ const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isA
   const handleDeleteReply = useCallback(async (replyId: string) => {
     try {
       await deleteReply(replyId);
-      await loadReplies();
-      if (onRefetch) {
-        await onRefetch();
-      }
+      await refreshReplies();
     } catch (error) {
       console.error('Error deleting reply:', error);
       setError('답변 삭제에 실패했습니다.');
     }
-  }, [deleteReply, loadReplies, onRefetch]);
+  }, [deleteReply, refreshReplies]);
 
   const replyElements = useMemo(() => {
     return replies.map(reply => (
@@ -141,15 +162,15 @@ const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isA
 
   return (
     <div className="mt-4 md:mt-6">
-      {loading ? (
+      {initialLoading ? (
         <div className="text-gray-400 text-sm md:text-base">답변 불러오는 중...</div>
       ) : error ? (
         <div className="text-red-500 text-sm md:text-base">
           {error}
           <button
             onClick={() => {
-              setLoading(true);
-              loadReplies().finally(() => setLoading(false));
+              setInitialLoading(true);
+              loadReplies().finally(() => setInitialLoading(false));
             }}
             className="ml-2 text-blue-600 hover:underline"
           >
@@ -211,6 +232,8 @@ const RepliesSection: React.FC<RepliesSectionProps> = ({ inquiryId, canView, isA
       )}
     </div>
   );
-};
+});
+
+RepliesSection.displayName = 'RepliesSection';
 
 export default RepliesSection;
