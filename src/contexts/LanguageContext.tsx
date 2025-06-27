@@ -366,6 +366,40 @@ const translations = {
         equipment_updated_success: '기계가 수정되었습니다.',
         equipment_added_success: '기계가 추가되었습니다.',
 
+        // Revenue Management
+        revenue_management_title: '매출 관리',
+        revenue_management_subtitle: '데이터 기반의 매출 분석과 시각화로 비즈니스 인사이트를 얻어보세요',
+        revenue_dashboard: '대시보드',
+        revenue_chart_analysis: '차트 분석',
+        revenue_data_input: '데이터 입력',
+        revenue_data_manage: '데이터 편집',
+        revenue_quick_select: '빠른 선택',
+        revenue_period: '기간',
+        revenue_export_data: '데이터 내보내기',
+        revenue_monthly_trend: '월별 매출 추이',
+        revenue_data_loading_error: '데이터 로딩 오류',
+        revenue_no_data: '매출 데이터가 없습니다',
+        revenue_no_data_desc: '데이터 입력 탭에서 매출 정보를 추가하여 분석을 시작해보세요.',
+        revenue_input_data: '데이터 입력하기',
+
+        // Revenue Table Headers
+        revenue_date: '날짜',
+        revenue_category: '카테고리',
+        revenue_product_name: '제품명',
+        revenue_amount: '매출',
+        revenue_quantity: '수량',
+        revenue_unit_price: '단가',
+        revenue_region: '지역',
+        revenue_customer_type: '고객유형',
+        revenue_notes: '비고',
+
+        // ProductCard
+        product_card_view_detail: '자세히 보기',
+        product_card_show: '표시하기',
+        product_card_hide: '숨기기',
+        product_card_edit: '편집',
+        product_card_delete: '삭제',
+
         // Certificates Page
         certificates_hero_title: '시험성적서/인증',
         certificates_hero_subtitle: '린코리아 제품의 우수한 품질과 안전성을 증명하는 각종 인증서와 시험성적서를 확인하세요.',
@@ -694,7 +728,7 @@ const translations = {
         grid_view: 'Grid View',
         list_view: 'List View',
         total_resources_count: 'Total {{count}} resources found',
-        search_results_for: "'{{term}' Search Results",
+        search_results_for: "'{{term}}' Search Results",
         no_resources_found: 'No resources found',
         try_different_filter: 'Try different filters or explore different categories',
         hidden: 'Hidden',
@@ -780,6 +814,40 @@ const translations = {
         hide_content: 'Hide Content',
         show_content: 'Show Content',
         private_inquiry: 'This is a private inquiry',
+
+        // Revenue Management
+        revenue_management_title: 'Revenue Management',
+        revenue_management_subtitle: 'Data-driven revenue analysis and visualization to gain business insights',
+        revenue_dashboard: 'Dashboard',
+        revenue_chart_analysis: 'Chart Analysis',
+        revenue_data_input: 'Data Input',
+        revenue_data_manage: 'Data Management',
+        revenue_quick_select: 'Quick Select',
+        revenue_period: 'Period',
+        revenue_export_data: 'Export Data',
+        revenue_monthly_trend: 'Monthly Trend',
+        revenue_data_loading_error: 'Data Loading Error',
+        revenue_no_data: 'No revenue data',
+        revenue_no_data_desc: 'Please add revenue information to start analyzing.',
+        revenue_input_data: 'Input Data',
+
+        // Revenue Table Headers
+        revenue_date: 'Date',
+        revenue_category: 'Category',
+        revenue_product_name: 'Product Name',
+        revenue_amount: 'Revenue',
+        revenue_quantity: 'Quantity',
+        revenue_unit_price: 'Unit Price',
+        revenue_region: 'Region',
+        revenue_customer_type: 'Customer Type',
+        revenue_notes: 'Notes',
+
+        // ProductCard
+        product_card_view_detail: 'View Details',
+        product_card_show: 'Show',
+        product_card_hide: 'Hide',
+        product_card_edit: 'Edit',
+        product_card_delete: 'Delete',
     },
     zh: {
         // Navigation
@@ -1178,6 +1246,40 @@ const translations = {
         hide_content: '隐藏内容',
         show_content: '显示内容',
         private_inquiry: '这是私密咨询',
+
+        // Revenue Management
+        revenue_management_title: '营收管理',
+        revenue_management_subtitle: '数据驱动的营收分析和可视化，以获得业务洞察',
+        revenue_dashboard: '仪表盘',
+        revenue_chart_analysis: '图表分析',
+        revenue_data_input: '数据输入',
+        revenue_data_manage: '数据管理',
+        revenue_quick_select: '快速选择',
+        revenue_period: '时期',
+        revenue_export_data: '导出数据',
+        revenue_monthly_trend: '每月趋势',
+        revenue_data_loading_error: '数据加载错误',
+        revenue_no_data: '没有营收数据',
+        revenue_no_data_desc: '请在数据输入标签中添加营收信息，开始分析。',
+        revenue_input_data: '输入数据',
+
+        // Revenue Table Headers
+        revenue_date: '日期',
+        revenue_category: '类别',
+        revenue_product_name: '产品名称',
+        revenue_amount: '营收',
+        revenue_quantity: '数量',
+        revenue_unit_price: '单价',
+        revenue_region: '地区',
+        revenue_customer_type: '客户类型',
+        revenue_notes: '备注',
+
+        // ProductCard
+        product_card_view_detail: '查看详情',
+        product_card_show: '显示',
+        product_card_hide: '隐藏',
+        product_card_edit: '编辑',
+        product_card_delete: '删除',
     },
 };
 

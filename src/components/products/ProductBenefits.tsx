@@ -5,32 +5,32 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const ProductBenefits = memo(() => {
   const { t } = useLanguage();
 
-  const benefits = [
-    {
-      icon: Shield,
+const benefits = [
+  {
+    icon: Shield,
       title: t('product_benefits_fire_resistant_title', '불연재 인증'),
       description: t('product_benefits_fire_resistant_desc', '안전한 순수 무기질 세라믹 코팅제'),
-      color: 'text-blue-600'
-    },
-    {
-      icon: Zap,
+    color: 'text-blue-600'
+  },
+  {
+    icon: Zap,
       title: t('product_benefits_easy_construction_title', '간편한 시공'),
       description: t('product_benefits_easy_construction_desc', '1액형으로 간편하게 시공 가능'),
-      color: 'text-yellow-600'
-    },
-    {
-      icon: Star,
+    color: 'text-yellow-600'
+  },
+  {
+    icon: Star,
       title: t('product_benefits_quality_title', '우수한 품질'),
       description: t('product_benefits_quality_desc', '엄격한 품질 관리를 통한 우수한 품질'),
-      color: 'text-green-600'
-    },
-    {
-      icon: Palette,
+    color: 'text-green-600'
+  },
+  {
+    icon: Palette,
       title: t('product_benefits_variety_title', '다양한 선택'),
       description: t('product_benefits_variety_desc', '용도와 요구사항에 맞는 다양한 제품군'),
-      color: 'text-purple-600'
-    }
-  ];
+    color: 'text-purple-600'
+  }
+];
 
   return (
     <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
