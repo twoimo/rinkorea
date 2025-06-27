@@ -1,7 +1,7 @@
-
 import React from 'react';
-import { Calendar, ArrowRight, Edit, Trash2 } from 'lucide-react';
-import AdminOnly from '../AdminOnly';
+import { Calendar, Eye, Edit, Trash2 } from 'lucide-react';
+import { useUserRole } from '@/hooks/useUserRole';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface NewsListItemProps {
   newsItem: {
@@ -22,66 +22,68 @@ const NewsListItem: React.FC<NewsListItemProps> = ({
   onEdit,
   onDelete
 }) => {
+  const { isAdmin } = useUserRole();
+  const { t } = useLanguage();
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  };
+
+  const getPreviewText = (content: string) => {
+    const textContent = content.replace(/<[^>]*>/g, '');
+    return textContent.length > 150 ? textContent.substring(0, 150) + '...' : textContent;
+  };
+
   return (
-    <article className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="p-4 md:p-8">
-        <div className="flex items-start justify-between mb-3 gap-2">
-          <span className="bg-blue-100 text-blue-800 px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium flex-shrink-0">
-            공지사항
-          </span>
-          <AdminOnly>
-            <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+    <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
+            {newsItem.title}
+          </h3>
+          <p className="text-gray-600 mb-4 line-clamp-3 text-sm md:text-base">
+            {getPreviewText(newsItem.content)}
+          </p>
+          <div className="flex items-center text-gray-400 text-xs md:text-sm">
+            <Calendar className="w-3 h-3 md:w-4 md:h-4 mr-2" />
+            <span>{formatDate(newsItem.created_at)}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
+          <button
+            onClick={() => onSelect(newsItem.id)}
+            className="flex items-center bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 md:px-4 py-2 rounded-lg font-medium transition-all duration-200 text-xs md:text-sm"
+          >
+            <Eye className="w-3 h-3 md:w-4 md:h-4 mr-2" />
+            {t('news_view_detail', '자세히 보기')}
+          </button>
+
+          {isAdmin && (
+            <>
               <button
                 onClick={() => onEdit(newsItem.id)}
-                className="text-blue-600 hover:text-blue-700 p-2 md:p-1 hover:bg-blue-50 rounded-lg md:rounded-none md:hover:bg-transparent transition-colors"
-                title="수정"
-                aria-label="수정"
+                className="flex items-center bg-yellow-50 hover:bg-yellow-100 text-yellow-700 px-3 md:px-4 py-2 rounded-lg font-medium transition-all duration-200 text-xs md:text-sm"
               >
-                <Edit className="w-4 h-4" aria-hidden="true" />
+                <Edit className="w-3 h-3 md:w-4 md:h-4 mr-2" />
+                {t('edit', '수정')}
               </button>
               <button
                 onClick={() => onDelete(newsItem.id)}
-                className="text-red-600 hover:text-red-700 p-2 md:p-1 hover:bg-red-50 rounded-lg md:rounded-none md:hover:bg-transparent transition-colors"
-                title="삭제"
-                aria-label="삭제"
+                className="flex items-center bg-red-50 hover:bg-red-100 text-red-700 px-3 md:px-4 py-2 rounded-lg font-medium transition-all duration-200 text-xs md:text-sm"
               >
-                <Trash2 className="w-4 h-4" aria-hidden="true" />
+                <Trash2 className="w-3 h-3 md:w-4 md:h-4 mr-2" />
+                {t('delete', '삭제')}
               </button>
-            </div>
-          </AdminOnly>
-        </div>
-
-        <h2
-          className="text-lg md:text-2xl font-bold text-gray-900 mb-2 md:mb-3 hover:text-blue-600 transition-colors cursor-pointer line-clamp-2 leading-tight"
-          onClick={() => onSelect(newsItem.id)}
-          aria-label="공지사항 상세보기"
-        >
-          {newsItem.title}
-        </h2>
-
-        <p className="text-gray-600 mb-3 md:mb-4 line-clamp-2 text-sm md:text-base">
-          {newsItem.content}
-        </p>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center text-xs md:text-sm text-gray-500">
-            <div className="flex items-center">
-              <Calendar className="w-3 h-3 md:w-4 md:h-4 mr-1" aria-hidden="true" />
-              {new Date(newsItem.created_at).toLocaleDateString('ko-KR')}
-            </div>
-          </div>
-
-          <button
-            onClick={() => onSelect(newsItem.id)}
-            className="text-blue-600 hover:text-blue-700 font-medium flex items-center transition-colors text-sm md:text-base px-2 py-1 md:px-0 md:py-0 hover:bg-blue-50 md:hover:bg-transparent rounded"
-            aria-label="자세히 보기"
-          >
-            자세히 보기
-            <ArrowRight className="w-3 h-3 md:w-4 md:h-4 ml-1" aria-hidden="true" />
-          </button>
+            </>
+          )}
         </div>
       </div>
-    </article>
+    </div>
   );
 };
 

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -10,6 +9,7 @@ import CertificateSection from '@/components/certificates/CertificateSection';
 import { Award, FileText, Shield, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 interface Certificate {
@@ -34,6 +34,7 @@ const Certificates = () => {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
   const { isAdmin } = useUserRole();
+  const { t } = useLanguage();
   const [showForm, setShowForm] = useState(false);
   const [editingCertificate, setEditingCertificate] = useState<Certificate | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -45,22 +46,22 @@ const Certificates = () => {
 
   const certificateTypes = [
     {
-      name: "특허 등록증",
-      type: "특허",
+      name: t('certificates_type_patent', '특허 등록증'),
+      type: t('certificate_type_patent', '특허'),
       icon: <Award className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-600" />,
-      description: "1액형 세라믹 제조기술에 대한 특허 등록으로 기술력을 인정받았습니다."
+      description: t('certificates_type_patent_desc', '1액형 세라믹 제조기술에 대한 특허 등록으로 기술력을 인정받았습니다.')
     },
     {
-      name: "불연재 인증",
-      type: "성적서",
+      name: t('certificates_type_fireproof', '불연재 인증'),
+      type: t('certificate_type_report', '성적서'),
       icon: <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />,
-      description: "안전한 순수 무기질 세라믹 코팅제입니다"
+      description: t('certificates_type_fireproof_desc', '안전한 순수 무기질 세라믹 코팅제입니다')
     },
     {
-      name: "품질시험성적서",
-      type: "시험성적서",
+      name: t('certificates_type_quality', '품질시험성적서'),
+      type: t('certificate_type_test_report', '시험성적서'),
       icon: <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />,
-      description: "공인시험기관에서 실시한 각종 품질 시험 결과를 확인할 수 있습니다."
+      description: t('certificates_type_quality_desc', '공인시험기관에서 실시한 각종 품질 시험 결과를 확인할 수 있습니다.')
     }
   ];
 

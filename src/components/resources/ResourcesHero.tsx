@@ -1,32 +1,33 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
-import AdminOnly from '../AdminOnly';
+import { useUserRole } from '@/hooks/useUserRole';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ResourcesHeroProps {
     setShowForm: (show: boolean) => void;
 }
 
 const ResourcesHero: React.FC<ResourcesHeroProps> = ({ setShowForm }) => {
+    const { isAdmin } = useUserRole();
+    const { t } = useLanguage();
+
     return (
-        <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 md:py-20">
+        <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 sm:py-20">
             <div className="container mx-auto px-4">
                 <div className="text-center">
-                    <h1 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6">자료실</h1>
-                    <p className="text-base md:text-xl max-w-2xl mx-auto px-4">
-                        린코리아의 다양한 기술 자료와 문서를 다운로드하실 수 있습니다.
+                    <h1 className="text-3xl sm:text-5xl font-bold mb-4 sm:mb-6">{t('resources_hero_title', '자료실')}</h1>
+                    <p className="text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
+                        {t('resources_hero_subtitle', '린코리아의 제품 카탈로그, 기술 자료, 인증서 등 다양한 자료를 확인하세요.')}
                     </p>
-                    <AdminOnly>
-                        <div className="mt-6 md:mt-8">
-                            <button
-                                onClick={() => setShowForm(true)}
-                                className="inline-flex items-center bg-white text-blue-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-sm md:text-base"
-                                aria-label="새 자료 등록"
-                            >
-                                <Plus className="w-4 h-4 md:w-5 md:h-5 mr-2" aria-hidden="true" />
-                                새 자료 등록
-                            </button>
-                        </div>
-                    </AdminOnly>
+                    {isAdmin && (
+                        <button
+                            className="mt-6 sm:mt-8 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 mx-auto touch-manipulation"
+                            onClick={() => setShowForm(true)}
+                            aria-label={t('resources_add_btn', '자료 추가')}
+                        >
+                            <Plus className="w-5 h-5" /> {t('resources_add_btn', '자료 추가')}
+                        </button>
+                    )}
                 </div>
             </div>
         </section>

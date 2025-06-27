@@ -7,6 +7,7 @@ import ResourceForm from '../components/resources/ResourceForm';
 import { useResources } from '@/hooks/useResources';
 import { useResourcesAdmin } from '@/hooks/useResourcesAdmin';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Resources = () => {
     const { resources, categories, loading, refetch, downloadResource } = useResources();
@@ -19,6 +20,7 @@ const Resources = () => {
     } = useResourcesAdmin();
 
     const { isAdmin } = useUserRole();
+    const { t } = useLanguage();
 
     const [showForm, setShowForm] = useState(false);
     const [editingResource, setEditingResource] = useState<string | null>(null);
@@ -46,7 +48,7 @@ const Resources = () => {
     };
 
     const handleDeleteResource = async (resourceId: string) => {
-        if (!confirm('정말로 이 자료를 삭제하시겠습니까?\n삭제된 자료는 복구할 수 없습니다.')) {
+        if (!confirm(t('resources_delete_confirm', '정말로 이 자료를 삭제하시겠습니까?\n삭제된 자료는 복구할 수 없습니다.'))) {
             return;
         }
 

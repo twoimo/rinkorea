@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { MessageCircle, CheckCircle, Clock } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface QnAStatsProps {
   totalInquiries: number;
@@ -13,6 +13,8 @@ const QnAStats: React.FC<QnAStatsProps> = ({
   answeredCount,
   pendingCount
 }) => {
+  const { t } = useLanguage();
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
       <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
@@ -21,7 +23,7 @@ const QnAStats: React.FC<QnAStatsProps> = ({
             <MessageCircle className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
           </div>
           <div className="ml-3 md:ml-4">
-            <p className="text-xs md:text-sm text-gray-600">전체 문의</p>
+            <p className="text-xs md:text-sm text-gray-600">{t('total_inquiries', '전체 문의')}</p>
             <p className="text-xl md:text-2xl font-bold text-gray-900">{totalInquiries}</p>
           </div>
         </div>
@@ -32,7 +34,7 @@ const QnAStats: React.FC<QnAStatsProps> = ({
             <CheckCircle className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
           </div>
           <div className="ml-3 md:ml-4">
-            <p className="text-xs md:text-sm text-gray-600">답변 완료</p>
+            <p className="text-xs md:text-sm text-gray-600">{t('qna_status_answered', '답변 완료')}</p>
             <p className="text-xl md:text-2xl font-bold text-gray-900">{answeredCount}</p>
           </div>
         </div>
@@ -43,7 +45,7 @@ const QnAStats: React.FC<QnAStatsProps> = ({
             <Clock className="w-5 h-5 md:w-6 md:h-6 text-yellow-600" />
           </div>
           <div className="ml-3 md:ml-4">
-            <p className="text-xs md:text-sm text-gray-600">답변 대기</p>
+            <p className="text-xs md:text-sm text-gray-600">{t('qna_status_pending', '답변 대기')}</p>
             <p className="text-xl md:text-2xl font-bold text-gray-900">{pendingCount}</p>
           </div>
         </div>

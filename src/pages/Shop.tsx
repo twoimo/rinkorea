@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -9,6 +8,7 @@ import ShopProductForm from '@/components/shop/ShopProductForm';
 import ShopDeleteModal from '@/components/shop/ShopDeleteModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 interface Product {
@@ -35,6 +35,7 @@ const Shop = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { isAdmin } = useUserRole();
+  const { t } = useLanguage();
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formValues, setFormValues] = useState<Partial<Product>>({});
@@ -56,14 +57,14 @@ const Shop = () => {
   ];
 
   const sortOptions = [
-    { value: 'popularity', label: '인기도순' },
-    { value: 'newest', label: '최신등록순' },
-    { value: 'priceAsc', label: '낮은 가격순' },
-    { value: 'priceDesc', label: '높은 가격순' },
-    { value: 'discount', label: '할인율순' },
-    { value: 'sales', label: '누적 판매순' },
-    { value: 'reviews', label: '리뷰 많은순' },
-    { value: 'rating', label: '평점 높은순' },
+    { value: 'popularity', label: t('shop_sort_popularity', '인기도순') },
+    { value: 'newest', label: t('shop_sort_newest', '최신등록순') },
+    { value: 'priceAsc', label: t('shop_sort_price_low', '낮은 가격순') },
+    { value: 'priceDesc', label: t('shop_sort_price_high', '높은 가격순') },
+    { value: 'discount', label: t('shop_sort_discount', '할인율순') },
+    { value: 'sales', label: t('shop_sort_sales', '누적 판매순') },
+    { value: 'reviews', label: t('shop_sort_reviews', '리뷰 많은순') },
+    { value: 'rating', label: t('shop_sort_rating', '평점 높은순') },
   ];
 
   // 숨김 상품 목록 불러오기 함수
