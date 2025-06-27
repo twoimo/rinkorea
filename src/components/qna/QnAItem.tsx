@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { Edit, Trash2, MessageCircle, User, Calendar, Lock, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Edit, Trash2, MessageCircle, User, Calendar, Lock, Eye, ChevronDown, ChevronUp, Shield, Reply as ReplyIcon } from 'lucide-react';
 import { User as UserType } from '@supabase/supabase-js';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useInquiries, Reply } from '@/hooks/useInquiries';
 
 interface Inquiry {
   id: string;
@@ -14,6 +15,7 @@ interface Inquiry {
   is_private: boolean;
   created_at: string;
   user_id: string;
+  admin_reply?: string | null;
   profiles?: {
     name: string;
   };
@@ -28,12 +30,33 @@ interface QnAItemProps {
 }
 
 const QnAItem: React.FC<QnAItemProps> = ({ inquiry, user, onEdit, onDelete, onRefetch }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [replies, setReplies] = useState<Reply[]>([]);
+  const [loadingReplies, setLoadingReplies] = useState(false);
   const { isAdmin } = useUserRole();
   const { t } = useLanguage();
+  const { getReplies } = useInquiries();
 
   const canView = !inquiry.is_private || isAdmin || (user && user.id === inquiry.user_id);
   const canEdit = user && (user.id === inquiry.user_id || isAdmin);
+
+  useEffect(() => {
+    if (canView && inquiry.id) {
+      loadReplies();
+    }
+  }, [inquiry.id, canView]);
+
+  const loadReplies = async () => {
+    try {
+      setLoadingReplies(true);
+      const repliesData = await getReplies(inquiry.id);
+      setReplies(repliesData);
+    } catch (error) {
+      console.error('Error loading replies:', error);
+    } finally {
+      setLoadingReplies(false);
+    }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('ko-KR', {
@@ -148,10 +171,51 @@ const QnAItem: React.FC<QnAItemProps> = ({ inquiry, user, onEdit, onDelete, onRe
         </button>
 
         {isExpanded && (
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-            <div className="prose prose-sm max-w-none">
-              <p className="text-gray-700 whitespace-pre-wrap">{inquiry.content}</p>
+          <div className="mt-4 space-y-4">
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="prose prose-sm max-w-none">
+                <p className="text-gray-700 whitespace-pre-wrap">{inquiry.content}</p>
+              </div>
             </div>
+
+            {inquiry.admin_reply && (
+              <div className="border-l-4 border-blue-500 bg-blue-50 p-4 rounded-lg ml-4">
+                <div className="flex items-center mb-2">
+                  <Shield className="w-4 h-4 text-blue-600 mr-2" />
+                  <span className="text-sm font-medium text-blue-800">관리자 답변</span>
+                </div>
+                <div className="prose prose-sm max-w-none">
+                  <p className="text-blue-700 whitespace-pre-wrap">{inquiry.admin_reply}</p>
+                </div>
+              </div>
+            )}
+
+            {loadingReplies ? (
+              <div className="text-center py-4">
+                <p className="text-gray-500 text-sm">답변을 불러오는 중...</p>
+              </div>
+            ) : replies.length > 0 ? (
+              <div className="space-y-3">
+                {replies.map((reply, index) => (
+                  <div key={reply.id} className="border-l-4 border-green-500 bg-green-50 p-4 rounded-lg ml-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center">
+                        <ReplyIcon className="w-4 h-4 text-green-600 mr-2" />
+                        <span className="text-sm font-medium text-green-800">
+                          관리자 답변 {replies.length > 1 ? `#${index + 1}` : ''}
+                        </span>
+                      </div>
+                      <span className="text-xs text-green-600">
+                        {formatDate(reply.created_at)}
+                      </span>
+                    </div>
+                    <div className="prose prose-sm max-w-none">
+                      <p className="text-green-700 whitespace-pre-wrap">{reply.content}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
           </div>
         )}
       </div>

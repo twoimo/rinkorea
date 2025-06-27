@@ -39,7 +39,10 @@ export const useInquiries = () => {
     try {
       const { data, error } = await supabase
         .from('inquiries')
-        .select('*')
+        .select(`
+          *,
+          profiles(name)
+        `)
         .order('created_at', { ascending: false });
 
       if (error) {

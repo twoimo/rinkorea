@@ -182,28 +182,28 @@ const translations = {
         equipment_added_success: '기계가 추가되었습니다.',
 
         // Products Page
-        products_hero_title: 'Products',
-        products_hero_subtitle: 'Discover RIN Korea\'s innovative ceramic coating materials and eco-friendly construction materials.',
+        products_hero_title: '제품소개',
+        products_hero_subtitle: '린코리아의 혁신적인 세라믹 코팅재와 친환경 건설재료를 만나보세요.',
 
         // News Page
-        news_hero_title: 'News',
-        news_hero_subtitle: 'Check the latest news and important announcements from RIN Korea.',
+        news_hero_title: '공지사항',
+        news_hero_subtitle: '린코리아의 최신 소식과 중요한 공지사항을 확인하세요.',
 
         // QnA Page
-        qna_hero_title: 'Customer Service',
-        qna_hero_subtitle: 'If you have any questions, please feel free to contact us anytime. Our experts will respond quickly and accurately.',
+        qna_hero_title: '고객상담',
+        qna_hero_subtitle: '궁금한 것이 있으시면 언제든지 문의해 주세요. 전문가가 신속하고 정확하게 답변드립니다.',
 
         // Resources Page
-        resources_hero_title: 'Resources',
-        resources_hero_subtitle: 'Check various materials such as RIN Korea\'s product catalogs, technical data, and certificates.',
+        resources_hero_title: '자료실',
+        resources_hero_subtitle: '린코리아의 제품 카탈로그, 기술 자료, 인증서 등 다양한 자료를 확인하세요.',
 
         // Shop Page
-        shop_hero_title: 'Online Store',
-        shop_hero_subtitle: 'You can order and purchase RIN Korea products online.',
+        shop_hero_title: '온라인 쇼핑몰',
+        shop_hero_subtitle: '린코리아 제품을 온라인으로 주문하고 구매할 수 있습니다.',
 
         // Certificates Page
-        certificates_hero_title: 'Certificates',
-        certificates_hero_subtitle: 'Check test reports and certifications that prove the quality and safety of RIN Korea products.',
+        certificates_hero_title: '시험성적서/인증',
+        certificates_hero_subtitle: '린코리아 제품의 품질과 안전성을 증명하는 시험성적서와 인증서를 확인하세요.',
 
         // Company Overview Section
         company_overview_title_reliable: '신뢰할 수 있는',
@@ -418,28 +418,28 @@ const translations = {
         equipment_added_success: 'Equipment has been added.',
 
         // Products Page
-        products_hero_title: 'Products',
-        products_hero_subtitle: 'Discover RIN Korea\'s innovative ceramic coating materials and eco-friendly construction materials.',
+        products_hero_title: '제품소개',
+        products_hero_subtitle: '린코리아의 혁신적인 세라믹 코팅재와 친환경 건설재료를 만나보세요.',
 
         // News Page
-        news_hero_title: 'News',
-        news_hero_subtitle: 'Check the latest news and important announcements from RIN Korea.',
+        news_hero_title: '공지사항',
+        news_hero_subtitle: '린코리아의 최신 소식과 중요한 공지사항을 확인하세요.',
 
         // QnA Page
-        qna_hero_title: 'Customer Service',
-        qna_hero_subtitle: 'If you have any questions, please feel free to contact us anytime. Our experts will respond quickly and accurately.',
+        qna_hero_title: '고객상담',
+        qna_hero_subtitle: '궁금한 것이 있으시면 언제든지 문의해 주세요. 전문가가 신속하고 정확하게 답변드립니다.',
 
         // Resources Page
-        resources_hero_title: 'Resources',
-        resources_hero_subtitle: 'Check various materials such as RIN Korea\'s product catalogs, technical data, and certificates.',
+        resources_hero_title: '자료실',
+        resources_hero_subtitle: '린코리아의 제품 카탈로그, 기술 자료, 인증서 등 다양한 자료를 확인하세요.',
 
         // Shop Page
-        shop_hero_title: 'Online Store',
-        shop_hero_subtitle: 'You can order and purchase RIN Korea products online.',
+        shop_hero_title: '온라인 쇼핑몰',
+        shop_hero_subtitle: '린코리아 제품을 온라인으로 주문하고 구매할 수 있습니다.',
 
         // Certificates Page
-        certificates_hero_title: 'Certificates',
-        certificates_hero_subtitle: 'Check test reports and certifications that prove the quality and safety of RIN Korea products.',
+        certificates_hero_title: '시험성적서/인증',
+        certificates_hero_subtitle: '린코리아 제품의 품질과 안전성을 증명하는 시험성적서와 인증서를 확인하세요.',
 
         // Company Overview Section
         company_overview_title_reliable: 'Reliable',
@@ -654,28 +654,28 @@ const translations = {
         equipment_added_success: '设备已添加。',
 
         // Products Page
-        products_hero_title: 'Products',
-        products_hero_subtitle: 'Discover RIN Korea\'s innovative ceramic coating materials and eco-friendly construction materials.',
+        products_hero_title: '产品介绍',
+        products_hero_subtitle: '探索RIN Korea的创新陶瓷涂料材料和环保建筑材料。',
 
         // News Page
-        news_hero_title: 'News',
-        news_hero_subtitle: 'Check the latest news and important announcements from RIN Korea.',
+        news_hero_title: '新闻公告',
+        news_hero_subtitle: '查看RIN Korea的最新消息和重要公告。',
 
         // QnA Page
-        qna_hero_title: 'Customer Service',
-        qna_hero_subtitle: 'If you have any questions, please feel free to contact us anytime. Our experts will respond quickly and accurately.',
+        qna_hero_title: '客户咨询',
+        qna_hero_subtitle: '如果您有任何问题，请随时联系我们。我们的专家将迅速准确地回复。',
 
         // Resources Page
-        resources_hero_title: 'Resources',
-        resources_hero_subtitle: 'Check various materials such as RIN Korea\'s product catalogs, technical data, and certificates.',
+        resources_hero_title: '资料库',
+        resources_hero_subtitle: '查看RIN Korea的产品目录、技术资料、证书等各种材料。',
 
         // Shop Page
-        shop_hero_title: 'Online Store',
-        shop_hero_subtitle: 'You can order and purchase RIN Korea products online.',
+        shop_hero_title: '在线商店',
+        shop_hero_subtitle: '您可以在线订购和购买RIN Korea产品。',
 
         // Certificates Page
-        certificates_hero_title: 'Certificates',
-        certificates_hero_subtitle: 'Check test reports and certifications that prove the quality and safety of RIN Korea products.',
+        certificates_hero_title: '证书',
+        certificates_hero_subtitle: '查看证明RIN Korea产品质量和安全性的测试报告和认证。',
 
         // Company Overview Section
         company_overview_title_reliable: '可靠的',

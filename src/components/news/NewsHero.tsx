@@ -23,9 +23,9 @@ const NewsHero: React.FC<NewsHeroProps> = ({ setShowForm }) => {
             <button
               className="mt-6 sm:mt-8 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 mx-auto touch-manipulation"
               onClick={() => setShowForm(true)}
-              aria-label="공지 추가"
+              aria-label={t('add')}
             >
-              <Plus className="w-5 h-5" /> 공지 추가
+              <Plus className="w-5 h-5" /> {t('add')}
             </button>
           )}
         </div>
