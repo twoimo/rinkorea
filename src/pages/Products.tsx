@@ -145,7 +145,7 @@ const Products = memo(() => {
       <div className="min-h-screen bg-white">
         <Header />
         <div className="flex items-center justify-center py-20">
-          <div className="text-red-600">오류가 발생했습니다: {error}</div>
+          <div className="text-red-600">{t('error')}: {error}</div>
         </div>
         <Footer />
       </div>
@@ -160,18 +160,17 @@ const Products = memo(() => {
       <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 lg:mb-6">제품소개</h1>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 lg:mb-6">{t('products_hero_title')}</h1>
             <p className="text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
-              린코리아의 혁신적인 제품군을 만나보세요. <br className="hidden sm:inline" />
-              최고 품질과 기술력으로 안전한 건설환경을 만들어갑니다.
+              {t('products_hero_subtitle')}
             </p>
             {isAdmin && (
               <button
                 className="mt-6 lg:mt-8 bg-green-600 hover:bg-green-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold flex items-center gap-2 mx-auto touch-manipulation"
                 onClick={() => handleOpenForm()}
-                aria-label="제품 추가"
+                aria-label={t('products_add_btn')}
               >
-                <Plus className="w-4 h-4 sm:w-5 sm:h-5" /> 제품 추가
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5" /> {t('products_add_btn')}
               </button>
             )}
           </div>

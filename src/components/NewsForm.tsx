@@ -52,7 +52,7 @@ const NewsForm: React.FC<NewsFormProps> = ({ onClose, onSave, initialData, isEdi
         <div className="p-4 md:p-6 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center justify-between">
             <h2 className="text-lg md:text-xl font-bold text-gray-900">
-              {isEdit ? '공지사항 수정' : '새 공지사항 작성'}
+              {isEdit ? t('news_form_title_edit', '공지사항 수정') : t('news_form_title_add', '새 공지사항 작성')}
             </h2>
             <button
               onClick={onClose}

@@ -124,8 +124,8 @@ const ShopProductGrid = ({
                 <button
                   onClick={() => onProductClick(product.naver_url || '')}
                   className={`w-full sm:w-auto px-4 py-3 sm:py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 hover:scale-105 touch-manipulation ${isSoldOut
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
                     }`}
                   disabled={isSoldOut}
                   aria-label={isSoldOut ? t('shop_product_out_of_stock', '품절') : t('shop_product_buy_now', '제품 구매하기')}

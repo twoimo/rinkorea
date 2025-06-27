@@ -326,7 +326,21 @@ const translations = {
         processing: '처리중...',
 
         // Shop Page
+        shop_hero_title: '온라인 쇼핑몰',
+        shop_hero_subtitle: '린코리아 제품을 온라인으로 주문하고 구매할 수 있습니다.',
+        shop_add_product: '제품 추가',
         shop_delete_title: '제품 삭제',
+        shop_sort_select: '정렬 방식 선택',
+        shop_sort_newest: '최신등록순',
+        shop_sort_price_low: '낮은 가격순',
+        shop_sort_price_high: '높은 가격순',
+        shop_grid_label: '그리드',
+        shop_grid_setting: '그리드 설정',
+        shop_grid_apply: '적용',
+        shop_grid_applying: '적용 중...',
+        shop_product_out_of_stock: '품절',
+        shop_product_buy_now: '구매하기',
+        shop_deleted_success: '삭제되었습니다.',
         reviews: '리뷰',
         currency_won: '원',
 
@@ -335,6 +349,22 @@ const translations = {
         shop_sort_discount: '할인율순',
         shop_sort_sales: '누적 판매순',
         shop_sort_rating: '평점 높은순',
+
+        // Product Benefits
+        product_benefits_title: '제품의 장점',
+        product_benefits_subtitle: '린코리아 세라믹 코팅제가 선택받는 이유',
+        product_benefits_fire_resistant_title: '불연재 인증',
+        product_benefits_fire_resistant_desc: '안전한 순수 무기질 세라믹 코팅제',
+        product_benefits_easy_construction_title: '간편한 시공',
+        product_benefits_easy_construction_desc: '1액형으로 간편하게 시공 가능',
+        product_benefits_quality_title: '우수한 품질',
+        product_benefits_quality_desc: '엄격한 품질 관리를 통한 우수한 품질',
+        product_benefits_variety_title: '다양한 선택',
+        product_benefits_variety_desc: '용도와 요구사항에 맞는 다양한 제품군',
+
+        // Equipment Success Messages
+        equipment_updated_success: '기계가 수정되었습니다.',
+        equipment_added_success: '기계가 추가되었습니다.',
 
         // Certificates Page
         certificates_hero_title: '시험성적서/인증',
@@ -630,7 +660,7 @@ const translations = {
         contact_form_send: 'Send Message',
         contact_form_required: 'Required Field',
         contact_send_success: 'Message has been sent successfully.',
-        contact_send_error: 'Failed to send message.',
+        contact_send_error: 'Message has not been sent.',
 
         // Resources Page
         resources_hero_title: 'Resources',
@@ -673,15 +703,45 @@ const translations = {
         processing: 'Processing...',
 
         // Shop Page
+        shop_hero_title: 'Online Store',
+        shop_hero_subtitle: 'You can order and purchase RIN Korea products online.',
+        shop_add_product: 'Add Product',
         shop_delete_title: 'Delete Product',
-        reviews: 'reviews',
-        currency_won: '',
+        shop_sort_select: 'Sort by',
+        shop_sort_newest: 'Newest First',
+        shop_sort_price_low: 'Lowest Price First',
+        shop_sort_price_high: 'Highest Price First',
+        shop_grid_label: 'Grid',
+        shop_grid_setting: 'Grid Settings',
+        shop_grid_apply: 'Apply',
+        shop_grid_applying: 'Applying...',
+        shop_product_out_of_stock: 'Out of Stock',
+        shop_product_buy_now: 'Buy Now',
+        shop_deleted_success: 'Deleted successfully.',
+        reviews: 'Reviews',
+        currency_won: 'Won',
 
         // Shop Additional
         shop_sort_popularity: 'Popularity',
         shop_sort_discount: 'Discount',
         shop_sort_sales: 'Sales',
         shop_sort_rating: 'Rating',
+
+        // Product Benefits
+        product_benefits_title: 'Product Benefits',
+        product_benefits_subtitle: 'Why RIN Korea Ceramic Coating is Chosen',
+        product_benefits_fire_resistant_title: 'Fire-resistant Certification',
+        product_benefits_fire_resistant_desc: 'Safe pure inorganic ceramic coating material',
+        product_benefits_easy_construction_title: 'Easy Construction',
+        product_benefits_easy_construction_desc: 'Easy construction with one-component',
+        product_benefits_quality_title: 'Excellent Quality',
+        product_benefits_quality_desc: 'Excellent quality through strict quality management',
+        product_benefits_variety_title: 'Diverse Selection',
+        product_benefits_variety_desc: 'Diverse product line for various uses and requirements',
+
+        // Equipment Success Messages
+        equipment_updated_success: 'Equipment has been updated.',
+        equipment_added_success: 'Equipment has been added.',
 
         // Certificates Page
         certificates_hero_title: 'Certificates',
@@ -1041,7 +1101,21 @@ const translations = {
         processing: '处理中...',
 
         // Shop Page
+        shop_hero_title: '在线商店',
+        shop_hero_subtitle: '您可以通过在线商店订购和购买RIN Korea产品。',
+        shop_add_product: '添加产品',
         shop_delete_title: '删除产品',
+        shop_sort_select: '排序方式选择',
+        shop_sort_newest: '最新注册优先',
+        shop_sort_price_low: '最低价格优先',
+        shop_sort_price_high: '最高价格优先',
+        shop_grid_label: '网格',
+        shop_grid_setting: '网格设置',
+        shop_grid_apply: '应用',
+        shop_grid_applying: '应用中...',
+        shop_product_out_of_stock: '缺货',
+        shop_product_buy_now: '立即购买',
+        shop_deleted_success: '删除成功。',
         reviews: '评论',
         currency_won: '元',
 
@@ -1050,6 +1124,22 @@ const translations = {
         shop_sort_discount: '折扣',
         shop_sort_sales: '销量',
         shop_sort_rating: '评分',
+
+        // Product Benefits
+        product_benefits_title: '产品优点',
+        product_benefits_subtitle: '为什么选择RIN Korea陶瓷涂料',
+        product_benefits_fire_resistant_title: '阻燃认证',
+        product_benefits_fire_resistant_desc: '安全的纯无机陶瓷涂料',
+        product_benefits_easy_construction_title: '简单施工',
+        product_benefits_easy_construction_desc: '1成分简单施工',
+        product_benefits_quality_title: '优秀品质',
+        product_benefits_quality_desc: '通过严格质量管理实现的优秀品质',
+        product_benefits_variety_title: '多种选择',
+        product_benefits_variety_desc: '多种产品线满足各种用途和要求',
+
+        // Equipment Success Messages
+        equipment_updated_success: '设备已更新。',
+        equipment_added_success: '设备已添加。',
 
         // Certificates Page
         certificates_hero_title: '证书',

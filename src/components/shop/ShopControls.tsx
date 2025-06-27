@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SortOption {
   value: string;
@@ -41,6 +41,8 @@ const ShopControls = ({
   onGridColsChange,
   onGridApply,
 }: ShopControlsProps) => {
+  const { t } = useLanguage();
+
   return (
     <div className="mb-6 sm:mb-8">
       {/* 모바일용 정렬 드롭다운 */}
@@ -49,7 +51,7 @@ const ShopControls = ({
           <button
             className="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-left flex items-center justify-between touch-manipulation"
             onClick={onToggleSortDropdown}
-            aria-label="정렬 방식 선택"
+            aria-label={t('shop_sort_select', '정렬 방식 선택')}
           >
             <span className="font-medium">
               {sortOptions.find(opt => opt.value === sortBy)?.label}
@@ -77,11 +79,10 @@ const ShopControls = ({
         {sortOptions.map(opt => (
           <button
             key={opt.value}
-            className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 touch-manipulation ${
-              sortBy === opt.value 
-                ? 'bg-blue-600 text-white shadow-md' 
+            className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 touch-manipulation ${sortBy === opt.value
+                ? 'bg-blue-600 text-white shadow-md'
                 : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-            }`}
+              }`}
             onClick={() => onSortChange(opt.value)}
             aria-label={opt.label}
           >
@@ -93,13 +94,13 @@ const ShopControls = ({
       {/* 관리자 그리드 설정 */}
       {isAdmin && (
         <div className="flex items-center gap-2 justify-end">
-          <label className="text-sm font-medium text-gray-700">그리드:</label>
+          <label className="text-sm font-medium text-gray-700">{t('shop_grid_label', '그리드')}:</label>
           <select
             className="border rounded px-2 py-1 text-sm touch-manipulation"
             value={pendingGridCols}
             onChange={e => onGridColsChange(Number(e.target.value))}
             disabled={gridLoading}
-            aria-label="그리드 설정"
+            aria-label={t('shop_grid_setting', '그리드 설정')}
           >
             {gridOptions.map(opt => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -109,9 +110,9 @@ const ShopControls = ({
             className="px-3 py-1 rounded bg-blue-600 text-white text-xs font-semibold disabled:opacity-50 touch-manipulation"
             onClick={onGridApply}
             disabled={gridLoading || pendingGridCols === gridCols}
-            aria-label="그리드 적용"
+            aria-label={t('shop_grid_apply', '그리드 적용')}
           >
-            {gridLoading ? '적용 중...' : '적용'}
+            {gridLoading ? t('shop_grid_applying', '적용 중...') : t('shop_grid_apply', '적용')}
           </button>
         </div>
       )}

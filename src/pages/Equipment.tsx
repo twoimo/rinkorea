@@ -181,14 +181,14 @@ const Equipment = () => {
             if (result.error) {
                 setFormError(result.error.message);
             } else {
-                setFormSuccess(editingEquipment ? '기계가 수정되었습니다.' : '기계가 추가되었습니다.');
+                setFormSuccess(editingEquipment ? t('equipment_updated_success', '기계가 수정되었습니다.') : t('equipment_added_success', '기계가 추가되었습니다.'));
                 setTimeout(() => {
                     closeForm();
                     window.location.reload();
                 }, 1500);
             }
         } catch (error) {
-            setFormError('오류가 발생했습니다.');
+            setFormError(t('error', '오류가 발생했습니다.'));
         } finally {
             setFormLoading(false);
         }

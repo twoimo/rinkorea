@@ -282,7 +282,7 @@ const Shop = () => {
       if (result.error) {
         setFormError(result.error.message);
       } else {
-        setFormSuccess('삭제되었습니다.');
+        setFormSuccess(t('shop_deleted_success', '삭제되었습니다.'));
         await refreshProducts();
         setTimeout(() => {
           setShowDeleteConfirm(false);
