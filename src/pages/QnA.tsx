@@ -32,15 +32,42 @@ const QnA = () => {
   const filteredInquiries = inquiries.filter(inquiry => {
     const matchesSearch = inquiry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       inquiry.content.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = selectedStatus === t('qna_filter_all', '전체') || inquiry.status === selectedStatus;
+
+    const allStatuses = [t('qna_filter_all', '전체'), '전체', 'All', '全部'];
+    const answeredStatuses = [t('qna_status_answered', '답변완료'), '답변완료', 'Answered', '已回复'];
+    const pendingStatuses = [t('qna_status_pending', '답변대기'), '답변대기', 'Pending', '待回复'];
+
+    let matchesStatus = false;
+    if (allStatuses.includes(selectedStatus)) {
+      matchesStatus = true;
+    } else if (answeredStatuses.includes(selectedStatus)) {
+      matchesStatus = answeredStatuses.includes(inquiry.status);
+    } else if (pendingStatuses.includes(selectedStatus)) {
+      matchesStatus = pendingStatuses.includes(inquiry.status);
+    } else {
+      matchesStatus = inquiry.status === selectedStatus;
+    }
+
     return matchesSearch && matchesStatus;
   });
 
   const totalInquiries = inquiries.length;
-  const answeredCount = inquiries.filter(inquiry => inquiry.status === t('qna_status_answered', '답변완료')).length;
-  const pendingCount = inquiries.filter(inquiry => inquiry.status === t('qna_status_pending', '접수')).length;
+  const answeredStatuses = [t('qna_status_answered', '답변완료'), '답변완료', 'Answered', '已回复'];
+  const pendingStatuses = [t('qna_status_pending', '답변대기'), '답변대기', 'Pending', '待回复'];
+
+  const answeredCount = inquiries.filter(inquiry => answeredStatuses.includes(inquiry.status)).length;
+  const pendingCount = inquiries.filter(inquiry => pendingStatuses.includes(inquiry.status)).length;
 
   const editingInquiryData = editingInquiry ? inquiries.find(inquiry => inquiry.id === editingInquiry) : null;
+
+  console.log('🔍 QnA Debug Info:', {
+    loading,
+    inquiriesCount: inquiries.length,
+    filteredCount: filteredInquiries.length,
+    selectedStatus,
+    searchTerm,
+    firstInquiry: inquiries[0]
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

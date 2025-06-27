@@ -15,6 +15,9 @@ interface Inquiry {
   created_at: string;
   updated_at: string;
   is_private: boolean;
+  profiles?: {
+    name: string;
+  };
 }
 
 export interface Reply {
@@ -37,21 +40,21 @@ export const useInquiries = () => {
 
   const fetchInquiries = async () => {
     try {
+      console.log('🔍 Fetching inquiries...');
       const { data, error } = await supabase
         .from('inquiries')
-        .select(`
-          *,
-          profiles(name)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching inquiries:', error);
+        console.error('❌ Error fetching inquiries:', error);
       } else {
+        console.log('✅ Inquiries fetched successfully:', data?.length || 0, 'items');
+        console.log('📝 Sample inquiry data:', data?.[0]);
         setInquiries(data || []);
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('💥 Exception in fetchInquiries:', error);
     } finally {
       setLoading(false);
     }

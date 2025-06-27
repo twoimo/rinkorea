@@ -246,6 +246,16 @@ const translations = {
         profile_password_change_success: '비밀번호가 성공적으로 변경되었습니다.',
         profile_delete_success: '계정이 성공적으로 삭제되었습니다.',
         profile_delete_failed: '계정 탈퇴 실패',
+
+        // QnA specific
+        qna_status_answered: '답변완료',
+        qna_status_pending: '답변대기',
+        qna_filter_all: '전체',
+        qna_private_question: '비공개 질문',
+        qna_delete_confirm: '정말로 이 질문을 삭제하시겠습니까?',
+        show_content: '내용 보기',
+        hide_content: '내용 숨기기',
+        anonymous: '익명',
     },
     en: {
         // Navigation
@@ -482,6 +492,16 @@ const translations = {
         profile_password_change_success: 'Password has been successfully changed.',
         profile_delete_success: 'Account has been successfully deleted.',
         profile_delete_failed: 'Account withdrawal failed',
+
+        // QnA specific
+        qna_status_answered: 'Answered',
+        qna_status_pending: 'Pending',
+        qna_filter_all: 'All',
+        qna_private_question: 'Private Question',
+        qna_delete_confirm: 'Are you sure you want to delete this question?',
+        show_content: 'Show Content',
+        hide_content: 'Hide Content',
+        anonymous: 'Anonymous',
     },
     zh: {
         // Navigation
@@ -718,6 +738,16 @@ const translations = {
         profile_password_change_success: '密码已成功更改。',
         profile_delete_success: '账户已成功删除。',
         profile_delete_failed: '账户注销失败',
+
+        // QnA specific
+        qna_status_answered: '已回复',
+        qna_status_pending: '待回复',
+        qna_filter_all: '全部',
+        qna_private_question: '私密问题',
+        qna_delete_confirm: '确定要删除此问题吗？',
+        show_content: '显示内容',
+        hide_content: '隐藏内容',
+        anonymous: '匿名',
     },
 };
 
