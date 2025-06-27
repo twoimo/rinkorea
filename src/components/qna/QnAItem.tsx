@@ -1,137 +1,159 @@
-import React from 'react';
-import { User, Calendar, CheckCircle, Clock, Lock, Edit, Trash2 } from 'lucide-react';
-import QnAEditForm from './QnAEditForm';
-import RepliesSection from './RepliesSection';
+import React, { useState } from 'react';
+import { Edit, Trash2, MessageCircle, User, Calendar, Lock, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Inquiry {
   id: string;
-  user_id: string | null;
-  name: string;
-  email: string;
-  phone: string | null;
   title: string;
   content: string;
+  category: string;
   status: string;
-  admin_reply: string | null;
-  created_at: string;
-  updated_at: string;
   is_private: boolean;
+  created_at: string;
+  user_id: string;
+  profiles?: {
+    name: string;
+  };
 }
 
 interface QnAItemProps {
   inquiry: Inquiry;
-  user: { id: string } | null;
+  user: any;
   onEdit: (id: string) => void;
-  onDelete: (id: string) => Promise<{ error?: Error; success?: boolean }>;
-  onRefetch: () => Promise<void>;
+  onDelete: (id: string) => void;
+  onRefetch: () => void;
 }
 
-const QnAItem: React.FC<QnAItemProps> = ({
-  inquiry,
-  user,
-  onEdit,
-  onDelete,
-  onRefetch
-}) => {
+const QnAItem: React.FC<QnAItemProps> = ({ inquiry, user, onEdit, onDelete, onRefetch }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
   const { isAdmin } = useUserRole();
-  const isOwner = user && inquiry.user_id === user.id;
-  const canView = !inquiry.is_private || isOwner || isAdmin;
-  const canShowContent = canView;
+  const { t } = useLanguage();
 
-  const maskName = (name: string) => {
-    if (isAdmin) return name;
-    if (name.length <= 1) return name;
-    return name[0] + '*'.repeat(name.length - 1);
+  const canView = !inquiry.is_private || isAdmin || (user && user.id === inquiry.user_id);
+  const canEdit = user && (user.id === inquiry.user_id || isAdmin);
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
-  const handleEditClick = () => {
-    onEdit(inquiry.id);
-  };
-
-  const handleDeleteClick = async () => {
-    if (confirm('정말로 이 문의를 삭제하시겠습니까?')) {
-      await onDelete(inquiry.id);
-    }
-  };
-
-  return (
-    <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 md:mb-4 gap-3">
-        {/* 상태 뱃지 */}
-        <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 w-fit ${inquiry.status === '답변완료'
-          ? 'bg-green-100 text-green-800'
-          : 'bg-yellow-100 text-yellow-800'
-          }`}>
-          {inquiry.status === '답변완료' ? (
-            <>
-              <CheckCircle className="w-3 h-3" /> 답변완료
-            </>
-          ) : (
-            <>
-              <Clock className="w-3 h-3" /> 답변대기
-            </>
-          )}
+  const getStatusBadge = (status: string) => {
+    if (status === t('qna_status_answered', '답변완료')) {
+      return (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <MessageCircle className="w-3 h-3 mr-1" />
+          {t('qna_status_answered', '답변완료')}
         </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+        <MessageCircle className="w-3 h-3 mr-1" />
+        {t('qna_status_pending', '답변대기')}
+      </span>
+    );
+  };
 
-        {/* 사용자 정보 */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-          <div className="flex flex-wrap items-center text-xs md:text-sm text-gray-500 gap-2 sm:gap-3">
-            <div className="flex items-center gap-1">
-              <User className="w-3 h-3 md:w-4 md:h-4" />
-              {maskName(inquiry.name)}
-            </div>
-            {isAdmin && (
-              <>
-                <div className="flex items-center gap-1">
-                  <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">{inquiry.email}</span>
-                </div>
-                {inquiry.phone && (
-                  <div className="flex items-center gap-1">
-                    <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">{inquiry.phone}</span>
-                  </div>
-                )}
-              </>
-            )}
-            <div className="flex items-center gap-1">
-              <Calendar className="w-3 h-3 md:w-4 md:h-4" />
-              {new Date(inquiry.created_at).toLocaleDateString('ko-KR')}
-            </div>
-          </div>
-          {(isAdmin || isOwner) && (
-            <div className="flex gap-2">
-              <button
-                onClick={handleEditClick}
-                className="text-blue-600 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-lg transition-colors"
-                title="수정"
-              >
-                <Edit className="w-4 h-4" />
-              </button>
-              <button
-                onClick={handleDeleteClick}
-                className="text-red-600 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors"
-                title="삭제"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          )}
+  if (!canView) {
+    return (
+      <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+        <div className="flex items-center text-gray-500">
+          <Lock className="w-5 h-5 mr-2" />
+          <span>{t('qna_private_question', '비공개 질문')}</span>
         </div>
       </div>
+    );
+  }
 
-      <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3 flex items-center">
-        {inquiry.is_private && <Lock className="w-4 h-4 text-gray-400 mr-1" />} {inquiry.title}
-      </h3>
-      {canShowContent ? (
-        <>
-          <p className="text-gray-600 mb-4 leading-relaxed whitespace-pre-wrap text-sm md:text-base">{inquiry.content}</p>
-          <RepliesSection inquiryId={inquiry.id} canView={canShowContent} isAdmin={isAdmin} onRefetch={onRefetch} />
-        </>
-      ) : (
-        <div className="text-gray-400 italic flex items-center text-sm md:text-base">
-          <Lock className="w-4 h-4 mr-1" /> 비밀글입니다
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+      <div className="p-6">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1">
+            <div className="flex items-center space-x-2 mb-2">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                {inquiry.category}
+              </span>
+              {getStatusBadge(inquiry.status)}
+              {inquiry.is_private && (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  <Lock className="w-3 h-3 mr-1" />
+                  {t('qna_private_question', '비공개')}
+                </span>
+              )}
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{inquiry.title}</h3>
+            <div className="flex items-center text-sm text-gray-500 space-x-4">
+              <div className="flex items-center">
+                <User className="w-4 h-4 mr-1" />
+                <span>{inquiry.profiles?.name || t('anonymous', '익명')}</span>
+              </div>
+              <div className="flex items-center">
+                <Calendar className="w-4 h-4 mr-1" />
+                <span>{formatDate(inquiry.created_at)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <Eye className="w-5 h-5" />
+            </button>
+            {canEdit && (
+              <>
+                <button
+                  onClick={() => onEdit(inquiry.id)}
+                  className="text-blue-600 hover:text-blue-700 transition-colors"
+                >
+                  <Edit className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => {
+                    if (confirm(t('qna_delete_confirm', '정말로 이 질문을 삭제하시겠습니까?'))) {
+                      onDelete(inquiry.id);
+                    }
+                  }}
+                  className="text-red-600 hover:text-red-700 transition-colors"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </>
+            )}
+          </div>
         </div>
-      )}
+
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-full flex items-center justify-between text-left bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors"
+        >
+          <span className="text-sm font-medium text-gray-700">
+            {isExpanded ? t('hide_content', '내용 숨기기') : t('show_content', '내용 보기')}
+          </span>
+          {isExpanded ? (
+            <ChevronUp className="w-4 h-4 text-gray-500" />
+          ) : (
+            <ChevronDown className="w-4 h-4 text-gray-500" />
+          )}
+        </button>
+
+        {isExpanded && (
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+            <div className="prose prose-sm max-w-none">
+              <p className="text-gray-700 whitespace-pre-wrap">{inquiry.content}</p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

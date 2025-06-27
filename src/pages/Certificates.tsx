@@ -107,7 +107,7 @@ const Certificates = () => {
       if (result.error) {
         setFormError(result.error.message);
       } else {
-        setFormSuccess(editingCertificate ? '인증서가 수정되었습니다.' : '인증서가 추가되었습니다.');
+        setFormSuccess(editingCertificate ? t('certificates_updated', '인증서가 수정되었습니다.') : t('certificates_added', '인증서가 추가되었습니다.'));
         setTimeout(closeForm, 1500);
         await fetchCertificates();
       }
@@ -201,10 +201,9 @@ const Certificates = () => {
       <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 sm:py-20">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <h1 className="text-3xl sm:text-5xl font-bold mb-4 sm:mb-6">시험성적서/인증</h1>
+            <h1 className="text-3xl sm:text-5xl font-bold mb-4 sm:mb-6">{t('certificates_hero_title', '시험성적서/인증')}</h1>
             <p className="text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
-              린코리아 제품의 우수한 품질과 안전성을 증명하는 <br className="hidden sm:block" />
-              각종 인증서와 시험성적서를 확인하세요.
+              {t('certificates_hero_subtitle', '린코리아 제품의 우수한 품질과 안전성을 증명하는 각종 인증서와 시험성적서를 확인하세요.')}
             </p>
             {isAdmin && (
               <button
@@ -212,7 +211,7 @@ const Certificates = () => {
                 className="mt-6 sm:mt-8 bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors flex items-center mx-auto touch-manipulation"
               >
                 <Plus className="w-5 h-5 mr-2" />
-                인증서 추가
+                {t('certificates_add_btn', '인증서 추가')}
               </button>
             )}
           </div>
@@ -238,8 +237,8 @@ const Certificates = () => {
 
       {/* Patents and Trademarks */}
       <CertificateSection
-        title="특허 및 상표 등록증"
-        description="린코리아의 기술력과 브랜드를 보증하는 공식 문서들"
+        title={t('certificates_patent_trademark_title', '특허 및 상표 등록증')}
+        description={t('certificates_patent_trademark_desc', '린코리아의 기술력과 브랜드를 보증하는 공식 문서들')}
         certificates={certificates.filter(cert => cert.category === 'patent')}
         hiddenCertificateIds={hiddenCertificateIds}
         isAdmin={isAdmin}
@@ -254,8 +253,8 @@ const Certificates = () => {
 
       {/* Test Reports */}
       <CertificateSection
-        title="RIN-COAT 시험성적서"
-        description="공인시험기관에서 실시한 품질 시험 결과 전체 문서"
+        title={t('certificates_rincoat_test_title', 'RIN-COAT 시험성적서')}
+        description={t('certificates_rincoat_test_desc', '공인시험기관에서 실시한 품질 시험 결과 전체 문서')}
         certificates={certificates.filter(cert => cert.category === 'certification')}
         hiddenCertificateIds={hiddenCertificateIds}
         isAdmin={isAdmin}
@@ -270,8 +269,8 @@ const Certificates = () => {
 
       {/* Rin Korea Test Reports */}
       <CertificateSection
-        title="린코리아 시험성적서"
-        description="린코리아 제품의 품질을 검증하는 시험성적서"
+        title={t('certificates_rin_test_title', '린코리아 시험성적서')}
+        description={t('certificates_rin_test_desc', '린코리아 제품의 품질을 검증하는 시험성적서')}
         certificates={certificates.filter(cert => cert.category === 'rin_test')}
         hiddenCertificateIds={hiddenCertificateIds}
         isAdmin={isAdmin}

@@ -1,178 +1,163 @@
-
-import React, { useState, useEffect } from 'react';
-import { MessageCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState } from 'react';
+import { X, Save, AlertCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface QnAFormProps {
   onClose: () => void;
-  onSave: (formData: { name: string; email: string; phone: string; title: string; content: string; is_private: boolean }) => Promise<{ data?: unknown; error?: Error }>;
-  onRefetch: () => Promise<void>;
+  onSave: (inquiryData: {
+    title: string;
+    content: string;
+    category: string;
+    is_private: boolean;
+  }) => Promise<void>;
+  onRefetch: () => void;
 }
 
-const QnAForm: React.FC<QnAFormProps> = ({
-  onClose,
-  onSave,
-  onRefetch
-}) => {
+const QnAForm: React.FC<QnAFormProps> = ({ onClose, onSave, onRefetch }) => {
+  const { user } = useAuth();
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
     title: '',
     content: '',
+    category: t('qna_category_general', '일반 문의'),
     is_private: false
   });
-  const [phoneError, setPhoneError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const validatePhone = (value: string) => {
-    return /^0\d{1,2}-\d{3,4}-\d{4}$/.test(value);
-  };
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/[^0-9]/g, '');
-    if (value.length <= 2) {
-      // 지역번호
-    } else if (value.length <= 3) {
-      value = value.replace(/(\d{2,3})/, '$1');
-    } else if (value.length <= 7) {
-      value = value.replace(/(\d{2,3})(\d{3,4})/, '$1-$2');
-    } else {
-      value = value.replace(/(\d{2,3})(\d{3,4})(\d{4})/, '$1-$2-$3');
-    }
-    setFormData(prev => ({ ...prev, phone: value }));
-    if (value && !validatePhone(value)) {
-      setPhoneError('연락처 형식이 올바르지 않습니다. 예: 010-1234-5678');
-    } else {
-      setPhoneError('');
-    }
-  };
+  const categories = [
+    t('qna_category_general', '일반 문의'),
+    t('qna_category_product', '제품 문의'),
+    t('qna_category_order', '주문/배송'),
+    t('qna_category_technical', '기술 지원'),
+    t('qna_category_other', '기타')
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.phone && !validatePhone(formData.phone)) {
-      setPhoneError('연락처 형식이 올바르지 않습니다. 예: 010-1234-5678');
+    if (!formData.title.trim() || !formData.content.trim()) {
+      setError(t('required_fields', '제목과 내용을 입력해주세요.'));
       return;
     }
 
-    const result = await onSave(formData);
-    if (!result.error) {
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        title: '',
-        content: '',
-        is_private: false
-      });
-      await onRefetch();
+    setLoading(true);
+    setError(null);
+
+    try {
+      await onSave(formData);
+      onRefetch();
       onClose();
+    } catch (err) {
+      setError(t('submit_error', '문의 등록에 실패했습니다.'));
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120] p-4">
-      <div className="bg-white rounded-xl p-4 md:p-8 shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center mb-4 md:mb-6">
-          <div className="bg-blue-100 p-2 rounded-lg mr-3">
-            <MessageCircle className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-gray-900">{t('qna_form_title_add', '질문 작성')}</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <h3 className="text-lg md:text-xl font-bold text-gray-900">새 문의 작성</h3>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                이름 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 md:px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm md:text-base"
-                placeholder="이름을 입력하세요"
-                required
-              />
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start space-x-3">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <p className="text-red-800 text-sm">{error}</p>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                이메일 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-3 md:px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm md:text-base"
-                placeholder="이메일을 입력하세요"
-                required
-              />
-            </div>
-          </div>
+          )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">연락처</label>
-            <input
-              type="tel"
-              value={formData.phone}
-              onChange={handlePhoneChange}
-              className={`w-full px-3 md:px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm md:text-base ${phoneError ? 'border-red-500' : 'border-gray-200'}`}
-              placeholder="연락처를 입력하세요"
-            />
-            {phoneError && <p className="text-xs text-red-500 mt-1">{phoneError}</p>}
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('qna_form_category', '카테고리')}
+            </label>
+            <select
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              {categories.map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              제목 <span className="text-red-500">*</span>
+              {t('qna_form_title', '제목')}
             </label>
             <input
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-3 md:px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm md:text-base"
-              placeholder="문의 제목을 입력하세요"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder={t('qna_form_title', '제목')}
               required
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              문의 내용 <span className="text-red-500">*</span>
+              {t('qna_form_content', '내용')}
             </label>
             <textarea
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               rows={6}
-              className="w-full px-3 md:px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none text-sm md:text-base"
-              placeholder="문의하실 내용을 자세히 입력해주세요"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              placeholder={t('qna_form_content', '내용')}
               required
             />
           </div>
 
-          <label className="flex items-center mt-4">
+          <div className="flex items-center">
             <input
               type="checkbox"
+              id="is_private"
               checked={formData.is_private}
-              onChange={e => setFormData(prev => ({ ...prev, is_private: e.target.checked }))}
-              className="mr-2 w-4 h-4"
+              onChange={(e) => setFormData({ ...formData, is_private: e.target.checked })}
+              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
-            <span className="text-sm md:text-base">비밀글로 등록 (관리자/작성자만 열람)</span>
-          </label>
+            <label htmlFor="is_private" className="ml-2 text-sm text-gray-700">
+              {t('qna_form_is_private', '비공개 질문')}
+            </label>
+          </div>
+          <p className="text-xs text-gray-500 ml-6">
+            {t('qna_form_is_private_desc', '체크하시면 관리자와 작성자만 볼 수 있습니다.')}
+          </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 md:px-8 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center text-sm md:text-base"
-            >
-              <MessageCircle className="w-4 h-4 mr-2" />
-              문의 접수
-            </button>
+          <div className="flex space-x-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 md:px-8 py-3 rounded-lg font-semibold transition-all duration-200 text-sm md:text-base"
+              className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
             >
-              취소
+              {t('cancel', '취소')}
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  {t('submit', '등록')}
+                </>
+              )}
             </button>
           </div>
         </form>
