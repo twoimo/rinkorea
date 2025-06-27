@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -11,9 +10,11 @@ import QnAHero from '@/components/qna/QnAHero';
 import QnAEmptyState from '@/components/qna/QnAEmptyState';
 import { useInquiries } from '@/hooks/useInquiries';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const QnA = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const {
     inquiries,
     loading,
@@ -26,18 +27,18 @@ const QnA = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingInquiry, setEditingInquiry] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('전체');
+  const [selectedStatus, setSelectedStatus] = useState(t('qna_filter_all', '전체'));
 
   const filteredInquiries = inquiries.filter(inquiry => {
     const matchesSearch = inquiry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       inquiry.content.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = selectedStatus === '전체' || inquiry.status === selectedStatus;
+    const matchesStatus = selectedStatus === t('qna_filter_all', '전체') || inquiry.status === selectedStatus;
     return matchesSearch && matchesStatus;
   });
 
   const totalInquiries = inquiries.length;
-  const answeredCount = inquiries.filter(inquiry => inquiry.status === '답변완료').length;
-  const pendingCount = inquiries.filter(inquiry => inquiry.status === '접수').length;
+  const answeredCount = inquiries.filter(inquiry => inquiry.status === t('qna_status_answered', '답변완료')).length;
+  const pendingCount = inquiries.filter(inquiry => inquiry.status === t('qna_status_pending', '접수')).length;
 
   const editingInquiryData = editingInquiry ? inquiries.find(inquiry => inquiry.id === editingInquiry) : null;
 
@@ -68,7 +69,7 @@ const QnA = () => {
 
             {loading ? (
               <div className="text-center py-12">
-                <p className="text-gray-500">로딩 중...</p>
+                <p className="text-gray-500">{t('loading', '로딩 중...')}</p>
               </div>
             ) : filteredInquiries.length === 0 ? (
               <QnAEmptyState

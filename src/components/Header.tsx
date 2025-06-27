@@ -117,12 +117,6 @@ const Header = () => {
 
           {/* Desktop User Menu */}
           <div className="hidden lg:flex items-center space-x-4">
-            {/* Language Selector */}
-            <LanguageSelector
-              className="mr-2"
-              isTransparent={shouldBeTransparent}
-            />
-
             {user ? (
               <div className="relative">
                 <button
@@ -201,6 +195,11 @@ const Header = () => {
                 {t('login')}
               </button>
             )}
+
+            {/* Language Selector - moved to the right */}
+            <LanguageSelector
+              isTransparent={shouldBeTransparent}
+            />
           </div>
 
           {/* Mobile menu button */}
@@ -304,6 +303,11 @@ const Header = () => {
                     {t('login')}
                   </button>
                 )}
+
+                {/* Language Selector - moved to the right */}
+                <LanguageSelector
+                  isTransparent={shouldBeTransparent}
+                />
               </div>
             </nav>
           </div>

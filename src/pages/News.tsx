@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -8,10 +7,12 @@ import NewsList from '../components/news/NewsList';
 import NewsModalManager from '../components/news/NewsModalManager';
 import { useNews } from '@/hooks/useNews';
 import { useNewsAdmin } from '@/hooks/useNewsAdmin';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const News = () => {
   const { news, loading, refetch } = useNews();
   const { createNews, updateNews, deleteNews } = useNewsAdmin();
+  const { t } = useLanguage();
   const [selectedNews, setSelectedNews] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingNews, setEditingNews] = useState<string | null>(null);
@@ -39,7 +40,7 @@ const News = () => {
   };
 
   const handleDeleteNews = async (newsId: string) => {
-    if (!confirm('정말로 이 공지사항을 삭제하시겠습니까?')) return;
+    if (!confirm(t('news_delete_confirm', '정말로 이 공지사항을 삭제하시겠습니까?'))) return;
 
     const result = await deleteNews(newsId);
     if (!result.error) {

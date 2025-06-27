@@ -25,7 +25,6 @@ LoadingFallback.displayName = 'LoadingFallback';
 
 const Products = memo(() => {
   const { isAdmin } = useUserRole();
-  const { t } = useLanguage();
   const {
     visibleProducts,
     hiddenProductIds,
@@ -36,6 +35,7 @@ const Products = memo(() => {
     updateProduct,
     deleteProduct
   } = useProductsOptimized();
+  const { t } = useLanguage();
 
   // UI state
   const [showForm, setShowForm] = useState(false);

@@ -54,8 +54,8 @@ const Contact = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">전화번호</h3>
-                  <a 
-                    href="tel:032-571-1023" 
+                  <a
+                    href="tel:032-571-1023"
                     className="text-sm md:text-base text-blue-600 hover:text-blue-700 font-medium transition-colors"
                   >
                     032-571-1023
@@ -72,8 +72,8 @@ const Contact = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">이메일</h3>
-                  <a 
-                    href="mailto:2019@rinkorea.com" 
+                  <a
+                    href="mailto:2019@rinkorea.com"
                     className="text-sm md:text-base text-blue-600 hover:text-blue-700 font-medium transition-colors break-all"
                   >
                     2019@rinkorea.com
