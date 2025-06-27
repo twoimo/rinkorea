@@ -1,7 +1,7 @@
-
-import React, { useState } from 'react';
-import { X, Save } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Save, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface NewsFormProps {
   onClose: () => void;
@@ -15,32 +15,31 @@ interface NewsFormProps {
 }
 
 const NewsForm: React.FC<NewsFormProps> = ({ onClose, onSave, initialData, isEdit = false }) => {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     content: initialData?.content || '',
-    published: initialData?.published || false
+    published: initialData?.published ?? true
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!formData.title.trim() || !formData.content.trim()) {
-      toast({
-        title: "필수 항목을 입력해주세요",
-        description: "제목과 내용을 모두 입력해주세요.",
-        variant: "destructive"
-      });
+      setError(t('required_fields', '제목과 내용을 입력해주세요.'));
       return;
     }
 
     setLoading(true);
+    setError(null);
+
     try {
       await onSave(formData);
       onClose();
-    } catch (error) {
-      console.error('Error saving news:', error);
+    } catch (err) {
+      setError(t('submit_error', '저장에 실패했습니다.'));
     } finally {
       setLoading(false);
     }
@@ -67,30 +66,37 @@ const NewsForm: React.FC<NewsFormProps> = ({ onClose, onSave, initialData, isEdi
         {/* Form - 스크롤 가능한 영역 */}
         <div className="flex-1 overflow-y-auto">
           <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4 md:space-y-6">
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start space-x-3">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <p className="text-red-800 text-sm">{error}</p>
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                제목 <span className="text-red-500">*</span>
+                {t('news_form_title', '제목')}
               </label>
               <input
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="w-full px-3 md:px-4 py-3 text-sm md:text-base border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="공지사항 제목을 입력하세요"
+                placeholder={t('news_form_title', '제목을 입력하세요')}
                 required
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                내용 <span className="text-red-500">*</span>
+                {t('news_form_content', '내용')}
               </label>
               <textarea
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 rows={10}
                 className="w-full px-3 md:px-4 py-3 text-sm md:text-base border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
-                placeholder="공지사항 내용을 입력하세요"
+                placeholder={t('news_form_content', '내용을 입력하세요')}
                 required
               />
             </div>
@@ -104,7 +110,7 @@ const NewsForm: React.FC<NewsFormProps> = ({ onClose, onSave, initialData, isEdi
                 className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
               />
               <label htmlFor="published" className="ml-2 text-sm font-medium text-gray-700">
-                즉시 게시
+                {t('publish_immediately', '즉시 게시')}
               </label>
             </div>
           </form>
@@ -119,15 +125,21 @@ const NewsForm: React.FC<NewsFormProps> = ({ onClose, onSave, initialData, isEdi
               disabled={loading}
               className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-6 md:px-8 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center text-sm md:text-base"
             >
-              <Save className="w-4 h-4 mr-2" />
-              {loading ? '저장 중...' : (isEdit ? '수정 완료' : '저장하기')}
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  {t('save', '저장')}
+                </>
+              )}
             </button>
             <button
               type="button"
               onClick={onClose}
               className="w-full md:w-auto bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 md:px-8 py-3 rounded-lg font-semibold transition-all duration-200 text-sm md:text-base"
             >
-              취소
+              {t('cancel', '취소')}
             </button>
           </div>
         </div>

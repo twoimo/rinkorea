@@ -261,6 +261,7 @@ const translations = {
         news_view_detail: '자세히 보기',
         news_important: '중요',
         news_date_format: 'MM/DD/YYYY',
+        publish_immediately: 'Publish Immediately',
 
         // Contact Page
         contact_hero_title: '연락처',
@@ -591,6 +592,7 @@ const translations = {
         news_view_detail: 'View Details',
         news_important: 'Important',
         news_date_format: 'MM/DD/YYYY',
+        publish_immediately: 'Publish Immediately',
 
         // Contact Page
         contact_hero_title: 'Contact',
@@ -941,7 +943,8 @@ const translations = {
         news_category_maintenance: '维护',
         news_view_detail: '查看详情',
         news_important: '重要',
-        news_date_format: 'MM/DD/YYYY',
+        news_date_format: 'YYYY.MM.DD',
+        publish_immediately: '立即发布',
 
         // Contact Page
         contact_hero_title: '联系我们',
