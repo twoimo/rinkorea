@@ -25,9 +25,9 @@ const QnAFilters: React.FC<QnAFiltersProps> = ({
   const { t } = useLanguage();
 
   const statusFilter = [
-    t('qna_filter_all', '전체'),
-    t('qna_filter_unanswered', '답변대기'),
-    t('qna_filter_answered', '답변완료')
+    { value: 'all', label: t('qna_filter_all', '전체') },
+    { value: 'pending', label: t('qna_filter_unanswered', '답변대기') },
+    { value: 'answered', label: t('qna_filter_answered', '답변완료') }
   ];
 
   return (
@@ -53,7 +53,7 @@ const QnAFilters: React.FC<QnAFiltersProps> = ({
             className="appearance-none bg-white border border-gray-200 rounded-lg px-4 py-3 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all w-full text-sm md:text-base"
           >
             {statusFilter.map(status => (
-              <option key={status} value={status}>{status}</option>
+              <option key={status.value} value={status.value}>{status.label}</option>
             ))}
           </select>
           <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />

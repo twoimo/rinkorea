@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import QnAStats from '@/components/qna/QnAStats';
@@ -8,6 +8,7 @@ import QnAEditForm from '@/components/qna/QnAEditForm';
 import QnAItem from '@/components/qna/QnAItem';
 import QnAHero from '@/components/qna/QnAHero';
 import QnAEmptyState from '@/components/qna/QnAEmptyState';
+import QnAList from '@/components/qna/QnAList';
 import { useInquiries } from '@/hooks/useInquiries';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';

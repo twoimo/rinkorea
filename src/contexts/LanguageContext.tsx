@@ -228,12 +228,12 @@ const translations = {
         product_benefits_variety_desc: '용도와 요구사항에 맞는 다양한 제품군',
 
         // News Page
-        news_hero_title: '新闻公告',
-        news_hero_subtitle: '查看RIN Korea的最新消息和重要公告。',
+        news_hero_title: '공지사항',
+        news_hero_subtitle: '린코리아의 최신 소식과 중요한 공지사항을 확인하세요.',
 
         // QnA Page
-        qna_hero_title: '客户咨询',
-        qna_hero_subtitle: '如果您有任何问题，请随时联系我们。我们的专家将迅速准确地回复。',
+        qna_hero_title: '고객상담',
+        qna_hero_subtitle: '궁금한 점이 있으시면 언제든지 문의해 주세요. 전문가가 신속하고 정확하게 답변해 드립니다.',
 
         // Resources Page
         resources_hero_title: '자료실',
@@ -401,15 +401,71 @@ const translations = {
         profile_delete_success: '계정이 성공적으로 삭제되었습니다.',
         profile_delete_failed: '계정 탈퇴 실패',
 
-        // QnA specific
+        // QnA Filters
+        qna_filter_all: '전체',
+        qna_filter_unanswered: '답변대기',
+        qna_filter_answered: '답변완료',
+        qna_search_placeholder: '문의 제목이나 내용을 검색하세요',
+        login_to_inquire: '로그인하여 문의하기',
+        qna_ask_question: '문의하기',
+
+        // QnA Form
+        qna_form_title: '문의 작성',
+        qna_form_edit_title: '문의 수정',
+        qna_form_subject: '제목',
+        qna_form_content: '내용',
+        qna_form_category: '카테고리',
+        qna_form_private: '비공개 문의',
+        qna_form_submit: '문의 등록',
+        qna_form_update: '수정하기',
+        qna_form_cancel: '취소',
+        qna_form_submitting: '등록 중...',
+        qna_form_updating: '수정 중...',
+
+        // QnA List
+        qna_no_questions: '등록된 문의가 없습니다.',
+        qna_load_more: '더 보기',
+        qna_loading: '로딩 중...',
+
+        // QnA Item
         qna_status_answered: '답변완료',
         qna_status_pending: '답변대기',
-        qna_filter_all: '전체',
         qna_private_question: '비공개 질문',
+        qna_show_content: '내용 보기',
+        qna_hide_content: '내용 숨기기',
+        qna_edit: '수정',
+        qna_delete: '삭제',
         qna_delete_confirm: '정말로 이 질문을 삭제하시겠습니까?',
-        show_content: '내용 보기',
-        hide_content: '내용 숨기기',
+        qna_answer: '답변',
+        qna_view_answer: '답변 보기',
+        qna_hide_answer: '답변 숨기기',
         anonymous: '익명',
+
+        // QnA Categories
+        qna_category_general: '일반문의',
+        qna_category_product: '제품문의',
+        qna_category_technical: '기술문의',
+        qna_category_service: '서비스문의',
+        qna_category_other: '기타',
+
+        // Contact Page
+        contact_hero_title: '연락처',
+        contact_hero_subtitle: '린코리아와 함께 더 나은 건설환경을 만들어가세요.\n언제든지 문의해 주시면 성심껏 답변드리겠습니다.',
+        contact_company_info: '회사 정보',
+        contact_address_label: '주소',
+        contact_address_value: '인천광역시 서구 백범로 707 (주안국가산업단지)\n천안 테크노파크 산업단지 입주예정 (2026~)',
+        contact_phone_label: '전화번호',
+        contact_email_label: '이메일',
+        contact_business_info: '사업자 정보',
+        contact_company_name: '상호',
+        contact_company_name_value: '린코리아',
+        contact_business_number: '사업자등록번호',
+        contact_business_number_value: '747-42-00526',
+        contact_ceo: '대표',
+        contact_ceo_value: '김정희',
+        contact_social_media: '소셜 미디어',
+        contact_call_button: '전화하기',
+        contact_email_button: '메일보내기',
     },
     en: {
         // Navigation
@@ -784,15 +840,75 @@ const translations = {
         profile_delete_success: 'Account has been successfully deleted.',
         profile_delete_failed: 'Account withdrawal failed',
 
-        // QnA specific
+        // QnA Page
+        qna_hero_title: 'Customer Support',
+        qna_hero_subtitle: 'If you have any questions, please feel free to contact us anytime. Our experts will respond quickly and accurately.',
+
+        // QnA Filters
+        qna_filter_all: 'All',
+        qna_filter_unanswered: 'Pending',
+        qna_filter_answered: 'Answered',
+        qna_search_placeholder: 'Search inquiry title or content',
+        login_to_inquire: 'Login to Inquire',
+        qna_ask_question: 'Ask Question',
+
+        // QnA Form
+        qna_form_title: 'Write Inquiry',
+        qna_form_edit_title: 'Edit Inquiry',
+        qna_form_subject: 'Subject',
+        qna_form_content: 'Content',
+        qna_form_category: 'Category',
+        qna_form_private: 'Private Inquiry',
+        qna_form_submit: 'Submit Inquiry',
+        qna_form_update: 'Update',
+        qna_form_cancel: 'Cancel',
+        qna_form_submitting: 'Submitting...',
+        qna_form_updating: 'Updating...',
+
+        // QnA List
+        qna_no_questions: 'No inquiries registered.',
+        qna_load_more: 'Load More',
+        qna_loading: 'Loading...',
+
+        // QnA Item
         qna_status_answered: 'Answered',
         qna_status_pending: 'Pending',
-        qna_filter_all: 'All',
         qna_private_question: 'Private Question',
+        qna_show_content: 'Show Content',
+        qna_hide_content: 'Hide Content',
+        qna_edit: 'Edit',
+        qna_delete: 'Delete',
         qna_delete_confirm: 'Are you sure you want to delete this question?',
-        show_content: 'Show Content',
-        hide_content: 'Hide Content',
+        qna_answer: 'Answer',
+        qna_view_answer: 'View Answer',
+        qna_hide_answer: 'Hide Answer',
         anonymous: 'Anonymous',
+
+        // QnA Categories
+        qna_category_general: 'General Inquiry',
+        qna_category_product: 'Product Inquiry',
+        qna_category_technical: 'Technical Inquiry',
+        qna_category_service: 'Service Inquiry',
+        qna_category_other: 'Other',
+
+        // Contact Page
+        contact_hero_title: 'Contact',
+        contact_hero_subtitle: 'Let\'s create a better construction environment together with RIN Korea.\nPlease feel free to contact us anytime and we will respond sincerely.',
+        contact_company_info: 'Company Information',
+        contact_address_label: 'Address',
+        contact_address_value: 'Incheon, Seo-gu, Baekbeom-ro 707 (Juan National Industrial Complex)\nTechnopark Industrial Complex (scheduled 2026~)',
+        contact_phone_label: 'Phone',
+        contact_email_label: 'Email',
+        contact_business_info: 'Business Information',
+        contact_company_name: 'Company Name',
+        contact_company_name_value: 'RIN Korea',
+        contact_business_number: 'Business Registration Number',
+        contact_business_number_value: '747-42-00526',
+        contact_ceo: 'CEO',
+        contact_ceo_value: 'Kim Jung-hee',
+        contact_social_media: 'Social Media',
+        contact_call_button: 'Call',
+        contact_email_button: 'Send Email',
     },
     zh: {
         // Navigation
@@ -1010,12 +1126,12 @@ const translations = {
         product_benefits_variety_desc: '满足不同用途和要求的多样化产品线',
 
         // News Page
-        news_hero_title: '新闻公告',
-        news_hero_subtitle: '查看RIN Korea的最新消息和重要公告。',
+        news_hero_title: '공지사항',
+        news_hero_subtitle: '린코리아의 최신 소식과 중요한 공지사항을 확인하세요.',
 
-        // QnA Page
-        qna_hero_title: '客户咨询',
-        qna_hero_subtitle: '如果您有任何问题，请随时联系我们。我们的专家将迅速准确地回复。',
+        // QnA Page  
+        qna_hero_title: '고객상담',
+        qna_hero_subtitle: '궁금한 점이 있으시면 언제든지 문의해 주세요. 전문가가 신속하고 정확하게 답변해 드립니다.',
 
         // Resources Page
         resources_hero_title: '资料库',
@@ -1183,15 +1299,75 @@ const translations = {
         profile_delete_success: '账户已成功删除。',
         profile_delete_failed: '账户注销失败',
 
-        // QnA specific
+        // QnA Page
+        qna_hero_title: '客户咨询',
+        qna_hero_subtitle: '如果您有任何问题，请随时联系我们。我们的专家将迅速准确地回复。',
+
+        // QnA Filters
+        qna_filter_all: '全部',
+        qna_filter_unanswered: '待回复',
+        qna_filter_answered: '已回复',
+        qna_search_placeholder: '搜索咨询标题或内容',
+        login_to_inquire: '登录咨询',
+        qna_ask_question: '提问',
+
+        // QnA Form
+        qna_form_title: '撰写咨询',
+        qna_form_edit_title: '编辑咨询',
+        qna_form_subject: '标题',
+        qna_form_content: '内容',
+        qna_form_category: '类别',
+        qna_form_private: '私密咨询',
+        qna_form_submit: '提交咨询',
+        qna_form_update: '更新',
+        qna_form_cancel: '取消',
+        qna_form_submitting: '提交中...',
+        qna_form_updating: '更新中...',
+
+        // QnA List
+        qna_no_questions: '没有注册的咨询。',
+        qna_load_more: '加载更多',
+        qna_loading: '加载中...',
+
+        // QnA Item
         qna_status_answered: '已回复',
         qna_status_pending: '待回复',
-        qna_filter_all: '全部',
         qna_private_question: '私密问题',
+        qna_show_content: '显示内容',
+        qna_hide_content: '隐藏内容',
+        qna_edit: '编辑',
+        qna_delete: '删除',
         qna_delete_confirm: '确定要删除此问题吗？',
-        show_content: '显示内容',
-        hide_content: '隐藏内容',
+        qna_answer: '回复',
+        qna_view_answer: '查看回复',
+        qna_hide_answer: '隐藏回复',
         anonymous: '匿名',
+
+        // QnA Categories
+        qna_category_general: '一般咨询',
+        qna_category_product: '产品咨询',
+        qna_category_technical: '技术咨询',
+        qna_category_service: '服务咨询',
+        qna_category_other: '其他',
+
+        // Contact Page
+        contact_hero_title: '联系我们',
+        contact_hero_subtitle: '与RIN Korea一起创造更好的建筑环境。\n请随时联系我们，我们将真诚回复。',
+        contact_company_info: '公司信息',
+        contact_address_label: '地址',
+        contact_address_value: '仁川广域市西区白凡路707号（注安国家产业园区）\n天安科技园产业园区入驻预定（2026~）',
+        contact_phone_label: '电话',
+        contact_email_label: '邮箱',
+        contact_business_info: '营业信息',
+        contact_company_name: '公司名',
+        contact_company_name_value: 'RIN Korea',
+        contact_business_number: '营业执照号码',
+        contact_business_number_value: '747-42-00526',
+        contact_ceo: '代表',
+        contact_ceo_value: '金正姬',
+        contact_social_media: '社交媒体',
+        contact_call_button: '拨打电话',
+        contact_email_button: '发送邮件',
     },
 };
 
