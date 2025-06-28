@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import ExchangeRateDisplay from './ExchangeRateDisplay';
 
 interface SortOption {
   value: string;
@@ -75,20 +76,23 @@ const ShopControls = ({
       </div>
 
       {/* 데스크톱용 정렬 버튼들 */}
-      <div className="hidden sm:flex flex-wrap gap-2 mb-4">
-        {sortOptions.map(opt => (
-          <button
-            key={opt.value}
-            className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 touch-manipulation ${sortBy === opt.value
+      <div className="hidden sm:flex items-center justify-between flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-2">
+          {sortOptions.map(opt => (
+            <button
+              key={opt.value}
+              className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 touch-manipulation ${sortBy === opt.value
                 ? 'bg-blue-600 text-white shadow-md'
                 : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-              }`}
-            onClick={() => onSortChange(opt.value)}
-            aria-label={opt.label}
-          >
-            {opt.label}
-          </button>
-        ))}
+                }`}
+              onClick={() => onSortChange(opt.value)}
+              aria-label={opt.label}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        <ExchangeRateDisplay />
       </div>
 
       {/* 관리자 그리드 설정 */}
