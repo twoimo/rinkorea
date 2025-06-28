@@ -135,8 +135,8 @@ const Projects = () => {
       <ProjectsGrid
         projects={getVisibleProjects()}
         category="other"
-        title="다양한 프로젝트"
-        description="린코리아의 프로젝트 사례"
+        title={t('projects_various_title')}
+        description={t('projects_various_desc')}
         isAdmin={isAdmin}
         hiddenProjectIds={hiddenProjectIds}
         isMobile={isMobile}

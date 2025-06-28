@@ -159,6 +159,13 @@ const translations = {
         projects_delete_error: '프로젝트 삭제에 실패했습니다.',
         projects_delete_success: '프로젝트가 삭제되었습니다.',
 
+        // Projects Stats
+        projects_stats_title: '시공 실적',
+        projects_stats_subtitle: '다양한 분야에서 인정받는 린코리아의 기술력',
+        projects_stats_construction_projects: '시공 프로젝트',
+        projects_stats_customer_satisfaction: '고객 만족도',
+        projects_stats_product_lineup: '린코리아 제품군',
+
         // Equipment Page
         equipment_hero_title: '기계소개',
         equipment_hero_subtitle: '최첨단 콘크리트 연마 기술로 최고의 품질과 효율성을 제공합니다.',
@@ -510,6 +517,13 @@ const translations = {
         projects_delete_error: 'Failed to delete project.',
         projects_delete_success: 'Project has been deleted.',
 
+        // Projects Stats
+        projects_stats_title: 'Construction Performance',
+        projects_stats_subtitle: 'RIN Korea\'s technology recognized in various fields',
+        projects_stats_construction_projects: 'Construction Projects',
+        projects_stats_customer_satisfaction: 'Customer Satisfaction',
+        projects_stats_product_lineup: 'RIN Korea Product Line',
+
         // Equipment Page
         equipment_hero_title: 'Equipment Introduction',
         equipment_hero_subtitle: 'Providing the highest quality and efficiency with state-of-the-art concrete grinding technology.',
@@ -844,6 +858,13 @@ const translations = {
         projects_various_desc: 'RIN Korea项目案例',
         projects_delete_error: '删除项目失败。',
         projects_delete_success: '项目已删除。',
+
+        // Projects Stats
+        projects_stats_title: '施工实绩',
+        projects_stats_subtitle: '在各个领域获得认可的RIN Korea技术力',
+        projects_stats_construction_projects: '施工项目',
+        projects_stats_customer_satisfaction: '客户满意度',
+        projects_stats_product_lineup: 'RIN Korea产品线',
 
         // Equipment Page
         equipment_hero_title: '建筑设备介绍',
