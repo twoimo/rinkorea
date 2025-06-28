@@ -67,7 +67,7 @@ const ShopProductGrid = ({
         const localizedDescription = getLocalizedValue(product, 'description', language);
 
         return (
-          <div key={product.id} className="bg-white rounded-xl shadow-lg overflow-hidden group relative">
+          <div key={product.id} className="bg-white rounded-xl shadow-lg overflow-hidden group relative h-full flex flex-col">
             {/* 뱃지 영역 */}
             <div className="absolute top-3 sm:top-4 left-3 sm:left-4 flex flex-col gap-1 sm:gap-2 z-10">
               {product.discount && (
@@ -98,7 +98,7 @@ const ShopProductGrid = ({
             </div>
 
             {/* 상품 정보 */}
-            <div className="p-4 sm:p-6 flex flex-col flex-grow">
+            <div className="p-4 sm:p-6 flex flex-col flex-grow min-h-0">
               <div className="mb-3">
                 <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
                   {localizedName}
