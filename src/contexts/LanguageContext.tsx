@@ -317,6 +317,47 @@ const translations = {
         // Certificates Page
         certificates_hero_title: '시험성적서/인증',
         certificates_hero_subtitle: '린코리아 제품의 품질과 안전성을 증명하는 시험성적서와 인증서를 확인해보세요.',
+        certificates_add_btn: '인증서 추가',
+        certificates_updated: '인증서가 수정되었습니다.',
+        certificates_added: '인증서가 추가되었습니다.',
+
+        // Certificate Types
+        certificates_type_patent: '특허 등록증',
+        certificate_type_patent: '특허',
+        certificates_type_patent_desc: '1액형 세라믹 제조기술에 대한 특허 등록으로 기술력을 인정받았습니다.',
+        certificates_type_fireproof: '불연재 인증',
+        certificate_type_report: '성적서',
+        certificates_type_fireproof_desc: '안전한 순수 무기질 세라믹 코팅제입니다',
+        certificates_type_quality: '품질시험성적서',
+        certificate_type_test_report: '시험성적서',
+        certificates_type_quality_desc: '공인시험기관에서 실시한 각종 품질 시험 결과를 확인할 수 있습니다.',
+
+        // Certificate Sections
+        certificates_patent_trademark_title: '특허 및 상표 등록증',
+        certificates_patent_trademark_desc: '린코리아의 기술력과 브랜드를 보증하는 공식 문서들',
+        certificates_rincoat_test_title: 'RIN-COAT 시험성적서',
+        certificates_rincoat_test_desc: '공인시험기관에서 실시한 품질 시험 결과 전체 문서',
+        certificates_rin_test_title: '린코리아 시험성적서',
+        certificates_rin_test_desc: '린코리아 제품의 품질을 검증하는 시험성적서',
+
+        // Certificate Form
+        certificates_form_add_title: '인증서 추가',
+        certificates_form_edit_title: '인증서 수정',
+        certificates_form_name: '인증서명',
+        certificates_form_description: '설명',
+        certificates_form_image_url: '이미지 URL',
+        certificates_form_category: '카테고리',
+        certificates_form_issue_date: '발급일',
+        certificates_form_expiry_date: '만료일',
+        certificates_form_close: '닫기',
+        certificates_form_save: '저장',
+        certificates_form_saving: '저장 중...',
+
+        // Certificate Delete
+        certificates_delete_title: '인증서 삭제',
+        certificates_delete_confirm: '정말로 이 인증서를 삭제하시겠습니까?',
+        certificates_delete_btn: '삭제',
+        certificates_deleting: '삭제 중...',
 
         // Company Overview Section
         company_overview_title_reliable: '신뢰할 수 있는',
@@ -659,6 +700,47 @@ const translations = {
         // Certificates Page
         certificates_hero_title: 'Certificates',
         certificates_hero_subtitle: 'Check test reports and certifications that prove the quality and safety of RIN Korea products.',
+        certificates_add_btn: 'Add Certificate',
+        certificates_updated: 'Certificate has been updated.',
+        certificates_added: 'Certificate has been added.',
+
+        // Certificate Types
+        certificates_type_patent: 'Patent Registration',
+        certificate_type_patent: 'Patent',
+        certificates_type_patent_desc: 'Technology recognized through patent registration for one-component ceramic manufacturing technology.',
+        certificates_type_fireproof: 'Fire-resistant Certification',
+        certificate_type_report: 'Report',
+        certificates_type_fireproof_desc: 'Safe pure inorganic ceramic coating material',
+        certificates_type_quality: 'Quality Test Report',
+        certificate_type_test_report: 'Test Report',
+        certificates_type_quality_desc: 'Quality test results conducted by authorized testing institutions.',
+
+        // Certificate Sections
+        certificates_patent_trademark_title: 'Patents and Trademarks',
+        certificates_patent_trademark_desc: 'Official documents certifying RIN Korea\'s technology and brand',
+        certificates_rincoat_test_title: 'RIN-COAT Test Reports',
+        certificates_rincoat_test_desc: 'Complete quality test results conducted by authorized testing institutions',
+        certificates_rin_test_title: 'RIN Korea Test Reports',
+        certificates_rin_test_desc: 'Test reports verifying the quality of RIN Korea products',
+
+        // Certificate Form
+        certificates_form_add_title: 'Add Certificate',
+        certificates_form_edit_title: 'Edit Certificate',
+        certificates_form_name: 'Certificate Name',
+        certificates_form_description: 'Description',
+        certificates_form_image_url: 'Image URL',
+        certificates_form_category: 'Category',
+        certificates_form_issue_date: 'Issue Date',
+        certificates_form_expiry_date: 'Expiry Date',
+        certificates_form_close: 'Close',
+        certificates_form_save: 'Save',
+        certificates_form_saving: 'Saving...',
+
+        // Certificate Delete
+        certificates_delete_title: 'Delete Certificate',
+        certificates_delete_confirm: 'Are you sure you want to delete this certificate?',
+        certificates_delete_btn: 'Delete',
+        certificates_deleting: 'Deleting...',
 
         // Company Overview Section
         company_overview_title_reliable: 'Reliable',
@@ -1017,6 +1099,47 @@ const translations = {
         // Certificates Page
         certificates_hero_title: '证书',
         certificates_hero_subtitle: '查看证明RIN Korea产品质量和安全性的测试报告和认证。',
+        certificates_add_btn: '添加证书',
+        certificates_updated: '证书已更新。',
+        certificates_added: '证书已添加。',
+
+        // Certificate Types
+        certificates_type_patent: '专利注册证',
+        certificate_type_patent: '专利',
+        certificates_type_patent_desc: '通过单组分陶瓷制造技术专利注册，技术力得到认可。',
+        certificates_type_fireproof: '阻燃材料认证',
+        certificate_type_report: '报告书',
+        certificates_type_fireproof_desc: '安全的纯无机陶瓷涂料',
+        certificates_type_quality: '质量测试报告',
+        certificate_type_test_report: '测试报告',
+        certificates_type_quality_desc: '由权威测试机构进行的各种质量测试结果。',
+
+        // Certificate Sections
+        certificates_patent_trademark_title: '专利和商标',
+        certificates_patent_trademark_desc: '证明RIN Korea技术和品牌的官方文件',
+        certificates_rincoat_test_title: 'RIN-COAT测试报告',
+        certificates_rincoat_test_desc: '由权威测试机构进行的完整质量测试结果',
+        certificates_rin_test_title: 'RIN Korea测试报告',
+        certificates_rin_test_desc: '验证RIN Korea产品质量的测试报告',
+
+        // Certificate Form
+        certificates_form_add_title: '添加证书',
+        certificates_form_edit_title: '编辑证书',
+        certificates_form_name: '证书名称',
+        certificates_form_description: '描述',
+        certificates_form_image_url: '图片URL',
+        certificates_form_category: '类别',
+        certificates_form_issue_date: '发行日期',
+        certificates_form_expiry_date: '到期日期',
+        certificates_form_close: '关闭',
+        certificates_form_save: '保存',
+        certificates_form_saving: '保存中...',
+
+        // Certificate Delete
+        certificates_delete_title: '删除证书',
+        certificates_delete_confirm: '确定要删除此证书吗？',
+        certificates_delete_btn: '删除',
+        certificates_deleting: '删除中...',
 
         // Company Overview Section
         company_overview_title_reliable: '可靠的',

@@ -9,7 +9,7 @@ import CertificateSection from '@/components/certificates/CertificateSection';
 import { Award, FileText, Shield, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole } from '@/hooks/useUserRole';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage, getLocalizedValue } from '@/contexts/LanguageContext';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 interface Certificate {
@@ -23,6 +23,15 @@ interface Certificate {
   is_active?: boolean;
   created_at?: string;
   updated_at?: string;
+  // 다국어 필드
+  name_ko?: string;
+  name_en?: string;
+  name_zh?: string;
+  name_id?: string;
+  description_ko?: string;
+  description_en?: string;
+  description_zh?: string;
+  description_id?: string;
 }
 
 const Certificates = () => {
@@ -34,7 +43,7 @@ const Certificates = () => {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
   const { isAdmin } = useUserRole();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [showForm, setShowForm] = useState(false);
   const [editingCertificate, setEditingCertificate] = useState<Certificate | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -193,6 +202,23 @@ const Certificates = () => {
     loadData();
   }, []);
 
+  // 인증서 이미지 클릭 핸들러에 다국어 지원 추가
+  const handleCertificateImageClick = (certificate: Certificate) => {
+    const getLocalizedCertificateName = (cert: Certificate): string => {
+      switch (language) {
+        case 'en':
+          return cert.name_en || cert.name;
+        case 'zh':
+          return cert.name_zh || cert.name;
+        default:
+          return cert.name_ko || cert.name;
+      }
+    };
+
+    const localizedName = getLocalizedCertificateName(certificate);
+    handleImageClick(certificate.image_url, localizedName, localizedName);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -242,13 +268,14 @@ const Certificates = () => {
         certificates={certificates.filter(cert => cert.category === 'patent')}
         hiddenCertificateIds={hiddenCertificateIds}
         isAdmin={isAdmin}
-        onImageClick={handleImageClick}
+        onImageClick={handleCertificateImageClick}
         onEdit={openForm}
         onDelete={(cert) => { setDeleteTarget(cert); setShowDeleteConfirm(true); }}
         onToggleHide={handleToggleHide}
         isLoading={formLoading}
         backgroundColor="bg-gray-50"
         gridCols="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+        language={language}
       />
 
       {/* Test Reports */}
@@ -258,13 +285,14 @@ const Certificates = () => {
         certificates={certificates.filter(cert => cert.category === 'certification')}
         hiddenCertificateIds={hiddenCertificateIds}
         isAdmin={isAdmin}
-        onImageClick={handleImageClick}
+        onImageClick={handleCertificateImageClick}
         onEdit={openForm}
         onDelete={(cert) => { setDeleteTarget(cert); setShowDeleteConfirm(true); }}
         onToggleHide={handleToggleHide}
         isLoading={formLoading}
         gridCols="grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
         cardSize="small"
+        language={language}
       />
 
       {/* Rin Korea Test Reports */}
@@ -274,7 +302,7 @@ const Certificates = () => {
         certificates={certificates.filter(cert => cert.category === 'rin_test')}
         hiddenCertificateIds={hiddenCertificateIds}
         isAdmin={isAdmin}
-        onImageClick={handleImageClick}
+        onImageClick={handleCertificateImageClick}
         onEdit={openForm}
         onDelete={(cert) => { setDeleteTarget(cert); setShowDeleteConfirm(true); }}
         onToggleHide={handleToggleHide}
@@ -282,6 +310,7 @@ const Certificates = () => {
         backgroundColor="bg-gray-50"
         gridCols="grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
         cardSize="small"
+        language={language}
       />
 
       {/* Modals */}

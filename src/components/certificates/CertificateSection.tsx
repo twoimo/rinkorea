@@ -1,6 +1,6 @@
-
 import React from 'react';
 import CertificateCard from './CertificateCard';
+import { Language } from '@/contexts/LanguageContext';
 
 interface Certificate {
   id: string;
@@ -13,6 +13,15 @@ interface Certificate {
   is_active?: boolean;
   created_at?: string;
   updated_at?: string;
+  // 다국어 필드
+  name_ko?: string;
+  name_en?: string;
+  name_zh?: string;
+  name_id?: string;
+  description_ko?: string;
+  description_en?: string;
+  description_zh?: string;
+  description_id?: string;
 }
 
 interface CertificateSectionProps {
@@ -21,7 +30,7 @@ interface CertificateSectionProps {
   certificates: Certificate[];
   hiddenCertificateIds: string[];
   isAdmin: boolean;
-  onImageClick: (src: string, alt: string, title: string) => void;
+  onImageClick: (certificate: Certificate) => void;
   onEdit: (certificate: Certificate) => void;
   onDelete: (certificate: Certificate) => void;
   onToggleHide: (certificate: Certificate) => void;
@@ -29,6 +38,7 @@ interface CertificateSectionProps {
   backgroundColor?: string;
   gridCols?: string;
   cardSize?: 'normal' | 'small';
+  language: Language;
 }
 
 const CertificateSection: React.FC<CertificateSectionProps> = ({
@@ -44,7 +54,8 @@ const CertificateSection: React.FC<CertificateSectionProps> = ({
   isLoading = false,
   backgroundColor = '',
   gridCols = 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
-  cardSize = 'normal'
+  cardSize = 'normal',
+  language
 }) => {
   const sectionClass = backgroundColor ? `py-12 sm:py-20 ${backgroundColor}` : 'py-12 sm:py-20';
 
@@ -71,6 +82,7 @@ const CertificateSection: React.FC<CertificateSectionProps> = ({
                 onToggleHide={onToggleHide}
                 isLoading={isLoading}
                 size={cardSize}
+                language={language}
               />
             ))}
         </div>
