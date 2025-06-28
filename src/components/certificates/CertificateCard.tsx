@@ -85,7 +85,7 @@ const CertificateCard: React.FC<CertificateCardProps> = ({
   const localizedDescription = getLocalizedCertificateDescription(certificate);
 
   return (
-    <div className={`bg-white ${cardPadding} rounded-2xl shadow-md hover:shadow-2xl transition-all duration-500 ${isHidden && isAdmin ? 'opacity-50' : ''} border-0 ring-1 ring-gray-100 hover:ring-blue-200 group transform hover:-translate-y-1`}>
+    <div className={`bg-white ${cardPadding} rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ${isHidden && isAdmin ? 'opacity-50' : ''} border border-gray-100`}>
       <div className="relative">
         <div
           className="cursor-pointer"
@@ -94,7 +94,7 @@ const CertificateCard: React.FC<CertificateCardProps> = ({
           <img
             src={certificate.image_url}
             alt={localizedName}
-            className="w-full aspect-[1/1.4142] object-contain rounded-xl mb-4 sm:mb-6 ring-1 ring-gray-200 hover:ring-blue-300 transition-all duration-300 group-hover:scale-105"
+            className="w-full aspect-[1/1.4142] object-contain rounded-lg mb-4 sm:mb-6 border hover:border-blue-300 transition-colors"
             loading="lazy"
           />
         </div>
