@@ -9,6 +9,7 @@ export interface Product {
     created_at?: string;
     updated_at?: string;
     detail_images?: string[];
+    [key: string]: unknown;
 }
 
 export interface ProductFormData {

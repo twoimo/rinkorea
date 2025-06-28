@@ -211,12 +211,13 @@ const translations = {
         products_error_occurred: '오류가 발생했습니다.',
 
         // Product Card
-        product_card_show: '표시하기',
-        product_card_hide: '숨기기',
-        product_card_edit: '편집',
-        product_card_delete: '삭제',
-        product_card_view_detail: '자세히 보기',
-        product_card_more_items: '개 더',
+        product_card_show: 'Tampilkan',
+        product_card_hide: 'Sembunyikan',
+        product_card_edit: 'Edit',
+        product_card_delete: 'Hapus',
+        product_card_view_detail: 'Lihat Detail',
+        product_card_more_items: ' lebih banyak',
+        product_card_show_less: 'Lebih sedikit',
 
         // Product Benefits
         product_benefits_title: '제품의 장점',
@@ -687,6 +688,7 @@ const translations = {
         product_card_delete: 'Delete',
         product_card_view_detail: 'View Details',
         product_card_more_items: ' more',
+        product_card_show_less: 'Less',
 
         // Product Benefits
         product_benefits_title: 'Product Benefits',
@@ -1142,6 +1144,7 @@ const translations = {
         product_card_delete: '删除',
         product_card_view_detail: '查看详情',
         product_card_more_items: '个更多',
+        product_card_show_less: '折叠',
 
         // Product Benefits
         product_benefits_title: '产品优势',
@@ -1621,6 +1624,15 @@ const translations = {
         products_save_success: 'Produk telah diperbarui.',
         products_add_success: 'Produk telah ditambahkan.',
         products_error_occurred: 'Terjadi kesalahan.',
+
+        // Product Card
+        product_card_show: 'Tampilkan',
+        product_card_hide: 'Sembunyikan',
+        product_card_edit: 'Edit',
+        product_card_delete: 'Hapus',
+        product_card_view_detail: 'Lihat Detail',
+        product_card_more_items: ' lebih banyak',
+        product_card_show_less: 'Lebih sedikit',
 
         // Contact Page
         contact_hero_title: 'Kontak',

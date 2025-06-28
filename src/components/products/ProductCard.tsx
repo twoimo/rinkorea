@@ -1,5 +1,5 @@
-import React, { memo } from 'react';
-import { Shield, Palette, Star, Zap, Leaf, Edit, Trash2, EyeOff, Eye } from 'lucide-react';
+import React, { memo, useState } from 'react';
+import { Shield, Palette, Star, Zap, Leaf, Edit, Trash2, EyeOff, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/image';
 import { Product } from '@/types/product';
 import { useLanguage, getLocalizedValue, getLocalizedArray } from '@/contexts/LanguageContext';
@@ -34,6 +34,7 @@ const ProductCard = memo(({
   onViewDetail
 }: ProductCardProps) => {
   const { language, t } = useLanguage();
+  const [isExpanded, setIsExpanded] = useState(false);
   const IconComponent = iconMap[product.icon as keyof typeof iconMap];
 
   if (!IconComponent) {
@@ -49,6 +50,11 @@ const ProductCard = memo(({
   const localizedName = getLocalizedValue(product, 'name', language);
   const localizedDescription = getLocalizedValue(product, 'description', language);
   const localizedFeatures = getLocalizedArray(product, 'features', language);
+
+  const handleToggleExpand = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsExpanded(!isExpanded);
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow flex flex-col">
@@ -112,7 +118,7 @@ const ProductCard = memo(({
           {localizedName}
         </h3>
 
-        <p className="text-sm sm:text-base text-gray-600 mb-4 flex-1 line-clamp-3">
+        <p className="text-sm sm:text-base text-gray-600 mb-4 line-clamp-3">
           {localizedDescription}
         </p>
 
@@ -120,15 +126,30 @@ const ProductCard = memo(({
         {localizedFeatures && localizedFeatures.length > 0 && (
           <div className="mb-4">
             <ul className="space-y-1">
-              {localizedFeatures.slice(0, 3).map((feature, featureIndex) => (
+              {(isExpanded ? localizedFeatures : localizedFeatures.slice(0, 3)).map((feature, featureIndex) => (
                 <li key={featureIndex} className="text-xs sm:text-sm text-gray-500 flex items-center">
                   <span className="w-1.5 h-1.5 bg-blue-600 rounded-full mr-2 flex-shrink-0"></span>
                   <span className="line-clamp-1">{feature}</span>
                 </li>
               ))}
               {localizedFeatures.length > 3 && (
-                <li className="text-xs text-gray-400">
-                  +{localizedFeatures.length - 3}{t('product_card_more_items', '개 더')}
+                <li>
+                  <button
+                    onClick={handleToggleExpand}
+                    className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors touch-manipulation"
+                  >
+                    {isExpanded ? (
+                      <>
+                        <ChevronUp className="w-3 h-3" />
+                        {t('product_card_show_less', '접기')}
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="w-3 h-3" />
+                        +{localizedFeatures.length - 3}{t('product_card_more_items', '개 더')}
+                      </>
+                    )}
+                  </button>
                 </li>
               )}
             </ul>
@@ -137,7 +158,7 @@ const ProductCard = memo(({
 
         <button
           onClick={() => onViewDetail(product)}
-          className="w-full bg-blue-600 text-white py-2 sm:py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm sm:text-base touch-manipulation"
+          className="w-full bg-blue-600 text-white py-2 sm:py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm sm:text-base touch-manipulation mt-auto"
         >
           {t('product_card_view_detail', '자세히 보기')}
         </button>
