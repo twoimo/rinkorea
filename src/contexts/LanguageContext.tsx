@@ -279,11 +279,14 @@ const translations = {
 
         // Shop product grid
         reviews: '리뷰',
-        currency_won: '원',
         shop_product_out_of_stock: '품절',
         shop_product_buy_now: '구매하기',
         show: '노출 해제',
         hide: '숨기기',
+
+        // Currency
+        currency_loading: '환율 정보 로딩 중...',
+        currency_error: '환율 정보를 불러올 수 없습니다',
 
         // Shop product form
         shop_edit_product: '상품 수정',
@@ -750,11 +753,14 @@ const translations = {
 
         // Shop product grid
         reviews: 'Reviews',
-        currency_won: '',
         shop_product_out_of_stock: 'Out of Stock',
         shop_product_buy_now: 'Buy Now',
         show: 'Show',
         hide: 'Hide',
+
+        // Currency
+        currency_loading: 'Loading exchange rates...',
+        currency_error: 'Unable to load exchange rates',
 
         // Shop product form
         shop_edit_product: 'Edit Product',
@@ -1202,11 +1208,14 @@ const translations = {
 
         // Shop product grid
         reviews: '评论',
-        currency_won: '元',
         shop_product_out_of_stock: '缺货',
         shop_product_buy_now: '立即购买',
         show: '显示',
         hide: '隐藏',
+
+        // Currency
+        currency_loading: '汇率信息加载中...',
+        currency_error: '无法加载汇率信息',
 
         // Shop product form
         shop_edit_product: '编辑商品',
@@ -1652,6 +1661,76 @@ const translations = {
         contact_social_media: 'Media Sosial',
         contact_call_button: 'Panggil',
         contact_email_button: 'Kirim Email',
+
+        // News Page
+        news_hero_title: 'Berita',
+        news_hero_subtitle: 'Periksa berita terbaru dan pengumuman penting dari RIN Korea.',
+
+        // QnA Page
+        qna_hero_title: 'Konsultasi Pelanggan',
+        qna_hero_subtitle: 'Jika Anda memiliki pertanyaan, silakan hubungi kami kapan saja. Para ahli kami akan merespons dengan cepat dan akurat.',
+
+        // Shop Page
+        shop_hero_title: 'Toko Online',
+        shop_hero_subtitle: 'Anda dapat memesan dan membeli produk RIN Korea secara online.',
+        shop_add_product: 'Tambah Produk',
+
+        // Shop sorting options
+        shop_sort_popularity: 'Berdasarkan Popularitas',
+        shop_sort_newest: 'Terbaru Dulu',
+        shop_sort_price_low: 'Harga: Rendah ke Tinggi',
+        shop_sort_price_high: 'Harga: Tinggi ke Rendah',
+        shop_sort_discount: 'Berdasarkan Diskon',
+        shop_sort_sales: 'Berdasarkan Penjualan',
+        shop_sort_reviews: 'Paling Banyak Diulas',
+        shop_sort_rating: 'Rating Tertinggi',
+
+        // Shop controls
+        shop_sort_select: 'Pilih Opsi Urutan',
+        shop_grid_label: 'Grid',
+        shop_grid_setting: 'Pengaturan Grid',
+        shop_grid_apply: 'Terapkan',
+        shop_grid_applying: 'Menerapkan...',
+
+        // Shop product grid
+        reviews: 'Ulasan',
+        shop_product_out_of_stock: 'Stok Habis',
+        shop_product_buy_now: 'Beli Sekarang',
+        show: 'Tampilkan',
+        hide: 'Sembunyikan',
+
+        // Currency
+        currency_loading: 'Memuat nilai tukar...',
+        currency_error: 'Tidak dapat memuat nilai tukar',
+
+        // Shop product form
+        shop_edit_product: 'Edit Produk',
+        close: 'Tutup',
+        shop_form_product_name: 'Nama Produk',
+        shop_form_description: 'Deskripsi',
+        shop_form_image_url: 'URL Gambar atau Nama File',
+        shop_form_image_placeholder: 'contoh: image.jpg atau https://example.com/image.jpg',
+        shop_form_image_note: 'Jika Anda hanya memasukkan nama file, jalur /images/ akan ditambahkan secara otomatis',
+        shop_form_price: 'Harga',
+        shop_form_original_price: 'Harga Asli',
+        shop_form_discount: 'Diskon (%)',
+        shop_form_stock: 'Stok',
+        shop_form_rating: 'Rating',
+        shop_form_reviews: 'Jumlah Ulasan',
+        shop_form_naver_url: 'URL Toko Naver',
+        shop_form_new_product: 'Produk Baru',
+        shop_form_best_product: 'Terlaris',
+        shop_form_saving: 'Menyimpan...',
+
+        // Shop delete modal
+        shop_delete_title: 'Hapus Produk',
+        shop_delete_confirm: 'Apakah Anda yakin ingin menghapus',
+        shop_delete_confirm_product: 'produk?',
+        shop_deleting: 'Menghapus...',
+
+        // Success messages
+        saved_success: 'Berhasil disimpan.',
+        shop_deleted_success: 'Berhasil dihapus.',
     },
 };
 

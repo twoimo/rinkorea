@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShoppingCart, Star, Edit, Trash2, EyeOff, Eye } from 'lucide-react';
 import { useLanguage, getLocalizedValue } from '@/contexts/LanguageContext';
+import { useCurrency } from '@/hooks/useCurrency';
 
 interface Product {
   id: string;
@@ -54,10 +55,7 @@ const ShopProductGrid = ({
   onToggleHide,
 }: ShopProductGridProps) => {
   const { t, language } = useLanguage();
-
-  const formatPrice = (price: number) => {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  };
+  const { formatPrice, loading: currencyLoading } = useCurrency(language);
 
   return (
     <div className={`grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-${Math.min(gridCols, 3)} lg:grid-cols-${gridCols}`}>
@@ -127,11 +125,11 @@ const ShopProductGrid = ({
                 <div className="flex flex-col">
                   {product.original_price && (
                     <del className="text-sm text-gray-400">
-                      {formatPrice(product.original_price)}{t('currency_won', '원')}
+                      {currencyLoading ? '...' : formatPrice(product.original_price)}
                     </del>
                   )}
                   <span className="text-xl font-bold text-blue-600">
-                    {formatPrice(product.price)}{t('currency_won', '원')}
+                    {currencyLoading ? '...' : formatPrice(product.price)}
                   </span>
                 </div>
                 <button
