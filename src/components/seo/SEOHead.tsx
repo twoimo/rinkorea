@@ -27,7 +27,7 @@ const defaultSEOData = {
     },
     en: {
         title: 'RIN Korea - Everything About Ceramic Coating',
-        description: 'RIN Korea is a construction materials manufacturer specializing in eco-friendly, fire-resistant (single-component) ceramic coating materials. We ensure construction site safety with the highest quality and technology.',
+        description: 'RIN Korea is a construction materials manufacturer specializing in eco-friendly, non-combustible (single-component) ceramic coating materials. We ensure construction site safety with the highest quality and technology.',
         keywords: ['ceramic coating', 'fire resistant', 'eco-friendly coating', 'construction materials', 'RIN Korea', 'waterproof coating', 'fireproof coating'],
         siteName: 'RIN Korea',
         language: 'en_US'

@@ -551,7 +551,7 @@ const translations = {
         features_subtitle: 'Creating a safe and eco-friendly construction environment with the highest quality ceramic coating materials',
 
         // Feature items
-        feature_fire_resistant_title: 'Fire-resistant Certification',
+        feature_fire_resistant_title: 'Non-Combustible Certification',
         feature_fire_resistant_desc: 'Safe pure inorganic ceramic coating material',
         feature_eco_friendly_title: 'Eco-friendly Finishing Method',
         feature_eco_friendly_desc: 'Environmentally friendly one-component new ceramic coating finish',
@@ -588,7 +588,7 @@ const translations = {
         about_business_subtitle: 'RIN Korea is leading the development of the construction industry through two core businesses: construction materials and construction machinery.',
         about_materials_title: 'Construction Materials Division',
         about_materials_subtitle: 'Core Business Area',
-        about_materials_desc: 'This is RIN Korea\'s core business division that produces the highest quality products such as concrete surface finishing one-component ceramic coatings (fire-resistant materials), heat-resistant paints, and special-purpose coatings.',
+        about_materials_desc: 'This is RIN Korea\'s core business division that produces the highest quality products such as concrete surface finishing one-component ceramic coatings (Non-Combustible materials), heat-resistant paints, and special-purpose coatings.',
         about_equipment_title: 'Construction Equipment Division',
         about_equipment_subtitle: 'Shanghai JS Floor Systems Official Partner',
         about_equipment_desc: 'As an official partner of Shanghai JS Floor Systems, we operate the official sales agency and service center in Korea. We are leaders in the concrete grinder and polisher market used at construction sites worldwide.',
@@ -715,7 +715,7 @@ const translations = {
         // Product Benefits
         product_benefits_title: 'Product Benefits',
         product_benefits_subtitle: 'Why RIN Korea Ceramic Coatings Are Chosen',
-        product_benefits_fire_resistant_title: 'Fire-resistant Certification',
+        product_benefits_fire_resistant_title: 'Non-Combustible Certification',
         product_benefits_fire_resistant_desc: 'Safe pure inorganic ceramic coating material',
         product_benefits_easy_construction_title: 'Easy Construction',
         product_benefits_easy_construction_desc: 'Easy construction with one-component system',
@@ -829,7 +829,7 @@ const translations = {
         certificates_type_patent: 'Patent Registration',
         certificate_type_patent: 'Patent',
         certificates_type_patent_desc: 'Technology recognized through patent registration for one-component ceramic manufacturing technology.',
-        certificates_type_fireproof: 'Fire-resistant Certification',
+        certificates_type_fireproof: 'Non-Combustible Certification',
         certificate_type_report: 'Report',
         certificates_type_fireproof_desc: 'Safe pure inorganic ceramic coating material',
         certificates_type_quality: 'Quality Test Report',
