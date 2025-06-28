@@ -172,7 +172,7 @@ const translations = {
         equipment_add_btn: '기계 추가',
         equipment_partnership_title: 'Shanghai JS Floor Systems 공식 파트너',
         equipment_partnership_desc: 'Shanghai JS Floor Systems의 공식 파트너로서 한국 공식 판매대리점 및 서비스센터를 운영하고 있습니다. 세계적 수준의 건설현장에서 사용되는 콘크리트 그라인더 시장의 선두주자입니다.',
-        equipment_partnership_contact: '한국 공식 판매 & 공식 서비스센터 (AS)\n주소: 인천\n문의전화: 032-571-1023',
+        equipment_partnership_contact: '한국 공식 판매 & 공식 서비스센터 (AS)\n주소: 인천광역시 서구 백범로 707 (주안국가산업단지)\n문의전화: 032-571-1023',
         equipment_construction_tab: '건설기계',
 
         // Phone numbers
@@ -642,7 +642,7 @@ const translations = {
         equipment_add_btn: 'Add Equipment',
         equipment_partnership_title: 'Shanghai JS Floor Systems Official Partner',
         equipment_partnership_desc: 'As an official partner of Shanghai JS Floor Systems, we operate the official sales agency and service center in Korea. We are leaders in the concrete grinder market used at world-class construction sites.',
-        equipment_partnership_contact: 'Korea Official Sales & Official Service Center (AS)\nAddress: Incheon\nInquiry Phone: +82 32-571-1023',
+        equipment_partnership_contact: 'Korea Official Sales & Official Service Center (AS)\nAddress: 707 Baekbeom-ro, Seo-gu, Incheon (Juan National Industrial Complex)\nInquiry Phone: +82 32-571-1023',
         equipment_construction_tab: 'Construction Equipment',
 
         // Phone numbers
@@ -1096,7 +1096,7 @@ const translations = {
         equipment_add_btn: '添加设备',
         equipment_partnership_title: 'Shanghai JS Floor Systems 官方合作伙伴',
         equipment_partnership_desc: '作为Shanghai JS Floor Systems的官方合作伙伴，运营韩国官方销售代理店和服务中心。是在世界级建筑现场使用的混凝土研磨机市场的领导者。',
-        equipment_partnership_contact: '韩国官方销售 & 官方服务中心(AS)\n地址: 仁川\n咨询电话: +82 32-571-1023',
+        equipment_partnership_contact: '韩国官方销售 & 官方服务中心(AS)\n地址: 仁川广域市西区白凡路707号 (注安国家产业园区)\n咨询电话: +82 32-571-1023',
         equipment_construction_tab: '建筑设备',
 
         // Phone numbers
@@ -1567,7 +1567,7 @@ const translations = {
         equipment_add_btn: 'Tambah Peralatan',
         equipment_partnership_title: 'Shanghai JS Floor Systems Official Partner',
         equipment_partnership_desc: 'Sebagai mitra resmi Shanghai JS Floor Systems, kami mengoperasikan agen penjualan resmi dan pusat layanan di Korea. Kami pemimpin di pasar penghalus dan penghalus beton yang digunakan di situs konstruksi kelas dunia.',
-        equipment_partnership_contact: 'Korea Official Sales & Official Service Center (AS)\nAlamat: Incheon\nTelepon Pertanyaan: +82 32-571-1023',
+        equipment_partnership_contact: 'Korea Official Sales & Official Service Center (AS)\nAlamat: 707 Baekbeom-ro, Seo-gu, Incheon (Juan National Industrial Complex)\nTelepon Pertanyaan: +82 32-571-1023',
         equipment_construction_tab: 'Peralatan Konstruksi',
 
         // Phone numbers
