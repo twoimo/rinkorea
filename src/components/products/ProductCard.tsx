@@ -128,7 +128,7 @@ const ProductCard = memo(({
               ))}
               {localizedFeatures.length > 3 && (
                 <li className="text-xs text-gray-400">
-                  +{localizedFeatures.length - 3}개 더
+                  +{localizedFeatures.length - 3}{t('product_card_more_items', '개 더')}
                 </li>
               )}
             </ul>
