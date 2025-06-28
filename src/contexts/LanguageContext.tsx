@@ -840,10 +840,6 @@ const translations = {
         profile_delete_success: 'Account has been successfully deleted.',
         profile_delete_failed: 'Account withdrawal failed',
 
-        // QnA Page
-        qna_hero_title: 'Customer Support',
-        qna_hero_subtitle: 'If you have any questions, please feel free to contact us anytime. Our experts will respond quickly and accurately.',
-
         // QnA Filters
         qna_filter_all: 'All',
         qna_filter_unanswered: 'Pending',
@@ -1126,12 +1122,8 @@ const translations = {
         product_benefits_variety_desc: '满足不同用途和要求的多样化产品线',
 
         // News Page
-        news_hero_title: '공지사항',
-        news_hero_subtitle: '린코리아의 최신 소식과 중요한 공지사항을 확인하세요.',
-
-        // QnA Page  
-        qna_hero_title: '고객상담',
-        qna_hero_subtitle: '궁금한 점이 있으시면 언제든지 문의해 주세요. 전문가가 신속하고 정확하게 답변해 드립니다.',
+        news_hero_title: '新闻公告',
+        news_hero_subtitle: '查看RIN Korea的最新消息和重要公告。',
 
         // Resources Page
         resources_hero_title: '资料库',
