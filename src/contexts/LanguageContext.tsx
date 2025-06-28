@@ -241,6 +241,18 @@ const translations = {
         // Resources Page
         resources_hero_title: '자료실',
         resources_hero_subtitle: '린코리아의 제품 카탈로그, 기술자료, 인증서 등 다양한 자료를 확인해보세요.',
+        resources_add_btn: '자료 추가',
+
+        // Resources list and search
+        search_resources: '자료명, 설명, 파일명으로 검색...',
+        all_categories: '전체 카테고리',
+        total_resources_count: '총 {{count}}개의 자료가 있습니다',
+        search_results_for: "'{{term}}' 검색 결과",
+        no_resources_found: '자료가 없습니다',
+        try_different_filter: '검색 조건을 변경하거나 다른 카테고리를 확인해보세요.',
+        grid_view: '격자',
+        list_view: '목록',
+        resources_form_category: '카테고리',
 
         // Shop Page
         shop_hero_title: '온라인 쇼핑몰',
@@ -699,6 +711,18 @@ const translations = {
         // Resources Page
         resources_hero_title: 'Resources',
         resources_hero_subtitle: 'Check various materials such as RIN Korea\'s product catalogs, technical data, and certificates.',
+        resources_add_btn: 'Add Resource',
+
+        // Resources list and search
+        search_resources: 'Search by resource name, description, file name...',
+        all_categories: 'All Categories',
+        total_resources_count: 'Total {{count}} resources available',
+        search_results_for: "Search results for '{{term}}'",
+        no_resources_found: 'No resources found',
+        try_different_filter: 'Try changing search criteria or check other categories.',
+        grid_view: 'Grid',
+        list_view: 'List',
+        resources_form_category: 'Category',
 
         // Shop Page
         shop_hero_title: 'Online Store',
@@ -1138,6 +1162,18 @@ const translations = {
         // Resources Page
         resources_hero_title: '资料库',
         resources_hero_subtitle: '查看RIN Korea的产品目录、技术资料、证书等各种材料。',
+        resources_add_btn: '添加资料',
+
+        // Resources list and search
+        search_resources: '按资料名称、描述、文件名搜索...',
+        all_categories: '全部类别',
+        total_resources_count: '共有{{count}}个资料',
+        search_results_for: "'{{term}}'搜索结果",
+        no_resources_found: '未找到资料',
+        try_different_filter: '请尝试更改搜索条件或查看其他类别。',
+        grid_view: '网格',
+        list_view: '列表',
+        resources_form_category: '类别',
 
         // Shop Page
         shop_hero_title: '在线商店',
@@ -1561,6 +1597,22 @@ const translations = {
         equipment_saving: 'Menyimpan...',
         equipment_updated_success: 'Peralatan telah diperbarui.',
         equipment_added_success: 'Peralatan telah ditambahkan.',
+
+        // Resources Page
+        resources_hero_title: 'Ruang Materi',
+        resources_hero_subtitle: 'Periksa berbagai materi seperti katalog produk RIN Korea, data teknis, dan sertifikat.',
+        resources_add_btn: 'Tambah Materi',
+
+        // Resources list and search
+        search_resources: 'Cari berdasarkan nama materi, deskripsi, nama file...',
+        all_categories: 'Semua Kategori',
+        total_resources_count: 'Total {{count}} materi tersedia',
+        search_results_for: "Hasil pencarian untuk '{{term}}'",
+        no_resources_found: 'Materi tidak ditemukan',
+        try_different_filter: 'Coba ubah kriteria pencarian atau periksa kategori lain.',
+        grid_view: 'Grid',
+        list_view: 'Daftar',
+        resources_form_category: 'Kategori',
 
         // Products Page
         products_hero_title: 'Produk',
