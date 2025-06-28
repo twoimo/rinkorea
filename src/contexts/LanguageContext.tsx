@@ -29,7 +29,7 @@ const translations = {
         about: '회사소개',
         products: '제품소개',
         equipment: '기계소개',
-        shop: '온라인쇼핑몰',
+        shop: '온라인 쇼핑몰',
         projects: '시공사례',
         certificates: '시험성적서/인증',
         qna: '고객상담',
