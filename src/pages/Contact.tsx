@@ -55,10 +55,10 @@ const Contact = () => {
                 <div className="flex-1 min-w-0">
                   <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">{t('contact_phone_label')}</h3>
                   <a
-                    href="tel:032-571-1023"
+                    href="tel:+82 032-571-1023"
                     className="text-sm md:text-base text-blue-600 hover:text-blue-700 font-medium transition-colors"
                   >
-                    032-571-1023
+                    +82 032-571-1023
                   </a>
                 </div>
               </div>
@@ -160,7 +160,7 @@ const Contact = () => {
             <div className="block md:hidden">
               <div className="grid grid-cols-2 gap-4">
                 <a
-                  href="tel:032-571-1023"
+                  href="tel:+82 032-571-1023"
                   className="flex items-center justify-center bg-green-600 hover:bg-green-700 text-white px-4 py-4 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <Phone className="w-5 h-5 mr-2" />
