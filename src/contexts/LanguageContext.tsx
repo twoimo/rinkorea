@@ -340,7 +340,7 @@ const translations = {
         shop_form_description_ko: '설명 (한국어)',
         shop_form_description_en: '설명 (English)',
         shop_form_description_zh: '설명 (中文)',
-        shop_form_description_id: '설명 (Indonesia)',
+
 
         // Shop delete modal
         shop_delete_title: '상품 삭제',

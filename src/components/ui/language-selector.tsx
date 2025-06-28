@@ -13,7 +13,6 @@ const languages: LanguageOption[] = [
     { code: 'ko', label: '한국어', flag: '🇰🇷' },
     { code: 'en', label: 'English', flag: '🇺🇸' },
     { code: 'zh', label: '中文', flag: '🇨🇳' },
-    { code: 'id', label: 'Bahasa Indonesia', flag: '🇮🇩' },
 ];
 
 interface LanguageSelectorProps {
