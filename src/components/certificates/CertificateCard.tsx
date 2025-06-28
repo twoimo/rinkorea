@@ -104,10 +104,7 @@ const CertificateCard: React.FC<CertificateCardProps> = ({
           <div className="absolute top-2 right-2 flex gap-1 sm:gap-2">
             <button
               onClick={() => onToggleHide(certificate)}
-              className={`${buttonSize} rounded-full transition-colors touch-manipulation ${isHidden
-                ? 'bg-gray-600 text-white hover:bg-gray-700'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`}
+              className={`${buttonSize} rounded-full transition-colors touch-manipulation shadow ${isLoading ? 'opacity-50 cursor-not-allowed' : ''} bg-gray-100 hover:bg-gray-200 text-gray-700`}
               disabled={isLoading}
               title={isHidden ? '표시하기' : '숨기기'}
             >
@@ -115,7 +112,7 @@ const CertificateCard: React.FC<CertificateCardProps> = ({
             </button>
             <button
               onClick={() => onEdit(certificate)}
-              className={`${buttonSize} bg-green-600 text-white rounded-full hover:bg-green-700 transition-colors touch-manipulation`}
+              className={`${buttonSize} bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full transition-colors touch-manipulation shadow`}
               disabled={isLoading}
               title="편집"
             >
@@ -123,7 +120,7 @@ const CertificateCard: React.FC<CertificateCardProps> = ({
             </button>
             <button
               onClick={() => onDelete(certificate)}
-              className={`${buttonSize} bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors touch-manipulation`}
+              className={`${buttonSize} bg-red-100 hover:bg-red-200 text-red-700 rounded-full transition-colors touch-manipulation shadow`}
               disabled={isLoading}
               title="삭제"
             >
