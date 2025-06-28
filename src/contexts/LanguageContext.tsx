@@ -229,16 +229,71 @@ const translations = {
         qna_hero_subtitle: '如果您有任何问题，请随时联系我们。我们的专家将迅速准确地回复。',
 
         // Resources Page
-        resources_hero_title: '资料库',
-        resources_hero_subtitle: '查看RIN Korea的产品目录、技术资料、证书等各种材料。',
+        resources_hero_title: '자료실',
+        resources_hero_subtitle: '린코리아의 제품 카탈로그, 기술자료, 인증서 등 다양한 자료를 확인해보세요.',
 
         // Shop Page
-        shop_hero_title: '在线商店',
-        shop_hero_subtitle: '您可以在线订购和购买RIN Korea产品。',
+        shop_hero_title: '온라인 쇼핑몰',
+        shop_hero_subtitle: '린코리아 제품을 온라인으로 주문하고 구매할 수 있습니다.',
+        shop_add_product: '제품 추가',
+
+        // Shop sorting options
+        shop_sort_popularity: '인기도순',
+        shop_sort_newest: '최신등록순',
+        shop_sort_price_low: '낮은 가격순',
+        shop_sort_price_high: '높은 가격순',
+        shop_sort_discount: '할인율순',
+        shop_sort_sales: '누적 판매순',
+        shop_sort_reviews: '리뷰 많은순',
+        shop_sort_rating: '평점 높은순',
+
+        // Shop controls
+        shop_sort_select: '정렬 방식 선택',
+        shop_grid_label: '그리드',
+        shop_grid_setting: '그리드 설정',
+        shop_grid_apply: '적용',
+        shop_grid_applying: '적용 중...',
+
+        // Shop product grid
+        reviews: '리뷰',
+        currency_won: '원',
+        shop_product_out_of_stock: '품절',
+        shop_product_buy_now: '구매하기',
+        show: '노출 해제',
+        hide: '숨기기',
+
+        // Shop product form
+        shop_edit_product: '상품 수정',
+        close: '닫기',
+        shop_form_product_name: '상품명',
+        shop_form_description: '설명',
+        shop_form_image_url: '이미지 URL 또는 파일명',
+        shop_form_image_placeholder: '예: image.jpg 또는 https://example.com/image.jpg',
+        shop_form_image_note: '파일명만 입력하면 자동으로 /images/ 경로가 추가됩니다',
+        shop_form_price: '판매가(원)',
+        shop_form_original_price: '정가(원)',
+        shop_form_discount: '할인율(%)',
+        shop_form_stock: '재고',
+        shop_form_rating: '평점',
+        shop_form_reviews: '리뷰 수',
+        shop_form_naver_url: '네이버 스토어 URL',
+        shop_form_new_product: '신상품',
+        shop_form_best_product: '베스트',
+        shop_form_saving: '저장 중...',
+
+        // Shop delete modal
+        shop_delete_title: '상품 삭제',
+        shop_delete_confirm: '정말로',
+        shop_delete_confirm_product: '상품을 삭제하시겠습니까?',
+        shop_deleting: '삭제 중...',
+
+        // Success messages
+        saved_success: '저장되었습니다.',
+        shop_deleted_success: '삭제되었습니다.',
 
         // Certificates Page
-        certificates_hero_title: '证书',
-        certificates_hero_subtitle: '查看证明RIN Korea产品质量和安全性的测试报告和认证。',
+        certificates_hero_title: '시험성적서/인증',
+        certificates_hero_subtitle: '린코리아 제품의 품질과 안전성을 증명하는 시험성적서와 인증서를 확인해보세요.',
 
         // Company Overview Section
         company_overview_title_reliable: '신뢰할 수 있는',
@@ -515,6 +570,61 @@ const translations = {
         // Shop Page
         shop_hero_title: 'Online Store',
         shop_hero_subtitle: 'You can order and purchase RIN Korea products online.',
+        shop_add_product: 'Add Product',
+
+        // Shop sorting options
+        shop_sort_popularity: 'By Popularity',
+        shop_sort_newest: 'Newest First',
+        shop_sort_price_low: 'Price: Low to High',
+        shop_sort_price_high: 'Price: High to Low',
+        shop_sort_discount: 'By Discount',
+        shop_sort_sales: 'By Sales',
+        shop_sort_reviews: 'Most Reviewed',
+        shop_sort_rating: 'Highest Rated',
+
+        // Shop controls
+        shop_sort_select: 'Select Sort Option',
+        shop_grid_label: 'Grid',
+        shop_grid_setting: 'Grid Setting',
+        shop_grid_apply: 'Apply',
+        shop_grid_applying: 'Applying...',
+
+        // Shop product grid
+        reviews: 'Reviews',
+        currency_won: '',
+        shop_product_out_of_stock: 'Out of Stock',
+        shop_product_buy_now: 'Buy Now',
+        show: 'Show',
+        hide: 'Hide',
+
+        // Shop product form
+        shop_edit_product: 'Edit Product',
+        close: 'Close',
+        shop_form_product_name: 'Product Name',
+        shop_form_description: 'Description',
+        shop_form_image_url: 'Image URL or Filename',
+        shop_form_image_placeholder: 'e.g. image.jpg or https://example.com/image.jpg',
+        shop_form_image_note: 'If you enter only filename, /images/ path will be added automatically',
+        shop_form_price: 'Price',
+        shop_form_original_price: 'Original Price',
+        shop_form_discount: 'Discount (%)',
+        shop_form_stock: 'Stock',
+        shop_form_rating: 'Rating',
+        shop_form_reviews: 'Review Count',
+        shop_form_naver_url: 'Naver Store URL',
+        shop_form_new_product: 'New Product',
+        shop_form_best_product: 'Best Seller',
+        shop_form_saving: 'Saving...',
+
+        // Shop delete modal
+        shop_delete_title: 'Delete Product',
+        shop_delete_confirm: 'Are you sure you want to delete',
+        shop_delete_confirm_product: 'product?',
+        shop_deleting: 'Deleting...',
+
+        // Success messages
+        saved_success: 'Saved successfully.',
+        shop_deleted_success: 'Deleted successfully.',
 
         // Certificates Page
         certificates_hero_title: 'Certificates',
@@ -795,6 +905,61 @@ const translations = {
         // Shop Page
         shop_hero_title: '在线商店',
         shop_hero_subtitle: '您可以在线订购和购买RIN Korea产品。',
+        shop_add_product: '添加产品',
+
+        // Shop sorting options
+        shop_sort_popularity: '按人气排序',
+        shop_sort_newest: '最新注册顺序',
+        shop_sort_price_low: '价格：低到高',
+        shop_sort_price_high: '价格：高到低',
+        shop_sort_discount: '按折扣排序',
+        shop_sort_sales: '按销量排序',
+        shop_sort_reviews: '评论最多',
+        shop_sort_rating: '评分最高',
+
+        // Shop controls
+        shop_sort_select: '选择排序方式',
+        shop_grid_label: '网格',
+        shop_grid_setting: '网格设置',
+        shop_grid_apply: '应用',
+        shop_grid_applying: '应用中...',
+
+        // Shop product grid
+        reviews: '评论',
+        currency_won: '元',
+        shop_product_out_of_stock: '缺货',
+        shop_product_buy_now: '立即购买',
+        show: '显示',
+        hide: '隐藏',
+
+        // Shop product form
+        shop_edit_product: '编辑商品',
+        close: '关闭',
+        shop_form_product_name: '商品名称',
+        shop_form_description: '描述',
+        shop_form_image_url: '图片URL或文件名',
+        shop_form_image_placeholder: '例如：image.jpg 或 https://example.com/image.jpg',
+        shop_form_image_note: '如果只输入文件名，将自动添加 /images/ 路径',
+        shop_form_price: '售价',
+        shop_form_original_price: '原价',
+        shop_form_discount: '折扣 (%)',
+        shop_form_stock: '库存',
+        shop_form_rating: '评分',
+        shop_form_reviews: '评论数',
+        shop_form_naver_url: 'Naver商店URL',
+        shop_form_new_product: '新产品',
+        shop_form_best_product: '热销产品',
+        shop_form_saving: '保存中...',
+
+        // Shop delete modal
+        shop_delete_title: '删除商品',
+        shop_delete_confirm: '确定要删除',
+        shop_delete_confirm_product: '商品吗？',
+        shop_deleting: '删除中...',
+
+        // Success messages
+        saved_success: '保存成功。',
+        shop_deleted_success: '删除成功。',
 
         // Certificates Page
         certificates_hero_title: '证书',
