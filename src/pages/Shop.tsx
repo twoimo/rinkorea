@@ -28,6 +28,15 @@ interface Product {
   sales?: number;
   created_at?: string;
   is_active?: boolean;
+  name_ko?: string;
+  name_en?: string;
+  name_zh?: string;
+  name_id?: string;
+  description_ko?: string;
+  description_en?: string;
+  description_zh?: string;
+  description_id?: string;
+  [key: string]: unknown;
 }
 
 const Shop = () => {
@@ -239,6 +248,14 @@ const Shop = () => {
         is_new: !!formValues.is_new,
         is_best: !!formValues.is_best,
         updated_at: new Date().toISOString(),
+        name_ko: formValues.name_ko || formValues.name || '',
+        name_en: formValues.name_en || '',
+        name_zh: formValues.name_zh || '',
+        name_id: formValues.name_id || '',
+        description_ko: formValues.description_ko || formValues.description || '',
+        description_en: formValues.description_en || '',
+        description_zh: formValues.description_zh || '',
+        description_id: formValues.description_id || '',
       };
       let result;
       if (editingProduct) {

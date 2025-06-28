@@ -281,6 +281,22 @@ const translations = {
         shop_form_best_product: '베스트',
         shop_form_saving: '저장 중...',
 
+        // 다국어 폼 관련 추가 번역
+        shop_form_basic_info: '기본 정보',
+        shop_form_product_names: '제품명 (다국어)',
+        shop_form_descriptions: '제품 설명 (다국어)',
+        shop_form_price_info: '가격 및 재고 정보',
+        shop_form_review_info: '평점 및 리뷰 정보',
+        shop_form_product_options: '제품 옵션',
+        shop_form_product_name_ko: '제품명 (한국어)',
+        shop_form_product_name_en: '제품명 (English)',
+        shop_form_product_name_zh: '제품명 (中文)',
+        shop_form_product_name_id: '제품명 (Indonesia)',
+        shop_form_description_ko: '설명 (한국어)',
+        shop_form_description_en: '설명 (English)',
+        shop_form_description_zh: '설명 (中文)',
+        shop_form_description_id: '설명 (Indonesia)',
+
         // Shop delete modal
         shop_delete_title: '상품 삭제',
         shop_delete_confirm: '정말로',
@@ -950,6 +966,22 @@ const translations = {
         shop_form_new_product: '新产品',
         shop_form_best_product: '热销产品',
         shop_form_saving: '保存中...',
+
+        // 다국어 폼 관련 추가 번역
+        shop_form_basic_info: '基本信息',
+        shop_form_product_names: '产品名称 (多语言)',
+        shop_form_descriptions: '产品描述 (多语言)',
+        shop_form_price_info: '价格及库存信息',
+        shop_form_review_info: '评分及评论信息',
+        shop_form_product_options: '产品选项',
+        shop_form_product_name_ko: '产品名称 (韩语)',
+        shop_form_product_name_en: '产品名称 (英语)',
+        shop_form_product_name_zh: '产品名称 (中文)',
+        shop_form_product_name_id: '产品名称 (印尼语)',
+        shop_form_description_ko: '描述 (韩语)',
+        shop_form_description_en: '描述 (英语)',
+        shop_form_description_zh: '描述 (中文)',
+        shop_form_description_id: '描述 (印尼语)',
 
         // Shop delete modal
         shop_delete_title: '删除商品',

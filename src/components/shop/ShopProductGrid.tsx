@@ -1,6 +1,6 @@
 import React from 'react';
 import { ShoppingCart, Star, Edit, Trash2, EyeOff, Eye } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage, getLocalizedValue } from '@/contexts/LanguageContext';
 
 interface Product {
   id: string;
@@ -19,6 +19,15 @@ interface Product {
   sales?: number;
   created_at?: string;
   is_active?: boolean;
+  name_ko?: string;
+  name_en?: string;
+  name_zh?: string;
+  name_id?: string;
+  description_ko?: string;
+  description_en?: string;
+  description_zh?: string;
+  description_id?: string;
+  [key: string]: unknown;
 }
 
 interface ShopProductGridProps {
@@ -44,7 +53,7 @@ const ShopProductGrid = ({
   onDeleteProduct,
   onToggleHide,
 }: ShopProductGridProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const formatPrice = (price: number) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -55,6 +64,10 @@ const ShopProductGrid = ({
       {products.map((product) => {
         const isSoldOut = !product.stock_quantity || product.stock_quantity <= 0;
         const isHidden = hiddenProductIds.includes(product.id);
+
+        const localizedName = getLocalizedValue(product, 'name', language);
+        const localizedDescription = getLocalizedValue(product, 'description', language);
+
         return (
           <div key={product.id} className="bg-white rounded-xl shadow-lg overflow-hidden group relative">
             {/* 뱃지 영역 */}
@@ -80,7 +93,7 @@ const ShopProductGrid = ({
             <div className="relative aspect-square w-full overflow-hidden">
               <img
                 src={product.image_url}
-                alt={product.name}
+                alt={localizedName}
                 className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"
               />
@@ -90,10 +103,10 @@ const ShopProductGrid = ({
             <div className="p-4 sm:p-6 flex flex-col flex-grow">
               <div className="mb-3">
                 <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                  {product.name}
+                  {localizedName}
                 </h3>
                 <p className="text-gray-600 text-sm line-clamp-2 mb-3">
-                  {product.description}
+                  {localizedDescription}
                 </p>
               </div>
 
