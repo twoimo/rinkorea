@@ -76,6 +76,13 @@
 - **SEO 최적화**: 메타 태그, 구조화된 데이터
 - **접근성**: ARIA 라벨, 키보드 네비게이션
 
+### 🌐 **NEW: 글로벌 SEO & 다국어 자동 감지**
+- **🔍 스마트 언어 감지**: 브라우저 언어, 지역, URL 파라미터 자동 감지
+- **🗺️ 다국어 사이트맵**: hreflang 태그가 포함된 XML 사이트맵 자동 생성
+- **📱 반응형 언어 선택기**: 감지 정보와 함께 제공되는 깔끔한 UI
+- **🔧 동적 SEO 관리**: 페이지별, 언어별 메타 태그 및 구조화된 데이터
+- **🌍 글로벌 최적화**: 165개국 지역별 언어 매핑
+
 ## 🛠️ 설치 및 실행
 
 ### 1. Bun 설치 (권장)
@@ -164,6 +171,10 @@ bun run preview
 
 # 이미지 최적화 (선택사항)
 bun run optimize-images
+
+# 🌐 SEO 최적화 스크립트 (NEW)
+bun run generate-sitemaps    # 다국어 사이트맵 생성
+bun run build:seo           # 사이트맵 생성 + 빌드
 ```
 
 ## 📁 프로젝트 구조
@@ -200,7 +211,8 @@ rinkorea/
 ├── supabase/                # Supabase 설정 및 마이그레이션
 │   └── migrations/          # 데이터베이스 마이그레이션
 └── scripts/                 # 빌드 스크립트
-    └── optimize-images.js   # 이미지 최적화 스크립트
+    ├── optimize-images.js   # 이미지 최적화 스크립트
+    └── generate-sitemaps.js # 🌐 다국어 사이트맵 자동 생성
 ```
 
 ## 🗄️ 데이터베이스 스키마

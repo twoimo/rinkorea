@@ -1,10 +1,38 @@
 User-agent: *
 Allow: /
 
-# Sitemap
+# Sitemaps
 Sitemap: https://rinkorea.com/sitemap.xml
+Sitemap: https://rinkorea.com/sitemap-index.xml
+Sitemap: https://rinkorea.com/sitemap-ko.xml
+Sitemap: https://rinkorea.com/sitemap-en.xml
+Sitemap: https://rinkorea.com/sitemap-zh.xml
+Sitemap: https://rinkorea.com/sitemap-id.xml
 
-# Disallow admin and private pages
+# Language-specific content
+Allow: /?lang=ko
+Allow: /?lang=en
+Allow: /?lang=zh
+Allow: /?lang=id
+
+# Block unnecessary crawling
 Disallow: /admin/
-Disallow: /private/
 Disallow: /api/
+Disallow: /_next/
+Disallow: /static/
+Disallow: /*.json$
+Disallow: /*?*utm_*
+Disallow: /*?*fbclid*
+Disallow: /*?*gclid*
+
+# Crawl delay
+Crawl-delay: 1
+
+# Important pages
+Allow: /products
+Allow: /projects
+Allow: /about
+Allow: /contact
+Allow: /shop
+Allow: /news
+Allow: /resources

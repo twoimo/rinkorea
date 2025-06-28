@@ -11,6 +11,7 @@ import { ReactPlugin } from "@stagewise-plugins/react";
 import { createPortal } from "react-dom";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import ErrorBoundary from "@/components/error-boundary";
+import SEOHead from "@/components/seo/SEOHead";
 
 // Optimized lazy loading with prefetch hints
 const Index = lazy(() =>
@@ -191,6 +192,7 @@ const App = memo(() => {
             <AuthProvider>
               <LanguageProvider>
                 <BrowserRouter>
+                  <SEOHead />
                   <div className="min-h-screen flex flex-col bg-background contain-layout">
                     <Suspense fallback={<PageLoader />}>
                       <AppRoutes />

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://rinkorea.com/sitemap.xml</loc>
+    <lastmod>2025-06-28</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://rinkorea.com/sitemap-ko.xml</loc>
+    <lastmod>2025-06-28</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://rinkorea.com/sitemap-en.xml</loc>
+    <lastmod>2025-06-28</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://rinkorea.com/sitemap-zh.xml</loc>
+    <lastmod>2025-06-28</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://rinkorea.com/sitemap-id.xml</loc>
+    <lastmod>2025-06-28</lastmod>
+  </sitemap>
+</sitemapindex>

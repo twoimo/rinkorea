@@ -14,6 +14,8 @@
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
     "optimize-images": "node scripts/optimize-images.js",
+    "generate-sitemaps": "node scripts/generate-sitemaps.mjs",
+    "build:seo": "npm run generate-sitemaps && npm run build",
     "clean": "rm -rf dist node_modules/.vite",
     "test": "echo \"No tests specified\" && exit 0",
     "prepare": "husky install || true"

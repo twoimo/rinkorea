@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 export type Language = 'ko' | 'en' | 'zh' | 'id';
 
@@ -7,7 +7,18 @@ interface LanguageContextType {
     language: Language;
     setLanguage: (lang: Language) => void;
     t: (key: string, fallback?: string) => string;
+    isAutoDetecting: boolean;
+    detectionMethod: string;
+    supportedLanguages: Language[];
 }
+
+// 국가별 기본 언어 매핑
+const geolocationLanguageMap: Record<string, Language> = {
+    'KR': 'ko',
+    'US': 'en', 'GB': 'en', 'CA': 'en', 'AU': 'en', 'NZ': 'en',
+    'CN': 'zh', 'TW': 'zh', 'HK': 'zh', 'MO': 'zh',
+    'ID': 'id'
+};
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
@@ -1758,19 +1769,127 @@ const translations = {
     },
 };
 
+// 언어 자동 감지 함수들
+const detectBrowserLanguage = (supportedLanguages: Language[]): Language | null => {
+    const browserLang = navigator.language || navigator.languages?.[0];
+    if (!browserLang) return null;
+
+    const lang = browserLang.toLowerCase();
+    if (lang.startsWith('ko') && supportedLanguages.includes('ko')) return 'ko';
+    if (lang.startsWith('en') && supportedLanguages.includes('en')) return 'en';
+    if (lang.startsWith('zh') && supportedLanguages.includes('zh')) return 'zh';
+    if (lang.startsWith('id') && supportedLanguages.includes('id')) return 'id';
+
+    return null;
+};
+
+const detectGeolocation = async (): Promise<string | null> => {
+    try {
+        const response = await fetch('https://ipapi.co/country/', {
+            method: 'GET',
+            headers: { 'Accept': 'text/plain' }
+        });
+        if (response.ok) {
+            return (await response.text()).trim().toUpperCase();
+        }
+    } catch (error) {
+        console.warn('Geolocation detection failed:', error);
+    }
+    return null;
+};
+
+const detectLanguageFromURL = (supportedLanguages: Language[]): Language | null => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const langParam = urlParams.get('lang') as Language;
+    return langParam && supportedLanguages.includes(langParam) ? langParam : null;
+};
+
 export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
-    const [language, setLanguageState] = useState<Language>(() => {
-        const saved = localStorage.getItem('language');
-        return (saved as Language) || 'ko';
-    });
+    const supportedLanguages: Language[] = ['ko', 'en', 'zh', 'id'];
+    const [language, setLanguageState] = useState<Language>('ko');
+    const [isAutoDetecting, setIsAutoDetecting] = useState(true);
+    const [detectionMethod, setDetectionMethod] = useState<string>('Loading...');
 
-    useEffect(() => {
-        localStorage.setItem('language', language);
-    }, [language]);
+    // 자동 언어 감지
+    const detectLanguage = useCallback(async (): Promise<Language> => {
+        try {
+            // 1. URL 파라미터 확인 (최우선)
+            const urlLang = detectLanguageFromURL(supportedLanguages);
+            if (urlLang) {
+                setDetectionMethod('URL Parameter');
+                return urlLang;
+            }
 
-    const setLanguage = (lang: Language) => {
+            // 2. 로컬 스토리지 확인
+            const savedLanguage = localStorage.getItem('rin-korea-language') as Language;
+            if (savedLanguage && supportedLanguages.includes(savedLanguage)) {
+                setDetectionMethod('User Preference');
+                return savedLanguage;
+            }
+
+            // 3. 브라우저 언어 확인
+            const browserLang = detectBrowserLanguage(supportedLanguages);
+            if (browserLang) {
+                setDetectionMethod('Browser Language');
+                return browserLang;
+            }
+
+            // 4. 지역 기반 감지
+            const countryCode = await detectGeolocation();
+            if (countryCode && geolocationLanguageMap[countryCode]) {
+                const geoLang = geolocationLanguageMap[countryCode];
+                if (supportedLanguages.includes(geoLang)) {
+                    setDetectionMethod('Geolocation');
+                    return geoLang;
+                }
+            }
+
+            // 5. 기본값
+            setDetectionMethod('Default');
+            return 'ko';
+        } catch (error) {
+            console.error('Language detection failed:', error);
+            setDetectionMethod('Error - Default');
+            return 'ko';
+        }
+    }, [supportedLanguages]);
+
+    // 언어 설정 함수
+    const setLanguage = useCallback((lang: Language) => {
         setLanguageState(lang);
-    };
+        localStorage.setItem('rin-korea-language', lang);
+
+        // URL 파라미터 업데이트
+        const url = new URL(window.location.href);
+        url.searchParams.set('lang', lang);
+        window.history.replaceState({}, '', url.toString());
+
+        // HTML lang 속성 업데이트
+        document.documentElement.lang = lang === 'ko' ? 'ko-KR' :
+            lang === 'en' ? 'en-US' :
+                lang === 'zh' ? 'zh-CN' : 'id-ID';
+    }, []);
+
+    // 초기 언어 감지
+    useEffect(() => {
+        let isMounted = true;
+
+        detectLanguage().then(detectedLang => {
+            if (isMounted) {
+                setLanguageState(detectedLang);
+                setIsAutoDetecting(false);
+
+                // HTML lang 속성 초기 설정
+                document.documentElement.lang = detectedLang === 'ko' ? 'ko-KR' :
+                    detectedLang === 'en' ? 'en-US' :
+                        detectedLang === 'zh' ? 'zh-CN' : 'id-ID';
+            }
+        });
+
+        return () => {
+            isMounted = false;
+        };
+    }, [detectLanguage]);
 
     const t = (key: string, fallback?: string): string => {
         const keys = key.split('.');
@@ -1787,6 +1906,9 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
         language,
         setLanguage,
         t,
+        isAutoDetecting,
+        detectionMethod,
+        supportedLanguages
     };
 
     return (
