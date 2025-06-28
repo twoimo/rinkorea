@@ -25,8 +25,8 @@ interface ProductFormProps {
   onSave: (product: ProductFormData) => Promise<void>;
   onClose: () => void;
   loading?: boolean;
-  formError?: string;
-  success?: boolean;
+  error?: string;
+  success?: string;
 }
 
 interface SortableItemProps {
@@ -70,7 +70,7 @@ const SortableItem = ({ id, children, onRemove }: SortableItemProps) => {
   );
 };
 
-const ProductForm = memo(({ product, onSave, onClose, loading, formError, success }: ProductFormProps) => {
+const ProductForm = memo(({ product, onSave, onClose, loading, error, success }: ProductFormProps) => {
   const [formValues, setFormValues] = useState<ProductFormData>({
     name: product?.name || '',
     description: product?.description || '',
@@ -81,7 +81,6 @@ const ProductForm = memo(({ product, onSave, onClose, loading, formError, succes
     is_active: product?.is_active ?? true
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [newFeature, setNewFeature] = useState('');
   const [newImage, setNewImage] = useState('');
@@ -112,7 +111,6 @@ const ProductForm = memo(({ product, onSave, onClose, loading, formError, succes
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitError(null);
 
     try {
       const payload = {
@@ -127,7 +125,6 @@ const ProductForm = memo(({ product, onSave, onClose, loading, formError, succes
       onClose();
     } catch (err) {
       console.error('Error saving product:', err);
-      setSubmitError(err instanceof Error ? err.message : '제품 저장 중 오류가 발생했습니다.');
     } finally {
       setIsSubmitting(false);
     }
@@ -330,9 +327,14 @@ const ProductForm = memo(({ product, onSave, onClose, loading, formError, succes
               </div>
             </div>
           </div>
-          {submitError && (
+          {error && (
             <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-lg">
-              {submitError}
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="mt-4 p-3 bg-green-50 text-green-600 rounded-lg">
+              {success}
             </div>
           )}
           <div className="mt-6 flex justify-end gap-3">
