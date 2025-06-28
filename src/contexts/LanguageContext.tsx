@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type Language = 'ko' | 'en' | 'zh';
+export type Language = 'ko' | 'en' | 'zh' | 'id';
 
 interface LanguageContextType {
     language: Language;
@@ -174,6 +174,9 @@ const translations = {
         equipment_partnership_desc: 'Shanghai JS Floor Systems의 공식 파트너로서 한국 공식 판매대리점 및 서비스센터를 운영하고 있습니다. 세계적 수준의 건설현장에서 사용되는 콘크리트 그라인더 시장의 선두주자입니다.',
         equipment_partnership_contact: '한국 공식 판매 & 공식 서비스센터 (AS)\n주소: 인천\n문의전화: 032-571-1023',
         equipment_construction_tab: '건설기계',
+
+        // Phone numbers
+        phone_number: '032-571-1023',
         equipment_diatool_tab: '다이아몬드 툴',
         equipment_premium_title: '최신형 콘크리트 그라인더',
         equipment_premium_subtitle: '최첨단 기술이 적용된 프리미엄 그라인더 라인업',
@@ -627,8 +630,11 @@ const translations = {
         equipment_add_btn: 'Add Equipment',
         equipment_partnership_title: 'Shanghai JS Floor Systems Official Partner',
         equipment_partnership_desc: 'As an official partner of Shanghai JS Floor Systems, we operate the official sales agency and service center in Korea. We are leaders in the concrete grinder market used at world-class construction sites.',
-        equipment_partnership_contact: 'Korea Official Sales & Official Service Center (AS)\nAddress: Incheon\nInquiry Phone: 032-571-1023',
+        equipment_partnership_contact: 'Korea Official Sales & Official Service Center (AS)\nAddress: Incheon\nInquiry Phone: +82 32-571-1023',
         equipment_construction_tab: 'Construction Equipment',
+
+        // Phone numbers
+        phone_number: '+82 32-571-1023',
         equipment_diatool_tab: 'Diamond Tools',
         equipment_premium_title: 'Latest Concrete Grinders',
         equipment_premium_subtitle: 'Premium grinder lineup with cutting-edge technology',
@@ -1066,8 +1072,12 @@ const translations = {
         equipment_add_btn: '添加设备',
         equipment_partnership_title: 'Shanghai JS Floor Systems 官方合作伙伴',
         equipment_partnership_desc: '作为Shanghai JS Floor Systems的官方合作伙伴，运营韩国官方销售代理店和服务中心。是在世界级建筑现场使用的混凝土研磨机市场的领导者。',
-        equipment_partnership_contact: '韩国官方销售 & 官方服务中心(AS)\n地址: 仁川\n咨询电话: 032-571-1023',
+        equipment_partnership_contact: '韩国官方销售 & 官方服务中心(AS)\n地址: 仁川\n咨询电话: +82 32-571-1023',
         equipment_construction_tab: '建筑设备',
+
+        // Phone numbers
+        phone_number: '+82 32-571-1023',
+
         equipment_diatool_tab: '钻石工具',
         equipment_premium_title: '最新型混凝土研磨机',
         equipment_premium_subtitle: '应用最先进技术的高端研磨机产品线',
@@ -1360,6 +1370,224 @@ const translations = {
         contact_social_media: '社交媒体',
         contact_call_button: '拨打电话',
         contact_email_button: '发送邮件',
+    },
+    id: {
+        // Navigation
+        home: 'Beranda',
+        about: 'Tentang Kami',
+        products: 'Produk',
+        equipment: 'Peralatan',
+        shop: 'Toko Online',
+        projects: 'Proyek',
+        certificates: 'Sertifikat/Certification',
+        qna: 'Konsultasi',
+        news: 'Berita',
+        resources: 'Ruang Materi',
+        contact: 'Kontak',
+
+        // User menu
+        admin: 'Admin',
+        user: 'Pengguna',
+        revenue_management: 'Manajemen Pendapatan',
+        admin_danger_zone: 'Area Bahaya Admin',
+        profile_settings: 'Pengaturan Profil',
+        login: 'Masuk',
+        logout: 'Keluar',
+        welcome: 'Selamat Datang!',
+        admin_account: 'Akun Admin',
+
+        // Hero Section
+        hero_patent: 'Nomor Paten 10-2312833',
+        hero_trademark: 'Nomor Merk 40-1678504',
+        hero_title_line1: 'Bahan Terbakar Lingkungan',
+        hero_title_line2: 'Bahan Keramik Baru',
+        hero_inquiry_btn: 'Pertanyaan Produk',
+        hero_purchase_btn: 'Beli Produk',
+        hero_projects_btn: 'Lihat Proyek',
+        hero_admin_youtube_edit: 'Edit Tautan Video YouTube Utama',
+        hero_youtube_placeholder: 'Masukkan URL Video YouTube',
+        hero_embed_preview: 'URL Embed Dikonversi:',
+        hero_save_btn: 'Simpan',
+        hero_saving: 'Menyimpan...',
+        hero_save_success: 'Tautan YouTube telah disimpan.',
+
+        // Features Section
+        features_title: 'Apa yang Membuat',
+        features_title_highlight: 'Khas RIN Korea',
+        features_subtitle: 'Membuat Lingkungan Konstruksi yang Aman dan Ramah Lingkungan dengan Bahan Keramik Berkualitas Tinggi',
+
+        // Feature items
+        feature_fire_resistant_title: 'Sertifikasi Tahan Api',
+        feature_fire_resistant_desc: 'Bahan Keramik Organik Tahan Api yang Aman',
+        feature_eco_friendly_title: 'Metode Penutupan Ramah Lingkungan',
+        feature_eco_friendly_desc: 'Penutupan Baru yang Ramah Lingkungan Satu Komponen Keramik',
+        feature_quality_title: 'Kualitas Tinggi',
+        feature_quality_desc: 'Kualitas diverifikasi melalui berbagai laporan uji dan sertifikasi, diterapkan di lebih dari 1.000 situs',
+        feature_industrial_title: 'Penerapan Industri',
+        feature_industrial_desc: 'Kegagalan yang terbukti di berbagai situs konstruksi',
+        feature_time_saving_title: 'Penghematan Waktu',
+        feature_time_saving_desc: 'Menghemat langkah penpolishing beton secara signifikan untuk konstruksi yang sederhana dan cepat',
+        feature_verified_title: 'Kinerja Diverifikasi',
+        feature_verified_desc: 'Produk yang telah melalui uji kualitas yang ketat',
+
+        // Footer
+        footer_company_info: 'Informasi Perusahaan',
+        footer_address: 'Incheon, Seo-gu, Baekbeom-ro 707 (Juan National Industrial Complex)',
+        footer_business_number: 'Nomor Pendaftaran Bisnis: 747-42-00526',
+        footer_quick_links: 'Tautan Cepat',
+        footer_customer_service: 'Layanan Pelanggan',
+        footer_social_media: 'Media Sosial',
+        footer_copyright: '© 2025 RIN Korea. Hak Cipta Dilindungi.',
+
+        // About Page
+        about_hero_title: 'Tentang Kami',
+        about_hero_subtitle: 'RIN Korea, perusahaan manufaktur bahan konstruksi khusus, menetapkan standar baru di industri konstruksi dengan teknologi inovatif dan kualitas.',
+        about_intro_title: 'RIN Korea Introduction',
+        about_intro_description: 'RIN Korea telah tumbuh menjadi perusahaan khusus yang menyediakan solusi inovatif di bidang bahan konstruksi dan peralatan konstruksi. Kami akan menjadi mitra terbaik untuk kesuksesan pelanggan kami dengan kualitas dan teknologi tertinggi.',
+        about_vision: 'Visi',
+        about_vision_desc: 'Perusahaan global yang memimpin inovasi di industri konstruksi',
+        about_mission: 'Misi',
+        about_mission_desc: 'Membuat nilai pelanggan dengan kualitas dan teknologi tertinggi',
+        about_core_values: 'Nilai Inti',
+        about_core_values_desc: 'Kepercayaan, Inovasi, Kekelanhidupan',
+        about_business_title: 'Bidang Bisnis',
+        about_business_subtitle: 'RIN Korea memimpin pengembangan industri konstruksi melalui dua bisnis inti: bahan konstruksi dan peralatan konstruksi.',
+        about_materials_title: 'Divisi Bahan Konstruksi',
+        about_materials_subtitle: 'Bidang Bisnis Inti',
+        about_materials_desc: 'Ini adalah divisi bisnis inti RIN Korea yang menghasilkan produk bahan konstruksi berkualitas tinggi seperti penutupan permukaan satu komponen keramik (bahan terbakar), cat anti panas, dan cat khusus.',
+        about_equipment_title: 'Divisi Peralatan Konstruksi',
+        about_equipment_subtitle: 'Shanghai JS Floor Systems Official Partner',
+        about_equipment_desc: 'Sebagai mitra resmi Shanghai JS Floor Systems, kami mengoperasikan agen penjualan resmi dan pusat layanan di Korea. Kami pemimpin di pasar penghalus dan penghalus beton yang digunakan di situs konstruksi global.',
+        about_location_title: 'Lokasi',
+        about_address_label: 'Alamat',
+        about_phone_label: 'Telepon',
+        about_email_label: 'Surel',
+
+        // About Business Items
+        about_materials_item1: 'Penguat Permukaan Beton/Cat (Silika)',
+        about_materials_item2: 'Semen Khusus/Penguat Air (Air Tidak Mampu)',
+        about_materials_item3: 'Penguat Permukaan Elastis/Penguat Air (Air Tidak Mampu)',
+        about_materials_item4: 'Penguat Permukaan/Epoxy, dll. Pengeluaran Khusus',
+        about_equipment_item1: 'Pengadaan Peralatan Konstruksi dan Bagian',
+        about_equipment_item2: 'Operasi Pusat Layanan Resmi (Dukungan A/S)',
+        about_equipment_item3: 'Dukungan Teknis dan Konsultasi',
+        about_equipment_item4: 'Kebijakan Harga yang Masuk Akal dan Manajemen Terintegrasi',
+
+        // Common
+        loading: 'Memuat...',
+        error: 'Kesalahan',
+        success: 'Berhasil',
+        cancel: 'Batal',
+        confirm: 'Konfirmasi',
+        save: 'Simpan',
+        edit: 'Mengedit',
+        delete: 'Hapus',
+        add: 'Tambah',
+        search: 'Pencarian',
+        filter: 'Filter',
+        reset: 'Setel Ulang',
+        select: 'Pilih',
+        none: 'Tidak Ada',
+
+        // Language names
+        korean: 'Bahasa Korea',
+        english: 'English',
+        chinese: '中文',
+
+        // Projects Page
+        projects_hero_title: 'Proyek',
+        projects_hero_subtitle: 'Temukan berbagai kasus proyek di mana teknologi keramik RIN Korea telah diterapkan.',
+        projects_add_btn: 'Tambah Proyek',
+        projects_no_projects: 'Tidak ada proyek terdaftar.',
+        projects_admin_add: 'Tambah Proyek Baru',
+        projects_form_title_add: 'Tambah Proyek',
+        projects_form_title_edit: 'Edit Proyek',
+        projects_form_name: 'Nama Proyek',
+        projects_form_location: 'Lokasi',
+        projects_form_description: 'Deskripsi',
+        projects_form_image: 'URL Gambar',
+        projects_form_features: 'Fitur',
+        projects_form_category: 'Kategori',
+        projects_form_add_feature: 'Masukkan fitur baru',
+        projects_delete_confirm: 'Apakah Anda yakin ingin menghapus proyek ini?',
+        projects_delete_title: 'Hapus Proyek',
+        projects_saving: 'Menyimpan...',
+        projects_view_detail: 'Lihat Detail',
+        projects_various_title: 'Berbagai Proyek',
+        projects_various_desc: 'Kasus Proyek RIN Korea',
+        projects_delete_error: 'Gagal menghapus proyek.',
+        projects_delete_success: 'Proyek telah dihapus.',
+
+        // Projects Stats
+        projects_stats_title: 'Kinerja Konstruksi',
+        projects_stats_subtitle: 'Teknologi RIN Korea dikenal di berbagai bidang',
+        projects_stats_construction_projects: 'Proyek Konstruksi',
+        projects_stats_customer_satisfaction: 'Kepuasan Pelanggan',
+        projects_stats_product_lineup: 'RIN Korea Product Line',
+
+        // Equipment Page
+        equipment_hero_title: 'Pengenalan Peralatan',
+        equipment_hero_subtitle: 'Menyediakan kualitas dan efisiensi tertinggi dengan teknologi penghalusan beton terbaru.',
+        equipment_add_btn: 'Tambah Peralatan',
+        equipment_partnership_title: 'Shanghai JS Floor Systems Official Partner',
+        equipment_partnership_desc: 'Sebagai mitra resmi Shanghai JS Floor Systems, kami mengoperasikan agen penjualan resmi dan pusat layanan di Korea. Kami pemimpin di pasar penghalus dan penghalus beton yang digunakan di situs konstruksi kelas dunia.',
+        equipment_partnership_contact: 'Korea Official Sales & Official Service Center (AS)\nAlamat: Incheon\nTelepon Pertanyaan: +82 32-571-1023',
+        equipment_construction_tab: 'Peralatan Konstruksi',
+
+        // Phone numbers
+        phone_number: '+82 32-571-1023',
+
+        equipment_diatool_tab: 'Diamond Tools',
+        equipment_premium_title: 'Penghalus Beton Terbaru',
+        equipment_premium_subtitle: 'Lineup penghalus premium dengan teknologi canggih',
+        equipment_professional_title: 'Penghalus Beton',
+        equipment_professional_subtitle: 'Seri penghalus kinerja tinggi untuk profesional',
+        equipment_diatool_title: 'Diamond Tools',
+        equipment_diatool_subtitle: 'Diamond tools dan aksesoris berkualitas tinggi',
+        equipment_diatool_empty: 'Produk diamond tool akan segera hadir.',
+        equipment_diatool_add: 'Tambah Diamond Tool',
+        equipment_features_label: 'Fitur Utama:',
+        equipment_edit_modal_title: 'Edit Peralatan',
+        equipment_add_modal_title: 'Tambah Peralatan',
+        equipment_delete_modal_title: 'Hapus Peralatan',
+        equipment_delete_confirm: 'Apakah Anda yakin ingin menghapus peralatan ini?',
+        equipment_form_name: 'Nama',
+        equipment_form_description: 'Deskripsi',
+        equipment_form_image: 'URL Gambar',
+        equipment_form_icon: 'Ikon',
+        equipment_form_category: 'Kategori',
+        equipment_form_features: 'Fitur',
+        equipment_form_add_feature: 'Masukkan fitur baru',
+        equipment_saving: 'Menyimpan...',
+        equipment_updated_success: 'Peralatan telah diperbarui.',
+        equipment_added_success: 'Peralatan telah ditambahkan.',
+
+        // Products Page
+        products_hero_title: 'Produk',
+        products_hero_subtitle: 'Temukan bahan keramik inovatif RIN Korea dan bahan konstruksi ramah lingkungan.',
+        products_add_btn: 'Tambah Produk',
+        products_save_success: 'Produk telah diperbarui.',
+        products_add_success: 'Produk telah ditambahkan.',
+        products_error_occurred: 'Terjadi kesalahan.',
+
+        // Contact Page
+        contact_hero_title: 'Kontak',
+        contact_hero_subtitle: 'Mari ciptakan lingkungan konstruksi yang lebih baik bersama RIN Korea.\nSilakan hubungi kami kapan saja dan kami akan merespons dengan tulus.',
+        contact_company_info: 'Informasi Perusahaan',
+        contact_address_label: 'Alamat',
+        contact_address_value: 'Incheon, Seo-gu, Baekbeom-ro 707 (Juan National Industrial Complex)\nTechnopark Industrial Complex (dijadwalkan 2026~)',
+        contact_phone_label: 'Telepon',
+        contact_email_label: 'Email',
+        contact_business_info: 'Informasi Bisnis',
+        contact_company_name: 'Nama Perusahaan',
+        contact_company_name_value: 'RIN Korea',
+        contact_business_number: 'Nomor Pendaftaran Bisnis',
+        contact_business_number_value: '747-42-00526',
+        contact_ceo: 'CEO',
+        contact_ceo_value: 'Kim Jung-hee',
+        contact_social_media: 'Media Sosial',
+        contact_call_button: 'Panggil',
+        contact_email_button: 'Kirim Email',
     },
 };
 

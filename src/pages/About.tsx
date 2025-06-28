@@ -146,7 +146,7 @@ const About = () => {
               <div className="flex flex-col items-center">
                 <Phone className="w-8 h-8 text-blue-600 mb-4" />
                 <h3 className="text-lg font-semibold mb-2">{t('about_phone_label')}</h3>
-                <p className="text-gray-600">032-571-1023</p>
+                <p className="text-gray-600">{t('phone_number')}</p>
               </div>
               <div className="flex flex-col items-center">
                 <Mail className="w-8 h-8 text-blue-600 mb-4" />
