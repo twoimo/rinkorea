@@ -17,7 +17,7 @@ const ResourcesHero: React.FC<ResourcesHeroProps> = ({ setShowForm }) => {
                 <div className="text-center">
                     <h1 className="text-3xl sm:text-5xl font-bold mb-4 sm:mb-6">{t('resources_hero_title', '자료실')}</h1>
                     <p className="text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
-                        {t('resources_hero_subtitle', '린코리아의 제품 카탈로그, 기술 자료, 인증서 등 다양한 자료를 확인하세요.')}
+                        {t('resources_hero_subtitle', '제품 카탈로그, 기술 자료, 인증서 등 다양한 자료를 확인하세요.')}
                     </p>
                     {isAdmin && (
                         <button

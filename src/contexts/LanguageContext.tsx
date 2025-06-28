@@ -241,7 +241,7 @@ const translations = {
 
         // Resources Page
         resources_hero_title: '자료실',
-        resources_hero_subtitle: '린코리아의 제품 카탈로그, 기술자료, 인증서 등 다양한 자료를 확인해보세요.',
+        resources_hero_subtitle: '제품 카탈로그, 기술자료, 인증서 등 다양한 자료를 확인해보세요.',
         resources_add_btn: '자료 추가',
 
         // Resources list and search
