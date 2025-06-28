@@ -115,11 +115,11 @@ const HeroSection = () => {
 
             {/* Main Heading */}
             <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-6 sm:mb-8 leading-tight">
-              <span className="text-white drop-shadow-2xl block">
+              <span className="text-white drop-shadow-2xl block lg:whitespace-nowrap">
                 {t('hero_title_line1')}
               </span>
               <div className="h-2 sm:h-4"></div>
-              <span className="text-blue-400 drop-shadow-2xl block">
+              <span className="text-blue-400 drop-shadow-2xl block lg:whitespace-nowrap">
                 {t('hero_title_line2')}
               </span>
             </h1>

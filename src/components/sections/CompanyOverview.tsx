@@ -82,7 +82,7 @@ const CompanyOverview = () => {
                 onClick={() => window.scrollTo(0, 0)}
                 className="group bg-red-600 hover:bg-red-700 text-white px-6 py-4 sm:px-8 rounded-xl font-bold transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-red-500/25 hover:scale-105 touch-manipulation text-sm sm:text-base"
               >
-                회사소개 자세히 보기
+                {t('company_overview_learn_more', '회사소개 자세히 보기')}
                 <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
@@ -91,7 +91,7 @@ const CompanyOverview = () => {
                 className="group bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-200 hover:border-gray-300 px-6 py-4 sm:px-8 rounded-xl font-bold transition-all duration-300 flex items-center justify-center hover:scale-105 touch-manipulation text-sm sm:text-base"
               >
                 <Phone className="mr-2 w-4 h-4 sm:w-5 sm:h-5" />
-                연락하기
+                {t('company_overview_contact', '연락하기')}
               </Link>
             </div>
           </div>
