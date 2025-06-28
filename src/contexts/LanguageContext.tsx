@@ -40,7 +40,7 @@ const translations = {
         // Hero Section
         hero_patent: '특허번호 10-2312833',
         hero_trademark: '상표번호 40-1678504',
-        hero_title_line1: '친환경 불연재료(1액형)',
+        hero_title_line1: '친환경 불연재(일액형)',
         hero_title_line2: '신개념 세라믹 코팅제',
         hero_inquiry_btn: '제품문의',
         hero_purchase_btn: '제품구매',
@@ -972,8 +972,8 @@ const translations = {
         // Hero Section
         hero_patent: '专利号 10-2312833',
         hero_trademark: '商标号 40-1678504',
-        hero_title_line1: '环保阻燃材料(单组分)',
-        hero_title_line2: '新型陶瓷涂料',
+        hero_title_line1: '环保不燃性物质（单一成分）',
+        hero_title_line2: '新概念陶瓷涂层剂',
         hero_inquiry_btn: '产品咨询',
         hero_purchase_btn: '购买产品',
         hero_projects_btn: '查看施工案例',
