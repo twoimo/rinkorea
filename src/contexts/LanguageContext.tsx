@@ -514,7 +514,7 @@ const translations = {
         // Hero Section
         hero_patent: 'Patent No. 10-2312833',
         hero_trademark: 'Trademark No. 40-1678504',
-        hero_title_line1: 'Eco-friendly Fire-resistant',
+        hero_title_line1: 'Eco-friendly Non-Combustible',
         hero_title_line2: 'New Ceramic Coating Material',
         hero_inquiry_btn: 'Product Inquiry',
         hero_purchase_btn: 'Purchase Products',
