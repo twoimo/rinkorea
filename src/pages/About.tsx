@@ -79,19 +79,19 @@ const About = () => {
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center">
                   <span className="w-2 h-2 bg-blue-600 rounded-full mr-3"></span>
-                  콘크리트 표면 강화제/코팅제(실러)
+                  {t('about_materials_item1', '콘크리트 표면 강화제/코팅제(실러)')}
                 </li>
                 <li className="flex items-center">
                   <span className="w-2 h-2 bg-blue-600 rounded-full mr-3"></span>
-                  특수시멘트/구체방수제(방청)
+                  {t('about_materials_item2', '특수시멘트/구체방수제(방청)')}
                 </li>
                 <li className="flex items-center">
                   <span className="w-2 h-2 bg-blue-600 rounded-full mr-3"></span>
-                  탄성도막방수제/침투식 교면방수제
+                  {t('about_materials_item3', '탄성도막방수제/침투식 교면방수제')}
                 </li>
                 <li className="flex items-center">
                   <span className="w-2 h-2 bg-blue-600 rounded-full mr-3"></span>
-                  발수제/에폭시 등 전문 제조
+                  {t('about_materials_item4', '발수제/에폭시 등 전문 제조')}
                 </li>
               </ul>
             </div>
@@ -112,19 +112,19 @@ const About = () => {
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-center">
                   <span className="w-2 h-2 bg-green-600 rounded-full mr-3"></span>
-                  건설기계 장비 및 부품 공급
+                  {t('about_equipment_item1', '건설기계 장비 및 부품 공급')}
                 </li>
                 <li className="flex items-center">
                   <span className="w-2 h-2 bg-green-600 rounded-full mr-3"></span>
-                  공식 서비스센터 운영 (A/S 지원)
+                  {t('about_equipment_item2', '공식 서비스센터 운영 (A/S 지원)')}
                 </li>
                 <li className="flex items-center">
                   <span className="w-2 h-2 bg-green-600 rounded-full mr-3"></span>
-                  기술 지원 및 컨설팅
+                  {t('about_equipment_item3', '기술 지원 및 컨설팅')}
                 </li>
                 <li className="flex items-center">
                   <span className="w-2 h-2 bg-green-600 rounded-full mr-3"></span>
-                  합리적인 가격 정책 및 체계적 관리
+                  {t('about_equipment_item4', '합리적인 가격 정책 및 체계적 관리')}
                 </li>
               </ul>
             </div>

@@ -104,6 +104,16 @@ const translations = {
         about_phone_label: '전화번호',
         about_email_label: '이메일',
 
+        // About Business Items
+        about_materials_item1: '콘크리트 표면 강화제/코팅제(실러)',
+        about_materials_item2: '특수시멘트/구체방수제(방청)',
+        about_materials_item3: '탄성도막방수제/침투식 교면방수제',
+        about_materials_item4: '발수제/에폭시 등 전문 제조',
+        about_equipment_item1: '건설기계 장비 및 부품 공급',
+        about_equipment_item2: '공식 서비스센터 운영 (A/S 지원)',
+        about_equipment_item3: '기술 지원 및 컨설팅',
+        about_equipment_item4: '합리적인 가격 정책 및 체계적 관리',
+
         // Common
         loading: '로딩 중...',
         error: '오류',
@@ -350,6 +360,16 @@ const translations = {
         about_phone_label: 'Phone',
         about_email_label: 'Email',
 
+        // About Business Items
+        about_materials_item1: 'Concrete Surface Hardener/Coating (Silica)',
+        about_materials_item2: 'Special Cement/Concrete Waterproofing (Waterproof)',
+        about_materials_item3: 'Elastic Bond Waterproofing/Penetrating Waterproofing',
+        about_materials_item4: 'Spray Waterproofing/Epoxy, etc. Special Manufacturing',
+        about_equipment_item1: 'Construction Equipment and Parts Supply',
+        about_equipment_item2: 'Official Service Center Operation (A/S Support)',
+        about_equipment_item3: 'Technical Support and Consulting',
+        about_equipment_item4: 'Reasonable Price Policy and Systematic Management',
+
         // Common
         loading: 'Loading...',
         error: 'Error',
@@ -595,6 +615,16 @@ const translations = {
         about_address_label: '地址',
         about_phone_label: '电话',
         about_email_label: '邮箱',
+
+        // About Business Items
+        about_materials_item1: '混凝土表面硬化剂/涂料(硅)',
+        about_materials_item2: '特殊水泥/混凝土防水剂(防水)',
+        about_materials_item3: '弹性膜防水剂/渗透性防水剂',
+        about_materials_item4: '喷涂防水剂/环氧树脂等特殊制造',
+        about_equipment_item1: '建筑设备和部件供应',
+        about_equipment_item2: '官方服务中心运营(A/S支持)',
+        about_equipment_item3: '技术支持和咨询',
+        about_equipment_item4: '合理的定价政策和系统管理',
 
         // Common
         loading: '加载中...',
