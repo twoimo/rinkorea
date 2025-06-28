@@ -30,6 +30,19 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     const { t } = useLanguage();
     const [isDownloading, setIsDownloading] = useState(false);
 
+    // Translate category names
+    const translateCategory = (category: string) => {
+        const categoryMap: Record<string, string> = {
+            '기술자료': t('technical_data', '기술자료'),
+            '카탈로그': t('catalog', '카탈로그'),
+            '매뉴얼': t('manual', '매뉴얼'),
+            '사양서': t('specification', '사양서'),
+            '인증서': t('certificate', '인증서'),
+            '시험성적서': t('test_report', '시험성적서'),
+        };
+        return categoryMap[category] || category;
+    };
+
     const getCategoryColor = (category: string) => {
         const colors: Record<string, string> = {
             '카탈로그': 'bg-blue-100 text-blue-800',
@@ -37,6 +50,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
             '매뉴얼': 'bg-amber-100 text-amber-800',
             '기술자료': 'bg-purple-100 text-purple-800',
             '인증서': 'bg-red-100 text-red-800',
+            '사양서': 'bg-indigo-100 text-indigo-800',
             '기타': 'bg-gray-100 text-gray-800'
         };
         return colors[category] || colors['기타'];
@@ -101,7 +115,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                     </h3>
                                     <div className="flex items-center gap-2 flex-shrink-0">
                                         <Badge className={getCategoryColor(resource.category)}>
-                                            {resource.category}
+                                            {translateCategory(resource.category)}
                                         </Badge>
                                         {!resource.is_active && isAdmin && (
                                             <Badge variant="secondary" className="bg-gray-200 text-gray-600 text-xs">
@@ -211,7 +225,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                 </h3>
                                 <div className="flex items-center gap-2">
                                     <Badge className={getCategoryColor(resource.category)}>
-                                        {resource.category}
+                                        {translateCategory(resource.category)}
                                     </Badge>
                                     {!resource.is_active && isAdmin && (
                                         <Badge variant="secondary" className="bg-gray-200 text-gray-600 text-xs">

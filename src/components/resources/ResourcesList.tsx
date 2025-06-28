@@ -32,6 +32,19 @@ const ResourcesList: React.FC<ResourcesListProps> = ({
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
+    // Translate category names
+    const translateCategory = (category: string) => {
+        const categoryMap: Record<string, string> = {
+            '기술자료': t('technical_data', '기술자료'),
+            '카탈로그': t('catalog', '카탈로그'),
+            '매뉴얼': t('manual', '매뉴얼'),
+            '사양서': t('specification', '사양서'),
+            '인증서': t('certificate', '인증서'),
+            '시험성적서': t('test_report', '시험성적서'),
+        };
+        return categoryMap[category] || category;
+    };
+
     const filteredResources = resources.filter(resource => {
         const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             resource.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -79,7 +92,7 @@ const ResourcesList: React.FC<ResourcesListProps> = ({
                                     <SelectItem value="all">{t('all_categories', '전체 카테고리')}</SelectItem>
                                     {categories.map((category) => (
                                         <SelectItem key={category.id} value={category.name}>
-                                            {category.name}
+                                            {translateCategory(category.name)}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>

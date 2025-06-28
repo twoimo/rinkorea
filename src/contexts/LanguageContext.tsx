@@ -255,6 +255,14 @@ const translations = {
         list_view: '목록',
         resources_form_category: '카테고리',
 
+        // Resource categories
+        technical_data: '기술자료',
+        catalog: '카탈로그',
+        manual: '매뉴얼',
+        specification: '사양서',
+        certificate: '인증서',
+        test_report: '시험성적서',
+
         // Shop Page
         shop_hero_title: '온라인 쇼핑몰',
         shop_hero_subtitle: '린코리아 제품을 온라인으로 주문하고 구매할 수 있습니다.',
@@ -719,7 +727,7 @@ const translations = {
         resources_add_btn: 'Add Resource',
 
         // Resources list and search
-        search_resources: 'Search by resource name, description, file name...',
+        search_resources: 'Search by resource name, description, filename...',
         all_categories: 'All Categories',
         total_resources_count: 'Total {{count}} resources available',
         search_results_for: "Search results for '{{term}}'",
@@ -728,6 +736,14 @@ const translations = {
         grid_view: 'Grid',
         list_view: 'List',
         resources_form_category: 'Category',
+
+        // Resource categories
+        technical_data: 'Technical Data',
+        catalog: 'Catalog',
+        manual: 'Manual',
+        specification: 'Specification',
+        certificate: 'Certificate',
+        test_report: 'Test Report',
 
         // Shop Page
         shop_hero_title: 'Online Store',
@@ -1183,6 +1199,14 @@ const translations = {
         grid_view: '网格',
         list_view: '列表',
         resources_form_category: '类别',
+
+        // Resource categories
+        technical_data: '技术资料',
+        catalog: '产品目录',
+        manual: '手册',
+        specification: '规格书',
+        certificate: '证书',
+        test_report: '测试报告',
 
         // Shop Page
         shop_hero_title: '在线商店',
