@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, DollarSign, CircleDollarSign } from 'lucide-react';
+import { DollarSign, CircleDollarSign } from 'lucide-react';
 import { useCurrency } from '@/hooks/useCurrency';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -14,14 +14,12 @@ const ExchangeRateDisplay = () => {
 
     const formatRateForDisplay = (rate: number, targetCurrency: string) => {
         if (targetCurrency === 'USD') {
-            return `1 USD = ${(1 / rate).toLocaleString('ko-KR', { maximumFractionDigits: 0 })}원`;
+            return `1 USD = ${(1 / rate).toLocaleString('ko-KR', { maximumFractionDigits: 0 })} KRW`;
         }
         if (targetCurrency === 'CNY') {
-            return `1 CNY = ${(1 / rate).toLocaleString('ko-KR', { maximumFractionDigits: 0 })}원`;
+            return `1 CNY = ${(1 / rate).toLocaleString('ko-KR', { maximumFractionDigits: 0 })} KRW`;
         }
-        if (targetCurrency === 'IDR') {
-            return `1,000 IDR = ${(1000 / rate).toLocaleString('ko-KR', { maximumFractionDigits: 0 })}원`;
-        }
+
         return '';
     };
 
@@ -39,12 +37,7 @@ const ExchangeRateDisplay = () => {
                     rate: formatRateForDisplay(exchangeRates.CNY, 'CNY'),
                     color: 'text-red-600'
                 };
-            case 'id':
-                return {
-                    icon: <TrendingUp className="w-3 h-3" />,
-                    rate: formatRateForDisplay(exchangeRates.IDR, 'IDR'),
-                    color: 'text-blue-600'
-                };
+
             default:
                 return null;
         }
@@ -61,7 +54,7 @@ const ExchangeRateDisplay = () => {
             </span>
             {lastUpdated && (
                 <span className="text-gray-400 ml-1">
-                    {lastUpdated.toLocaleTimeString(language === 'en' ? 'en-US' : language === 'zh' ? 'zh-CN' : 'id-ID', {
+                    {lastUpdated.toLocaleTimeString(language === 'en' ? 'en-US' : 'zh-CN', {
                         hour: '2-digit',
                         minute: '2-digit'
                     })}
