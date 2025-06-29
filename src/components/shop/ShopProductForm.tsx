@@ -142,16 +142,7 @@ const ShopProductForm = ({
                   placeholder="中文产品名称"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">{t('shop_form_product_name_id', '제품명 (Indonesia)')}</label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
-                  value={formValues.name_id || ''}
-                  onChange={e => onFormValueChange('name_id', e.target.value)}
-                  placeholder="Nama Produk dalam Bahasa Indonesia"
-                />
-              </div>
+
             </div>
           </div>
 
@@ -195,15 +186,7 @@ const ShopProductForm = ({
                   placeholder="中文产品描述"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">{t('shop_form_description_id', '설명 (Indonesia)')}</label>
-                <textarea
-                  className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation min-h-[80px]"
-                  value={formValues.description_id || ''}
-                  onChange={e => onFormValueChange('description_id', e.target.value)}
-                  placeholder="Deskripsi produk dalam Bahasa Indonesia"
-                />
-              </div>
+
             </div>
           </div>
 

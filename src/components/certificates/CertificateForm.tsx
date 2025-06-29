@@ -181,17 +181,7 @@ const CertificateForm: React.FC<CertificateFormProps> = ({
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Indonesia
-                </label>
-                <input
-                  type="text"
-                  value={formValues.name_id || ''}
-                  onChange={(e) => setFormValues({ ...formValues, name_id: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
+
             </div>
           </div>
 
@@ -236,17 +226,7 @@ const CertificateForm: React.FC<CertificateFormProps> = ({
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Indonesia
-                </label>
-                <textarea
-                  value={formValues.description_id || ''}
-                  onChange={(e) => setFormValues({ ...formValues, description_id: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24"
-                  rows={3}
-                />
-              </div>
+
             </div>
           </div>
 

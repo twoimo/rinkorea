@@ -4,7 +4,6 @@ import { Language } from '@/contexts/LanguageContext';
 interface ExchangeRates {
     USD: number;
     CNY: number;
-    IDR: number;
     KRW: number;
 }
 
@@ -29,11 +28,6 @@ const CURRENCY_MAP: Record<Language, CurrencyInfo> = {
         code: 'CNY',
         symbol: '¥',
         format: (amount: number) => `¥${amount.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-    },
-    id: {
-        code: 'IDR',
-        symbol: 'Rp',
-        format: (amount: number) => `Rp${amount.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
     }
 };
 
@@ -63,8 +57,7 @@ export const useCurrency = (language: Language) => {
             setExchangeRates({
                 KRW: 1,
                 USD: data.rates.USD,
-                CNY: data.rates.CNY,
-                IDR: data.rates.IDR
+                CNY: data.rates.CNY
             });
 
             setLastUpdated(new Date());
@@ -77,8 +70,7 @@ export const useCurrency = (language: Language) => {
             setExchangeRates({
                 KRW: 1,
                 USD: 0.00075, // 약 1,330 KRW = 1 USD
-                CNY: 0.0055,  // 약 180 KRW = 1 CNY
-                IDR: 11.5     // 약 0.087 KRW = 1 IDR
+                CNY: 0.0055   // 약 180 KRW = 1 CNY
             });
         } finally {
             setLoading(false);
