@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Edit } from 'lucide-react';
 
@@ -56,7 +55,10 @@ const QnAEditForm: React.FC<QnAEditFormProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120] p-4">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120] p-4"
+      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+    >
       <div className="bg-white rounded-xl p-4 md:p-6 shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center mb-4 md:mb-6">
           <div className="bg-blue-100 p-2 rounded-lg mr-3">

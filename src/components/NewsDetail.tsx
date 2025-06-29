@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Calendar, ArrowLeft, User, Edit, Trash2, X } from 'lucide-react';
 import AdminOnly from './AdminOnly';
@@ -102,8 +101,8 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ news, onBack, onDelete, onUpdat
 
       {/* 수정 모달 - 모바일 최적화 */}
       {isEditing && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end md:items-center justify-center z-[120] p-0 md:p-4">
-          <div className="bg-white rounded-t-2xl md:rounded-xl w-full md:max-w-4xl md:w-full h-[90vh] md:max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120] p-4">
+          <div className="bg-white rounded-lg w-full md:max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
             {/* 헤더 */}
             <div className="p-4 md:p-6 border-b border-gray-200 flex-shrink-0">
               <div className="flex items-center justify-between">

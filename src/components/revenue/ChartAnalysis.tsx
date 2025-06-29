@@ -863,7 +863,7 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
 
             {/* 차트 추가 모달 */}
             {isAddingChart && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120]">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120] p-4">
                     <div className="bg-white rounded-lg p-6 w-full max-w-md">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-semibold">새 차트 추가</h3>
