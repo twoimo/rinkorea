@@ -139,94 +139,40 @@ const CertificateForm: React.FC<CertificateFormProps> = ({
             </div>
           </div>
 
-          {/* 다국어 이름 */}
+          {/* 인증서명 */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">인증서명 (다국어)</h3>
+            <h3 className="text-lg font-semibold text-gray-900">인증서명</h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  한국어
-                </label>
-                <input
-                  type="text"
-                  value={formValues.name_ko || formValues.name || ''}
-                  onChange={(e) => setFormValues({ ...formValues, name_ko: e.target.value, name: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  English
-                </label>
-                <input
-                  type="text"
-                  value={formValues.name_en || ''}
-                  onChange={(e) => setFormValues({ ...formValues, name_en: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  中文
-                </label>
-                <input
-                  type="text"
-                  value={formValues.name_zh || ''}
-                  onChange={(e) => setFormValues({ ...formValues, name_zh: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                인증서명
+              </label>
+              <input
+                type="text"
+                value={formValues.name || ''}
+                onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="인증서명을 입력하세요"
+                required
+              />
             </div>
           </div>
 
-          {/* 다국어 설명 */}
+          {/* 설명 */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">설명 (다국어)</h3>
+            <h3 className="text-lg font-semibold text-gray-900">설명</h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  한국어
-                </label>
-                <textarea
-                  value={formValues.description_ko || formValues.description || ''}
-                  onChange={(e) => setFormValues({ ...formValues, description_ko: e.target.value, description: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24"
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  English
-                </label>
-                <textarea
-                  value={formValues.description_en || ''}
-                  onChange={(e) => setFormValues({ ...formValues, description_en: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24"
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  中文
-                </label>
-                <textarea
-                  value={formValues.description_zh || ''}
-                  onChange={(e) => setFormValues({ ...formValues, description_zh: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24"
-                  rows={3}
-                />
-              </div>
-
-
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                설명
+              </label>
+              <textarea
+                value={formValues.description || ''}
+                onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24"
+                placeholder="인증서 설명을 입력하세요"
+                rows={3}
+              />
             </div>
           </div>
 
