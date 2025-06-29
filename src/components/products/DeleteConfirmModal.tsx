@@ -11,29 +11,34 @@ interface DeleteConfirmModalProps {
 const DeleteConfirmModal = memo(({ product, onConfirm, onCancel }: DeleteConfirmModalProps) => {
   // Portal과 body scroll 차단으로 완벽한 중앙 정렬
   useEffect(() => {
-    // 1. 강제로 맨 위로 스크롤
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    if (typeof window !== 'undefined') {
+      // 1. 강제로 맨 위로 스크롤
+      window.scrollTo({ top: 0, behavior: 'instant' });
 
-    // 2. Body scroll 완전 차단
-    const originalOverflow = document.body.style.overflow;
-    const originalPosition = document.body.style.position;
-    const originalTop = document.body.style.top;
-    const scrollY = window.scrollY;
+      // 2. Body scroll 완전 차단
+      const originalOverflow = document.body.style.overflow;
+      const originalPosition = document.body.style.position;
+      const originalTop = document.body.style.top;
+      const scrollY = window.scrollY;
 
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
 
-    // 청소 함수
-    return () => {
-      document.body.style.overflow = originalOverflow;
-      document.body.style.position = originalPosition;
-      document.body.style.top = originalTop;
-      document.body.style.width = '';
-      window.scrollTo(0, scrollY);
-    };
+      // 청소 함수
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.body.style.position = originalPosition;
+        document.body.style.top = originalTop;
+        document.body.style.width = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
   }, []);
+
+  // SSR 환경에서 안전하게 처리
+  if (typeof window === 'undefined' || !document.body) return null;
 
   return createPortal(
     <div
@@ -83,7 +88,8 @@ const DeleteConfirmModal = memo(({ product, onConfirm, onCancel }: DeleteConfirm
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 });
 
