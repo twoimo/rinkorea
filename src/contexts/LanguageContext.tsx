@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type Language = 'ko' | 'en' | 'zh' | 'id';
+export type Language = 'ko' | 'en' | 'zh';
 
 interface LanguageContextType {
     language: Language;
@@ -211,13 +211,13 @@ const translations = {
         products_error_occurred: '오류가 발생했습니다.',
 
         // Product Card
-        product_card_show: 'Tampilkan',
-        product_card_hide: 'Sembunyikan',
-        product_card_edit: 'Edit',
-        product_card_delete: 'Hapus',
-        product_card_view_detail: 'Lihat Detail',
-        product_card_more_items: ' lebih banyak',
-        product_card_show_less: 'Lebih sedikit',
+        product_card_show: '보이기',
+        product_card_hide: '숨기기',
+        product_card_edit: '편집',
+        product_card_delete: '삭제',
+        product_card_view_detail: '자세히 보기',
+        product_card_more_items: '개 더',
+        product_card_show_less: '접기',
 
         // Product Benefits
         product_benefits_title: '제품의 장점',
@@ -254,6 +254,14 @@ const translations = {
         grid_view: '격자',
         list_view: '목록',
         resources_form_category: '카테고리',
+        resources_download: '다운로드',
+        downloading: '다운로드 중...',
+        download_count_suffix: '회',
+        hidden: '숨김',
+        show: '보이기',
+        hide: '숨기기',
+        resources_delete_confirm: '정말로 이 자료를 삭제하시겠습니까?',
+        processing: '처리중...',
 
         // Shop Page
         shop_hero_title: '온라인 스토어',
