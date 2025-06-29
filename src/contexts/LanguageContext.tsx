@@ -51,8 +51,8 @@ const translations = {
         // Hero Section
         hero_patent: '특허번호 10-2312833',
         hero_trademark: '상표번호 40-1678504',
-        hero_title_line1: '친환경 불연재료(1액형)',
-        hero_title_line2: '신개념 세라믹 코팅제',
+        hero_title_line1: '친환경 불연재(일액형)',
+        hero_title_line2: '신소재 세라믹 코팅제',
         hero_inquiry_btn: '제품문의',
         hero_purchase_btn: '제품구매',
         hero_projects_btn: '시공사례 보기',
