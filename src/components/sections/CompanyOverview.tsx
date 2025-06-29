@@ -10,8 +10,8 @@ const CompanyOverview = () => {
   const companyInfo = [
     {
       icon: <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />,
-      label: t('company_overview_location_label', '본사 위치'),
-      value: t('company_overview_location_value', '인천광역시 서구 백범로 707 (주안국가산업단지)\n천안 테크노파크 산업단지 입주예정 (2026~)').split('\n').map((line, index) => (
+      label: String(t('company_overview_location_label', '본사 위치')),
+      value: String(t('company_overview_location_value', '인천광역시 서구 백범로 707 (주안국가산업단지)\n천안 테크노파크 산업단지 입주예정 (2026~)')).split('\n').map((line, index) => (
         <React.Fragment key={index}>
           {line}
           {index === 0 && <br />}
@@ -21,14 +21,14 @@ const CompanyOverview = () => {
     },
     {
       icon: <FileText className="w-5 h-5 sm:w-6 sm:h-6" />,
-      label: t('company_overview_business_number_label', '사업자등록번호'),
+      label: String(t('company_overview_business_number_label', '사업자등록번호')),
       value: "747-42-00526",
       color: "text-green-600"
     },
     {
       icon: <Building2 className="w-5 h-5 sm:w-6 sm:h-6" />,
-      label: t('company_overview_business_division_label', '사업부문'),
-      value: t('company_overview_business_division_value', '건설재료사업부 / 건설기계사업부'),
+      label: String(t('company_overview_business_division_label', '사업부문')),
+      value: String(t('company_overview_business_division_value', '건설재료사업부 / 건설기계사업부')),
       color: "text-orange-600"
     }
   ];
@@ -47,12 +47,12 @@ const CompanyOverview = () => {
           {/* Content */}
           <div className="order-2 lg:order-1">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-4 sm:mb-6 leading-tight">
-              {t('company_overview_title_reliable', '신뢰할 수 있는')}
-              <span className="text-red-600"> {t('company_overview_title_partner', '파트너')}</span>
+              {String(t('company_overview_title_reliable', '신뢰할 수 있는'))}
+              <span className="text-red-600"> {String(t('company_overview_title_partner', '파트너'))}</span>
             </h2>
 
             <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 leading-relaxed">
-              {t('company_overview_description', '린코리아는 건설재료사업부와 2024년 신설된 건설기계사업부를 통해 종합적인 건설 솔루션을 제공합니다.')}
+              {String(t('company_overview_description', '린코리아는 건설재료사업부와 2024년 신설된 건설기계사업부를 통해 종합적인 건설 솔루션을 제공합니다.'))}
             </p>
 
             {/* Company Info Cards */}
@@ -82,7 +82,7 @@ const CompanyOverview = () => {
                 onClick={() => window.scrollTo(0, 0)}
                 className="group bg-red-600 hover:bg-red-700 text-white px-6 py-4 sm:px-8 rounded-xl font-bold transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-red-500/25 hover:scale-105 touch-manipulation text-sm sm:text-base"
               >
-                {t('company_overview_learn_more', '회사소개 자세히 보기')}
+                {String(t('company_overview_learn_more', '회사소개 자세히 보기'))}
                 <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
@@ -91,7 +91,7 @@ const CompanyOverview = () => {
                 className="group bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-200 hover:border-gray-300 px-6 py-4 sm:px-8 rounded-xl font-bold transition-all duration-300 flex items-center justify-center hover:scale-105 touch-manipulation text-sm sm:text-base"
               >
                 <Phone className="mr-2 w-4 h-4 sm:w-5 sm:h-5" />
-                {t('company_overview_contact', '연락하기')}
+                {String(t('company_overview_contact', '연락하기'))}
               </Link>
             </div>
           </div>

@@ -123,9 +123,9 @@ const ResourcesList: React.FC<ResourcesListProps> = ({
 
                 {/* 결과 카운트 */}
                 <div className="mt-4 text-sm text-gray-600">
-                    {t('total_resources_count', '총 {{count}}개의 자료가 있습니다').replace('{{count}}', filteredResources.length.toString())}
+                    {String(t('total_resources_count', '총 {{count}}개의 자료가 있습니다')).replace('{{count}}', filteredResources.length.toString())}
                     {searchTerm && (
-                        <span> ({t('search_results_for', "'{{term}}' 검색 결과").replace('{{term}}', searchTerm)})</span>
+                        <span> ({String(t('search_results_for', "'{{term}}' 검색 결과")).replace('{{term}}', searchTerm)})</span>
                     )}
                 </div>
             </div>
