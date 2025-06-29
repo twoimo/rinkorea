@@ -7,7 +7,7 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Resource } from '@/hooks/useResources';
 import { formatDistanceToNow } from 'date-fns';
-import { ko } from 'date-fns/locale';
+import { ko, enUS, zhCN } from 'date-fns/locale';
 
 interface ResourceCardProps {
     resource: Resource;
@@ -27,8 +27,16 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     onToggleStatus
 }) => {
     const { isAdmin } = useUserRole();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [isDownloading, setIsDownloading] = useState(false);
+
+    const getDateLocale = () => {
+        switch (language) {
+            case 'en': return enUS;
+            case 'zh': return zhCN;
+            default: return ko;
+        }
+    };
 
     const getCategoryColor = (category: string) => {
         const colors: Record<string, string> = {
@@ -40,6 +48,18 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
             '기타': 'bg-gray-100 text-gray-800'
         };
         return colors[category] || colors['기타'];
+    };
+
+    const getCategoryTranslation = (category: string) => {
+        const categoryMap: Record<string, string> = {
+            '카탈로그': t('category_catalog', '카탈로그'),
+            '시험성적서': t('category_test_report', '시험성적서'),
+            '매뉴얼': t('category_manual', '매뉴얼'),
+            '기술자료': t('category_technical', '기술자료'),
+            '인증서': t('category_certificate', '인증서'),
+            '기타': t('category_other', '기타')
+        };
+        return categoryMap[category] || t('category_other', '기타');
     };
 
     const formatFileSize = (bytes: number | null) => {
@@ -101,7 +121,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                     </h3>
                                     <div className="flex items-center gap-2 flex-shrink-0">
                                         <Badge className={getCategoryColor(resource.category)}>
-                                            {resource.category}
+                                            {getCategoryTranslation(resource.category)}
                                         </Badge>
                                         {!resource.is_active && isAdmin && (
                                             <Badge variant="secondary" className="bg-gray-200 text-gray-600 text-xs">
@@ -128,7 +148,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                         <span>
                                             {formatDistanceToNow(new Date(resource.created_at), {
                                                 addSuffix: true,
-                                                locale: ko
+                                                locale: getDateLocale()
                                             })}
                                         </span>
                                     </div>
@@ -211,7 +231,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                 </h3>
                                 <div className="flex items-center gap-2">
                                     <Badge className={getCategoryColor(resource.category)}>
-                                        {resource.category}
+                                        {getCategoryTranslation(resource.category)}
                                     </Badge>
                                     {!resource.is_active && isAdmin && (
                                         <Badge variant="secondary" className="bg-gray-200 text-gray-600 text-xs">
@@ -279,7 +299,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                             <span className="truncate">
                                 {formatDistanceToNow(new Date(resource.created_at), {
                                     addSuffix: true,
-                                    locale: ko
+                                    locale: getDateLocale()
                                 })}
                             </span>
                             <span className="flex items-center flex-shrink-0 ml-2">

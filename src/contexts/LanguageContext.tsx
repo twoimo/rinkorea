@@ -262,6 +262,14 @@ const translations = {
         resources_delete_confirm: '정말로 이 자료를 삭제하시겠습니까?',
         processing: '처리중...',
 
+        // Resource categories
+        category_catalog: '카탈로그',
+        category_test_report: '시험성적서',
+        category_manual: '매뉴얼',
+        category_technical: '기술자료',
+        category_certificate: '인증서',
+        category_other: '기타',
+
         // Shop Page
         shop_hero_title: '온라인 스토어',
         shop_hero_subtitle: '린코리아 제품을 온라인으로 주문하고 구매할 수 있습니다.',
@@ -537,7 +545,7 @@ const translations = {
         features_subtitle: 'Creating a safe and eco-friendly construction environment with the highest quality ceramic coating materials',
 
         // Feature items
-        feature_fire_resistant_title: 'Non-combustible Certification',
+        feature_fire_resistant_title: 'Non-Combustible Certification',
         feature_fire_resistant_desc: 'Safe pure inorganic ceramic coating material',
         feature_eco_friendly_title: 'Eco-friendly Finishing Method',
         feature_eco_friendly_desc: 'Environmentally friendly one-component new ceramic coating finish',
@@ -701,7 +709,7 @@ const translations = {
         // Product Benefits
         product_benefits_title: 'Product Benefits',
         product_benefits_subtitle: 'Why RIN Korea Ceramic Coatings Are Chosen',
-        product_benefits_fire_resistant_title: 'non-combustible Certification',
+        product_benefits_fire_resistant_title: 'Non-Combustible Certification',
         product_benefits_fire_resistant_desc: 'Safe pure inorganic ceramic coating material',
         product_benefits_easy_construction_title: 'Easy Construction',
         product_benefits_easy_construction_desc: 'Easy construction with one-component system',
@@ -740,6 +748,14 @@ const translations = {
         hidden: 'Hidden',
         resources_delete_confirm: 'Are you sure you want to delete this resource?',
         processing: 'Processing...',
+
+        // Resource categories
+        category_catalog: 'Catalog',
+        category_test_report: 'Test Report',
+        category_manual: 'Manual',
+        category_technical: 'Technical Data',
+        category_certificate: 'Certificate',
+        category_other: 'Other',
 
         // Shop Page
         shop_hero_title: 'Online Store',
@@ -814,7 +830,7 @@ const translations = {
         certificates_type_patent: 'Patent Registration',
         certificate_type_patent: 'Patent',
         certificates_type_patent_desc: 'Technology recognized through patent registration for one-component ceramic manufacturing technology.',
-        certificates_type_fireproof: 'Non-combustible Certification',
+        certificates_type_fireproof: 'Non-Combustible Certification',
         certificate_type_report: 'Report',
         certificates_type_fireproof_desc: 'Safe pure inorganic ceramic coating material',
         certificates_type_quality: 'Quality Test Report',
@@ -1202,6 +1218,14 @@ const translations = {
         hidden: '隐藏',
         resources_delete_confirm: '确定要删除这个资料吗？',
         processing: '处理中...',
+
+        // Resource categories
+        category_catalog: '产品目录',
+        category_test_report: '测试报告',
+        category_manual: '操作手册',
+        category_technical: '技术资料',
+        category_certificate: '认证文件',
+        category_other: '其他',
 
         // Shop Page
         shop_hero_title: '在线商店',
