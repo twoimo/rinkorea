@@ -133,9 +133,9 @@ const CertificateCard: React.FC<CertificateCardProps> = ({
         )}
       </div>
 
-      <h3 className={`${titleSize} font-bold text-gray-900 mb-2 line-clamp-2`}>{localizedName}</h3>
+      <h3 className={`${titleSize} font-bold text-gray-900 mb-2 line-clamp-2 text-center`}>{localizedName}</h3>
       {!isSmall && (
-        <p className="text-sm sm:text-base text-gray-600 line-clamp-2">{localizedDescription}</p>
+        <p className="text-sm sm:text-base text-gray-600 line-clamp-2 text-center">{localizedDescription}</p>
       )}
     </div>
   );
