@@ -226,9 +226,9 @@ const translations = {
         product_card_hide: 'Sembunyikan',
         product_card_edit: 'Edit',
         product_card_delete: 'Hapus',
-        product_card_view_detail: 'Lihat Detail',
-        product_card_more_items: ' lebih banyak',
-        product_card_show_less: 'Lebih sedikit',
+        product_card_view_detail: '자세히 보기',
+        product_card_more_items: ' 더보기',
+        product_card_show_less: '접기',
 
         // Product Benefits
         product_benefits_title: '제품의 장점',
@@ -1595,7 +1595,7 @@ const translations = {
         projects_delete_confirm: 'Apakah Anda yakin ingin menghapus proyek ini?',
         projects_delete_title: 'Hapus Proyek',
         projects_saving: 'Menyimpan...',
-        projects_view_detail: 'Lihat Detail',
+        projects_view_detail: '자세히 보기',
         projects_various_title: 'Berbagai Proyek',
         projects_various_desc: 'Kasus Proyek RIN Korea',
         projects_delete_error: 'Gagal menghapus proyek.',
@@ -1674,9 +1674,9 @@ const translations = {
         product_card_hide: 'Sembunyikan',
         product_card_edit: 'Edit',
         product_card_delete: 'Hapus',
-        product_card_view_detail: 'Lihat Detail',
-        product_card_more_items: ' lebih banyak',
-        product_card_show_less: 'Lebih sedikit',
+        product_card_view_detail: '자세히 보기',
+        product_card_more_items: ' 더보기',
+        product_card_show_less: '접기',
 
         // Contact Page
         contact_hero_title: 'Kontak',
