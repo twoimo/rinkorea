@@ -1,11 +1,20 @@
 {
     "rewrites": [
         {
-            "source": "/(.*)",
+            "source": "/((?!assets/|.*\\.(js|css|ico|png|jpg|jpeg|webp|svg|woff|woff2|ttf|eot)).*)",
             "destination": "/index.html"
         }
     ],
     "headers": [
+        {
+            "source": "/assets/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, immutable, max-age=31536000"
+                }
+            ]
+        },
         {
             "source": "/(.*)",
             "headers": [
