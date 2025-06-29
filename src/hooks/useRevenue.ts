@@ -255,7 +255,7 @@ export const useRevenue = () => {
         // 날짜순으로 정렬하여 반환
         const result = Object.values(grouped).sort((a, b) => a.date.localeCompare(b.date));
 
-        console.log('Chart data generated:', result); // 디버깅용
+        // Chart data generated successfully
         return result;
     };
 

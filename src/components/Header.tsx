@@ -181,7 +181,7 @@ const Header = () => {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  console.log('로그인 버튼 클릭됨');
+                  // Login button clicked
                   navigate('/auth');
                 }}
                 className={cn(
@@ -298,7 +298,7 @@ const Header = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      console.log('모바일 로그인 버튼 클릭됨');
+                      // Mobile login button clicked
                       navigate('/auth');
                       setIsMenuOpen(false);
                     }}

@@ -38,7 +38,7 @@ const ProductCard = memo(({
   const IconComponent = iconMap[product.icon as keyof typeof iconMap];
 
   if (!IconComponent) {
-    console.warn(`Unknown icon type: ${product.icon}`);
+    // Unknown icon type - using default
   }
 
   const getImageUrl = (imagePath: string) => {
