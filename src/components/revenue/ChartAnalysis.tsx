@@ -859,8 +859,7 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                             </div>
                         </div>
                     </div>
-                </div>,
-                document.body
+                </div>
             )}
 
             {/* 차트 추가 모달 - Portal 방식으로 최적화 */}
@@ -1018,7 +1017,8 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                             </button>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );
