@@ -11,36 +11,31 @@ interface ProductDetailModalProps {
 
 const ProductDetailModal = memo(({ product, onClose }: ProductDetailModalProps) => {
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
 
-      const originalOverflow = document.body.style.overflow;
-      const originalPosition = document.body.style.position;
-      const originalTop = document.body.style.top;
-      const scrollY = window.scrollY;
+    const originalOverflow = document.body.style.overflow;
+    const originalPosition = document.body.style.position;
+    const originalTop = document.body.style.top;
+    const scrollY = window.scrollY;
 
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
 
-      return () => {
-        document.body.style.overflow = originalOverflow;
-        document.body.style.position = originalPosition;
-        document.body.style.top = originalTop;
-        document.body.style.width = '';
-        window.scrollTo(0, scrollY);
-      };
-    }
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.position = originalPosition;
+      document.body.style.top = originalTop;
+      document.body.style.width = '';
+      window.scrollTo(0, scrollY);
+    };
   }, []);
 
   const getImageUrl = (imagePath: string) => {
     if (imagePath.includes('://') || imagePath.startsWith('@')) return imagePath;
     return `/images/${imagePath}`;
   };
-
-  // SSR 환경에서 안전하게 처리
-  if (typeof window === 'undefined' || !document.body) return null;
 
   return createPortal(
     <div
@@ -103,8 +98,7 @@ const ProductDetailModal = memo(({ product, onClose }: ProductDetailModalProps) 
           </div>
         </div>
       </div>
-    </div>,
-    document.body
+    </div>
   );
 });
 

@@ -20,6 +20,15 @@ interface Product {
   sales?: number;
   created_at?: string;
   is_active?: boolean;
+  // 다국어 필드들 추가
+  name_ko?: string;
+  name_en?: string;
+  name_zh?: string;
+  name_id?: string;
+  description_ko?: string;
+  description_en?: string;
+  description_zh?: string;
+  description_id?: string;
   // 인덱스 시그니처 추가
   [key: string]: unknown;
 }
@@ -138,6 +147,10 @@ const ShopProductForm = ({
                 onChange={e => onFormValueChange('naver_url', e.target.value)}
               />
             </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900">{t('shop_form_product_names', '제품명 (다국어)')}</h3>
 
             <div>
               <label className="block text-sm font-medium mb-2">{t('shop_form_product_name', '상품명')}</label>
@@ -146,18 +159,102 @@ const ShopProductForm = ({
                 className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
                 value={formValues.name || ''}
                 onChange={e => onFormValueChange('name', e.target.value)}
-                placeholder="상품명을 입력하세요"
               />
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">{t('shop_form_product_name_ko', '제품명 (한국어)')}</label>
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
+                  value={formValues.name_ko || ''}
+                  onChange={e => onFormValueChange('name_ko', e.target.value)}
+                  placeholder="한국어 제품명"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">{t('shop_form_product_name_en', '제품명 (English)')}</label>
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
+                  value={formValues.name_en || ''}
+                  onChange={e => onFormValueChange('name_en', e.target.value)}
+                  placeholder="Product Name in English"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">{t('shop_form_product_name_zh', '제품명 (中文)')}</label>
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
+                  value={formValues.name_zh || ''}
+                  onChange={e => onFormValueChange('name_zh', e.target.value)}
+                  placeholder="中文产品名称"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">{t('shop_form_product_name_id', '제품명 (Indonesia)')}</label>
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
+                  value={formValues.name_id || ''}
+                  onChange={e => onFormValueChange('name_id', e.target.value)}
+                  placeholder="Nama Produk dalam Bahasa Indonesia"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900">{t('shop_form_descriptions', '제품 설명 (다국어)')}</h3>
+
             <div>
-              <label className="block text-sm font-medium mb-2">{t('shop_form_description', '상품 설명')}</label>
+              <label className="block text-sm font-medium mb-2">{t('shop_form_description', '설명')}</label>
               <textarea
                 className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation min-h-[100px]"
                 value={formValues.description || ''}
                 onChange={e => onFormValueChange('description', e.target.value)}
-                placeholder="상품 설명을 입력하세요"
               />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">{t('shop_form_description_ko', '설명 (한국어)')}</label>
+                <textarea
+                  className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation min-h-[80px]"
+                  value={formValues.description_ko || ''}
+                  onChange={e => onFormValueChange('description_ko', e.target.value)}
+                  placeholder="한국어 제품 설명"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">{t('shop_form_description_en', '설명 (English)')}</label>
+                <textarea
+                  className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation min-h-[80px]"
+                  value={formValues.description_en || ''}
+                  onChange={e => onFormValueChange('description_en', e.target.value)}
+                  placeholder="Product description in English"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">{t('shop_form_description_zh', '설명 (中文)')}</label>
+                <textarea
+                  className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation min-h-[80px]"
+                  value={formValues.description_zh || ''}
+                  onChange={e => onFormValueChange('description_zh', e.target.value)}
+                  placeholder="中文产品描述"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">{t('shop_form_description_id', '설명 (Indonesia)')}</label>
+                <textarea
+                  className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation min-h-[80px]"
+                  value={formValues.description_id || ''}
+                  onChange={e => onFormValueChange('description_id', e.target.value)}
+                  placeholder="Deskripsi produk dalam Bahasa Indonesia"
+                />
+              </div>
             </div>
           </div>
 

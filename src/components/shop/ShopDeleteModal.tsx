@@ -102,8 +102,7 @@ const ShopDeleteModal = ({
         {formError && <div className="mt-4 text-sm text-red-600 p-3 bg-red-50 rounded-lg">{formError}</div>}
         {formSuccess && <div className="mt-4 text-sm text-green-700 p-3 bg-green-50 rounded-lg">{formSuccess}</div>}
       </div>
-    </div>,
-    document.body
+    </div>
   );
 };
 

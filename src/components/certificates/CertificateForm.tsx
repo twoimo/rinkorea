@@ -15,6 +15,15 @@ interface Certificate {
   is_active?: boolean;
   created_at?: string;
   updated_at?: string;
+  // 다국어 필드
+  name_ko?: string;
+  name_en?: string;
+  name_zh?: string;
+  name_id?: string;
+  description_ko?: string;
+  description_en?: string;
+  description_zh?: string;
+  description_id?: string;
 }
 
 interface CertificateFormProps {
@@ -124,61 +133,36 @@ const CertificateForm: React.FC<CertificateFormProps> = ({
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900">기본 정보</h3>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('certificates_form_image_url', '이미지 URL')}
-              </label>
-              <input
-                type="text"
-                value={formValues.image_url || ''}
-                onChange={(e) => setFormValues({ ...formValues, image_url: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('certificates_form_image_url', '이미지 URL')}
+                </label>
+                <input
+                  type="text"
+                  value={formValues.image_url || ''}
+                  onChange={(e) => setFormValues({ ...formValues, image_url: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('certificates_form_category', '카테고리')}
-              </label>
-              <select
-                value={formValues.category || ''}
-                onChange={(e) => setFormValues({ ...formValues, category: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              >
-                <option value="">카테고리 선택</option>
-                <option value="patent">특허/상표</option>
-                <option value="certification">RIN-COAT 시험성적서</option>
-                <option value="rin_test">린코리아 시험성적서</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                인증서명
-              </label>
-              <input
-                type="text"
-                value={formValues.name || ''}
-                onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="인증서명을 입력하세요"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                설명
-              </label>
-              <textarea
-                value={formValues.description || ''}
-                onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24"
-                placeholder="인증서 설명을 입력하세요"
-                rows={3}
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('certificates_form_category', '카테고리')}
+                </label>
+                <select
+                  value={formValues.category || ''}
+                  onChange={(e) => setFormValues({ ...formValues, category: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                >
+                  <option value="">카테고리 선택</option>
+                  <option value="patent">특허/상표</option>
+                  <option value="certification">RIN-COAT 시험성적서</option>
+                  <option value="rin_test">린코리아 시험성적서</option>
+                </select>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -203,6 +187,117 @@ const CertificateForm: React.FC<CertificateFormProps> = ({
                   value={formValues.expiry_date || ''}
                   onChange={(e) => setFormValues({ ...formValues, expiry_date: e.target.value })}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 다국어 이름 */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900">인증서명 (다국어)</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  한국어
+                </label>
+                <input
+                  type="text"
+                  value={formValues.name_ko || formValues.name || ''}
+                  onChange={(e) => setFormValues({ ...formValues, name_ko: e.target.value, name: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  English
+                </label>
+                <input
+                  type="text"
+                  value={formValues.name_en || ''}
+                  onChange={(e) => setFormValues({ ...formValues, name_en: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  中文
+                </label>
+                <input
+                  type="text"
+                  value={formValues.name_zh || ''}
+                  onChange={(e) => setFormValues({ ...formValues, name_zh: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Indonesia
+                </label>
+                <input
+                  type="text"
+                  value={formValues.name_id || ''}
+                  onChange={(e) => setFormValues({ ...formValues, name_id: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 다국어 설명 */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900">설명 (다국어)</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  한국어
+                </label>
+                <textarea
+                  value={formValues.description_ko || formValues.description || ''}
+                  onChange={(e) => setFormValues({ ...formValues, description_ko: e.target.value, description: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24"
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  English
+                </label>
+                <textarea
+                  value={formValues.description_en || ''}
+                  onChange={(e) => setFormValues({ ...formValues, description_en: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24"
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  中文
+                </label>
+                <textarea
+                  value={formValues.description_zh || ''}
+                  onChange={(e) => setFormValues({ ...formValues, description_zh: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24"
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Indonesia
+                </label>
+                <textarea
+                  value={formValues.description_id || ''}
+                  onChange={(e) => setFormValues({ ...formValues, description_id: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24"
+                  rows={3}
                 />
               </div>
             </div>
