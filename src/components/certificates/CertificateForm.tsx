@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useIsMobile } from '../../hooks/use-mobile';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -48,6 +49,34 @@ const CertificateForm: React.FC<CertificateFormProps> = ({
   const { t } = useLanguage();
   const [formValues, setFormValues] = useState<Partial<Certificate>>(certificate || {});
 
+  // Portal과 body scroll 차단으로 완벽한 중앙 정렬
+  useEffect(() => {
+    if (isOpen) {
+      // 1. 강제로 맨 위로 스크롤
+      window.scrollTo({ top: 0, behavior: 'instant' });
+
+      // 2. Body scroll 완전 차단
+      const originalOverflow = document.body.style.overflow;
+      const originalPosition = document.body.style.position;
+      const originalTop = document.body.style.top;
+      const scrollY = window.scrollY;
+
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+
+      // 청소 함수
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.body.style.position = originalPosition;
+        document.body.style.top = originalTop;
+        document.body.style.width = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isOpen]);
+
   React.useEffect(() => {
     setFormValues(certificate || {});
   }, [certificate]);
@@ -59,12 +88,33 @@ const CertificateForm: React.FC<CertificateFormProps> = ({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[120] p-4"
-      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999,
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+        margin: 0
+      }}
+      onClick={onClose}
     >
-      <div className={`bg-white rounded-lg shadow-lg relative w-full ${isMobile ? 'max-h-[90vh] overflow-y-auto' : 'max-w-4xl'}`}>
+      <div
+        className={`bg-white rounded-lg shadow-lg relative w-full ${isMobile ? 'max-h-[90vh] overflow-y-auto' : 'max-w-4xl'}`}
+        style={{
+          position: 'relative',
+          margin: 'auto',
+          transform: 'none'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="sticky top-0 bg-white border-b p-4 sm:p-6 flex items-center justify-between">
           <h2 className="text-xl sm:text-2xl font-bold">
             {certificate ? t('certificates_form_edit_title', '인증서 수정') : t('certificates_form_add_title', '인증서 추가')}
@@ -285,7 +335,8 @@ const CertificateForm: React.FC<CertificateFormProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

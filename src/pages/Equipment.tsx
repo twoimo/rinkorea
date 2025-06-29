@@ -10,6 +10,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { createPortal } from 'react-dom';
 
 interface Equipment {
     id: string;
@@ -497,13 +498,34 @@ const Equipment = () => {
                 </>
             )}
 
-            {/* Equipment Form Modal - 모바일 최적화 */}
-            {showForm && (
+            {/* Equipment Form Modal - Portal 방식으로 최적화 */}
+            {showForm && createPortal(
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[120] p-4"
-                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 9999,
+                        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                        margin: 0
+                    }}
+                    onClick={closeForm}
                 >
-                    <div className="bg-white rounded-lg shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto relative">
+                    <div
+                        className="bg-white rounded-lg shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto relative"
+                        style={{
+                            position: 'relative',
+                            margin: 'auto',
+                            transform: 'none'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="sticky top-0 bg-white border-b border-gray-200 p-4 md:p-6">
                             <button
                                 className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 touch-manipulation"
@@ -648,13 +670,38 @@ const Equipment = () => {
                             </form>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
-            {/* Delete Confirmation Modal - 모바일 최적화 */}
-            {showDeleteConfirm && deleteTarget && (
-                <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[120] p-4">
-                    <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+            {/* Delete Confirmation Modal - Portal 방식으로 최적화 */}
+            {showDeleteConfirm && deleteTarget && createPortal(
+                <div
+                    className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 9999,
+                        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                        margin: 0
+                    }}
+                    onClick={closeDeleteConfirm}
+                >
+                    <div
+                        className="bg-white rounded-lg shadow-lg w-full max-w-md"
+                        style={{
+                            position: 'relative',
+                            margin: 'auto',
+                            transform: 'none'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="p-6 md:p-8">
                             <h2 className="text-xl md:text-2xl font-bold mb-4">{t('equipment_delete_modal_title', '기계 삭제')}</h2>
                             <p className="text-gray-600 mb-6">
@@ -676,7 +723,8 @@ const Equipment = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
             <Footer />

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Save, AlertCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -35,6 +36,30 @@ const NewsForm: React.FC<NewsFormProps> = ({
     const [formError, setFormError] = useState<string | null>(null);
 
     useEffect(() => {
+        if (isOpen) {
+            window.scrollTo({ top: 0, behavior: 'instant' });
+
+            const originalOverflow = document.body.style.overflow;
+            const originalPosition = document.body.style.position;
+            const originalTop = document.body.style.top;
+            const scrollY = window.scrollY;
+
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.width = '100%';
+
+            return () => {
+                document.body.style.overflow = originalOverflow;
+                document.body.style.position = originalPosition;
+                document.body.style.top = originalTop;
+                document.body.style.width = '';
+                window.scrollTo(0, scrollY);
+            };
+        }
+    }, [isOpen]);
+
+    useEffect(() => {
         if (news) {
             setFormData({
                 title: news.title,
@@ -67,9 +92,33 @@ const NewsForm: React.FC<NewsFormProps> = ({
 
     if (!isOpen) return null;
 
-    return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120] p-4">
-            <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    return createPortal(
+        <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+            style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 9999,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                margin: 0
+            }}
+            onClick={onClose}
+        >
+            <div
+                className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                style={{
+                    position: 'relative',
+                    margin: 'auto',
+                    transform: 'none'
+                }}
+                onClick={(e) => e.stopPropagation()}
+            >
                 <div className="p-6 border-b border-gray-200">
                     <div className="flex items-center justify-between">
                         <h2 className="text-xl font-bold text-gray-900">
