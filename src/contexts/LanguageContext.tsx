@@ -245,6 +245,7 @@ const translations = {
         // News Page
         news_hero_title: '공지사항',
         news_hero_subtitle: '린코리아의 최신 소식과 중요한 공지사항을 확인하세요.',
+        news_view_detail: '자세히 보기',
 
         // QnA Page
         qna_hero_title: '고객상담',
@@ -727,6 +728,7 @@ const translations = {
         // News Page
         news_hero_title: 'News',
         news_hero_subtitle: 'Check the latest news and important announcements from RIN Korea.',
+        news_view_detail: 'View Details',
 
         // QnA Page
         qna_hero_title: 'Customer Support',
@@ -1194,6 +1196,7 @@ const translations = {
         // News Page
         news_hero_title: '新闻公告',
         news_hero_subtitle: '查看RIN Korea的最新消息和重要公告。',
+        news_view_detail: '查看详情',
 
         // Resources Page
         resources_hero_title: '资料库',
@@ -1619,7 +1622,6 @@ const translations = {
 
         // Phone numbers
         phone_number: '+82 32-571-1023',
-
         equipment_diatool_tab: 'Diamond Tools',
         equipment_premium_title: 'Penghalus Beton Terbaru',
         equipment_premium_subtitle: 'Lineup penghalus premium dengan teknologi canggih',
@@ -1700,6 +1702,7 @@ const translations = {
         // News Page
         news_hero_title: 'Berita',
         news_hero_subtitle: 'Periksa berita terbaru dan pengumuman penting dari RIN Korea.',
+        news_view_detail: 'Lihat Detail',
 
         // QnA Page
         qna_hero_title: 'Konsultasi Pelanggan',

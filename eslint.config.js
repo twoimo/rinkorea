@@ -24,8 +24,8 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       "@typescript-eslint/no-unused-vars": "off",
-      // Console 관련 규칙 - 개발 환경에서는 허용, 프로덕션에서는 경고
-      "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
+      // Console 관련 규칙 - 개발 환경에서는 허용, 프로덕션에서는 허용 (에러/경고만)
+      "no-console": ["warn", { "allow": ["warn", "error"] }],
       "no-debugger": process.env.NODE_ENV === "production" ? "error" : "warn",
     },
   },
