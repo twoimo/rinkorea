@@ -382,7 +382,7 @@ const Equipment = () => {
             <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 md:py-20">
                 <div className="container mx-auto px-4">
                     <div className="text-center">
-                        <h1 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6">{t('equipment_hero_title', '건설기계소개')}</h1>
+                        <h1 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6">{t('equipment_hero_title', '건설건설기계소개')}</h1>
                         <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
                             {t('equipment_hero_subtitle', '최첨단 기술의 콘크리트 연삭기로 최고의 품질과 효율성을 제공합니다.')}
                         </p>

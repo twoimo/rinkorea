@@ -17,8 +17,8 @@ const translations = {
         home: '홈',
         about: '회사소개',
         products: '제품소개',
-        equipment: '기계소개',
-        shop: '온라인쇼핑몰',
+        equipment: '건설기계소개',
+        shop: '온라인 스토어',
         projects: '시공사례',
         certificates: '시험성적서/인증',
         qna: '고객상담',
@@ -41,7 +41,7 @@ const translations = {
         hero_patent: '특허번호 10-2312833',
         hero_trademark: '상표번호 40-1678504',
         hero_title_line1: '친환경 불연재(일액형)',
-        hero_title_line2: '신개념 세라믹 코팅제',
+        hero_title_line2: '신소재 세라믹 코팅제',
         hero_inquiry_btn: '제품문의',
         hero_purchase_btn: '제품구매',
         hero_projects_btn: '시공사례 보기',
@@ -167,7 +167,7 @@ const translations = {
         projects_stats_product_lineup: '린코리아 제품군',
 
         // Equipment Page
-        equipment_hero_title: '기계소개',
+        equipment_hero_title: '건설기계소개',
         equipment_hero_subtitle: '최첨단 콘크리트 연마 기술로 최고의 품질과 효율성을 제공합니다.',
         equipment_add_btn: '기계 추가',
         equipment_partnership_title: 'Shanghai JS Floor Systems 공식 파트너',
@@ -256,7 +256,7 @@ const translations = {
         resources_form_category: '카테고리',
 
         // Shop Page
-        shop_hero_title: '온라인 쇼핑몰',
+        shop_hero_title: '온라인 스토어',
         shop_hero_subtitle: '린코리아 제품을 온라인으로 주문하고 구매할 수 있습니다.',
         shop_add_product: '제품 추가',
 
