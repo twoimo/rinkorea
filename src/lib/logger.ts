@@ -27,13 +27,13 @@ class Logger {
 
     debug(message: string, ...args: unknown[]): void {
         if (this.shouldLog('debug')) {
-            console.log(`🔍 [DEBUG] ${message}`, ...args);
+            console.warn(`🔍 [DEBUG] ${message}`, ...args);
         }
     }
 
     info(message: string, ...args: unknown[]): void {
         if (this.shouldLog('info')) {
-            console.log(`ℹ️ [INFO] ${message}`, ...args);
+            console.warn(`ℹ️ [INFO] ${message}`, ...args);
         }
     }
 
@@ -52,7 +52,38 @@ class Logger {
     // Performance logging
     performance(name: string, value: number): void {
         if (this.shouldLog('debug')) {
-            console.log(`📊 [PERF] ${name}: ${value.toFixed(2)}ms`);
+            console.warn(`📊 [PERF] ${name}: ${value.toFixed(2)}ms`);
+        }
+    }
+
+    // General log method
+    log(message: string, data?: unknown): void {
+        if (this.shouldLog('warn')) {
+            const timestamp = new Date().toISOString();
+            const logMessage = `[${timestamp}] [LOG] ${message}`;
+
+            if (data) {
+                console.warn(logMessage, data);
+            } else {
+                console.warn(logMessage);
+            }
+        }
+    }
+
+    logPerformanceMetric(metric: string, value: number, unit = 'ms'): void {
+        if (this.shouldLog('warn')) {
+            const message = `Performance: ${metric} = ${value}${unit}`;
+            console.warn(`📊 [PERF] ${message}`);
+        }
+    }
+
+    logQuery(query: string, variables: unknown): void {
+        if (this.shouldLog('warn')) {
+            console.warn('[SUPABASE]', {
+                query,
+                variables,
+                timestamp: new Date().toISOString()
+            });
         }
     }
 }
