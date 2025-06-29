@@ -116,7 +116,7 @@ const Header = () => {
           </nav>
 
           {/* Desktop User Menu and Language Selector */}
-          <div className="hidden lg:flex items-center space-x-3">
+          <div className="hidden xl:flex items-center space-x-3">
             {user ? (
               <div className="relative">
                 <button
