@@ -39,10 +39,13 @@ const NewsListItem: React.FC<NewsListItemProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+    <div
+      className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer"
+      onClick={() => onSelect(newsItem.id)}
+    >
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
+          <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-blue-600 transition-colors">
             {newsItem.title}
           </h3>
           <p className="text-gray-600 mb-4 line-clamp-3 text-sm md:text-base">
@@ -56,28 +59,40 @@ const NewsListItem: React.FC<NewsListItemProps> = ({
 
         <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
           <button
-            onClick={() => onSelect(newsItem.id)}
-            className="flex items-center bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 md:px-4 py-2 rounded-lg font-medium transition-all duration-200 text-xs md:text-sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelect(newsItem.id);
+            }}
+            className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow touch-manipulation"
+            title={t('news_view_detail', '자세히 보기')}
+            aria-label={t('news_view_detail', '자세히 보기')}
           >
-            <Eye className="w-3 h-3 md:w-4 md:h-4 mr-2" />
-            {t('news_view_detail', '자세히 보기')}
+            <Eye className="w-4 h-4" />
           </button>
 
           {isAdmin && (
             <>
               <button
-                onClick={() => onEdit(newsItem.id)}
-                className="flex items-center bg-yellow-50 hover:bg-yellow-100 text-yellow-700 px-3 md:px-4 py-2 rounded-lg font-medium transition-all duration-200 text-xs md:text-sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(newsItem.id);
+                }}
+                className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow touch-manipulation"
+                title={t('edit', '수정')}
+                aria-label={t('edit', '수정')}
               >
-                <Edit className="w-3 h-3 md:w-4 md:h-4 mr-2" />
-                {t('edit', '수정')}
+                <Edit className="w-4 h-4" />
               </button>
               <button
-                onClick={() => onDelete(newsItem.id)}
-                className="flex items-center bg-red-50 hover:bg-red-100 text-red-700 px-3 md:px-4 py-2 rounded-lg font-medium transition-all duration-200 text-xs md:text-sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(newsItem.id);
+                }}
+                className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-2 shadow touch-manipulation"
+                title={t('delete', '삭제')}
+                aria-label={t('delete', '삭제')}
               >
-                <Trash2 className="w-3 h-3 md:w-4 md:h-4 mr-2" />
-                {t('delete', '삭제')}
+                <Trash2 className="w-4 h-4" />
               </button>
             </>
           )}
