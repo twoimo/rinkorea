@@ -13,7 +13,7 @@ interface ImageModalProps {
 const ImageModal = ({ isOpen, onClose, imageSrc, imageAlt, imageTitle }: ImageModalProps) => {
   // Portal과 body scroll 차단으로 완벽한 중앙 정렬
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && typeof window !== 'undefined') {
       // 1. 강제로 맨 위로 스크롤
       window.scrollTo({ top: 0, behavior: 'instant' });
 
@@ -39,7 +39,8 @@ const ImageModal = ({ isOpen, onClose, imageSrc, imageAlt, imageTitle }: ImageMo
     }
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  // SSR 환경에서 안전하게 처리
+  if (!isOpen || typeof window === 'undefined' || !document.body) return null;
 
   return createPortal(
     <div
@@ -85,7 +86,8 @@ const ImageModal = ({ isOpen, onClose, imageSrc, imageAlt, imageTitle }: ImageMo
           />
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
