@@ -10,6 +10,7 @@ interface Inquiry {
   phone: string | null;
   title: string;
   content: string;
+  category?: string;
   status: string;
   admin_reply: string | null;
   created_at: string;
@@ -66,6 +67,8 @@ export const useInquiries = () => {
     phone?: string;
     title: string;
     content: string;
+    category: string;
+    is_private?: boolean;
   }) => {
     try {
       const { data, error } = await supabase

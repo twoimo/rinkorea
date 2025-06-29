@@ -8,7 +8,6 @@ import QnAEditForm from '@/components/qna/QnAEditForm';
 import QnAItem from '@/components/qna/QnAItem';
 import QnAHero from '@/components/qna/QnAHero';
 import QnAEmptyState from '@/components/qna/QnAEmptyState';
-import QnAList from '@/components/qna/QnAList';
 import { useInquiries } from '@/hooks/useInquiries';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -60,6 +59,26 @@ const QnA = () => {
   const pendingCount = inquiries.filter(inquiry => pendingStatuses.includes(inquiry.status)).length;
 
   const editingInquiryData = editingInquiry ? inquiries.find(inquiry => inquiry.id === editingInquiry) : null;
+
+  const handleCreateInquiry = async (formData: {
+    title: string;
+    content: string;
+    category: string;
+    is_private: boolean;
+  }): Promise<void> => {
+    const result = await createInquiry({
+      name: user?.user_metadata?.name || user?.email || '익명',
+      email: user?.email || 'anonymous@example.com',
+      title: formData.title,
+      content: formData.content,
+      category: formData.category,
+      is_private: formData.is_private
+    });
+
+    if (result.error) {
+      throw new Error('문의 등록에 실패했습니다.');
+    }
+  };
 
   console.log('🔍 QnA Debug Info:', {
     loading,
@@ -127,7 +146,7 @@ const QnA = () => {
       {showForm && (
         <QnAForm
           onClose={() => setShowForm(false)}
-          onSave={createInquiry}
+          onSave={handleCreateInquiry}
           onRefetch={refetch}
         />
       )}

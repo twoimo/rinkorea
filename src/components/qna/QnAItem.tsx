@@ -10,7 +10,7 @@ interface Inquiry {
   id: string;
   title: string;
   content: string;
-  category: string;
+  category?: string;
   status: string;
   is_private: boolean;
   created_at: string;
@@ -85,7 +85,7 @@ const QnAItem: React.FC<QnAItemProps> = ({ inquiry, user, onEdit, onDelete, onRe
           <div className="flex-1">
             <div className="flex items-center space-x-2 mb-2">
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                {inquiry.category}
+                {inquiry.category || t('qna_category_general', '일반 문의')}
               </span>
               {getStatusBadge(inquiry.status)}
               {inquiry.is_private && (
