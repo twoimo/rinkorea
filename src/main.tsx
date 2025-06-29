@@ -3,17 +3,16 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { logger } from './lib/logger'
-import { ErrorBoundary } from './components/error-boundary.tsx';
 
 // Register Service Worker for caching and offline functionality
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
             .then((registration) => {
-                logger.info('SW registered:', registration);
+                logger.log('SW registered: ', registration);
             })
             .catch((registrationError) => {
-                logger.error('SW registration failed:', registrationError);
+                logger.error('SW registration failed: ', registrationError);
             });
     });
 }
@@ -66,9 +65,7 @@ const renderApp = async () => {
 
         root.render(
             <React.StrictMode>
-                <ErrorBoundary>
-                    <App />
-                </ErrorBoundary>
+                <App />
             </React.StrictMode>
         );
     } catch (error) {
@@ -91,22 +88,23 @@ const renderApp = async () => {
 renderApp();
 
 // Add performance monitoring
-if (import.meta.env.PROD && 'performance' in window) {
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            const perfData = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-            const metrics = {
-                FCP: performance.getEntriesByName('first-contentful-paint')[0]?.startTime || 0,
-                LCP: 0, // Will be measured by LCP observer
-                FID: 0, // Will be measured by FID observer
-                CLS: 0, // Will be measured by CLS observer
-                TTFB: perfData.responseStart - perfData.requestStart,
-                domContentLoaded: perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart,
-                load: perfData.loadEventEnd - perfData.loadEventStart
-            };
+if (import.meta.env.PROD) {
+    // Measure and log key web vitals
+    if ('PerformanceObserver' in window) {
+        const observer = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+                if (entry.entryType === 'largest-contentful-paint') {
+                    logger.log('LCP', entry);
+                }
+                if (entry.entryType === 'first-input') {
+                    logger.log('FID', entry);
+                }
+                if (entry.entryType === 'layout-shift') {
+                    logger.log('CLS', entry);
+                }
+            }
+        });
 
-            // Log metrics (in production, send to analytics)
-            logger.debug('Performance Metrics:', metrics);
-        }, 0);
-    });
+        observer.observe({ entryTypes: ['largest-contentful-paint', 'first-input', 'layout-shift'] });
+    }
 }
