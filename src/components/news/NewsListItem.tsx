@@ -39,7 +39,10 @@ const NewsListItem: React.FC<NewsListItemProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+    <div
+      className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer"
+      onClick={() => onSelect(newsItem.id)}
+    >
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
         <div className="flex-1 min-w-0">
           <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
@@ -56,7 +59,10 @@ const NewsListItem: React.FC<NewsListItemProps> = ({
 
         <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
           <button
-            onClick={() => onSelect(newsItem.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelect(newsItem.id);
+            }}
             className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow touch-manipulation transition-colors"
             title={t('news_view_detail', '자세히 보기')}
             aria-label={t('news_view_detail', '자세히 보기')}
@@ -67,7 +73,10 @@ const NewsListItem: React.FC<NewsListItemProps> = ({
           {isAdmin && (
             <>
               <button
-                onClick={() => onEdit(newsItem.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(newsItem.id);
+                }}
                 className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow touch-manipulation transition-colors"
                 title={t('edit', '수정')}
                 aria-label={t('edit', '수정')}
@@ -75,7 +84,10 @@ const NewsListItem: React.FC<NewsListItemProps> = ({
                 <Edit className="w-4 h-4" />
               </button>
               <button
-                onClick={() => onDelete(newsItem.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(newsItem.id);
+                }}
                 className="bg-red-100 hover:bg-red-200 text-red-700 rounded-full p-2 shadow touch-manipulation transition-colors"
                 title={t('delete', '삭제')}
                 aria-label={t('delete', '삭제')}
