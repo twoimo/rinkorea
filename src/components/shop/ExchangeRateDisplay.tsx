@@ -14,13 +14,13 @@ const ExchangeRateDisplay = () => {
 
     const formatRateForDisplay = (rate: number, targetCurrency: string) => {
         if (targetCurrency === 'USD') {
-            return `1 USD = ${(1 / rate).toLocaleString('ko-KR', { maximumFractionDigits: 0 })}원`;
+            return `1 USD = ${(1 / rate).toLocaleString('ko-KR', { maximumFractionDigits: 0 })} KRW`;
         }
         if (targetCurrency === 'CNY') {
-            return `1 CNY = ${(1 / rate).toLocaleString('ko-KR', { maximumFractionDigits: 0 })}원`;
+            return `1 CNY = ${(1 / rate).toLocaleString('ko-KR', { maximumFractionDigits: 0 })} KRW`;
         }
         if (targetCurrency === 'IDR') {
-            return `1,000 IDR = ${(1000 / rate).toLocaleString('ko-KR', { maximumFractionDigits: 0 })}원`;
+            return `1,000 IDR = ${(1000 / rate).toLocaleString('ko-KR', { maximumFractionDigits: 0 })}KRW`;
         }
         return '';
     };
@@ -38,12 +38,6 @@ const ExchangeRateDisplay = () => {
                     icon: <CircleDollarSign className="w-3 h-3" />,
                     rate: formatRateForDisplay(exchangeRates.CNY, 'CNY'),
                     color: 'text-red-600'
-                };
-            case 'id':
-                return {
-                    icon: <TrendingUp className="w-3 h-3" />,
-                    rate: formatRateForDisplay(exchangeRates.IDR, 'IDR'),
-                    color: 'text-blue-600'
                 };
             default:
                 return null;
