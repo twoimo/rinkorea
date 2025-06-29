@@ -42,7 +42,7 @@ CREATE TABLE public.equipment_introductions (
   description text NOT NULL,
   image_url text NOT NULL,
   icon text NOT NULL,
-  features ARRAY NOT NULL,
+  features text[] NOT NULL,
   category text NOT NULL,
   is_active boolean DEFAULT true,
   created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
@@ -55,10 +55,10 @@ CREATE TABLE public.equipment_introductions (
   description_en text,
   description_zh text,
   description_id text,
-  features_ko ARRAY,
-  features_en ARRAY,
-  features_zh ARRAY,
-  features_id ARRAY,
+  features_ko text[],
+  features_en text[],
+  features_zh text[],
+  features_id text[],
   CONSTRAINT equipment_introductions_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.inquiries (
@@ -121,11 +121,11 @@ CREATE TABLE public.product_introductions (
   description text NOT NULL,
   image_url text NOT NULL,
   icon text NOT NULL,
-  features ARRAY NOT NULL,
+  features text[] NOT NULL,
   is_active boolean DEFAULT true,
   created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
   updated_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
-  detail_images ARRAY DEFAULT '{}'::text[],
+  detail_images text[] DEFAULT '{}'::text[],
   order integer NOT NULL DEFAULT 0,
   name_ko text,
   name_en text,
@@ -135,10 +135,10 @@ CREATE TABLE public.product_introductions (
   description_en text,
   description_zh text,
   description_id text,
-  features_ko ARRAY,
-  features_en ARRAY,
-  features_zh ARRAY,
-  features_id ARRAY,
+  features_ko text[],
+  features_en text[],
+  features_zh text[],
+  features_id text[],
   CONSTRAINT product_introductions_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.products (
@@ -196,7 +196,7 @@ CREATE TABLE public.projects (
   image text NOT NULL,
   description text NOT NULL,
   url text NOT NULL,
-  features ARRAY NOT NULL DEFAULT '{}'::text[],
+  features text[] NOT NULL DEFAULT '{}'::text[],
   created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
   updated_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
   category text NOT NULL DEFAULT 'construction'::text,
@@ -212,10 +212,10 @@ CREATE TABLE public.projects (
   description_en text,
   description_zh text,
   description_id text,
-  features_ko ARRAY,
-  features_en ARRAY,
-  features_zh ARRAY,
-  features_id ARRAY,
+  features_ko text[],
+  features_en text[],
+  features_zh text[],
+  features_id text[],
   CONSTRAINT projects_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.replies (

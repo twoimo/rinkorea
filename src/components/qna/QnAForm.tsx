@@ -20,14 +20,14 @@ const QnAForm: React.FC<QnAFormProps> = ({ onClose, onSave, onRefetch }) => {
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    category: t('qna_category_general', '일반 문의'),
+    category: t('qna_category_general', '일반문의'),
     is_private: false
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const categories = [
-    t('qna_category_general', '일반 문의'),
+    t('qna_category_general', '일반문의'),
     t('qna_category_product', '제품 문의'),
     t('qna_category_order', '주문/배송'),
     t('qna_category_technical', '기술 지원'),
