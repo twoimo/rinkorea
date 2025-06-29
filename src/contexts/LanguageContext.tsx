@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 
-export type Language = 'ko' | 'en' | 'zh' | 'id';
+export type Language = 'ko' | 'en' | 'zh';
 
 interface LanguageContextType {
     language: Language;
@@ -16,8 +16,7 @@ interface LanguageContextType {
 const geolocationLanguageMap: Record<string, Language> = {
     'KR': 'ko',
     'US': 'en', 'GB': 'en', 'CA': 'en', 'AU': 'en', 'NZ': 'en',
-    'CN': 'zh', 'TW': 'zh', 'HK': 'zh', 'MO': 'zh',
-    'ID': 'id'
+    'CN': 'zh', 'TW': 'zh', 'HK': 'zh', 'MO': 'zh'
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -222,10 +221,10 @@ const translations = {
         products_error_occurred: '오류가 발생했습니다.',
 
         // Product Card
-        product_card_show: 'Tampilkan',
-        product_card_hide: 'Sembunyikan',
-        product_card_edit: 'Edit',
-        product_card_delete: 'Hapus',
+        product_card_show: '보이기',
+        product_card_hide: '숨기기',
+        product_card_edit: '편집',
+        product_card_delete: '삭제',
         product_card_view_detail: '자세히 보기',
         product_card_more_items: ' 더보기',
         product_card_show_less: '접기',
@@ -337,7 +336,6 @@ const translations = {
         shop_form_product_name_ko: '제품명 (한국어)',
         shop_form_product_name_en: '제품명 (English)',
         shop_form_product_name_zh: '제품명 (中文)',
-        shop_form_product_name_id: '제품명 (Indonesia)',
         shop_form_description_ko: '설명 (한국어)',
         shop_form_description_en: '설명 (English)',
         shop_form_description_zh: '설명 (中文)',
@@ -1284,11 +1282,9 @@ const translations = {
         shop_form_product_name_ko: '产品名称 (韩语)',
         shop_form_product_name_en: '产品名称 (英语)',
         shop_form_product_name_zh: '产品名称 (中文)',
-        shop_form_product_name_id: '产品名称 (印尼语)',
         shop_form_description_ko: '描述 (韩语)',
         shop_form_description_en: '描述 (英语)',
         shop_form_description_zh: '描述 (中文)',
-        shop_form_description_id: '描述 (印尼语)',
 
         // Shop delete modal
         shop_delete_title: '删除商品',
@@ -1457,319 +1453,6 @@ const translations = {
         contact_call_button: '拨打电话',
         contact_email_button: '发送邮件',
     },
-    id: {
-        // Navigation
-        home: 'Beranda',
-        about: 'Tentang Kami',
-        products: 'Produk',
-        equipment: 'Peralatan',
-        shop: 'Toko Online',
-        projects: 'Proyek',
-        certificates: 'Sertifikat/Certification',
-        qna: 'Konsultasi',
-        news: 'Berita',
-        resources: 'Ruang Materi',
-        contact: 'Kontak',
-
-        // User menu
-        admin: 'Admin',
-        user: 'Pengguna',
-        revenue_management: 'Manajemen Pendapatan',
-        admin_danger_zone: 'Area Bahaya Admin',
-        profile_settings: 'Pengaturan Profil',
-        login: 'Masuk',
-        logout: 'Keluar',
-        welcome: 'Selamat Datang!',
-        admin_account: 'Akun Admin',
-
-        // Hero Section
-        hero_patent: 'Nomor Paten 10-2312833',
-        hero_trademark: 'Nomor Merk 40-1678504',
-        hero_title_line1: 'Bahan Terbakar Lingkungan',
-        hero_title_line2: 'Bahan Keramik Baru',
-        hero_inquiry_btn: 'Pertanyaan Produk',
-        hero_purchase_btn: 'Beli Produk',
-        hero_projects_btn: 'Lihat Proyek',
-        hero_admin_youtube_edit: 'Edit Tautan Video YouTube Utama',
-        hero_youtube_placeholder: 'Masukkan URL Video YouTube',
-        hero_embed_preview: 'URL Embed Dikonversi:',
-        hero_save_btn: 'Simpan',
-        hero_saving: 'Menyimpan...',
-        hero_save_success: 'Tautan YouTube telah disimpan.',
-
-        // Features Section
-        features_title: 'Apa yang Membuat',
-        features_title_highlight: 'Khas RIN Korea',
-        features_subtitle: 'Membuat Lingkungan Konstruksi yang Aman dan Ramah Lingkungan dengan Bahan Keramik Berkualitas Tinggi',
-
-        // Feature items
-        feature_fire_resistant_title: 'Sertifikasi Tahan Api',
-        feature_fire_resistant_desc: 'Bahan Keramik Organik Tahan Api yang Aman',
-        feature_eco_friendly_title: 'Metode Penutupan Ramah Lingkungan',
-        feature_eco_friendly_desc: 'Penutupan Baru yang Ramah Lingkungan Satu Komponen Keramik',
-        feature_quality_title: 'Kualitas Tinggi',
-        feature_quality_desc: 'Kualitas diverifikasi melalui berbagai laporan uji dan sertifikasi, diterapkan di lebih dari 1.000 situs',
-        feature_industrial_title: 'Penerapan Industri',
-        feature_industrial_desc: 'Kegagalan yang terbukti di berbagai situs konstruksi',
-        feature_time_saving_title: 'Penghematan Waktu',
-        feature_time_saving_desc: 'Menghemat langkah penpolishing beton secara signifikan untuk konstruksi yang sederhana dan cepat',
-        feature_verified_title: 'Kinerja Diverifikasi',
-        feature_verified_desc: 'Produk yang telah melalui uji kualitas yang ketat',
-
-        // Footer
-        footer_company_info: 'Informasi Perusahaan',
-        footer_address: 'Incheon, Seo-gu, Baekbeom-ro 707 (Juan National Industrial Complex)',
-        footer_business_number: 'Nomor Pendaftaran Bisnis: 747-42-00526',
-        footer_quick_links: 'Tautan Cepat',
-        footer_customer_service: 'Layanan Pelanggan',
-        footer_social_media: 'Media Sosial',
-        footer_copyright: '© 2025 RIN Korea. Hak Cipta Dilindungi.',
-
-        // About Page
-        about_hero_title: 'Tentang Kami',
-        about_hero_subtitle: 'RIN Korea, perusahaan manufaktur bahan konstruksi khusus, menetapkan standar baru di industri konstruksi dengan teknologi inovatif dan kualitas.',
-        about_intro_title: 'RIN Korea Introduction',
-        about_intro_description: 'RIN Korea telah tumbuh menjadi perusahaan khusus yang menyediakan solusi inovatif di bidang bahan konstruksi dan peralatan konstruksi. Kami akan menjadi mitra terbaik untuk kesuksesan pelanggan kami dengan kualitas dan teknologi tertinggi.',
-        about_vision: 'Visi',
-        about_vision_desc: 'Perusahaan global yang memimpin inovasi di industri konstruksi',
-        about_mission: 'Misi',
-        about_mission_desc: 'Membuat nilai pelanggan dengan kualitas dan teknologi tertinggi',
-        about_core_values: 'Nilai Inti',
-        about_core_values_desc: 'Kepercayaan, Inovasi, Kekelanhidupan',
-        about_business_title: 'Bidang Bisnis',
-        about_business_subtitle: 'RIN Korea memimpin pengembangan industri konstruksi melalui dua bisnis inti: bahan konstruksi dan peralatan konstruksi.',
-        about_materials_title: 'Divisi Bahan Konstruksi',
-        about_materials_subtitle: 'Bidang Bisnis Inti',
-        about_materials_desc: 'Ini adalah divisi bisnis inti RIN Korea yang menghasilkan produk bahan konstruksi berkualitas tinggi seperti penutupan permukaan satu komponen keramik (bahan terbakar), cat anti panas, dan cat khusus.',
-        about_equipment_title: 'Divisi Peralatan Konstruksi',
-        about_equipment_subtitle: 'Shanghai JS Floor Systems Official Partner',
-        about_equipment_desc: 'Sebagai mitra resmi Shanghai JS Floor Systems, kami mengoperasikan agen penjualan resmi dan pusat layanan di Korea. Kami pemimpin di pasar penghalus dan penghalus beton yang digunakan di situs konstruksi global.',
-        about_location_title: 'Lokasi',
-        about_address_label: 'Alamat',
-        about_phone_label: 'Telepon',
-        about_email_label: 'Surel',
-
-        // About Business Items
-        about_materials_item1: 'Penguat Permukaan Beton/Cat (Silika)',
-        about_materials_item2: 'Semen Khusus/Penguat Air (Air Tidak Mampu)',
-        about_materials_item3: 'Penguat Permukaan Elastis/Penguat Air (Air Tidak Mampu)',
-        about_materials_item4: 'Penguat Permukaan/Epoxy, dll. Pengeluaran Khusus',
-        about_equipment_item1: 'Pengadaan Peralatan Konstruksi dan Bagian',
-        about_equipment_item2: 'Operasi Pusat Layanan Resmi (Dukungan A/S)',
-        about_equipment_item3: 'Dukungan Teknis dan Konsultasi',
-        about_equipment_item4: 'Kebijakan Harga yang Masuk Akal dan Manajemen Terintegrasi',
-
-        // Common
-        loading: 'Memuat...',
-        error: 'Kesalahan',
-        success: 'Berhasil',
-        cancel: 'Batal',
-        confirm: 'Konfirmasi',
-        save: 'Simpan',
-        edit: 'Mengedit',
-        delete: 'Hapus',
-        add: 'Tambah',
-        search: 'Pencarian',
-        filter: 'Filter',
-        reset: 'Setel Ulang',
-        select: 'Pilih',
-        none: 'Tidak Ada',
-
-        // Language names
-        korean: 'Bahasa Korea',
-        english: 'English',
-        chinese: '中文',
-
-        // Projects Page
-        projects_hero_title: 'Proyek',
-        projects_hero_subtitle: 'Temukan berbagai kasus proyek di mana teknologi keramik RIN Korea telah diterapkan.',
-        projects_add_btn: 'Tambah Proyek',
-        projects_no_projects: 'Tidak ada proyek terdaftar.',
-        projects_admin_add: 'Tambah Proyek Baru',
-        projects_form_title_add: 'Tambah Proyek',
-        projects_form_title_edit: 'Edit Proyek',
-        projects_form_name: 'Nama Proyek',
-        projects_form_location: 'Lokasi',
-        projects_form_description: 'Deskripsi',
-        projects_form_image: 'URL Gambar',
-        projects_form_features: 'Fitur',
-        projects_form_category: 'Kategori',
-        projects_form_add_feature: 'Masukkan fitur baru',
-        projects_delete_confirm: 'Apakah Anda yakin ingin menghapus proyek ini?',
-        projects_delete_title: 'Hapus Proyek',
-        projects_saving: 'Menyimpan...',
-        projects_view_detail: '자세히 보기',
-        projects_various_title: 'Berbagai Proyek',
-        projects_various_desc: 'Kasus Proyek RIN Korea',
-        projects_delete_error: 'Gagal menghapus proyek.',
-        projects_delete_success: 'Proyek telah dihapus.',
-
-        // Projects Stats
-        projects_stats_title: 'Kinerja Konstruksi',
-        projects_stats_subtitle: 'Teknologi RIN Korea dikenal di berbagai bidang',
-        projects_stats_construction_projects: 'Proyek Konstruksi',
-        projects_stats_customer_satisfaction: 'Kepuasan Pelanggan',
-        projects_stats_product_lineup: 'RIN Korea Product Line',
-
-        // Equipment Page
-        equipment_hero_title: 'Pengenalan Peralatan',
-        equipment_hero_subtitle: 'Menyediakan kualitas dan efisiensi tertinggi dengan teknologi penghalusan beton terbaru.',
-        equipment_add_btn: 'Tambah Peralatan',
-        equipment_partnership_title: 'Shanghai JS Floor Systems Official Partner',
-        equipment_partnership_desc: 'Sebagai mitra resmi Shanghai JS Floor Systems, kami mengoperasikan agen penjualan resmi dan pusat layanan di Korea. Kami pemimpin di pasar penghalus dan penghalus beton yang digunakan di situs konstruksi kelas dunia.',
-        equipment_partnership_contact: 'Korea Official Sales & Official Service Center (AS)\nAlamat: 707 Baekbeom-ro, Seo-gu, Incheon (Juan National Industrial Complex)\nTelepon Pertanyaan: +82 32-571-1023',
-        equipment_construction_tab: 'Peralatan Konstruksi',
-
-        // Phone numbers
-        phone_number: '+82 32-571-1023',
-        equipment_diatool_tab: 'Diamond Tools',
-        equipment_premium_title: 'Penghalus Beton Terbaru',
-        equipment_premium_subtitle: 'Lineup penghalus premium dengan teknologi canggih',
-        equipment_professional_title: 'Penghalus Beton',
-        equipment_professional_subtitle: 'Seri penghalus kinerja tinggi untuk profesional',
-        equipment_diatool_title: 'Diamond Tools',
-        equipment_diatool_subtitle: 'Diamond tools dan aksesoris berkualitas tinggi',
-        equipment_diatool_empty: 'Produk diamond tool akan segera hadir.',
-        equipment_diatool_add: 'Tambah Diamond Tool',
-        equipment_features_label: 'Fitur Utama:',
-        equipment_edit_modal_title: 'Edit Peralatan',
-        equipment_add_modal_title: 'Tambah Peralatan',
-        equipment_delete_modal_title: 'Hapus Peralatan',
-        equipment_delete_confirm: 'Apakah Anda yakin ingin menghapus peralatan ini?',
-        equipment_form_name: 'Nama',
-        equipment_form_description: 'Deskripsi',
-        equipment_form_image: 'URL Gambar',
-        equipment_form_icon: 'Ikon',
-        equipment_form_category: 'Kategori',
-        equipment_form_features: 'Fitur',
-        equipment_form_add_feature: 'Masukkan fitur baru',
-        equipment_saving: 'Menyimpan...',
-        equipment_updated_success: 'Peralatan telah diperbarui.',
-        equipment_added_success: 'Peralatan telah ditambahkan.',
-
-        // Resources Page
-        resources_hero_title: 'Ruang Materi',
-        resources_hero_subtitle: 'Periksa berbagai materi seperti katalog produk RIN Korea, data teknis, dan sertifikat.',
-        resources_add_btn: 'Tambah Materi',
-
-        // Resources list and search
-        search_resources: 'Cari berdasarkan nama materi, deskripsi, nama file...',
-        all_categories: 'Semua Kategori',
-        total_resources_count: 'Total {{count}} materi tersedia',
-        search_results_for: "Hasil pencarian untuk '{{term}}'",
-        no_resources_found: 'Materi tidak ditemukan',
-        try_different_filter: 'Coba ubah kriteria pencarian atau periksa kategori lain.',
-        grid_view: 'Grid',
-        list_view: 'Daftar',
-        resources_form_category: 'Kategori',
-
-        // Products Page
-        products_hero_title: 'Produk',
-        products_hero_subtitle: 'Temukan bahan keramik inovatif RIN Korea dan bahan konstruksi ramah lingkungan.',
-        products_add_btn: 'Tambah Produk',
-        products_save_success: 'Produk telah diperbarui.',
-        products_add_success: 'Produk telah ditambahkan.',
-        products_error_occurred: 'Terjadi kesalahan.',
-
-        // Product Card
-        product_card_show: 'Tampilkan',
-        product_card_hide: 'Sembunyikan',
-        product_card_edit: 'Edit',
-        product_card_delete: 'Hapus',
-        product_card_view_detail: '자세히 보기',
-        product_card_more_items: ' 더보기',
-        product_card_show_less: '접기',
-
-        // Contact Page
-        contact_hero_title: 'Kontak',
-        contact_hero_subtitle: 'Mari ciptakan lingkungan konstruksi yang lebih baik bersama RIN Korea.\nSilakan hubungi kami kapan saja dan kami akan merespons dengan tulus.',
-        contact_company_info: 'Informasi Perusahaan',
-        contact_address_label: 'Alamat',
-        contact_address_value: 'Incheon, Seo-gu, Baekbeom-ro 707 (Juan National Industrial Complex)\nTechnopark Industrial Complex (dijadwalkan 2026~)',
-        contact_phone_label: 'Telepon',
-        contact_email_label: 'Email',
-        contact_business_info: 'Informasi Bisnis',
-        contact_company_name: 'Nama Perusahaan',
-        contact_company_name_value: 'RIN Korea',
-        contact_business_number: 'Nomor Pendaftaran Bisnis',
-        contact_business_number_value: '747-42-00526',
-        contact_ceo: 'CEO',
-        contact_ceo_value: 'Kim Jung-hee',
-        contact_social_media: 'Media Sosial',
-        contact_call_button: 'Panggil',
-        contact_email_button: 'Kirim Email',
-
-        // News Page
-        news_hero_title: 'Berita',
-        news_hero_subtitle: 'Periksa berita terbaru dan pengumuman penting dari RIN Korea.',
-        news_view_detail: 'Lihat Detail',
-
-        // QnA Page
-        qna_hero_title: 'Konsultasi Pelanggan',
-        qna_hero_subtitle: 'Jika Anda memiliki pertanyaan, silakan hubungi kami kapan saja. Para ahli kami akan merespons dengan cepat dan akurat.',
-
-        // Shop Page
-        shop_hero_title: 'Toko Online',
-        shop_hero_subtitle: 'Anda dapat memesan dan membeli produk RIN Korea secara online.',
-        shop_add_product: 'Tambah Produk',
-
-        // Shop sorting options
-        shop_sort_popularity: 'Berdasarkan Popularitas',
-        shop_sort_newest: 'Terbaru Dulu',
-        shop_sort_price_low: 'Harga: Rendah ke Tinggi',
-        shop_sort_price_high: 'Harga: Tinggi ke Rendah',
-        shop_sort_discount: 'Berdasarkan Diskon',
-        shop_sort_sales: 'Berdasarkan Penjualan',
-        shop_sort_reviews: 'Paling Banyak Diulas',
-        shop_sort_rating: 'Rating Tertinggi',
-
-        // Shop controls
-        shop_sort_select: 'Pilih Opsi Urutan',
-        shop_grid_label: 'Grid',
-        shop_grid_setting: 'Pengaturan Grid',
-        shop_grid_apply: 'Terapkan',
-        shop_grid_applying: 'Menerapkan...',
-
-        // Shop product grid
-        reviews: 'Ulasan',
-        shop_product_out_of_stock: 'Stok Habis',
-        shop_product_buy_now: 'Beli Sekarang',
-        show: 'Tampilkan',
-        hide: 'Sembunyikan',
-
-        // Currency
-        currency_loading: 'Memuat nilai tukar...',
-        currency_error: 'Tidak dapat memuat nilai tukar',
-
-        // Shop product form
-        shop_edit_product: 'Edit Produk',
-        close: 'Tutup',
-        shop_form_product_name: 'Nama Produk',
-        shop_form_description: 'Deskripsi',
-        shop_form_image_url: 'URL Gambar atau Nama File',
-        shop_form_image_placeholder: 'contoh: image.jpg atau https://example.com/image.jpg',
-        shop_form_image_note: 'Jika Anda hanya memasukkan nama file, jalur /images/ akan ditambahkan secara otomatis',
-        shop_form_price: 'Harga',
-        shop_form_original_price: 'Harga Asli',
-        shop_form_discount: 'Diskon (%)',
-        shop_form_stock: 'Stok',
-        shop_form_rating: 'Rating',
-        shop_form_reviews: 'Jumlah Ulasan',
-        shop_form_naver_url: 'URL Toko Naver',
-        shop_form_new_product: 'Produk Baru',
-        shop_form_best_product: 'Terlaris',
-        shop_form_saving: 'Menyimpan...',
-
-        // Shop delete modal
-        shop_delete_title: 'Hapus Produk',
-        shop_delete_confirm: 'Apakah Anda yakin ingin menghapus',
-        shop_delete_confirm_product: 'produk?',
-        shop_deleting: 'Menghapus...',
-
-        // Success messages
-        saved_success: 'Berhasil disimpan.',
-        shop_deleted_success: 'Berhasil dihapus.',
-    },
 };
 
 // 언어 자동 감지 함수들
@@ -1781,7 +1464,6 @@ const detectBrowserLanguage = (supportedLanguages: Language[]): Language | null 
     if (lang.startsWith('ko') && supportedLanguages.includes('ko')) return 'ko';
     if (lang.startsWith('en') && supportedLanguages.includes('en')) return 'en';
     if (lang.startsWith('zh') && supportedLanguages.includes('zh')) return 'zh';
-    if (lang.startsWith('id') && supportedLanguages.includes('id')) return 'id';
 
     return null;
 };
@@ -1808,7 +1490,7 @@ const detectLanguageFromURL = (supportedLanguages: Language[]): Language | null 
 };
 
 export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
-    const supportedLanguages = useMemo<Language[]>(() => ['ko', 'en', 'zh', 'id'], []);
+    const supportedLanguages = useMemo<Language[]>(() => ['ko', 'en', 'zh'], []);
     const [language, setLanguageState] = useState<Language>('ko');
     const [isAutoDetecting, setIsAutoDetecting] = useState(true);
     const [detectionMethod, setDetectionMethod] = useState<string>('Loading...');
@@ -1869,8 +1551,7 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
 
         // HTML lang 속성 업데이트
         document.documentElement.lang = lang === 'ko' ? 'ko-KR' :
-            lang === 'en' ? 'en-US' :
-                lang === 'zh' ? 'zh-CN' : 'id-ID';
+            lang === 'en' ? 'en-US' : 'zh-CN';
     }, []);
 
     // 초기 언어 감지
@@ -1884,8 +1565,7 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
 
                 // HTML lang 속성 초기 설정
                 document.documentElement.lang = detectedLang === 'ko' ? 'ko-KR' :
-                    detectedLang === 'en' ? 'en-US' :
-                        detectedLang === 'zh' ? 'zh-CN' : 'id-ID';
+                    detectedLang === 'en' ? 'en-US' : 'zh-CN';
             }
         });
 
