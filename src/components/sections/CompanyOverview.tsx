@@ -11,11 +11,12 @@ const CompanyOverview = () => {
     {
       icon: <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />,
       label: t('company_overview_location_label', '본사 위치'),
-      value: (
-        <div className="whitespace-pre-line">
-          {t('company_overview_location_value', '인천광역시 서구 백범로 707 (주안국가산업단지)\n천안 테크노파크 산업단지 입주예정 (2026~)')}
-        </div>
-      ),
+      value: t('company_overview_location_value', '인천광역시 서구 백범로 707 (주안국가산업단지)\n천안 테크노파크 산업단지 입주예정 (2026~)').split('\n').map((line, index) => (
+        <React.Fragment key={index}>
+          {line}
+          {index === 0 && <br />}
+        </React.Fragment>
+      )),
       color: "text-blue-600"
     },
     {
