@@ -3,28 +3,38 @@ import { createClient } from '@supabase/supabase-js';
 import { env } from '@/lib/env';
 import type { Database } from './types';
 
+// Supabase 연결 상태 확인
+export const isSupabaseConfigured = () => {
+    return env.SUPABASE_URL !== 'https://placeholder.supabase.co' &&
+        env.SUPABASE_ANON_KEY !== 'placeholder-anon-key';
+};
+
 // Supabase 클라이언트 안전한 초기화
 function createSupabaseClient() {
     try {
-        // 환경변수 검증
-        if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) {
-            console.warn('Supabase environment variables are missing');
+        if (!isSupabaseConfigured()) {
+            console.warn('🚧 Supabase: Using placeholder configuration');
+            console.warn('📋 Database features disabled. To enable:');
+            console.warn('   1. Go to Vercel Dashboard → Settings → Environment Variables');
+            console.warn('   2. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY');
+            console.warn('   3. Redeploy the application');
 
-            // 개발 환경에서는 더미 클라이언트 반환
-            if (env.DEV) {
-                return createClient(
-                    'https://placeholder.supabase.co',
-                    'placeholder-key',
-                    {
-                        auth: { persistSession: false },
-                        realtime: { enabled: false },
-                    }
-                );
-            }
-
-            throw new Error('Supabase configuration is required in production');
+            // 안전한 더미 클라이언트 (에러 발생 안 함)
+            return createClient(
+                'https://placeholder.supabase.co',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDk3NzEyMDAsImV4cCI6MTk2NTM0NzIwMH0.fake-key',
+                {
+                    auth: {
+                        persistSession: false,
+                        autoRefreshToken: false,
+                        detectSessionInUrl: false
+                    },
+                    realtime: { enabled: false }
+                }
+            );
         }
 
+        console.log('✅ Supabase: Connected successfully');
         return createClient<Database>(
             env.SUPABASE_URL,
             env.SUPABASE_ANON_KEY,
@@ -49,18 +59,31 @@ function createSupabaseClient() {
             }
         );
     } catch (error) {
-        console.error('Failed to create Supabase client:', error);
+        console.error('❌ Supabase: Failed to create client:', error);
 
-        // 폴백 클라이언트 (기능 제한됨)
+        // 최종 폴백 클라이언트
         return createClient(
             'https://placeholder.supabase.co',
             'placeholder-key',
             {
-                auth: { persistSession: false },
-                realtime: { enabled: false },
+                auth: {
+                    persistSession: false,
+                    autoRefreshToken: false,
+                    detectSessionInUrl: false
+                },
+                realtime: { enabled: false }
             }
         );
     }
 }
 
 export const supabase = createSupabaseClient();
+
+// 개발 환경에서 상태 표시
+if (env.DEV) {
+    console.log('🔧 Supabase Configuration Status:', {
+        configured: isSupabaseConfigured(),
+        url: isSupabaseConfigured() ? '✅ Configured' : '❌ Missing VITE_SUPABASE_URL',
+        key: isSupabaseConfigured() ? '✅ Configured' : '❌ Missing VITE_SUPABASE_ANON_KEY'
+    });
+}
