@@ -651,7 +651,8 @@ const DataTable: React.FC<DataTableProps> = ({
                             </button>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
             {/* 데이터 초기화 확인 모달 - Portal 방식으로 최적화 */}
@@ -747,7 +748,8 @@ const DataTable: React.FC<DataTableProps> = ({
                             </button>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
             {/* 데이터가 없을 때 */}
