@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 export type Language = 'ko' | 'en' | 'zh' | 'id';
 
@@ -1805,7 +1805,7 @@ const detectLanguageFromURL = (supportedLanguages: Language[]): Language | null 
 };
 
 export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
-    const supportedLanguages: Language[] = ['ko', 'en', 'zh', 'id'];
+    const supportedLanguages = useMemo<Language[]>(() => ['ko', 'en', 'zh', 'id'], []);
     const [language, setLanguageState] = useState<Language>('ko');
     const [isAutoDetecting, setIsAutoDetecting] = useState(true);
     const [detectionMethod, setDetectionMethod] = useState<string>('Loading...');

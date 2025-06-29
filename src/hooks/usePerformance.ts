@@ -77,22 +77,23 @@ export const usePerformance = (options: UsePerformanceOptions = {}) => {
 
     const measureCLS = useCallback(() => {
         let clsValue = 0;
-        let clsEntries: any[] = [];
+        let clsEntries: (PerformanceEntry & { hadRecentInput?: boolean; value?: number })[] = [];
 
         const observer = new PerformanceObserver((list) => {
             for (const entry of list.getEntries()) {
-                if (!(entry as any).hadRecentInput) {
+                const clsEntry = entry as PerformanceEntry & { hadRecentInput?: boolean; value?: number };
+                if (!clsEntry.hadRecentInput) {
                     const firstSessionEntry = clsEntries[0];
                     const lastSessionEntry = clsEntries[clsEntries.length - 1];
 
                     if (!firstSessionEntry ||
                         entry.startTime - lastSessionEntry.startTime < 1000 &&
                         entry.startTime - firstSessionEntry.startTime < 5000) {
-                        clsEntries.push(entry);
-                        clsValue += (entry as any).value;
+                        clsEntries.push(clsEntry);
+                        clsValue += clsEntry.value || 0;
                     } else {
-                        clsEntries = [entry];
-                        clsValue = (entry as any).value;
+                        clsEntries = [clsEntry];
+                        clsValue = clsEntry.value || 0;
                     }
                 }
             }

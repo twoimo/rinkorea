@@ -83,8 +83,17 @@ const updateLinkTag = (rel: string, href: string, hreflang?: string) => {
     link.href = href;
 };
 
+// JSON-LD 구조화된 데이터 타입
+interface StructuredDataType {
+    name?: string;
+    description?: string;
+    image?: string;
+    url?: string;
+    [key: string]: unknown;
+}
+
 // JSON-LD 구조화된 데이터 업데이트
-const updateStructuredData = (data: any, language: Language) => {
+const updateStructuredData = (data: StructuredDataType, language: Language) => {
     const selector = 'script[type="application/ld+json"]';
     let script = document.querySelector(selector) as HTMLScriptElement;
 
@@ -97,7 +106,7 @@ const updateStructuredData = (data: any, language: Language) => {
     const defaultData = defaultSEOData[language];
     const baseUrl = window.location.origin;
 
-    const structuredData = {
+    const structuredData: Record<string, unknown> = {
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": defaultData.siteName,
@@ -253,6 +262,9 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
         finalImage,
         currentUrl,
         currentLanguage,
+        currentPath,
+        defaultData.language,
+        defaultData.siteName,
         type,
         publishedTime,
         modifiedTime,

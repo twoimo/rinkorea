@@ -9,6 +9,20 @@ import { useProfile } from '@/hooks/useProfile';
 import { LanguageSelector } from '@/components/ui/language-selector';
 import { cn } from '@/lib/utils';
 
+// Types for better type safety
+interface UserType {
+  id: string;
+  email: string;
+  [key: string]: unknown;
+}
+
+interface ProfileType {
+  name?: string;
+  company?: string;
+  phone?: string;
+  [key: string]: unknown;
+}
+
 // Memoized Logo Component
 const Logo = memo<{ shouldBeTransparent: boolean }>(({ shouldBeTransparent }) => (
   <Link to="/" className="flex items-center">
@@ -83,9 +97,9 @@ const UserMenu = memo<{
   isOpen: boolean;
   onToggle: () => void;
   onClose: () => void;
-  user: any;
+  user: UserType | null;
   isAdmin: boolean;
-  profile: any;
+  profile: ProfileType | null;
   shouldBeTransparent: boolean;
   onSignOut: () => void;
   t: (key: string, fallback?: string) => string;
@@ -192,9 +206,9 @@ const MobileNavigation = memo<{
   isOpen: boolean;
   navItems: Array<{ name: string; path: string }>;
   currentPath: string;
-  user: any;
+  user: UserType | null;
   isAdmin: boolean;
-  profile: any;
+  profile: ProfileType | null;
   onNavigate: (path: string) => void;
   onSignOut: () => void;
   onClose: () => void;

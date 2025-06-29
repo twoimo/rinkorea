@@ -142,7 +142,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
                 setLanguage(detectedLang);
             }
         });
-    }, []);
+    }, [language, setLanguage]);
 
     // 언어 변경 핸들러
     const handleLanguageChange = (newLanguage: Language) => {
