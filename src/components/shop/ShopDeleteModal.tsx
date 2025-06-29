@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Product {
@@ -26,59 +25,9 @@ const ShopDeleteModal = ({
 }: ShopDeleteModalProps) => {
   const { t } = useLanguage();
 
-  // Portal과 body scroll 차단으로 완벽한 중앙 정렬
-  useEffect(() => {
-    // 1. 강제로 맨 위로 스크롤
-    window.scrollTo({ top: 0, behavior: 'instant' });
-
-    // 2. Body scroll 완전 차단
-    const originalOverflow = document.body.style.overflow;
-    const originalPosition = document.body.style.position;
-    const originalTop = document.body.style.top;
-    const scrollY = window.scrollY;
-
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
-
-    // 청소 함수
-    return () => {
-      document.body.style.overflow = originalOverflow;
-      document.body.style.position = originalPosition;
-      document.body.style.top = originalTop;
-      document.body.style.width = '';
-      window.scrollTo(0, scrollY);
-    };
-  }, []);
-
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        margin: 0
-      }}
-      onClick={onCancel}
-    >
-      <div
-        className="bg-white rounded-lg shadow-lg w-full max-w-sm text-center p-6"
-        style={{
-          position: 'relative',
-          margin: 'auto',
-          transform: 'none'
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120] p-4">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-sm text-center p-6">
         <div className="text-lg font-bold text-red-700 mb-4">{t('shop_delete_title', '상품 삭제')}</div>
         <div className="mb-6 text-gray-800">
           {t('shop_delete_confirm', '정말로')} <strong>{product.name}</strong> {t('shop_delete_confirm_product', '상품을 삭제하시겠습니까?')}

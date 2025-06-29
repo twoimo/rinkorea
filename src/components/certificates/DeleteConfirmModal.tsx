@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import React from 'react';
 import { useIsMobile } from '../../hooks/use-mobile';
 import { useLanguage, getLocalizedValue } from '@/contexts/LanguageContext';
 
@@ -41,34 +40,6 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   const isMobile = useIsMobile();
   const { t, language } = useLanguage();
 
-  // Portal과 body scroll 차단으로 완벽한 중앙 정렬
-  useEffect(() => {
-    if (isOpen) {
-      // 1. 강제로 맨 위로 스크롤
-      window.scrollTo({ top: 0, behavior: 'instant' });
-
-      // 2. Body scroll 완전 차단
-      const originalOverflow = document.body.style.overflow;
-      const originalPosition = document.body.style.position;
-      const originalTop = document.body.style.top;
-      const scrollY = window.scrollY;
-
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
-
-      // 청소 함수
-      return () => {
-        document.body.style.overflow = originalOverflow;
-        document.body.style.position = originalPosition;
-        document.body.style.top = originalTop;
-        document.body.style.width = '';
-        window.scrollTo(0, scrollY);
-      };
-    }
-  }, [isOpen]);
-
   if (!isOpen || !certificate) return null;
 
   // 현재 언어에 맞는 인증서명 가져오기
@@ -85,33 +56,9 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
 
   const localizedName = getLocalizedCertificateName(certificate);
 
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        backgroundColor: 'rgba(0, 0, 0, 0.3)',
-        margin: 0
-      }}
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-lg shadow-lg p-6 sm:p-8 max-w-md w-full"
-        style={{
-          position: 'relative',
-          margin: 'auto',
-          transform: 'none'
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[120] p-4">
+      <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 max-w-md w-full">
         <h2 className="text-xl sm:text-2xl font-bold mb-4">
           {t('certificates_delete_title', '인증서 삭제')}
         </h2>

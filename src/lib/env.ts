@@ -1,1 +1,53 @@
-﻿// Safe environment variables - never crashes`ninterface EnvConfig {`n    SUPABASE_URL: string;`n    SUPABASE_ANON_KEY: string;`n    NODE_ENV: string;`n    DEV: boolean;`n    PROD: boolean;`n}`n`nfunction validateEnv(): EnvConfig {`n    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;`n    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;`n    `n    if (!supabaseUrl || !supabaseAnonKey) {`n        const missing = [];`n        if (!supabaseUrl) missing.push("VITE_SUPABASE_URL");`n        if (!supabaseAnonKey) missing.push("VITE_SUPABASE_ANON_KEY");`n        `n        console.warn(``Missing env vars: `${missing.join(", ")}``);`n        console.warn("Add them in Vercel Dashboard");`n    }`n`n    return {`n        SUPABASE_URL: supabaseUrl || "https://placeholder.supabase.co",`n        SUPABASE_ANON_KEY: supabaseAnonKey || "placeholder-anon-key",`n        NODE_ENV: import.meta.env.NODE_ENV || "development",`n        DEV: import.meta.env.DEV || false,`n        PROD: import.meta.env.PROD || false,`n    };`n}`n`nlet env: EnvConfig;`ntry {`n    env = validateEnv();`n} catch (error) {`n    console.error("Env error:", error);`n    env = {`n        SUPABASE_URL: "https://placeholder.supabase.co",`n        SUPABASE_ANON_KEY: "placeholder-anon-key",`n        NODE_ENV: "development",`n        DEV: true,`n        PROD: false,`n    };`n}`n`nexport { env };`nexport default env;
+import { z } from "zod";
+
+const envSchema = z.object({
+    // API 관련
+    VITE_API_URL: z.string().url(),
+    VITE_API_KEY: z.string().min(1),
+
+    // 인증 관련
+    VITE_AUTH_DOMAIN: z.string().min(1),
+    VITE_AUTH_CLIENT_ID: z.string().min(1),
+
+    // 기타 설정
+    VITE_APP_ENV: z.enum(["development", "production", "test"]),
+    VITE_APP_VERSION: z.string(),
+    VITE_APP_NAME: z.string(),
+
+    // 외부 서비스
+    VITE_GA_TRACKING_ID: z.string().optional(),
+    VITE_SENTRY_DSN: z.string().url().optional(),
+});
+
+type Env = z.infer<typeof envSchema>;
+
+function validateEnv(): Env {
+    try {
+        return envSchema.parse(import.meta.env);
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            const missingVars = error.errors
+                .map((err) => err.path.join("."))
+                .join(", ");
+            throw new Error(`환경 변수 설정 오류: ${missingVars}`);
+        }
+        throw error;
+    }
+}
+
+export const env = validateEnv();
+
+// 환경 변수 타입 선언
+declare global {
+    interface ImportMetaEnv {
+        readonly VITE_API_URL: string;
+        readonly VITE_API_KEY: string;
+        readonly VITE_AUTH_DOMAIN: string;
+        readonly VITE_AUTH_CLIENT_ID: string;
+        readonly VITE_APP_ENV: "development" | "production" | "test";
+        readonly VITE_APP_VERSION: string;
+        readonly VITE_APP_NAME: string;
+        readonly VITE_GA_TRACKING_ID?: string;
+        readonly VITE_SENTRY_DSN?: string;
+    }
+} 

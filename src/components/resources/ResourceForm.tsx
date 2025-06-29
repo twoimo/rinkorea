@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { X, FileText, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import type { Resource, ResourceCategory } from '@/hooks/useResources';
 import type { CreateResourceData, UpdateResourceData } from '@/hooks/useResourcesAdmin';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ResourceFormProps {
     resource?: Resource | null;
@@ -18,8 +16,6 @@ interface ResourceFormProps {
     onSubmit: (data: CreateResourceData | UpdateResourceData) => Promise<void>;
     onClose: () => void;
     loading?: boolean;
-    error?: string;
-    success?: boolean;
 }
 
 // 파일 확장자와 MIME 타입 매핑
@@ -81,22 +77,18 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
     categories,
     onSubmit,
     onClose,
-    loading = false,
-    error,
-    success
+    loading = false
 }) => {
     const { toast } = useToast();
-    const { t } = useLanguage();
     const [formData, setFormData] = useState({
-        title: resource?.title || '',
-        description: resource?.description || '',
+        title: '',
+        description: '',
         file_name: '',
-        file_url: resource?.file_url || '',
-        file_size: resource?.file_size || 0,
-        file_type: resource?.file_type || '',
-        category: resource?.category || '',
-        is_active: resource?.is_active !== false,
-        is_featured: resource?.is_featured || false
+        file_url: '',
+        file_size: 0,
+        file_type: '',
+        category: '',
+        is_active: true
     });
 
     const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -111,37 +103,10 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
                 file_size: resource.file_size || 0,
                 file_type: resource.file_type || '',
                 category: resource.category,
-                is_active: true,
-                is_featured: resource.is_featured || false
+                is_active: true // 기본값으로 설정
             });
         }
     }, [resource]);
-
-    // Portal과 body scroll 차단으로 완벽한 중앙 정렬
-    useEffect(() => {
-        // 1. 강제로 맨 위로 스크롤
-        window.scrollTo({ top: 0, behavior: 'instant' });
-
-        // 2. Body scroll 완전 차단
-        const originalOverflow = document.body.style.overflow;
-        const originalPosition = document.body.style.position;
-        const originalTop = document.body.style.top;
-        const scrollY = window.scrollY;
-
-        document.body.style.overflow = 'hidden';
-        document.body.style.position = 'fixed';
-        document.body.style.top = `-${scrollY}px`;
-        document.body.style.width = '100%';
-
-        // 청소 함수
-        return () => {
-            document.body.style.overflow = originalOverflow;
-            document.body.style.position = originalPosition;
-            document.body.style.top = originalTop;
-            document.body.style.width = '';
-            window.scrollTo(0, scrollY);
-        };
-    }, []);
 
     const handleInputChange = (field: string, value: string | number | boolean) => {
         setFormData(prev => ({
@@ -255,33 +220,9 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
         }
     };
 
-    return createPortal(
-        <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-            style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 9999,
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                margin: 0
-            }}
-            onClick={onClose}
-        >
-            <div
-                className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
-                style={{
-                    position: 'relative',
-                    margin: 'auto',
-                    transform: 'none'
-                }}
-                onClick={(e) => e.stopPropagation()}
-            >
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10001] p-4">
+            <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 <CardHeader className="flex flex-row items-center justify-between px-4 md:px-6 py-4 md:py-6 sticky top-0 bg-white border-b z-10">
                     <CardTitle className="text-lg md:text-xl">
                         {resource ? '자료 수정' : '새 자료 등록'}
@@ -436,9 +377,8 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
                         </div>
                     </form>
                 </CardContent>
-            </div>
-        </div>,
-        document.body
+            </Card>
+        </div>
     );
 };
 

@@ -6,7 +6,6 @@ import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { createPortal } from 'react-dom';
 
 const MB = 1024 * 1024;
 
@@ -273,34 +272,10 @@ const AdminDangerZone = () => {
                     {/* 결과 안내 */}
                     {result && <div className="mt-4 p-4 bg-gray-100 rounded text-center text-sm text-gray-700">{result}</div>}
                 </div>
-                {/* 경고/확인 모달 - Portal 방식으로 최적화 */}
-                {modal.open && createPortal(
-                    <div
-                        className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-                        style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            zIndex: 9999,
-                            backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                            margin: 0
-                        }}
-                        onClick={closeModal}
-                    >
-                        <div
-                            className="bg-white rounded-lg shadow-lg p-8 max-w-xs w-full text-center"
-                            style={{
-                                position: 'relative',
-                                margin: 'auto',
-                                transform: 'none'
-                            }}
-                            onClick={(e) => e.stopPropagation()}
-                        >
+                {/* 경고/확인 모달 */}
+                {modal.open && (
+                    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[120]">
+                        <div className="bg-white rounded-lg shadow-lg p-8 max-w-xs w-full text-center">
                             <div className="text-lg font-bold text-red-700 mb-4">경고</div>
                             <div className="mb-6 text-gray-800">{modal.message}</div>
                             <div className="flex gap-4 justify-center">
@@ -318,8 +293,7 @@ const AdminDangerZone = () => {
                                 <button onClick={closeModal} className="bg-gray-300 text-gray-700 px-4 py-2 rounded">취소</button>
                             </div>
                         </div>
-                    </div>,
-                    document.body
+                    </div>
                 )}
             </div>
             <Footer />

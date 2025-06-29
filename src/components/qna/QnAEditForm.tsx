@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+
+import React, { useState } from 'react';
 import { Edit } from 'lucide-react';
 
 interface Inquiry {
@@ -39,32 +39,6 @@ const QnAEditForm: React.FC<QnAEditFormProps> = ({
     is_private: inquiry.is_private
   });
 
-  // Portal과 body scroll 차단으로 완벽한 중앙 정렬
-  useEffect(() => {
-    // 1. 강제로 맨 위로 스크롤
-    window.scrollTo({ top: 0, behavior: 'instant' });
-
-    // 2. Body scroll 완전 차단
-    const originalOverflow = document.body.style.overflow;
-    const originalPosition = document.body.style.position;
-    const originalTop = document.body.style.top;
-    const scrollY = window.scrollY;
-
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
-
-    // 청소 함수
-    return () => {
-      document.body.style.overflow = originalOverflow;
-      document.body.style.position = originalPosition;
-      document.body.style.top = originalTop;
-      document.body.style.width = '';
-      window.scrollTo(0, scrollY);
-    };
-  }, []);
-
   const handleSave = async () => {
     const result = await onSave(inquiry.id, {
       name: editFormData.name,
@@ -81,33 +55,9 @@ const QnAEditForm: React.FC<QnAEditFormProps> = ({
     }
   };
 
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        margin: 0
-      }}
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-xl p-4 md:p-6 shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-        style={{
-          position: 'relative',
-          margin: 'auto',
-          transform: 'none'
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120] p-4">
+      <div className="bg-white rounded-xl p-4 md:p-6 shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center mb-4 md:mb-6">
           <div className="bg-blue-100 p-2 rounded-lg mr-3">
             <Edit className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
@@ -213,8 +163,7 @@ const QnAEditForm: React.FC<QnAEditFormProps> = ({
           </div>
         </form>
       </div>
-    </div>,
-    document.body
+    </div>
   );
 };
 

@@ -7,15 +7,7 @@ import { useUserRole } from '@/hooks/useUserRole';
 export interface Resource {
     id: string;
     title: string;
-    title_ko?: string;
-    title_en?: string;
-    title_zh?: string;
-    title_id?: string;
     description: string | null;
-    description_ko?: string;
-    description_en?: string;
-    description_zh?: string;
-    description_id?: string;
     file_name: string;
     file_url: string;
     file_size: number | null;
@@ -31,10 +23,6 @@ export interface Resource {
 export interface ResourceCategory {
     id: string;
     name: string;
-    name_ko?: string;
-    name_en?: string;
-    name_zh?: string;
-    name_id?: string;
     color: string;
     is_active: boolean;
     created_at: string;
@@ -57,40 +45,34 @@ export const useResources = () => {
     const fetchResources = useCallback(async () => {
         try {
             setLoading(true);
-            console.log('🔍 Fetching resources... isAdmin:', isAdmin);
 
             // Build the query - 관리자는 모든 자료, 일반 사용자는 활성화된 자료만
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             let query = (supabase as any)
                 .from('resources')
                 .select('*');
-            // 일시적으로 기본 쿼리로 변경하여 문제 진단
 
             // 관리자가 아닌 경우에만 is_active=true 필터 적용
             if (!isAdmin) {
                 query = query.eq('is_active', true);
-                console.log('📝 Added is_active filter for non-admin user');
             }
 
             query = query.order('created_at', { ascending: true });
 
             const { data, error } = await query;
 
-            console.log('📊 Resources query result:', { data, error, count: data?.length });
-
             if (error) {
-                console.error('❌ Error fetching resources:', error);
+                console.error('Error fetching resources:', error);
                 setAllResources([]);
             } else {
-                console.log('✅ Resources fetched successfully:', data?.length || 0, 'items');
                 setAllResources(data as Resource[] || []);
             }
 
-            // Fetch categories with multilanguage support
+            // Fetch categories
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { data: categoriesData, error: categoriesError } = await (supabase as any)
                 .from('resource_categories')
-                .select('id, name, name_ko, name_en, name_zh, name_id, color, is_active, created_at')
+                .select('*')
                 .eq('is_active', true)
                 .order('name');
 

@@ -14,7 +14,7 @@ const ShopHero: React.FC<ShopHeroProps> = ({ isAdmin, onAddProduct }) => {
     <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 sm:py-20">
       <div className="container mx-auto px-4">
         <div className="text-center">
-          <h1 className="text-3xl sm:text-5xl font-bold mb-4 sm:mb-6">{t('shop_hero_title', '온라인 스토어')}</h1>
+          <h1 className="text-3xl sm:text-5xl font-bold mb-4 sm:mb-6">{t('shop_hero_title', '온라인 쇼핑몰')}</h1>
           <p className="text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
             {t('shop_hero_subtitle', '린코리아 제품을 온라인으로 주문하고 구매할 수 있습니다.')}
           </p>

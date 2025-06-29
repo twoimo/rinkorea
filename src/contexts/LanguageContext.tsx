@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export type Language = 'ko' | 'en' | 'zh' | 'id';
 
@@ -7,18 +7,7 @@ interface LanguageContextType {
     language: Language;
     setLanguage: (lang: Language) => void;
     t: (key: string, fallback?: string) => string;
-    isAutoDetecting: boolean;
-    detectionMethod: string;
-    supportedLanguages: Language[];
 }
-
-// 국가별 기본 언어 매핑
-const geolocationLanguageMap: Record<string, Language> = {
-    'KR': 'ko',
-    'US': 'en', 'GB': 'en', 'CA': 'en', 'AU': 'en', 'NZ': 'en',
-    'CN': 'zh', 'TW': 'zh', 'HK': 'zh', 'MO': 'zh',
-    'ID': 'id'
-};
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
@@ -28,8 +17,8 @@ const translations = {
         home: '홈',
         about: '회사소개',
         products: '제품소개',
-        equipment: '건설기계소개',
-        shop: '온라인 스토어',
+        equipment: '기계소개',
+        shop: '온라인쇼핑몰',
         projects: '시공사례',
         certificates: '시험성적서/인증',
         qna: '고객상담',
@@ -52,7 +41,7 @@ const translations = {
         hero_patent: '특허번호 10-2312833',
         hero_trademark: '상표번호 40-1678504',
         hero_title_line1: '친환경 불연재(일액형)',
-        hero_title_line2: '신소재 세라믹 코팅제',
+        hero_title_line2: '신개념 세라믹 코팅제',
         hero_inquiry_btn: '제품문의',
         hero_purchase_btn: '제품구매',
         hero_projects_btn: '시공사례 보기',
@@ -72,7 +61,7 @@ const translations = {
         feature_fire_resistant_title: '불연재 인증',
         feature_fire_resistant_desc: '안전한 순수 무기질 세라믹 코팅제',
         feature_eco_friendly_title: '친환경 마감공법',
-        feature_eco_friendly_desc: '환경을 고려한 친환경 1액형 신소재 세라믹 코팅 마감',
+        feature_eco_friendly_desc: '환경을 고려한 친환경 1액형 신개념 세라믹 코팅 마감',
         feature_quality_title: '우수한 품질',
         feature_quality_desc: '다양한 시험성적서와 인증을 통해 검증된 품질, 1,000여 현장 적용',
         feature_industrial_title: '산업 적용',
@@ -178,7 +167,7 @@ const translations = {
         projects_stats_product_lineup: '린코리아 제품군',
 
         // Equipment Page
-        equipment_hero_title: '건설기계소개',
+        equipment_hero_title: '기계소개',
         equipment_hero_subtitle: '최첨단 콘크리트 연마 기술로 최고의 품질과 효율성을 제공합니다.',
         equipment_add_btn: '기계 추가',
         equipment_partnership_title: 'Shanghai JS Floor Systems 공식 파트너',
@@ -252,7 +241,7 @@ const translations = {
 
         // Resources Page
         resources_hero_title: '자료실',
-        resources_hero_subtitle: '제품 카탈로그, 기술자료, 인증서 등 다양한 자료를 확인해보세요.',
+        resources_hero_subtitle: '린코리아의 제품 카탈로그, 기술자료, 인증서 등 다양한 자료를 확인해보세요.',
         resources_add_btn: '자료 추가',
 
         // Resources list and search
@@ -266,16 +255,8 @@ const translations = {
         list_view: '목록',
         resources_form_category: '카테고리',
 
-        // Resource categories
-        technical_data: '기술자료',
-        catalog: '카탈로그',
-        manual: '매뉴얼',
-        specification: '사양서',
-        certificate: '인증서',
-        test_report: '시험성적서',
-
         // Shop Page
-        shop_hero_title: '온라인 스토어',
+        shop_hero_title: '온라인 쇼핑몰',
         shop_hero_subtitle: '린코리아 제품을 온라인으로 주문하고 구매할 수 있습니다.',
         shop_add_product: '제품 추가',
 
@@ -340,7 +321,7 @@ const translations = {
         shop_form_description_ko: '설명 (한국어)',
         shop_form_description_en: '설명 (English)',
         shop_form_description_zh: '설명 (中文)',
-
+        shop_form_description_id: '설명 (Indonesia)',
 
         // Shop delete modal
         shop_delete_title: '상품 삭제',
@@ -551,7 +532,7 @@ const translations = {
         features_subtitle: 'Creating a safe and eco-friendly construction environment with the highest quality ceramic coating materials',
 
         // Feature items
-        feature_fire_resistant_title: 'Non-Combustible Certification',
+        feature_fire_resistant_title: 'Fire-resistant Certification',
         feature_fire_resistant_desc: 'Safe pure inorganic ceramic coating material',
         feature_eco_friendly_title: 'Eco-friendly Finishing Method',
         feature_eco_friendly_desc: 'Environmentally friendly one-component new ceramic coating finish',
@@ -588,7 +569,7 @@ const translations = {
         about_business_subtitle: 'RIN Korea is leading the development of the construction industry through two core businesses: construction materials and construction machinery.',
         about_materials_title: 'Construction Materials Division',
         about_materials_subtitle: 'Core Business Area',
-        about_materials_desc: 'This is RIN Korea\'s core business division that produces the highest quality products such as concrete surface finishing one-component ceramic coatings (Non-Combustible materials), heat-resistant paints, and special-purpose coatings.',
+        about_materials_desc: 'This is RIN Korea\'s core business division that produces the highest quality products such as concrete surface finishing one-component ceramic coatings (fire-resistant materials), heat-resistant paints, and special-purpose coatings.',
         about_equipment_title: 'Construction Equipment Division',
         about_equipment_subtitle: 'Shanghai JS Floor Systems Official Partner',
         about_equipment_desc: 'As an official partner of Shanghai JS Floor Systems, we operate the official sales agency and service center in Korea. We are leaders in the concrete grinder and polisher market used at construction sites worldwide.',
@@ -715,7 +696,7 @@ const translations = {
         // Product Benefits
         product_benefits_title: 'Product Benefits',
         product_benefits_subtitle: 'Why RIN Korea Ceramic Coatings Are Chosen',
-        product_benefits_fire_resistant_title: 'Non-Combustible Certification',
+        product_benefits_fire_resistant_title: 'Fire-resistant Certification',
         product_benefits_fire_resistant_desc: 'Safe pure inorganic ceramic coating material',
         product_benefits_easy_construction_title: 'Easy Construction',
         product_benefits_easy_construction_desc: 'Easy construction with one-component system',
@@ -738,7 +719,7 @@ const translations = {
         resources_add_btn: 'Add Resource',
 
         // Resources list and search
-        search_resources: 'Search by resource name, description, filename...',
+        search_resources: 'Search by resource name, description, file name...',
         all_categories: 'All Categories',
         total_resources_count: 'Total {{count}} resources available',
         search_results_for: "Search results for '{{term}}'",
@@ -747,14 +728,6 @@ const translations = {
         grid_view: 'Grid',
         list_view: 'List',
         resources_form_category: 'Category',
-
-        // Resource categories
-        technical_data: 'Technical Data',
-        catalog: 'Catalog',
-        manual: 'Manual',
-        specification: 'Specification',
-        certificate: 'Certificate',
-        test_report: 'Test Report',
 
         // Shop Page
         shop_hero_title: 'Online Store',
@@ -829,7 +802,7 @@ const translations = {
         certificates_type_patent: 'Patent Registration',
         certificate_type_patent: 'Patent',
         certificates_type_patent_desc: 'Technology recognized through patent registration for one-component ceramic manufacturing technology.',
-        certificates_type_fireproof: 'Non-Combustible Certification',
+        certificates_type_fireproof: 'Fire-resistant Certification',
         certificate_type_report: 'Report',
         certificates_type_fireproof_desc: 'Safe pure inorganic ceramic coating material',
         certificates_type_quality: 'Quality Test Report',
@@ -999,8 +972,8 @@ const translations = {
         // Hero Section
         hero_patent: '专利号 10-2312833',
         hero_trademark: '商标号 40-1678504',
-        hero_title_line1: '环保阻燃材料(单组分)',
-        hero_title_line2: '新型陶瓷涂料',
+        hero_title_line1: '环保不燃性物质（单一成分）',
+        hero_title_line2: '新概念陶瓷涂层剂',
         hero_inquiry_btn: '产品咨询',
         hero_purchase_btn: '购买产品',
         hero_projects_btn: '查看施工案例',
@@ -1210,14 +1183,6 @@ const translations = {
         grid_view: '网格',
         list_view: '列表',
         resources_form_category: '类别',
-
-        // Resource categories
-        technical_data: '技术资料',
-        catalog: '产品目录',
-        manual: '手册',
-        specification: '规格书',
-        certificate: '证书',
-        test_report: '测试报告',
 
         // Shop Page
         shop_hero_title: '在线商店',
@@ -1769,127 +1734,19 @@ const translations = {
     },
 };
 
-// 언어 자동 감지 함수들
-const detectBrowserLanguage = (supportedLanguages: Language[]): Language | null => {
-    const browserLang = navigator.language || navigator.languages?.[0];
-    if (!browserLang) return null;
-
-    const lang = browserLang.toLowerCase();
-    if (lang.startsWith('ko') && supportedLanguages.includes('ko')) return 'ko';
-    if (lang.startsWith('en') && supportedLanguages.includes('en')) return 'en';
-    if (lang.startsWith('zh') && supportedLanguages.includes('zh')) return 'zh';
-    if (lang.startsWith('id') && supportedLanguages.includes('id')) return 'id';
-
-    return null;
-};
-
-const detectGeolocation = async (): Promise<string | null> => {
-    try {
-        const response = await fetch('https://ipapi.co/country/', {
-            method: 'GET',
-            headers: { 'Accept': 'text/plain' }
-        });
-        if (response.ok) {
-            return (await response.text()).trim().toUpperCase();
-        }
-    } catch (error) {
-        console.warn('Geolocation detection failed:', error);
-    }
-    return null;
-};
-
-const detectLanguageFromURL = (supportedLanguages: Language[]): Language | null => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const langParam = urlParams.get('lang') as Language;
-    return langParam && supportedLanguages.includes(langParam) ? langParam : null;
-};
-
 export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
-    const supportedLanguages = useMemo<Language[]>(() => ['ko', 'en', 'zh', 'id'], []);
-    const [language, setLanguageState] = useState<Language>('ko');
-    const [isAutoDetecting, setIsAutoDetecting] = useState(true);
-    const [detectionMethod, setDetectionMethod] = useState<string>('Loading...');
+    const [language, setLanguageState] = useState<Language>(() => {
+        const saved = localStorage.getItem('language');
+        return (saved as Language) || 'ko';
+    });
 
-    // 자동 언어 감지
-    const detectLanguage = useCallback(async (): Promise<Language> => {
-        try {
-            // 1. URL 파라미터 확인 (최우선)
-            const urlLang = detectLanguageFromURL(supportedLanguages);
-            if (urlLang) {
-                setDetectionMethod('URL Parameter');
-                return urlLang;
-            }
-
-            // 2. 로컬 스토리지 확인
-            const savedLanguage = localStorage.getItem('rin-korea-language') as Language;
-            if (savedLanguage && supportedLanguages.includes(savedLanguage)) {
-                setDetectionMethod('User Preference');
-                return savedLanguage;
-            }
-
-            // 3. 브라우저 언어 확인
-            const browserLang = detectBrowserLanguage(supportedLanguages);
-            if (browserLang) {
-                setDetectionMethod('Browser Language');
-                return browserLang;
-            }
-
-            // 4. 지역 기반 감지
-            const countryCode = await detectGeolocation();
-            if (countryCode && geolocationLanguageMap[countryCode]) {
-                const geoLang = geolocationLanguageMap[countryCode];
-                if (supportedLanguages.includes(geoLang)) {
-                    setDetectionMethod('Geolocation');
-                    return geoLang;
-                }
-            }
-
-            // 5. 기본값
-            setDetectionMethod('Default');
-            return 'ko';
-        } catch (error) {
-            console.error('Language detection failed:', error);
-            setDetectionMethod('Error - Default');
-            return 'ko';
-        }
-    }, [supportedLanguages]);
-
-    // 언어 설정 함수
-    const setLanguage = useCallback((lang: Language) => {
-        setLanguageState(lang);
-        localStorage.setItem('rin-korea-language', lang);
-
-        // URL 파라미터 업데이트
-        const url = new URL(window.location.href);
-        url.searchParams.set('lang', lang);
-        window.history.replaceState({}, '', url.toString());
-
-        // HTML lang 속성 업데이트
-        document.documentElement.lang = lang === 'ko' ? 'ko-KR' :
-            lang === 'en' ? 'en-US' :
-                lang === 'zh' ? 'zh-CN' : 'id-ID';
-    }, []);
-
-    // 초기 언어 감지
     useEffect(() => {
-        let isMounted = true;
+        localStorage.setItem('language', language);
+    }, [language]);
 
-        detectLanguage().then(detectedLang => {
-            if (isMounted) {
-                setLanguageState(detectedLang);
-                setIsAutoDetecting(false);
-
-                // HTML lang 속성 초기 설정
-                document.documentElement.lang = detectedLang === 'ko' ? 'ko-KR' :
-                    detectedLang === 'en' ? 'en-US' :
-                        detectedLang === 'zh' ? 'zh-CN' : 'id-ID';
-            }
-        });
-
-        return () => {
-            isMounted = false;
-        };
-    }, [detectLanguage]);
+    const setLanguage = (lang: Language) => {
+        setLanguageState(lang);
+    };
 
     const t = (key: string, fallback?: string): string => {
         const keys = key.split('.');
@@ -1906,9 +1763,6 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
         language,
         setLanguage,
         t,
-        isAutoDetecting,
-        detectionMethod,
-        supportedLanguages
     };
 
     return (

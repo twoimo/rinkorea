@@ -5,13 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useLanguage } from '@/contexts/LanguageContext';
-import type { Resource, ResourceCategory } from '@/hooks/useResources';
+import type { Resource } from '@/hooks/useResources';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
 interface ResourceCardProps {
     resource: Resource;
-    categories?: ResourceCategory[];
     viewMode?: 'grid' | 'list';
     onDownload: (id: string, fileName: string, fileUrl: string) => void;
     onEdit?: (resource: Resource) => void;
@@ -21,7 +20,6 @@ interface ResourceCardProps {
 
 const ResourceCard: React.FC<ResourceCardProps> = ({
     resource,
-    categories = [],
     viewMode = 'grid',
     onDownload,
     onEdit,
@@ -29,66 +27,8 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     onToggleStatus
 }) => {
     const { isAdmin } = useUserRole();
-    const { t, language } = useLanguage();
+    const { t } = useLanguage();
     const [isDownloading, setIsDownloading] = useState(false);
-
-    // Get localized resource title and description
-    const getResourceTitle = () => {
-        switch (language) {
-            case 'en':
-                return resource.title_en || resource.title_ko || resource.title;
-            case 'zh':
-                return resource.title_zh || resource.title_ko || resource.title;
-            case 'id':
-                return resource.title_id || resource.title_ko || resource.title;
-            case 'ko':
-            default:
-                return resource.title_ko || resource.title;
-        }
-    };
-
-    const getResourceDescription = () => {
-        switch (language) {
-            case 'en':
-                return resource.description_en || resource.description_ko || resource.description;
-            case 'zh':
-                return resource.description_zh || resource.description_ko || resource.description;
-            case 'id':
-                return resource.description_id || resource.description_ko || resource.description;
-            case 'ko':
-            default:
-                return resource.description_ko || resource.description;
-        }
-    };
-
-    // Get localized category name based on current language
-    const getCategoryDisplayName = (categoryName: string) => {
-        const category = categories.find(cat => cat.name === categoryName);
-        if (category) {
-            switch (language) {
-                case 'en':
-                    return category.name_en || category.name_ko || category.name;
-                case 'zh':
-                    return category.name_zh || category.name_ko || category.name;
-                case 'id':
-                    return category.name_id || category.name_ko || category.name;
-                case 'ko':
-                default:
-                    return category.name_ko || category.name;
-            }
-        }
-
-        // Fallback to i18n translations if category not found
-        const categoryMap: Record<string, string> = {
-            '기술자료': t('technical_data', '기술자료'),
-            '카탈로그': t('catalog', '카탈로그'),
-            '매뉴얼': t('manual', '매뉴얼'),
-            '사양서': t('specification', '사양서'),
-            '인증서': t('certificate', '인증서'),
-            '시험성적서': t('test_report', '시험성적서'),
-        };
-        return categoryMap[categoryName] || categoryName;
-    };
 
     const getCategoryColor = (category: string) => {
         const colors: Record<string, string> = {
@@ -97,7 +37,6 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
             '매뉴얼': 'bg-amber-100 text-amber-800',
             '기술자료': 'bg-purple-100 text-purple-800',
             '인증서': 'bg-red-100 text-red-800',
-            '사양서': 'bg-indigo-100 text-indigo-800',
             '기타': 'bg-gray-100 text-gray-800'
         };
         return colors[category] || colors['기타'];
@@ -158,11 +97,11 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                             <div className="flex-1 min-w-0">
                                 <div className="flex flex-col sm:flex-row sm:items-start gap-2 mb-2">
                                     <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors text-base md:text-lg break-words hyphens-auto">
-                                        {getResourceTitle()}
+                                        {resource.title}
                                     </h3>
                                     <div className="flex items-center gap-2 flex-shrink-0">
                                         <Badge className={getCategoryColor(resource.category)}>
-                                            {getCategoryDisplayName(resource.category)}
+                                            {resource.category}
                                         </Badge>
                                         {!resource.is_active && isAdmin && (
                                             <Badge variant="secondary" className="bg-gray-200 text-gray-600 text-xs">
@@ -171,9 +110,9 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                         )}
                                     </div>
                                 </div>
-                                {getResourceDescription() && (
+                                {resource.description && (
                                     <p className="text-gray-600 text-sm md:text-base mb-2 break-words hyphens-auto">
-                                        {getResourceDescription()}
+                                        {resource.description}
                                     </p>
                                 )}
                                 <div className="flex flex-col gap-1 text-sm text-gray-500">
@@ -268,11 +207,11 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                         <div className="flex-1 min-w-0">
                             <div className="flex flex-col gap-2 mb-2">
                                 <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 text-sm md:text-base leading-tight">
-                                    {getResourceTitle()}
+                                    {resource.title}
                                 </h3>
                                 <div className="flex items-center gap-2">
                                     <Badge className={getCategoryColor(resource.category)}>
-                                        {getCategoryDisplayName(resource.category)}
+                                        {resource.category}
                                     </Badge>
                                     {!resource.is_active && isAdmin && (
                                         <Badge variant="secondary" className="bg-gray-200 text-gray-600 text-xs">
@@ -322,9 +261,9 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                 </div>
 
                 <div className="flex-1 flex flex-col justify-between">
-                    {getResourceDescription() && (
+                    {resource.description && (
                         <p className="text-gray-600 text-sm mb-4 line-clamp-3 min-h-[3rem] overflow-hidden">
-                            {getResourceDescription()}
+                            {resource.description}
                         </p>
                     )}
 

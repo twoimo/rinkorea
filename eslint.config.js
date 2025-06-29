@@ -24,11 +24,6 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       "@typescript-eslint/no-unused-vars": "off",
-      // Console statements는 development에서는 warn, production에서는 error
-      "no-console": process.env.NODE_ENV === "production" ? "error" : "warn",
-      // 기타 프로덕션 배포에 유용한 규칙들
-      "no-debugger": process.env.NODE_ENV === "production" ? "error" : "warn",
-      "@typescript-eslint/no-explicit-any": "warn",
     },
   },
   // Shadcn UI 컴포넌트들은 react-refresh 규칙에서 제외

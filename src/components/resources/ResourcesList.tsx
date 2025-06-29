@@ -27,44 +27,10 @@ const ResourcesList: React.FC<ResourcesListProps> = ({
     onDelete,
     onToggleStatus
 }) => {
-    const { t, language } = useLanguage();
+    const { t } = useLanguage();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
-    // Get localized category name based on current language
-    const getCategoryDisplayName = (category: ResourceCategory) => {
-        switch (language) {
-            case 'en':
-                return category.name_en || category.name_ko || category.name;
-            case 'zh':
-                return category.name_zh || category.name_ko || category.name;
-            case 'id':
-                return category.name_id || category.name_ko || category.name;
-            case 'ko':
-            default:
-                return category.name_ko || category.name;
-        }
-    };
-
-    // Translate category names for resource filtering
-    const translateCategory = (categoryName: string) => {
-        const category = categories.find(cat => cat.name === categoryName);
-        if (category) {
-            return getCategoryDisplayName(category);
-        }
-
-        // Fallback to i18n translations if category not found
-        const categoryMap: Record<string, string> = {
-            '기술자료': t('technical_data', '기술자료'),
-            '카탈로그': t('catalog', '카탈로그'),
-            '매뉴얼': t('manual', '매뉴얼'),
-            '사양서': t('specification', '사양서'),
-            '인증서': t('certificate', '인증서'),
-            '시험성적서': t('test_report', '시험성적서'),
-        };
-        return categoryMap[categoryName] || categoryName;
-    };
 
     const filteredResources = resources.filter(resource => {
         const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -113,7 +79,7 @@ const ResourcesList: React.FC<ResourcesListProps> = ({
                                     <SelectItem value="all">{t('all_categories', '전체 카테고리')}</SelectItem>
                                     {categories.map((category) => (
                                         <SelectItem key={category.id} value={category.name}>
-                                            {getCategoryDisplayName(category)}
+                                            {category.name}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -171,7 +137,6 @@ const ResourcesList: React.FC<ResourcesListProps> = ({
                         <ResourceCard
                             key={resource.id}
                             resource={resource}
-                            categories={categories}
                             viewMode={viewMode}
                             onDownload={onDownload}
                             onEdit={onEdit}

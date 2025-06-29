@@ -85,7 +85,7 @@ const CertificateCard: React.FC<CertificateCardProps> = ({
   const localizedDescription = getLocalizedCertificateDescription(certificate);
 
   return (
-    <div className={`bg-white ${cardPadding} rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ${isHidden && isAdmin ? 'opacity-50' : ''} border border-gray-100`}>
+    <div className={`bg-white ${cardPadding} rounded-lg shadow-lg hover:shadow-xl transition-shadow ${isHidden && isAdmin ? 'opacity-50' : ''}`}>
       <div className="relative">
         <div
           className="cursor-pointer"
@@ -94,7 +94,7 @@ const CertificateCard: React.FC<CertificateCardProps> = ({
           <img
             src={certificate.image_url}
             alt={localizedName}
-            className="w-full aspect-[1/1.4142] object-contain rounded-lg mb-4 sm:mb-6 border hover:border-blue-300 transition-colors"
+            className="w-full aspect-[1/1.4142] object-contain rounded-lg mb-3 sm:mb-4 border hover:border-blue-300 transition-colors"
             loading="lazy"
           />
         </div>
@@ -104,7 +104,10 @@ const CertificateCard: React.FC<CertificateCardProps> = ({
           <div className="absolute top-2 right-2 flex gap-1 sm:gap-2">
             <button
               onClick={() => onToggleHide(certificate)}
-              className={`${buttonSize} rounded-full transition-colors touch-manipulation shadow ${isLoading ? 'opacity-50 cursor-not-allowed' : ''} bg-gray-100 hover:bg-gray-200 text-gray-700`}
+              className={`${buttonSize} rounded-full transition-colors touch-manipulation ${isHidden
+                ? 'bg-gray-600 text-white hover:bg-gray-700'
+                : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
               disabled={isLoading}
               title={isHidden ? '표시하기' : '숨기기'}
             >
@@ -112,7 +115,7 @@ const CertificateCard: React.FC<CertificateCardProps> = ({
             </button>
             <button
               onClick={() => onEdit(certificate)}
-              className={`${buttonSize} bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full transition-colors touch-manipulation shadow`}
+              className={`${buttonSize} bg-green-600 text-white rounded-full hover:bg-green-700 transition-colors touch-manipulation`}
               disabled={isLoading}
               title="편집"
             >
@@ -120,7 +123,7 @@ const CertificateCard: React.FC<CertificateCardProps> = ({
             </button>
             <button
               onClick={() => onDelete(certificate)}
-              className={`${buttonSize} bg-red-100 hover:bg-red-200 text-red-700 rounded-full transition-colors touch-manipulation shadow`}
+              className={`${buttonSize} bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors touch-manipulation`}
               disabled={isLoading}
               title="삭제"
             >
@@ -130,12 +133,10 @@ const CertificateCard: React.FC<CertificateCardProps> = ({
         )}
       </div>
 
-      <div className="text-center space-y-2">
-        <h3 className={`${titleSize} font-bold text-gray-900 line-clamp-2 leading-tight`}>{localizedName}</h3>
-        {!isSmall && (
-          <p className="text-sm sm:text-base text-gray-600 line-clamp-2 leading-relaxed">{localizedDescription}</p>
-        )}
-      </div>
+      <h3 className={`${titleSize} font-bold text-gray-900 mb-2 line-clamp-2`}>{localizedName}</h3>
+      {!isSmall && (
+        <p className="text-sm sm:text-base text-gray-600 line-clamp-2">{localizedDescription}</p>
+      )}
     </div>
   );
 };

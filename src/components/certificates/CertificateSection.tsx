@@ -67,24 +67,23 @@ const CertificateSection: React.FC<CertificateSectionProps> = ({
           <p className="text-lg sm:text-xl text-gray-600">{description}</p>
         </div>
 
-        <div className={`grid ${gridCols} gap-6 sm:gap-8 justify-items-center`}>
+        <div className={`grid ${gridCols} gap-4 sm:gap-6`}>
           {certificates
             .filter(cert => !hiddenCertificateIds.includes(cert.id) || isAdmin)
             .map((cert, index) => (
-              <div key={index} className="w-full max-w-sm">
-                <CertificateCard
-                  certificate={cert}
-                  isHidden={hiddenCertificateIds.includes(cert.id)}
-                  isAdmin={isAdmin}
-                  onImageClick={onImageClick}
-                  onEdit={onEdit}
-                  onDelete={onDelete}
-                  onToggleHide={onToggleHide}
-                  isLoading={isLoading}
-                  size={cardSize}
-                  language={language}
-                />
-              </div>
+              <CertificateCard
+                key={index}
+                certificate={cert}
+                isHidden={hiddenCertificateIds.includes(cert.id)}
+                isAdmin={isAdmin}
+                onImageClick={onImageClick}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onToggleHide={onToggleHide}
+                isLoading={isLoading}
+                size={cardSize}
+                language={language}
+              />
             ))}
         </div>
       </div>
