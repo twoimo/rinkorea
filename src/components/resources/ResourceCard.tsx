@@ -62,6 +62,107 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
         return categoryMap[category] || t('category_other', '기타');
     };
 
+    const getTranslatedTitle = () => {
+        // 임시 번역 맵 (실제로는 데이터베이스에서 가져와야 함)
+        const translations: Record<string, Record<string, string>> = {
+            'RIN-COAT 도장사양서': {
+                ko: 'RIN-COAT 도장사양서',
+                en: 'RIN-COAT Coating Specification',
+                zh: 'RIN-COAT 涂装规格书'
+            },
+            'RIN-COAT 카탈로그': {
+                ko: 'RIN-COAT 카탈로그',
+                en: 'RIN-COAT Catalog',
+                zh: 'RIN-COAT 产品目录'
+            },
+            'MSDS 안내': {
+                ko: 'MSDS 안내',
+                en: 'MSDS Information',
+                zh: 'MSDS 资料说明'
+            },
+            'RIN-HARD PLUS 카탈로그': {
+                ko: 'RIN-HARD PLUS 카탈로그',
+                en: 'RIN-HARD PLUS Catalog',
+                zh: 'RIN-HARD PLUS 产品目录'
+            },
+            'RIN-SEAL PLUS 카탈로그': {
+                ko: 'RIN-SEAL PLUS 카탈로그',
+                en: 'RIN-SEAL PLUS Catalog',
+                zh: 'RIN-SEAL PLUS 产品目录'
+            },
+            'GT 시리즈 메뉴얼': {
+                ko: 'GT 시리즈 메뉴얼',
+                en: 'GT Series Manual',
+                zh: 'GT 系列手册'
+            },
+            '자재공급원 서류 안내': {
+                ko: '자재공급원 서류 안내',
+                en: 'Material Supplier Document Information',
+                zh: '材料供应商文件说明'
+            },
+            '2025 JS FLOOR SYSTEMS 카탈로그': {
+                ko: '2025 JS FLOOR SYSTEMS 카탈로그',
+                en: '2025 JS FLOOR SYSTEMS Catalog',
+                zh: '2025 JS FLOOR SYSTEMS 产品目录'
+            },
+            'RIN-SEAL PLUS 도장사양서': {
+                ko: 'RIN-SEAL PLUS 도장사양서',
+                en: 'RIN-SEAL PLUS Coating Specification',
+                zh: 'RIN-SEAL PLUS 涂装规格书'
+            },
+            '린코리아 콘크리트 폴리싱 기술자료': {
+                ko: '린코리아 콘크리트 폴리싱 기술자료',
+                en: 'RIN Korea Concrete Polishing Technical Data',
+                zh: '林韩国混凝土抛光技术资料'
+            }
+        };
+
+        return translations[resource.title]?.[language] || resource.title;
+    };
+
+    const getTranslatedDescription = () => {
+        // 임시 번역 맵
+        const translations: Record<string, Record<string, string>> = {
+            '도장사양서': {
+                ko: '도장사양서',
+                en: 'Coating specification document',
+                zh: '涂装规格书'
+            },
+            '카탈로그': {
+                ko: '카탈로그',
+                en: 'Product catalog',
+                zh: '产品目录'
+            },
+            '고객상담 페이지, 이메일을 통해 현장명을 전달 주시면 MSDS를 발송드리고 있습니다.': {
+                ko: '고객상담 페이지, 이메일을 통해 현장명을 전달 주시면 MSDS를 발송드리고 있습니다.',
+                en: 'Please provide your site name through the customer consultation page or email, and we will send you the MSDS.',
+                zh: '请通过客户咨询页面或邮件提供现场名称，我们将向您发送MSDS资料。'
+            },
+            '850GT, 950GT 매뉴얼': {
+                ko: '850GT, 950GT 매뉴얼',
+                en: '850GT, 950GT manual',
+                zh: '850GT, 950GT 操作手册'
+            },
+            '고객상담 페이지, 이메일을 통해 현장명을 전달 주시면 자재공급원 서류를 발송드리고 있습니다.': {
+                ko: '고객상담 페이지, 이메일을 통해 현장명을 전달 주시면 자재공급원 서류를 발송드리고 있습니다.',
+                en: 'Please provide your site name through the customer consultation page or email, and we will send you the material supplier documents.',
+                zh: '请通过客户咨询页面或邮件提供现场名称，我们将向您发送材料供应商文件。'
+            },
+            '린코리아 콘크리트 폴리싱 기술자료': {
+                ko: '린코리아 콘크리트 폴리싱 기술자료',
+                en: 'RIN Korea concrete polishing technical documentation',
+                zh: '林韩国混凝土抛光技术文档'
+            },
+            '2025 JS FLOOR SYSTEMS 카탈로그': {
+                ko: '2025 JS FLOOR SYSTEMS 카탈로그',
+                en: '2025 JS FLOOR SYSTEMS catalog',
+                zh: '2025 JS FLOOR SYSTEMS 产品目录'
+            }
+        };
+
+        return translations[resource.description || '']?.[language] || resource.description;
+    };
+
     const formatFileSize = (bytes: number | null) => {
         if (!bytes) return '';
         const sizes = ['B', 'KB', 'MB', 'GB'];
@@ -117,7 +218,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                             <div className="flex-1 min-w-0">
                                 <div className="flex flex-col sm:flex-row sm:items-start gap-2 mb-2">
                                     <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors text-base md:text-lg break-words hyphens-auto">
-                                        {resource.title}
+                                        {getTranslatedTitle()}
                                     </h3>
                                     <div className="flex items-center gap-2 flex-shrink-0">
                                         <Badge className={getCategoryColor(resource.category)}>
@@ -132,7 +233,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                                 </div>
                                 {resource.description && (
                                     <p className="text-gray-600 text-sm md:text-base mb-2 break-words hyphens-auto">
-                                        {resource.description}
+                                        {getTranslatedDescription()}
                                     </p>
                                 )}
                                 <div className="flex flex-col gap-1 text-sm text-gray-500">
@@ -227,7 +328,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                         <div className="flex-1 min-w-0">
                             <div className="flex flex-col gap-2 mb-2">
                                 <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 text-sm md:text-base leading-tight">
-                                    {resource.title}
+                                    {getTranslatedTitle()}
                                 </h3>
                                 <div className="flex items-center gap-2">
                                     <Badge className={getCategoryColor(resource.category)}>
@@ -283,7 +384,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
                 <div className="flex-1 flex flex-col justify-between">
                     {resource.description && (
                         <p className="text-gray-600 text-sm mb-4 line-clamp-3 min-h-[3rem] overflow-hidden">
-                            {resource.description}
+                            {getTranslatedDescription()}
                         </p>
                     )}
 
