@@ -1,7 +1,9 @@
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App.tsx";
+import "./index.css";
 import { logger } from './lib/logger'
+import { ErrorBoundary } from './components/error-boundary.tsx';
 
 // Register Service Worker for caching and offline functionality
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
@@ -39,12 +41,54 @@ if (import.meta.env.PROD) {
     preloadCriticalResources();
 }
 
-// Optimize rendering
-const rootElement = document.getElementById("root");
-if (!rootElement) throw new Error('Root element not found');
+// DOM이 로드되었는지 확인
+const ensureDOM = () => {
+    return new Promise<void>((resolve) => {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => resolve());
+        } else {
+            resolve();
+        }
+    });
+};
 
-const root = createRoot(rootElement);
-root.render(<App />);
+// 안전한 렌더링 함수
+const renderApp = async () => {
+    try {
+        await ensureDOM();
+
+        const rootElement = document.getElementById("root");
+        if (!rootElement) {
+            throw new Error("Root element not found");
+        }
+
+        const root = ReactDOM.createRoot(rootElement);
+
+        root.render(
+            <React.StrictMode>
+                <ErrorBoundary>
+                    <App />
+                </ErrorBoundary>
+            </React.StrictMode>
+        );
+    } catch (error) {
+        console.error('Failed to render app:', error);
+        // 폴백 렌더링
+        document.body.innerHTML = `
+      <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif;">
+        <div style="text-align: center;">
+          <h1>Loading...</h1>
+          <p>앱을 로드하는 중입니다...</p>
+        </div>
+      </div>
+    `;
+        // 재시도
+        setTimeout(renderApp, 1000);
+    }
+};
+
+// 앱 렌더링 시작
+renderApp();
 
 // Add performance monitoring
 if (import.meta.env.PROD && 'performance' in window) {

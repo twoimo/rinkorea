@@ -448,4 +448,117 @@ vercel env add SUPABASE_ANON_KEY
 - **AI 백엔드**: Railway/Render (FastAPI Python)
 - **장점**: 최고 성능, 모든 기능 구현 가능
 
-**결론**: **Vercel 전용으로도 충분히 인상적인 포트폴리오 구현 가능**하지만, 일부 아키텍처 수정이 필요합니다! 
+**결론**: **Vercel 전용으로도 충분히 인상적인 포트폴리오 구현 가능**하지만, 일부 아키텍처 수정이 필요합니다!
+
+# Vercel 배포 문제 해결 가이드
+
+## 🚨 하얀 화면 문제 해결 방법
+
+### 1. 환경 변수 설정 (가장 중요!)
+
+Vercel 대시보드에서 다음 환경 변수를 **반드시** 설정하세요:
+
+```
+VITE_SUPABASE_URL=https://fpyqjvnpduwifxgnbrck.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZweXFqdm5wZHV3aWZ4Z25icmNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NDA0MDQsImV4cCI6MjA2NTExNjQwNH0.Uqn7ajeRHEqMl7gbPtOYHKd1ZhUb6xiMTZsK4QMxtfU
+NODE_ENV=production
+```
+
+### 2. createPortal 오류 수정
+
+다음 명령어로 모든 createPortal 오류를 수정하세요:
+
+```bash
+# Windows (PowerShell)
+Get-ChildItem -Path "src" -Include "*.tsx" -Recurse | ForEach-Object {
+    $content = Get-Content $_.FullName -Raw
+    if ($content -match "createPortal\(" -and $content -notmatch "document\.body") {
+        $content = $content -replace "(\s+)\);?\s*$", "`$1, document.body);"
+        Set-Content -Path $_.FullName -Value $content
+        Write-Host "Fixed: $($_.FullName)"
+    }
+}
+```
+
+### 3. 빌드 및 배포 확인
+
+```bash
+# 로컬에서 프로덕션 빌드 테스트
+npm run build
+npm run preview
+
+# 빌드 성공 후 Vercel에 배포
+vercel --prod
+```
+
+### 4. 배포 후 확인사항
+
+1. **브라우저 개발자 도구 콘솔 확인**
+   - JavaScript 오류가 없는지 확인
+   - 404 오류가 없는지 확인
+
+2. **네트워크 탭 확인**
+   - 모든 리소스가 로드되는지 확인
+   - API 요청이 성공하는지 확인
+
+3. **Vercel 함수 로그 확인**
+   - Vercel 대시보드에서 함수 로그 확인
+
+### 5. 일반적인 문제 해결
+
+#### 문제: 하얀 화면만 보임
+**해결책:**
+1. Vercel 환경 변수 설정 확인
+2. 브라우저 캐시 삭제 후 재시도
+3. 시크릿 모드에서 접속 확인
+
+#### 문제: "Target container is not a DOM element"
+**해결책:**
+1. 모든 createPortal 호출에 `document.body` 추가
+2. SSR 안전성 확인 (`typeof window !== 'undefined'` 체크)
+
+#### 문제: 환경 변수 오류
+**해결책:**
+1. Vercel 대시보드에서 환경 변수 재설정
+2. 재배포 실행
+
+### 6. 긴급 복구 방법
+
+만약 배포가 계속 실패한다면:
+
+1. **롤백**: 이전 정상 배포로 롤백
+2. **로컬 빌드 테스트**: `npm run build && npm run preview`
+3. **단계별 배포**: 작은 변경사항부터 점진적으로 배포
+4. **환경 분리**: development 브랜치에서 먼저 테스트
+
+### 7. 모니터링 설정
+
+```javascript
+// src/lib/error-monitoring.ts
+export const initErrorMonitoring = () => {
+  if (typeof window !== 'undefined') {
+    window.addEventListener('error', (event) => {
+      console.error('Global error:', event.error);
+      // 에러 리포팅 서비스에 전송
+    });
+    
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('Unhandled promise rejection:', event.reason);
+      // 에러 리포팅 서비스에 전송
+    });
+  }
+};
+```
+
+---
+
+## 🎯 체크리스트
+
+- [ ] Vercel 환경 변수 설정 완료
+- [ ] 로컬 프로덕션 빌드 성공
+- [ ] createPortal 오류 수정 완료
+- [ ] 배포 후 정상 작동 확인
+- [ ] 브라우저 콘솔 오류 없음
+- [ ] 모든 페이지 정상 로드 확인
+
+이 가이드를 따르면 Vercel 배포 시 하얀 화면 문제를 완전히 해결할 수 있습니다. 

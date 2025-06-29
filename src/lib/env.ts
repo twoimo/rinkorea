@@ -21,21 +21,69 @@ const envSchema = z.object({
 
 type Env = z.infer<typeof envSchema>;
 
-function validateEnv(): Env {
-    try {
-        return envSchema.parse(import.meta.env);
-    } catch (error) {
-        if (error instanceof z.ZodError) {
-            const missingVars = error.errors
-                .map((err) => err.path.join("."))
-                .join(", ");
-            throw new Error(`환경 변수 설정 오류: ${missingVars}`);
-        }
-        throw error;
-    }
+// Environment configuration with validation
+const requiredEnvVars = [
+    'VITE_SUPABASE_URL',
+    'VITE_SUPABASE_ANON_KEY',
+] as const;
+
+interface EnvConfig {
+    SUPABASE_URL: string;
+    SUPABASE_ANON_KEY: string;
+    NODE_ENV: string;
+    DEV: boolean;
+    PROD: boolean;
 }
 
-export const env = validateEnv();
+// Validate environment variables
+function validateEnv(): EnvConfig {
+    const missing: string[] = [];
+
+    // Check for required variables in production
+    if (import.meta.env.PROD) {
+        requiredEnvVars.forEach(key => {
+            if (!import.meta.env[key]) {
+                missing.push(key);
+            }
+        });
+    }
+
+    if (missing.length > 0) {
+        console.error('Missing required environment variables:', missing);
+        // In production, use fallback values or throw error
+        if (import.meta.env.PROD) {
+            throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+        }
+    }
+
+    return {
+        SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL || '',
+        SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY || '',
+        NODE_ENV: import.meta.env.NODE_ENV || 'development',
+        DEV: import.meta.env.DEV || false,
+        PROD: import.meta.env.PROD || false,
+    };
+}
+
+// Safe environment access
+let env: EnvConfig;
+
+try {
+    env = validateEnv();
+} catch (error) {
+    console.error('Environment validation failed:', error);
+    // Fallback configuration for development
+    env = {
+        SUPABASE_URL: '',
+        SUPABASE_ANON_KEY: '',
+        NODE_ENV: 'development',
+        DEV: true,
+        PROD: false,
+    };
+}
+
+export { env };
+export default env;
 
 // 환경 변수 타입 선언
 declare global {

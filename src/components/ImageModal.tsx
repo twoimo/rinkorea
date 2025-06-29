@@ -11,13 +11,12 @@ interface ImageModalProps {
 }
 
 const ImageModal = ({ isOpen, onClose, imageSrc, imageAlt, imageTitle }: ImageModalProps) => {
-  // Portal과 body scroll 차단으로 완벽한 중앙 정렬
+  // Portal�?body scroll 차단?�로 ?�벽??중앙 ?�렬
   useEffect(() => {
     if (isOpen && typeof window !== 'undefined') {
-      // 1. 강제로 맨 위로 스크롤
-      window.scrollTo({ top: 0, behavior: 'instant' });
+      // 1. 강제�?�??�로 ?�크�?      window.scrollTo({ top: 0, behavior: 'instant' });
 
-      // 2. Body scroll 완전 차단
+      // 2. Body scroll ?�전 차단
       const originalOverflow = document.body.style.overflow;
       const originalPosition = document.body.style.position;
       const originalTop = document.body.style.top;
@@ -28,7 +27,7 @@ const ImageModal = ({ isOpen, onClose, imageSrc, imageAlt, imageTitle }: ImageMo
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = '100%';
 
-      // 청소 함수
+      // �?�� ?�수
       return () => {
         document.body.style.overflow = originalOverflow;
         document.body.style.position = originalPosition;
@@ -39,7 +38,7 @@ const ImageModal = ({ isOpen, onClose, imageSrc, imageAlt, imageTitle }: ImageMo
     }
   }, [isOpen]);
 
-  // SSR 환경에서 안전하게 처리
+  // SSR ?�경?�서 ?�전?�게 처리
   if (!isOpen || typeof window === 'undefined' || !document.body) return null;
 
   return createPortal(
