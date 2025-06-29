@@ -8,16 +8,19 @@ import NewsModalManager from '../components/news/NewsModalManager';
 import { useNews } from '@/hooks/useNews';
 import { useNewsAdmin } from '@/hooks/useNewsAdmin';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useUserRole } from '@/hooks/useUserRole';
 
 const News = () => {
   const { news, loading, refetch } = useNews();
   const { createNews, updateNews, deleteNews } = useNewsAdmin();
   const { t } = useLanguage();
+  const { isAdmin } = useUserRole();
   const [selectedNews, setSelectedNews] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingNews, setEditingNews] = useState<string | null>(null);
+  const [hiddenNews, setHiddenNews] = useState<Set<string>>(new Set());
 
-  const displayNews = news;
+  const displayNews = isAdmin ? news : news.filter(item => !hiddenNews.has(item.id));
   const selectedNewsItem = selectedNews ? displayNews.find(item => item.id === selectedNews) : null;
   const editingNewsItem = editingNews ? displayNews.find(item => item.id === editingNews) : null;
 
@@ -46,6 +49,18 @@ const News = () => {
     if (!result.error) {
       refetch();
     }
+  };
+
+  const handleToggleHideNews = (newsId: string) => {
+    setHiddenNews(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(newsId)) {
+        newSet.delete(newsId);
+      } else {
+        newSet.add(newsId);
+      }
+      return newSet;
+    });
   };
 
   // 상세보기 모드
@@ -82,9 +97,11 @@ const News = () => {
             <NewsList
               news={displayNews}
               loading={loading}
+              hiddenNews={hiddenNews}
               onSelectNews={setSelectedNews}
               onEditNews={setEditingNews}
               onDeleteNews={handleDeleteNews}
+              onToggleHideNews={handleToggleHideNews}
             />
           </div>
         </section>

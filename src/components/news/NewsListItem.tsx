@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Eye, Edit, Trash2 } from 'lucide-react';
+import { Calendar, Eye, EyeOff, Edit, Trash2 } from 'lucide-react';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -14,13 +14,17 @@ interface NewsListItemProps {
   onSelect: (id: string) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  onToggleHide: (id: string) => void;
+  isHidden: boolean;
 }
 
 const NewsListItem: React.FC<NewsListItemProps> = ({
   newsItem,
   onSelect,
   onEdit,
-  onDelete
+  onDelete,
+  onToggleHide,
+  isHidden
 }) => {
   const { isAdmin } = useUserRole();
   const { t } = useLanguage();
@@ -58,20 +62,19 @@ const NewsListItem: React.FC<NewsListItemProps> = ({
         </div>
 
         <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onSelect(newsItem.id);
-            }}
-            className="bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full p-2 shadow touch-manipulation transition-colors"
-            title={t('news_view_detail', '자세히 보기')}
-            aria-label={t('news_view_detail', '자세히 보기')}
-          >
-            <Eye className="w-4 h-4" />
-          </button>
-
           {isAdmin && (
             <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleHide(newsItem.id);
+                }}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full p-2 shadow touch-manipulation transition-colors"
+                title={isHidden ? t('show', '보이기') : t('hide', '숨기기')}
+                aria-label={isHidden ? t('show', '보이기') : t('hide', '숨기기')}
+              >
+                {isHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+              </button>
               <button
                 onClick={(e) => {
                   e.stopPropagation();

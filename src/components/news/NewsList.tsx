@@ -11,17 +11,21 @@ interface NewsListProps {
     published: boolean;
   }>;
   loading: boolean;
+  hiddenNews: Set<string>;
   onSelectNews: (id: string) => void;
   onEditNews: (id: string) => void;
   onDeleteNews: (id: string) => void;
+  onToggleHideNews: (id: string) => void;
 }
 
 const NewsList: React.FC<NewsListProps> = ({
   news,
   loading,
+  hiddenNews,
   onSelectNews,
   onEditNews,
-  onDeleteNews
+  onDeleteNews,
+  onToggleHideNews
 }) => {
   const { t } = useLanguage();
 
@@ -50,6 +54,8 @@ const NewsList: React.FC<NewsListProps> = ({
           onSelect={onSelectNews}
           onEdit={onEditNews}
           onDelete={onDeleteNews}
+          onToggleHide={onToggleHideNews}
+          isHidden={hiddenNews.has(newsItem.id)}
         />
       ))}
     </div>
