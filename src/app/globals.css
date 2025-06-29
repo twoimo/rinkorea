@@ -89,41 +89,6 @@ body {
     }
 }
 
-/* 모바일 터치 애니메이션 */
-@keyframes touch-ripple {
-    0% {
-        transform: scale(0);
-        opacity: 1;
-    }
-
-    100% {
-        transform: scale(4);
-        opacity: 0;
-    }
-}
-
-@keyframes fade-in-up {
-    0% {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slide-in-bottom {
-    0% {
-        transform: translateY(100%);
-    }
-
-    100% {
-        transform: translateY(0);
-    }
-}
-
 .smooth-scroll {
     animation: smoothScroll 0.3s ease-out;
     will-change: transform;
@@ -167,55 +132,25 @@ body {
         -ms-user-select: none;
         user-select: none;
         -webkit-tap-highlight-color: transparent;
-        min-height: 44px;
-        /* Apple's recommended minimum touch target */
-        min-width: 44px;
     }
 
     /* 모바일 메뉴 최적화 */
     .mobile-menu {
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        height: calc(100vh - 4rem);
-        height: calc(var(--vh, 1vh) * 100 - 4rem);
     }
 
     /* 터치 피드백 */
-    .touch-feedback {
-        position: relative;
-        overflow: hidden;
-    }
-
     .touch-feedback:active {
         transform: scale(0.95);
         transition: transform 0.1s ease;
     }
 
-    .touch-feedback::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.3);
-        transform: translate(-50%, -50%);
-        transition: width 0.6s, height 0.6s;
-    }
-
-    .touch-feedback:active::after {
-        width: 300px;
-        height: 300px;
-    }
-
     /* 모바일 드롭다운 최적화 */
     .mobile-dropdown {
         max-height: calc(100vh - 8rem);
-        max-height: calc(var(--vh, 1vh) * 100 - 8rem);
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        scroll-behavior: smooth;
     }
 
     /* 모바일 입력 최적화 */
@@ -225,86 +160,12 @@ body {
     button {
         font-size: 16px;
         /* iOS 확대 방지 */
-        min-height: 44px;
-        /* 터치 타겟 최소 크기 */
-    }
-
-    /* 버튼 최소 크기 보장 */
-    button,
-    [role="button"],
-    .btn {
-        min-height: 44px;
-        min-width: 44px;
-        padding: 12px 16px;
-    }
-
-    /* 링크 최소 크기 보장 */
-    a {
-        min-height: 44px;
-        display: inline-flex;
-        align-items: center;
     }
 
     /* 모바일 호버 효과 비활성화 */
     .hover-desktop-only:hover {
         background-color: initial;
         color: initial;
-    }
-
-    /* 더 나은 스크롤 성능 */
-    * {
-        -webkit-transform: translateZ(0);
-        transform: translateZ(0);
-    }
-
-    /* 가상 키보드 대응 */
-    .keyboard-adaptive {
-        height: 100vh;
-        height: calc(var(--vh, 1vh) * 100);
-    }
-
-    /* 풀 스크린 모달 */
-    .mobile-modal {
-        height: 100vh;
-        height: calc(var(--vh, 1vh) * 100);
-        max-height: none;
-    }
-
-    /* 스크롤 바운스 방지 */
-    body {
-        overscroll-behavior: none;
-        -webkit-overflow-scrolling: touch;
-    }
-}
-
-/* 타블렛 최적화 */
-@media (min-width: 768px) and (max-width: 1024px) {
-    .tablet-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .tablet-spacing {
-        padding: 1.5rem;
-    }
-}
-
-/* 모바일 세로/가로 모드 */
-@media (max-width: 768px) and (orientation: portrait) {
-    .portrait-full-height {
-        min-height: 100vh;
-        min-height: calc(var(--vh, 1vh) * 100);
-    }
-}
-
-@media (max-width: 768px) and (orientation: landscape) {
-    .landscape-compact {
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
-    }
-
-    .mobile-menu {
-        height: calc(100vh - 3rem);
-        height: calc(var(--vh, 1vh) * 100 - 3rem);
     }
 }
 
