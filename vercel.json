@@ -1,9 +1,4 @@
 {
-    "functions": {
-        "**/*.{tsx,ts}": {
-            "runtime": "nodejs18.x"
-        }
-    },
     "rewrites": [
         {
             "source": "/(.*)",
