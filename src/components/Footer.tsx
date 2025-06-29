@@ -7,8 +7,8 @@ const Footer = () => {
   const { t } = useLanguage();
 
   return (
-    <footer className="bg-gray-900 text-white mt-auto w-full">
-      <div className="container mx-auto px-4 py-12">
+    <footer className="bg-gray-900 text-white mt-auto w-full safe-area-inset-bottom">
+      <div className="container mx-auto px-4 py-8 sm:py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
@@ -33,28 +33,28 @@ const Footer = () => {
           {/* Quick Links */}
           <div className="space-y-4">
             <h3 className="text-xl font-bold text-white">{t('footer_quick_links')}</h3>
-            <ul className="space-y-3">
+            <ul className="space-y-2">
               <li>
-                <Link to="/about" className="text-gray-300 hover:text-white transition-colors flex items-center group">
-                  <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-white transition-colors"></span>
+                <Link to="/about" className="text-gray-300 no-touch:hover:text-white transition-colors flex items-center group py-2 touch-manipulation touch-feedback min-h-touch">
+                  <span className="w-1 h-1 bg-gray-500 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
                   {t('about')}
                 </Link>
               </li>
               <li>
-                <Link to="/products" className="text-gray-300 hover:text-white transition-colors flex items-center group">
-                  <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-white transition-colors"></span>
+                <Link to="/products" className="text-gray-300 no-touch:hover:text-white transition-colors flex items-center group py-2 touch-manipulation touch-feedback min-h-touch">
+                  <span className="w-1 h-1 bg-gray-500 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
                   {t('products')}
                 </Link>
               </li>
               <li>
-                <Link to="/projects" className="text-gray-300 hover:text-white transition-colors flex items-center group">
-                  <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-white transition-colors"></span>
+                <Link to="/projects" className="text-gray-300 no-touch:hover:text-white transition-colors flex items-center group py-2 touch-manipulation touch-feedback min-h-touch">
+                  <span className="w-1 h-1 bg-gray-500 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
                   {t('projects')}
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-gray-300 hover:text-white transition-colors flex items-center group">
-                  <span className="w-1 h-1 bg-gray-500 rounded-full mr-2 group-hover:bg-white transition-colors"></span>
+                <Link to="/contact" className="text-gray-300 no-touch:hover:text-white transition-colors flex items-center group py-2 touch-manipulation touch-feedback min-h-touch">
+                  <span className="w-1 h-1 bg-gray-500 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
                   {t('contact')}
                 </Link>
               </li>
@@ -83,12 +83,13 @@ const Footer = () => {
           {/* Social Links */}
           <div className="space-y-4">
             <h3 className="text-xl font-bold text-white">{t('footer_social_media')}</h3>
-            <div className="flex space-x-6">
+            <div className="flex space-x-4 sm:space-x-6">
               <a
                 href="https://www.instagram.com/rinkorea_kr"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-300 hover:text-white transition-colors transform hover:scale-110"
+                className="text-gray-300 no-touch:hover:text-white transition-all duration-200 no-touch:transform no-touch:hover:scale-110 p-2 rounded-lg touch-manipulation touch-feedback min-w-touch min-h-touch flex items-center justify-center"
+                aria-label="Instagram으로 이동"
               >
                 <OptimizedImage
                   src="/images/instagram-icon.png"
@@ -102,7 +103,8 @@ const Footer = () => {
                 href="https://blog.naver.com/rinkorea"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-300 hover:text-white transition-colors transform hover:scale-110"
+                className="text-gray-300 no-touch:hover:text-white transition-all duration-200 no-touch:transform no-touch:hover:scale-110 p-2 rounded-lg touch-manipulation touch-feedback min-w-touch min-h-touch flex items-center justify-center"
+                aria-label="네이버 블로그로 이동"
               >
                 <OptimizedImage
                   src="/images/blog-logo-hq.png"
@@ -116,7 +118,8 @@ const Footer = () => {
                 href="https://www.youtube.com/@rinkorea"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-300 hover:text-white transition-colors transform hover:scale-110"
+                className="text-gray-300 no-touch:hover:text-white transition-all duration-200 no-touch:transform no-touch:hover:scale-110 p-2 rounded-lg touch-manipulation touch-feedback min-w-touch min-h-touch flex items-center justify-center"
+                aria-label="YouTube로 이동"
               >
                 <OptimizedImage
                   src="/images/youtube-icon.png"

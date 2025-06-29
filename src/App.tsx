@@ -70,18 +70,56 @@ const PageLoader = () => (
 // Mobile optimization hook
 const useMobileOptimization = () => {
   useEffect(() => {
-    // Prevent double-tap zoom on mobile
-    document.addEventListener('touchstart', (event) => {
-      if (event.touches.length > 1) {
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('SW registered: ', registration);
+          })
+          .catch((registrationError) => {
+            console.log('SW registration failed: ', registrationError);
+          });
+      });
+    }
+
+    // Prevent double-tap zoom on mobile (but allow pinch zoom)
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (event) => {
+      const now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 300) {
         event.preventDefault();
       }
-    }, { passive: false });
+      lastTouchEnd = now;
+    }, false);
 
     // Optimize scroll performance
     document.body.style.setProperty('-webkit-overflow-scrolling', 'touch');
+    document.body.style.setProperty('overscroll-behavior', 'contain');
+
+    // Improve touch responsiveness
+    document.body.style.setProperty('touch-action', 'manipulation');
+
+    // Prevent pull-to-refresh on mobile
+    document.body.style.setProperty('overscroll-behavior-y', 'none');
+
+    // Handle viewport changes for virtual keyboard
+    const handleViewportChange = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+
+    window.addEventListener('resize', handleViewportChange);
+    window.addEventListener('orientationchange', handleViewportChange);
+    handleViewportChange();
 
     return () => {
       document.body.style.removeProperty('-webkit-overflow-scrolling');
+      document.body.style.removeProperty('overscroll-behavior');
+      document.body.style.removeProperty('touch-action');
+      document.body.style.removeProperty('overscroll-behavior-y');
+      window.removeEventListener('resize', handleViewportChange);
+      window.removeEventListener('orientationchange', handleViewportChange);
     };
   }, []);
 };

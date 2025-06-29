@@ -1,0 +1,87 @@
+{
+    "name": "린코리아 (RIN KOREA)",
+    "short_name": "린코리아",
+    "description": "고성능 건축 코팅 솔루션 전문업체",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#1d4ed8",
+    "orientation": "portrait-primary",
+    "categories": [
+        "business",
+        "productivity"
+    ],
+    "lang": "ko",
+    "dir": "ltr",
+    "scope": "/",
+    "icons": [
+        {
+            "src": "/images/site-icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/images/optimized/site-icon-512.webp",
+            "sizes": "512x512",
+            "type": "image/webp",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/favicon.ico",
+            "sizes": "48x48",
+            "type": "image/x-icon"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/images/optimized/homepage-main.webp",
+            "sizes": "1280x720",
+            "type": "image/webp",
+            "form_factor": "wide"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "제품 보기",
+            "short_name": "제품",
+            "description": "린코리아 제품 카탈로그",
+            "url": "/products",
+            "icons": [
+                {
+                    "src": "/favicon.ico",
+                    "sizes": "48x48"
+                }
+            ]
+        },
+        {
+            "name": "문의하기",
+            "short_name": "문의",
+            "description": "제품 문의 및 견적 요청",
+            "url": "/contact",
+            "icons": [
+                {
+                    "src": "/favicon.ico",
+                    "sizes": "48x48"
+                }
+            ]
+        },
+        {
+            "name": "쇼핑몰",
+            "short_name": "쇼핑",
+            "description": "온라인 제품 구매",
+            "url": "/shop",
+            "icons": [
+                {
+                    "src": "/favicon.ico",
+                    "sizes": "48x48"
+                }
+            ]
+        }
+    ],
+    "prefer_related_applications": false,
+    "related_applications": [],
+    "edge_side_panel": {
+        "preferred_width": 400
+    }
+}

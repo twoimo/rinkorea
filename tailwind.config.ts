@@ -88,7 +88,24 @@ export default {
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'touch-ripple': 'touch-ripple 0.6s ease-out',
+				'fade-in-up': 'fade-in-up 0.3s ease-out',
+				'slide-in-bottom': 'slide-in-bottom 0.3s ease-out'
+			},
+			spacing: {
+				'touch': '44px', // Minimum touch target size
+				'safe-top': 'env(safe-area-inset-top)',
+				'safe-bottom': 'env(safe-area-inset-bottom)',
+				'safe-left': 'env(safe-area-inset-left)',
+				'safe-right': 'env(safe-area-inset-right)'
+			},
+			screens: {
+				'xs': '475px',
+				'touch': { 'raw': '(hover: none) and (pointer: coarse)' },
+				'no-touch': { 'raw': '(hover: hover) and (pointer: fine)' },
+				'landscape': { 'raw': '(orientation: landscape)' },
+				'portrait': { 'raw': '(orientation: portrait)' }
 			}
 		}
 	},
