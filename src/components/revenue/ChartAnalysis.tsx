@@ -3,6 +3,7 @@ import { BarChart3, TrendingUp, PieChart, AreaChart, Plus, X, Eye, EyeOff, Maxim
 import { ChartData, RevenueCategory } from '@/types/revenue';
 import RevenueChart from './RevenueChart';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { createPortal } from 'react-dom';
 
 interface ChartAnalysisProps {
     data: ChartData[];
@@ -861,10 +862,34 @@ const ChartAnalysis: React.FC<ChartAnalysisProps> = ({
                 </div>
             )}
 
-            {/* 차트 추가 모달 */}
-            {isAddingChart && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120] p-4">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            {/* 차트 추가 모달 - Portal 방식으로 최적화 */}
+            {isAddingChart && createPortal(
+                <div
+                    className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 9999,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        margin: 0
+                    }}
+                    onClick={() => setIsAddingChart(false)}
+                >
+                    <div
+                        className="bg-white rounded-lg p-6 w-full max-w-md"
+                        style={{
+                            position: 'relative',
+                            margin: 'auto',
+                            transform: 'none'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-semibold">새 차트 추가</h3>
                             <button

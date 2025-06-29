@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Calendar, ArrowLeft, User, Edit, Trash2, X } from 'lucide-react';
 import AdminOnly from './AdminOnly';
 import { useNewsAdmin } from '@/hooks/useNewsAdmin';
@@ -26,6 +27,30 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ news, onBack, onDelete, onUpdat
   });
   const { updateNews } = useNewsAdmin();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (isEditing) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+
+      const originalOverflow = document.body.style.overflow;
+      const originalPosition = document.body.style.position;
+      const originalTop = document.body.style.top;
+      const scrollY = window.scrollY;
+
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.body.style.position = originalPosition;
+        document.body.style.top = originalTop;
+        document.body.style.width = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isEditing]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,10 +124,34 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ news, onBack, onDelete, onUpdat
         </div>
       </div>
 
-      {/* 수정 모달 - 모바일 최적화 */}
-      {isEditing && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120] p-4">
-          <div className="bg-white rounded-lg w-full md:max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+      {/* 수정 모달 - Portal 방식으로 최적화 */}
+      {isEditing && createPortal(
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            margin: 0
+          }}
+          onClick={() => setIsEditing(false)}
+        >
+          <div
+            className="bg-white rounded-lg w-full md:max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
+            style={{
+              position: 'relative',
+              margin: 'auto',
+              transform: 'none'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* 헤더 */}
             <div className="p-4 md:p-6 border-b border-gray-200 flex-shrink-0">
               <div className="flex items-center justify-between">
@@ -184,7 +233,8 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ news, onBack, onDelete, onUpdat
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

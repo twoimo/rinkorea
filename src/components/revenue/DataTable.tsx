@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Edit, Trash2, X, Save, Calendar, Package, DollarSign, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { RevenueData, RevenueCategory } from '@/types/revenue';
+import { createPortal } from 'react-dom';
 
 interface DataTableProps {
     data: RevenueData[];
@@ -603,10 +604,34 @@ const DataTable: React.FC<DataTableProps> = ({
                 itemsPerPage={itemsPerPage}
             />
 
-            {/* 삭제 확인 모달 */}
-            {deleteConfirmId && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120] p-4">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            {/* 삭제 확인 모달 - Portal 방식으로 최적화 */}
+            {deleteConfirmId && createPortal(
+                <div
+                    className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 9999,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        margin: 0
+                    }}
+                    onClick={() => setDeleteConfirmId(null)}
+                >
+                    <div
+                        className="bg-white rounded-lg p-6 w-full max-w-md"
+                        style={{
+                            position: 'relative',
+                            margin: 'auto',
+                            transform: 'none'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <h3 className="text-lg font-semibold mb-4">데이터 삭제</h3>
                         <p className="text-gray-600 mb-6">
                             이 매출 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
@@ -629,10 +654,34 @@ const DataTable: React.FC<DataTableProps> = ({
                 </div>
             )}
 
-            {/* 데이터 초기화 확인 모달 */}
-            {showResetDialog && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[120] p-4">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            {/* 데이터 초기화 확인 모달 - Portal 방식으로 최적화 */}
+            {showResetDialog && createPortal(
+                <div
+                    className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 9999,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        margin: 0
+                    }}
+                    onClick={() => setShowResetDialog(false)}
+                >
+                    <div
+                        className="bg-white rounded-lg p-6 w-full max-w-md"
+                        style={{
+                            position: 'relative',
+                            margin: 'auto',
+                            transform: 'none'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="flex items-center mb-4">
                             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
                                 <Trash2 className="w-6 h-6 text-red-600" />
