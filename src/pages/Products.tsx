@@ -7,6 +7,7 @@ import { useProductsOptimized } from '@/hooks/useProductsOptimized';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Product } from '@/types/product';
+import { SEOHead } from '@/components/seo/SEOHead';
 
 // Lazy load components for better performance
 const ProductCard = React.lazy(() => import('@/components/products/ProductCard'));
@@ -35,7 +36,7 @@ const Products = memo(() => {
     updateProduct,
     deleteProduct
   } = useProductsOptimized();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   // UI state
   const [showForm, setShowForm] = useState(false);
@@ -49,6 +50,24 @@ const Products = memo(() => {
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
+
+  const seoData = {
+    ko: {
+      title: '제품소개 | 린코리아 - 세라믹 코팅 전문제품',
+      description: '린코리아의 혁신적인 세라믹 코팅재와 친환경 건설재료를 만나보세요. 불연재 인증, 1액형 세라믹 코팅제, 방수재 등 다양한 제품을 확인하세요.',
+      keywords: '세라믹 코팅, 불연재, 린코트, 린하드플러스, 건설재료, 방수재, 1액형 코팅'
+    },
+    en: {
+      title: 'Products | RIN Korea - Ceramic Coating Solutions',
+      description: 'Discover RIN Korea\'s innovative ceramic coatings and eco-friendly construction materials. Check out our fire-resistant certified, one-component ceramic coatings, waterproofing materials and more.',
+      keywords: 'ceramic coating, fire resistant, RIN-COAT, RIN-HARD PLUS, construction materials, waterproofing, one-component coating'
+    },
+    zh: {
+      title: '产品介绍 | 林韩国 - 陶瓷涂层解决方案',
+      description: '探索林韩国的创新陶瓷涂层和环保建筑材料。查看我们的阻燃认证、单组分陶瓷涂层、防水材料等产品。',
+      keywords: '陶瓷涂层, 阻燃材料, 林涂层, 林硬化剂, 建筑材料, 防水材料, 单组分涂层'
+    }
+  };
 
   // Event handlers
   const handleOpenForm = useCallback((product?: Product) => {
@@ -131,6 +150,13 @@ const Products = memo(() => {
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
+        <SEOHead
+          title={seoData[language].title}
+          description={seoData[language].description}
+          keywords={seoData[language].keywords}
+          url={`${window.location.origin}/products`}
+          image="/images/optimized/RIN-COAT-scaled.webp"
+        />
         <Header />
         <div className="flex items-center justify-center py-20">
           <LoadingSpinner className="w-8 h-8" />
@@ -143,6 +169,13 @@ const Products = memo(() => {
   if (error) {
     return (
       <div className="min-h-screen bg-white">
+        <SEOHead
+          title={seoData[language].title}
+          description={seoData[language].description}
+          keywords={seoData[language].keywords}
+          url={`${window.location.origin}/products`}
+          image="/images/optimized/RIN-COAT-scaled.webp"
+        />
         <Header />
         <div className="flex items-center justify-center py-20">
           <div className="text-red-600">{t('error')}: {error}</div>
@@ -154,6 +187,13 @@ const Products = memo(() => {
 
   return (
     <div className="min-h-screen bg-white">
+      <SEOHead
+        title={seoData[language].title}
+        description={seoData[language].description}
+        keywords={seoData[language].keywords}
+        url={`${window.location.origin}/products`}
+        image="/images/optimized/RIN-COAT-scaled.webp"
+      />
       <Header />
 
       {/* Hero Section */}

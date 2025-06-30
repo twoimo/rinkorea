@@ -1,10 +1,95 @@
 User-agent: *
 Allow: /
 
-# Sitemap
+# Allow specific important pages
+Allow: /about
+Allow: /products
+Allow: /equipment
+Allow: /projects
+Allow: /certificates
+Allow: /news
+Allow: /qna
+Allow: /resources
+Allow: /contact
+Allow: /shop
+
+# Allow images and assets
+Allow: /images/
+Allow: /public/
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.webp$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.png$
+Allow: /*.gif$
+Allow: /*.svg$
+
+# Disallow admin and sensitive pages
+Disallow: /admin/
+Disallow: /auth
+Disallow: /profile
+Disallow: /revenue-management
+Disallow: /api/
+Disallow: /_next/
+Disallow: /node_modules/
+Disallow: /.env
+Disallow: /package.json
+Disallow: /package-lock.json
+
+# Disallow query parameters that don't add value for SEO
+Disallow: /*?*utm_
+Disallow: /*?*fbclid=
+Disallow: /*?*gclid=
+Disallow: /*?*ref=
+Disallow: /*?*source=
+
+# Allow language parameters
+Allow: /*?lang=ko
+Allow: /*?lang=en
+Allow: /*?lang=zh
+
+# Crawl delay to be respectful
+Crawl-delay: 1
+
+# Sitemap location
 Sitemap: https://rinkorea.com/sitemap.xml
 
-# Disallow admin and private pages
-Disallow: /admin/
-Disallow: /private/
-Disallow: /api/
+# Additional specific bot instructions
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Baiduspider
+Allow: /
+Crawl-delay: 2
+
+User-agent: NaverBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+# Block unwanted bots
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /

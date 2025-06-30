@@ -19,6 +19,20 @@
   <meta name="language" content="Korean" />
   <meta name="revisit-after" content="7 days" />
 
+  <!-- Geographic and Location Meta Tags -->
+  <meta name="geo.region" content="KR-28" />
+  <meta name="geo.placename" content="Incheon, South Korea" />
+  <meta name="geo.position" content="37.4563;126.7052" />
+  <meta name="ICBM" content="37.4563, 126.7052" />
+
+  <!-- Content Language and International SEO -->
+  <meta http-equiv="content-language" content="ko-KR" />
+  <meta name="content-language" content="ko-KR" />
+  <link rel="alternate" hreflang="ko" href="https://rinkorea.com/?lang=ko" />
+  <link rel="alternate" hreflang="en" href="https://rinkorea.com/?lang=en" />
+  <link rel="alternate" hreflang="zh-CN" href="https://rinkorea.com/?lang=zh" />
+  <link rel="alternate" hreflang="x-default" href="https://rinkorea.com/" />
+
   <!-- Favicon -->
   <link rel="icon" href="/images/site-icon-512.png" type="image/png">
   <link rel="apple-touch-icon" href="/images/site-icon-512.png" />
@@ -29,12 +43,37 @@
   <meta property="og:url" content="https://rinkorea.com" />
   <meta property="og:title" content="린코리아 - 세라믹 코팅의 모든 것" />
   <meta property="og:description" content="친환경 불연재(1액형) 신소재 세라믹 코팅제 전문 제조업체" />
-  <meta property="og:image" content="/images/site-icon-512.png" />
+  <meta property="og:image" content="https://rinkorea.com/images/site-icon-512.png" />
   <meta property="og:site_name" content="린코리아" />
+  <meta property="og:locale" content="ko_KR" />
+  <meta property="og:locale:alternate" content="en_US" />
+  <meta property="og:locale:alternate" content="zh_CN" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://rinkorea.com" />
+  <meta name="twitter:title" content="린코리아 - 세라믹 코팅의 모든 것" />
+  <meta name="twitter:description" content="친환경 불연재(1액형) 신소재 세라믹 코팅제 전문 제조업체" />
+  <meta name="twitter:image" content="https://rinkorea.com/images/site-icon-512.png" />
+
+  <!-- Additional SEO Meta Tags -->
+  <meta name="application-name" content="린코리아" />
+  <meta name="msapplication-TileColor" content="#1e40af" />
+  <meta name="msapplication-TileImage" content="/images/site-icon-512.png" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <!-- Industry and Business Meta Tags -->
+  <meta name="industry" content="Construction Materials, Ceramic Coatings" />
+  <meta name="coverage" content="Worldwide" />
+  <meta name="distribution" content="Global" />
+  <meta name="rating" content="General" />
+  <meta name="target" content="all" />
 
   <!-- Preload critical assets -->
   <link rel="preload" href="/src/main.tsx" as="script" />
   <link rel="preload" href="/src/index.css" as="style" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -42,17 +81,60 @@
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "린코리아",
+      "alternateName": "RIN Korea",
       "url": "https://rinkorea.com",
       "logo": "https://rinkorea.com/images/site-icon-512.png",
       "description": "친환경 불연재(1액형) 신소재 세라믹 코팅제 전문 제조업체",
+      "foundingDate": "2019",
       "address": {
         "@type": "PostalAddress",
+        "streetAddress": "백범로 707",
+        "addressLocality": "인천광역시 서구",
+        "addressRegion": "인천",
+        "postalCode": "22836",
         "addressCountry": "KR"
       },
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "telephone": "+82032-571-1023",
-        "contactType": "customer service"
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 37.4563,
+        "longitude": 126.7052
+      },
+      "contactPoint": [
+        {
+          "@type": "ContactPoint",
+          "telephone": "+82-32-571-1023",
+          "contactType": "customer service",
+          "availableLanguage": ["Korean", "English", "Chinese"]
+        }
+      ],
+      "sameAs": [
+        "https://www.youtube.com/@rinkorea",
+        "https://www.instagram.com/rinkorea_official"
+      ],
+      "industry": "Construction Materials Manufacturing",
+      "numberOfEmployees": {
+        "@type": "QuantitativeValue",
+        "value": "10-50"
+      },
+      "knowsAbout": [
+        "Ceramic Coating",
+        "Fire Resistant Materials",
+        "Construction Materials",
+        "Waterproofing Solutions",
+        "Construction Equipment"
+      ],
+      "areaServed": {
+        "@type": "Country",
+        "name": "South Korea"
+      },
+      "serviceArea": {
+        "@type": "GeoCircle",
+        "geoMidpoint": {
+          "@type": "GeoCoordinates",
+          "latitude": 37.5665,
+          "longitude": 126.9780
+        },
+        "geoRadius": "1000000"
       }
     }
   </script>

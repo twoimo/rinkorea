@@ -1464,10 +1464,70 @@ const translations = {
     },
 };
 
+// Auto-detect language based on browser settings and geolocation
+const detectLanguage = (): Language => {
+    // Check URL parameters first
+    const urlParams = new URLSearchParams(window.location.search);
+    const langParam = urlParams.get('lang') as Language;
+    if (langParam && ['ko', 'en', 'zh'].includes(langParam)) {
+        return langParam;
+    }
+
+    // Check localStorage
+    const saved = localStorage.getItem('language') as Language;
+    if (saved && ['ko', 'en', 'zh'].includes(saved)) {
+        return saved;
+    }
+
+    // Auto-detect from browser language
+    const browserLang = navigator.language.toLowerCase();
+
+    if (browserLang.startsWith('ko')) return 'ko';
+    if (browserLang.startsWith('zh')) return 'zh';
+    if (browserLang.startsWith('en')) return 'en';
+
+    // Additional language mappings for better coverage
+    const languageMap: Record<string, Language> = {
+        'ja': 'en', // Japanese -> English
+        'th': 'en', // Thai -> English
+        'vi': 'en', // Vietnamese -> English
+        'id': 'en', // Indonesian -> English
+        'ms': 'en', // Malay -> English
+        'tl': 'en', // Filipino -> English
+        'hi': 'en', // Hindi -> English
+        'ar': 'en', // Arabic -> English
+        'ru': 'en', // Russian -> English
+        'de': 'en', // German -> English
+        'fr': 'en', // French -> English
+        'es': 'en', // Spanish -> English
+        'pt': 'en', // Portuguese -> English
+        'it': 'en', // Italian -> English
+    };
+
+    for (const [lang, target] of Object.entries(languageMap)) {
+        if (browserLang.startsWith(lang)) {
+            return target;
+        }
+    }
+
+    // Default to Korean for Asian regions, English for others
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const asianTimezones = [
+        'Asia/Seoul', 'Asia/Tokyo', 'Asia/Shanghai', 'Asia/Hong_Kong',
+        'Asia/Taipei', 'Asia/Bangkok', 'Asia/Singapore', 'Asia/Manila',
+        'Asia/Kuala_Lumpur', 'Asia/Jakarta', 'Asia/Ho_Chi_Minh'
+    ];
+
+    if (asianTimezones.includes(timezone)) {
+        return 'ko';
+    }
+
+    return 'en'; // Default fallback
+};
+
 export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
     const [language, setLanguageState] = useState<Language>(() => {
-        const saved = localStorage.getItem('language');
-        return (saved as Language) || 'ko';
+        return detectLanguage();
     });
 
     useEffect(() => {
@@ -1476,7 +1536,40 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
 
     const setLanguage = (lang: Language) => {
         setLanguageState(lang);
+
+        // Update URL parameter without page reload
+        const url = new URL(window.location.href);
+        url.searchParams.set('lang', lang);
+        window.history.replaceState({}, '', url.toString());
     };
+
+    // Listen for URL parameter changes and browser language changes
+    useEffect(() => {
+        const handleLanguageChange = () => {
+            const newLang = detectLanguage();
+            if (newLang !== language) {
+                setLanguageState(newLang);
+            }
+        };
+
+        // Listen for popstate events (browser back/forward)
+        window.addEventListener('popstate', handleLanguageChange);
+
+        // Listen for storage events (when language changes in another tab)
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'language' && e.newValue) {
+                const newLang = e.newValue as Language;
+                if (['ko', 'en', 'zh'].includes(newLang)) {
+                    setLanguageState(newLang);
+                }
+            }
+        });
+
+        return () => {
+            window.removeEventListener('popstate', handleLanguageChange);
+            window.removeEventListener('storage', handleLanguageChange);
+        };
+    }, [language]);
 
     const t = (key: string, fallback?: string): string => {
         const keys = key.split('.');

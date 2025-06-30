@@ -2,15 +2,41 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { MapPin, Phone, Mail } from 'lucide-react';
+import { MapPin, Phone, Mail, Building2, User } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/image';
 import { useLanguage } from '../contexts/LanguageContext';
+import { SEOHead } from '@/components/seo/SEOHead';
 
 const Contact = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  const seoData = {
+    ko: {
+      title: '연락처 | 린코리아 - 건설재료 전문업체 연락처 정보',
+      description: '린코리아 연락처 정보입니다. 인천광역시 서구 백범로 707에 위치하며, 전화 032-571-1023으로 문의하실 수 있습니다. 세라믹 코팅 관련 문의 환영합니다.',
+      keywords: '린코리아 연락처, 인천 건설재료, 세라믹 코팅 문의, 032-571-1023, 백범로 707'
+    },
+    en: {
+      title: 'Contact Us | RIN Korea - Construction Materials Company Contact Information',
+      description: 'Contact information for RIN Korea. Located at 707 Baekbeom-ro, Seo-gu, Incheon. Contact us at 032-571-1023 for ceramic coating inquiries.',
+      keywords: 'RIN Korea contact, Incheon construction materials, ceramic coating inquiry, 032-571-1023, Baekbeom-ro 707'
+    },
+    zh: {
+      title: '联系我们 | 林韩国 - 建筑材料公司联系信息',
+      description: '林韩国联系信息。位于仁川广域市西区白凡路707号。有关陶瓷涂层咨询请致电032-571-1023。',
+      keywords: '林韩国联系方式, 仁川建筑材料, 陶瓷涂层咨询, 032-571-1023, 白凡路707'
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
+      <SEOHead
+        title={seoData[language].title}
+        description={seoData[language].description}
+        keywords={seoData[language].keywords}
+        url={`${window.location.origin}/contact`}
+        type="website"
+      />
       <Header />
 
       {/* Hero Section - 모바일 최적화 */}
