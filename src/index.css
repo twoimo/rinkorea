@@ -158,4 +158,23 @@
     scrollbar-width: auto;
     scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   }
+
+  /* 드롭다운 메뉴 위치 안정화 */
+  [data-radix-popper-content-wrapper] {
+    position: fixed !important;
+    z-index: 9999 !important;
+  }
+
+  /* 드롭다운 콘텐츠 위치 개선 */
+  [data-radix-dropdown-menu-content] {
+    position: fixed !important;
+    z-index: 9999 !important;
+    will-change: transform;
+  }
+
+  /* 언어 선택기 드롭다운 특별 처리 */
+  [role="menu"] {
+    position: fixed !important;
+    z-index: 10000 !important;
+  }
 }

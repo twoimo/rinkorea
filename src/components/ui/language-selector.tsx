@@ -1,12 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage, Language } from '@/contexts/LanguageContext';
 import { Globe } from 'lucide-react';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 
 interface LanguageOption {
@@ -53,18 +47,50 @@ export function LanguageSelector({
     isTransparent = false
 }: LanguageSelectorProps) {
     const { language, setLanguage } = useLanguage();
+    const [isOpen, setIsOpen] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const currentLanguage = languages.find(lang => lang.code === language);
 
     const handleLanguageChange = (langCode: Language) => {
         setLanguage(langCode);
+        setIsOpen(false);
 
         // Optional: Reload page to ensure all content is updated
-        // This can be removed if the app handles language changes smoothly
         setTimeout(() => {
             window.location.reload();
         }, 100);
     };
+
+    const handleToggle = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsOpen(!isOpen);
+    };
+
+    // 외부 클릭 감지
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const handleClickOutside = (event: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        const handleEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleEscape);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleEscape);
+        };
+    }, [isOpen]);
 
     const getButtonSize = () => {
         switch (size) {
@@ -74,96 +100,116 @@ export function LanguageSelector({
         }
     };
 
+    const DropdownContent = ({ children }: { children: React.ReactNode }) => (
+        <div
+            className={`absolute top-full right-0 mt-2 z-[9999] bg-white rounded-md shadow-lg border border-gray-200 min-w-[180px] transform transition-all duration-200 ${isOpen ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'
+                }`}
+            style={{
+                position: 'absolute',
+                top: '100%',
+                right: '0',
+                marginTop: '8px',
+                zIndex: 9999
+            }}
+        >
+            {children}
+        </div>
+    );
+
     if (variant === 'flag-only') {
         return (
-            <DropdownMenu modal={false}>
-                <DropdownMenuTrigger asChild>
-                    <Button
-                        variant="secondary"
-                        size="icon"
-                        className={`flex items-center justify-center w-10 h-10 rounded-md transition-all duration-200 hover:scale-105 touch-manipulation focus:outline-none focus:ring-2 focus:ring-offset-2 ${isTransparent
-                            ? 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm focus:ring-white/50'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-400'
-                            }`}
-                        aria-label="언어 선택"
-                    >
-                        <Globe className="w-6 h-6" />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="min-w-[150px]">
-                    {languages.map((lang) => (
-                        <DropdownMenuItem
-                            key={lang.code}
-                            onClick={() => handleLanguageChange(lang.code)}
-                            className={`flex items-center gap-2 cursor-pointer ${language === lang.code ? 'bg-blue-50 text-blue-600' : ''
-                                }`}
-                        >
-                            <span>{lang.flag}</span>
-                            <span className="font-medium">{lang.nativeName}</span>
-                            {language === lang.code && (
-                                <span className="ml-auto text-blue-600">✓</span>
-                            )}
-                        </DropdownMenuItem>
-                    ))}
-                </DropdownMenuContent>
-            </DropdownMenu>
+            <div ref={containerRef} className="relative inline-block">
+                <Button
+                    variant="secondary"
+                    size="icon"
+                    onClick={handleToggle}
+                    className={`flex items-center justify-center w-10 h-10 rounded-md transition-all duration-200 hover:scale-105 touch-manipulation focus:outline-none focus:ring-2 focus:ring-offset-2 ${isTransparent
+                        ? 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm focus:ring-white/50'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-400'
+                        }`}
+                    aria-label="언어 선택"
+                >
+                    <Globe className="w-6 h-6" />
+                </Button>
+
+                <DropdownContent>
+                    <div className="py-1">
+                        {languages.map((lang) => (
+                            <button
+                                key={lang.code}
+                                onClick={() => handleLanguageChange(lang.code)}
+                                className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-50 transition-colors ${language === lang.code ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                                    }`}
+                            >
+                                <span>{lang.flag}</span>
+                                <span className="font-medium">{lang.nativeName}</span>
+                                {language === lang.code && (
+                                    <span className="ml-auto text-blue-600">✓</span>
+                                )}
+                            </button>
+                        ))}
+                    </div>
+                </DropdownContent>
+            </div>
         );
     }
 
     if (variant === 'minimal') {
         return (
-            <DropdownMenu modal={false}>
-                <DropdownMenuTrigger asChild>
-                    <Button
-                        variant="secondary"
-                        className="flex items-center justify-center w-10 h-10 rounded-md transition-all duration-200 hover:scale-105 touch-manipulation focus:outline-none focus:ring-2 focus:ring-offset-2 bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm focus:ring-white/50"
-                        aria-label="언어 선택"
-                    >
-                        <Globe className="w-6 h-6" />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="min-w-[150px]">
-                    {languages.map((lang) => (
-                        <DropdownMenuItem
-                            key={lang.code}
-                            onClick={() => handleLanguageChange(lang.code)}
-                            className={`flex items-center gap-2 cursor-pointer ${language === lang.code ? 'bg-blue-50 text-blue-600' : ''
-                                }`}
-                        >
-                            <span>{lang.flag}</span>
-                            <span className="font-medium">{lang.nativeName}</span>
-                            {language === lang.code && (
-                                <span className="ml-auto text-blue-600">✓</span>
-                            )}
-                        </DropdownMenuItem>
-                    ))}
-                </DropdownMenuContent>
-            </DropdownMenu>
-        );
-    }
-
-    // Default variant
-    return (
-        <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
+            <div ref={containerRef} className="relative inline-block">
                 <Button
                     variant="secondary"
+                    onClick={handleToggle}
                     className="flex items-center justify-center w-10 h-10 rounded-md transition-all duration-200 hover:scale-105 touch-manipulation focus:outline-none focus:ring-2 focus:ring-offset-2 bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm focus:ring-white/50"
                     aria-label="언어 선택"
                 >
                     <Globe className="w-6 h-6" />
                 </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[180px]">
+
+                <DropdownContent>
+                    <div className="py-1">
+                        {languages.map((lang) => (
+                            <button
+                                key={lang.code}
+                                onClick={() => handleLanguageChange(lang.code)}
+                                className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gray-50 transition-colors ${language === lang.code ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                                    }`}
+                            >
+                                <span>{lang.flag}</span>
+                                <span className="font-medium">{lang.nativeName}</span>
+                                {language === lang.code && (
+                                    <span className="ml-auto text-blue-600">✓</span>
+                                )}
+                            </button>
+                        ))}
+                    </div>
+                </DropdownContent>
+            </div>
+        );
+    }
+
+    // Default variant
+    return (
+        <div ref={containerRef} className="relative inline-block">
+            <Button
+                variant="secondary"
+                onClick={handleToggle}
+                className="flex items-center justify-center w-10 h-10 rounded-md transition-all duration-200 hover:scale-105 touch-manipulation focus:outline-none focus:ring-2 focus:ring-offset-2 bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm focus:ring-white/50"
+                aria-label="언어 선택"
+            >
+                <Globe className="w-6 h-6" />
+            </Button>
+
+            <DropdownContent>
                 <div className="p-2">
                     <div className="text-xs font-medium text-gray-500 mb-2 px-2">언어 선택</div>
                     {languages.map((lang) => (
-                        <DropdownMenuItem
+                        <button
                             key={lang.code}
                             onClick={() => handleLanguageChange(lang.code)}
-                            className={`flex items-center gap-3 cursor-pointer rounded-md p-2 ${language === lang.code
+                            className={`w-full flex items-center gap-3 rounded-md p-2 text-left transition-colors ${language === lang.code
                                 ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                                : 'hover:bg-gray-50'
+                                : 'hover:bg-gray-50 text-gray-700'
                                 }`}
                         >
                             <span className="text-lg">{lang.flag}</span>
@@ -174,11 +220,11 @@ export function LanguageSelector({
                             {language === lang.code && (
                                 <span className="ml-auto text-blue-600 font-bold">✓</span>
                             )}
-                        </DropdownMenuItem>
+                        </button>
                     ))}
                 </div>
-            </DropdownMenuContent>
-        </DropdownMenu>
+            </DropdownContent>
+        </div>
     );
 }
 

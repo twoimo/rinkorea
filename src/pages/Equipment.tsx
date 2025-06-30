@@ -1022,4 +1022,4 @@ const Equipment = () => {
     );
 };
 
-export default Equipment; 
+export default Equipment;
