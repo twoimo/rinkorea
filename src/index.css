@@ -126,4 +126,36 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* 스크롤바를 항상 표시하여 드롭다운 열릴 때 UI 밀림 현상 방지 */
+  html {
+    overflow-y: scroll;
+  }
+
+  /* 스크롤바 스타일 개선 (Webkit 기반 브라우저) */
+  ::-webkit-scrollbar {
+    width: 16px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border: 4px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+    background-clip: content-box;
+  }
+
+  /* Firefox 스크롤바 스타일 */
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  }
 }

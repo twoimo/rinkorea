@@ -76,7 +76,7 @@ export function LanguageSelector({
 
     if (variant === 'flag-only') {
         return (
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                     <Button
                         variant="secondary"
@@ -112,7 +112,7 @@ export function LanguageSelector({
 
     if (variant === 'minimal') {
         return (
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                     <Button
                         variant="secondary"
@@ -144,7 +144,7 @@ export function LanguageSelector({
 
     // Default variant
     return (
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
                 <Button
                     variant="secondary"
