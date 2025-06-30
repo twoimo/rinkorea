@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import ErrorBoundary from "@/components/error-boundary";
+import LoadingFallback from "@/components/LoadingFallback";
 
 // Lazy load pages with prefetch
 const Index = lazy(() => import("./pages/Index"));
@@ -40,29 +41,21 @@ const queryClient = new QueryClient({
   },
 });
 
-// Optimized loading fallback component
+// Simplified loading fallback component
 const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-screen bg-background">
-    <LoadingSpinner className="w-8 h-8" />
+  <div className="flex items-center justify-center min-h-screen bg-white">
+    <div className="text-center">
+      <LoadingSpinner className="w-8 h-8 mx-auto" />
+      <p className="mt-2 text-gray-600">로딩 중...</p>
+    </div>
   </div>
 );
 
-// Mobile optimization hook
+// Simplified mobile optimization (no performance interference)
 const useMobileOptimization = () => {
   useEffect(() => {
-    // Prevent double-tap zoom on mobile
-    document.addEventListener('touchstart', (event) => {
-      if (event.touches.length > 1) {
-        event.preventDefault();
-      }
-    }, { passive: false });
-
-    // Optimize scroll performance
-    document.body.style.setProperty('-webkit-overflow-scrolling', 'touch');
-
-    return () => {
-      document.body.style.removeProperty('-webkit-overflow-scrolling');
-    };
+    // Minimal mobile optimizations only
+    console.log('Mobile optimizations initialized');
   }, []);
 };
 
@@ -71,6 +64,8 @@ const App = () => {
 
   return (
     <ErrorBoundary>
+      {/* LoadingFallback temporarily disabled for debugging NO_FCP */}
+      {/* <LoadingFallback /> */}
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <div className="app-content">

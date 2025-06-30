@@ -73,7 +73,7 @@ export const preloadCriticalResources = () => {
         // 중요한 이미지 preload
         const criticalImages = [
             '/images/optimized/site-icon-512.webp',
-            '/images/optimized/rin-korea-logo-white.webp',
+            '/images/site-icon-512.png',
         ];
 
         criticalImages.forEach(src => {
@@ -220,37 +220,70 @@ export const addResourceHints = () => {
     }
 };
 
-// 성능 메트릭 초기화 (안전하게)
+// 성능 메트릭 초기화 (더 안전하게)
 export const initPerformanceMonitoring = () => {
-    if (typeof window !== 'undefined') {
-        try {
-            // 즉시 실행 가능한 최적화
-            optimizeConnections();
-            enableMobileOptimizations();
+    if (typeof window === 'undefined') return;
 
-            // DOM 준비 후 실행
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => {
-                    preloadCriticalResources();
-                    optimizeForNetworkCondition();
-                });
-            } else {
+    try {
+        // React가 렌더링된 후에만 실행
+        const reactRoot = document.getElementById('root');
+        if (!reactRoot || !reactRoot.children.length) {
+            // React가 아직 렌더링되지 않음, 재시도
+            setTimeout(initPerformanceMonitoring, 100);
+            return;
+        }
+
+        // 안전한 최적화만 즉시 실행
+        setTimeout(() => {
+            try {
+                optimizeConnections();
+            } catch (e) {
+                console.warn('Connection optimization failed:', e);
+            }
+        }, 0);
+
+        setTimeout(() => {
+            try {
+                enableMobileOptimizations();
+            } catch (e) {
+                console.warn('Mobile optimization failed:', e);
+            }
+        }, 100);
+
+        // 더 늦게 실행되는 최적화들
+        setTimeout(() => {
+            try {
                 preloadCriticalResources();
                 optimizeForNetworkCondition();
+            } catch (e) {
+                console.warn('Resource optimization failed:', e);
             }
+        }, 300);
 
-            // 페이지 로드 완료 후 실행
-            if (document.readyState === 'complete') {
-                reportWebVitals();
-                addResourceHints();
-            } else {
-                window.addEventListener('load', () => {
+        // 페이지 로드 완료 후 실행
+        setTimeout(() => {
+            try {
+                if (document.readyState === 'complete') {
                     reportWebVitals();
                     addResourceHints();
-                });
+                } else {
+                    window.addEventListener('load', () => {
+                        reportWebVitals();
+                        addResourceHints();
+                    });
+                }
+            } catch (e) {
+                console.warn('Web vitals failed:', e);
             }
-        } catch (error) {
-            console.warn('Performance monitoring initialization failed:', error);
+        }, 1000);
+
+        // 성능 분석 로그 (개발 모드에서만)
+        if (import.meta.env.DEV) {
+            console.log('🚀 Performance monitoring initialized safely');
+            console.log('💡 Lazy loading enabled for DND and Charts');
+            console.log('📊 Bundle optimization active');
         }
+    } catch (error) {
+        console.warn('Performance monitoring initialization failed:', error);
     }
 }; 
