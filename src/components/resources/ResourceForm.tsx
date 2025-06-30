@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import type { Resource, ResourceCategory } from '@/hooks/useResources';
 import type { CreateResourceData, UpdateResourceData } from '@/hooks/useResourcesAdmin';
+import Portal from '@/components/ui/portal';
 
 interface ResourceFormProps {
     resource?: Resource | null;
@@ -107,6 +108,22 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
             });
         }
     }, [resource]);
+
+    useEffect(() => {
+        const handleEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape' && !loading) {
+                onClose();
+            }
+        };
+
+        document.addEventListener('keydown', handleEscape);
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            document.removeEventListener('keydown', handleEscape);
+            document.body.style.overflow = 'unset';
+        };
+    }, [onClose, loading]);
 
     const handleInputChange = (field: string, value: string | number | boolean) => {
         setFormData(prev => ({
@@ -221,164 +238,172 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10001] p-4">
-            <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                <CardHeader className="flex flex-row items-center justify-between px-4 md:px-6 py-4 md:py-6 sticky top-0 bg-white border-b z-10">
-                    <CardTitle className="text-lg md:text-xl">
-                        {resource ? '자료 수정' : '새 자료 등록'}
-                    </CardTitle>
-                    <Button variant="ghost" size="sm" onClick={onClose} className="h-10 w-10 p-0 touch-manipulation">
-                        <X className="w-5 h-5" />
-                    </Button>
-                </CardHeader>
+        <Portal>
+            <div
+                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10001] p-4"
+                onClick={!loading ? onClose : undefined}
+            >
+                <Card
+                    className="w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <CardHeader className="flex flex-row items-center justify-between px-4 md:px-6 py-4 md:py-6 sticky top-0 bg-white border-b z-10">
+                        <CardTitle className="text-lg md:text-xl">
+                            {resource ? '자료 수정' : '새 자료 등록'}
+                        </CardTitle>
+                        <Button variant="ghost" size="sm" onClick={onClose} className="h-10 w-10 p-0 touch-manipulation">
+                            <X className="w-5 h-5" />
+                        </Button>
+                    </CardHeader>
 
-                <CardContent className="px-4 md:px-6 py-4 md:py-6">
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* 기본 정보 */}
-                        <div className="space-y-4">
-                            <div>
-                                <Label htmlFor="title" className="text-sm md:text-base font-medium">제목 *</Label>
-                                <Input
-                                    id="title"
-                                    type="text"
-                                    value={formData.title}
-                                    onChange={(e) => handleInputChange('title', e.target.value)}
-                                    placeholder="자료 제목을 입력하세요"
-                                    className="h-12 md:h-10 text-base md:text-sm mt-2"
-                                    required
-                                />
-                            </div>
-
-                            <div>
-                                <Label htmlFor="description" className="text-sm md:text-base font-medium">설명</Label>
-                                <Textarea
-                                    id="description"
-                                    value={formData.description}
-                                    onChange={(e) => handleInputChange('description', e.target.value)}
-                                    placeholder="자료에 대한 설명을 입력하세요"
-                                    rows={3}
-                                    className="text-base md:text-sm mt-2 min-h-[80px]"
-                                />
-                            </div>
-
-                            <div>
-                                <Label htmlFor="category" className="text-sm md:text-base font-medium">카테고리 *</Label>
-                                <Select
-                                    value={formData.category}
-                                    onValueChange={(value) => handleInputChange('category', value)}
-                                >
-                                    <SelectTrigger className="h-12 md:h-10 text-base md:text-sm mt-2">
-                                        <SelectValue placeholder="카테고리를 선택하세요" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {categories.map((category) => (
-                                            <SelectItem key={category.id} value={category.name}>
-                                                {category.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-
-                        {/* 파일 정보 */}
-                        <div className="space-y-4">
-                            <div>
-                                <Label htmlFor="file_url" className="text-sm md:text-base font-medium">파일 URL *</Label>
-                                <Input
-                                    id="file_url"
-                                    type="url"
-                                    value={formData.file_url}
-                                    onChange={(e) => handleFileUrlChange(e.target.value)}
-                                    placeholder="https://example.com/file.pdf"
-                                    className="h-12 md:h-10 text-base md:text-sm mt-2"
-                                    required
-                                />
-                            </div>
-
-                            <div>
-                                <Label htmlFor="file_name" className="text-sm md:text-base font-medium">파일명</Label>
-                                <Input
-                                    id="file_name"
-                                    type="text"
-                                    value={formData.file_name}
-                                    onChange={(e) => handleInputChange('file_name', e.target.value)}
-                                    placeholder="파일명을 입력하세요"
-                                    className="h-12 md:h-10 text-base md:text-sm mt-2"
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <CardContent className="px-4 md:px-6 py-4 md:py-6">
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            {/* 기본 정보 */}
+                            <div className="space-y-4">
                                 <div>
-                                    <Label htmlFor="file_type" className="text-sm md:text-base font-medium">
-                                        파일 타입
-                                        {isAnalyzing && (
-                                            <Loader2 className="w-3 h-3 animate-spin inline ml-1" />
-                                        )}
-                                    </Label>
+                                    <Label htmlFor="title" className="text-sm md:text-base font-medium">제목 *</Label>
                                     <Input
-                                        id="file_type"
+                                        id="title"
                                         type="text"
-                                        value={formData.file_type}
-                                        onChange={(e) => handleInputChange('file_type', e.target.value)}
-                                        placeholder="자동으로 감지됩니다"
-                                        className="bg-gray-50 h-12 md:h-10 text-base md:text-sm mt-2"
-                                        readOnly
+                                        value={formData.title}
+                                        onChange={(e) => handleInputChange('title', e.target.value)}
+                                        placeholder="자료 제목을 입력하세요"
+                                        className="h-12 md:h-10 text-base md:text-sm mt-2"
+                                        required
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">
-                                        파일 URL 입력 시 자동으로 감지됩니다
-                                    </p>
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="file_size" className="text-sm md:text-base font-medium">
-                                        파일 크기 (bytes)
-                                        {isAnalyzing && (
-                                            <Loader2 className="w-3 h-3 animate-spin inline ml-1" />
-                                        )}
-                                    </Label>
-                                    <Input
-                                        id="file_size"
-                                        type="number"
-                                        value={formData.file_size}
-                                        onChange={(e) => handleInputChange('file_size', parseInt(e.target.value) || 0)}
-                                        placeholder="자동으로 감지됩니다"
-                                        className="bg-gray-50 h-12 md:h-10 text-base md:text-sm mt-2"
-                                        readOnly={formData.file_size > 0}
-                                        min="0"
+                                    <Label htmlFor="description" className="text-sm md:text-base font-medium">설명</Label>
+                                    <Textarea
+                                        id="description"
+                                        value={formData.description}
+                                        onChange={(e) => handleInputChange('description', e.target.value)}
+                                        placeholder="자료에 대한 설명을 입력하세요"
+                                        rows={3}
+                                        className="text-base md:text-sm mt-2 min-h-[80px]"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">
-                                        {formData.file_size > 0
-                                            ? `${(formData.file_size / 1024 / 1024).toFixed(2)} MB`
-                                            : '파일 URL 입력 시 자동으로 감지됩니다'
-                                        }
-                                    </p>
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="category" className="text-sm md:text-base font-medium">카테고리 *</Label>
+                                    <Select
+                                        value={formData.category}
+                                        onValueChange={(value) => handleInputChange('category', value)}
+                                    >
+                                        <SelectTrigger className="h-12 md:h-10 text-base md:text-sm mt-2">
+                                            <SelectValue placeholder="카테고리를 선택하세요" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {categories.map((category) => (
+                                                <SelectItem key={category.id} value={category.name}>
+                                                    {category.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* 제출 버튼 */}
-                        <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-6 border-t">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={onClose}
-                                className="w-full sm:w-auto h-12 md:h-10 text-base md:text-sm touch-manipulation"
-                            >
-                                취소
-                            </Button>
-                            <Button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full sm:w-auto h-12 md:h-10 text-base md:text-sm touch-manipulation"
-                            >
-                                {loading ? '처리중...' : (resource ? '수정' : '등록')}
-                            </Button>
-                        </div>
-                    </form>
-                </CardContent>
-            </Card>
-        </div>
+                            {/* 파일 정보 */}
+                            <div className="space-y-4">
+                                <div>
+                                    <Label htmlFor="file_url" className="text-sm md:text-base font-medium">파일 URL *</Label>
+                                    <Input
+                                        id="file_url"
+                                        type="url"
+                                        value={formData.file_url}
+                                        onChange={(e) => handleFileUrlChange(e.target.value)}
+                                        placeholder="https://example.com/file.pdf"
+                                        className="h-12 md:h-10 text-base md:text-sm mt-2"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="file_name" className="text-sm md:text-base font-medium">파일명</Label>
+                                    <Input
+                                        id="file_name"
+                                        type="text"
+                                        value={formData.file_name}
+                                        onChange={(e) => handleInputChange('file_name', e.target.value)}
+                                        placeholder="파일명을 입력하세요"
+                                        className="h-12 md:h-10 text-base md:text-sm mt-2"
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <Label htmlFor="file_type" className="text-sm md:text-base font-medium">
+                                            파일 타입
+                                            {isAnalyzing && (
+                                                <Loader2 className="w-3 h-3 animate-spin inline ml-1" />
+                                            )}
+                                        </Label>
+                                        <Input
+                                            id="file_type"
+                                            type="text"
+                                            value={formData.file_type}
+                                            onChange={(e) => handleInputChange('file_type', e.target.value)}
+                                            placeholder="자동으로 감지됩니다"
+                                            className="bg-gray-50 h-12 md:h-10 text-base md:text-sm mt-2"
+                                            readOnly
+                                        />
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            파일 URL 입력 시 자동으로 감지됩니다
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <Label htmlFor="file_size" className="text-sm md:text-base font-medium">
+                                            파일 크기 (bytes)
+                                            {isAnalyzing && (
+                                                <Loader2 className="w-3 h-3 animate-spin inline ml-1" />
+                                            )}
+                                        </Label>
+                                        <Input
+                                            id="file_size"
+                                            type="number"
+                                            value={formData.file_size}
+                                            onChange={(e) => handleInputChange('file_size', parseInt(e.target.value) || 0)}
+                                            placeholder="자동으로 감지됩니다"
+                                            className="bg-gray-50 h-12 md:h-10 text-base md:text-sm mt-2"
+                                            readOnly={formData.file_size > 0}
+                                            min="0"
+                                        />
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            {formData.file_size > 0
+                                                ? `${(formData.file_size / 1024 / 1024).toFixed(2)} MB`
+                                                : '파일 URL 입력 시 자동으로 감지됩니다'
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 제출 버튼 */}
+                            <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-6 border-t">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={onClose}
+                                    className="w-full sm:w-auto h-12 md:h-10 text-base md:text-sm touch-manipulation"
+                                >
+                                    취소
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full sm:w-auto h-12 md:h-10 text-base md:text-sm touch-manipulation"
+                                >
+                                    {loading ? '처리중...' : (resource ? '수정' : '등록')}
+                                </Button>
+                            </div>
+                        </form>
+                    </CardContent>
+                </Card>
+            </div>
+        </Portal>
     );
 };
 

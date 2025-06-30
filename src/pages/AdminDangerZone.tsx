@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { SupabaseClient } from '@supabase/supabase-js';
+import Portal from '@/components/ui/portal';
 
 const MB = 1024 * 1024;
 
@@ -54,6 +55,25 @@ const AdminDangerZone = () => {
     };
     // 모달 닫기
     const closeModal = () => setModal({ open: false, action: null, message: '' });
+
+    // ESC 키 이벤트 리스너 추가
+    useEffect(() => {
+        const handleEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape' && modal.open) {
+                closeModal();
+            }
+        };
+
+        if (modal.open) {
+            document.addEventListener('keydown', handleEscape);
+            document.body.style.overflow = 'hidden';
+        }
+
+        return () => {
+            document.removeEventListener('keydown', handleEscape);
+            document.body.style.overflow = 'unset';
+        };
+    }, [modal.open]);
 
     // 고객상담(문의/답변) 초기화
     const handleResetQnA = async () => {
@@ -274,26 +294,34 @@ const AdminDangerZone = () => {
                 </div>
                 {/* 경고/확인 모달 */}
                 {modal.open && (
-                    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[120]">
-                        <div className="bg-white rounded-lg shadow-lg p-8 max-w-xs w-full text-center">
-                            <div className="text-lg font-bold text-red-700 mb-4">경고</div>
-                            <div className="mb-6 text-gray-800">{modal.message}</div>
-                            <div className="flex gap-4 justify-center">
-                                <button
-                                    onClick={() => {
-                                        if (modal.action) {
-                                            modal.action();
-                                        }
-                                        closeModal();
-                                    }}
-                                    className="bg-red-600 text-white px-4 py-2 rounded"
-                                >
-                                    확인
-                                </button>
-                                <button onClick={closeModal} className="bg-gray-300 text-gray-700 px-4 py-2 rounded">취소</button>
+                    <Portal>
+                        <div
+                            className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[120]"
+                            onClick={closeModal}
+                        >
+                            <div
+                                className="bg-white rounded-lg shadow-lg p-8 max-w-xs w-full text-center"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <div className="text-lg font-bold text-red-700 mb-4">경고</div>
+                                <div className="mb-6 text-gray-800">{modal.message}</div>
+                                <div className="flex gap-4 justify-center">
+                                    <button
+                                        onClick={() => {
+                                            if (modal.action) {
+                                                modal.action();
+                                            }
+                                            closeModal();
+                                        }}
+                                        className="bg-red-600 text-white px-4 py-2 rounded"
+                                    >
+                                        확인
+                                    </button>
+                                    <button onClick={closeModal} className="bg-gray-300 text-gray-700 px-4 py-2 rounded">취소</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </Portal>
                 )}
             </div>
             <Footer />

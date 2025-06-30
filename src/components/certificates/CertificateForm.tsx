@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useIsMobile } from '../../hooks/use-mobile';
 import { useLanguage } from '@/contexts/LanguageContext';
+import Portal from '@/components/ui/portal';
 
 interface Certificate {
   id: string;
@@ -52,6 +53,24 @@ const CertificateForm: React.FC<CertificateFormProps> = ({
     setFormValues(certificate || {});
   }, [certificate]);
 
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !isLoading) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onClose, isLoading]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await onSave(formValues);
@@ -60,155 +79,171 @@ const CertificateForm: React.FC<CertificateFormProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[120] p-4">
-      <div className={`bg-white rounded-lg shadow-lg relative w-full ${isMobile ? 'max-h-[90vh] overflow-y-auto' : 'max-w-4xl'}`}>
-        <div className="sticky top-0 bg-white border-b p-4 sm:p-6 flex items-center justify-between">
-          <h2 className="text-xl sm:text-2xl font-bold">
-            {certificate ? t('certificates_form_edit_title', '인증서 수정') : t('certificates_form_add_title', '인증서 추가')}
-          </h2>
-          <button
-            className="text-gray-400 hover:text-gray-700 p-2 touch-manipulation"
-            onClick={onClose}
-            aria-label={t('certificates_form_close', '닫기')}
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
+    <Portal>
+      <div
+        className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[120] p-4"
+        onClick={!isLoading ? onClose : undefined}
+      >
+        <div
+          className={`bg-white rounded-lg shadow-lg relative w-full ${isMobile ? 'max-h-[90vh] overflow-y-auto' : 'max-w-4xl'}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="sticky top-0 bg-white border-b p-4 sm:p-6 flex items-center justify-between">
+            <h2 className="text-xl sm:text-2xl font-bold">
+              {certificate ? t('certificates_form_edit_title', '인증서 수정') : t('certificates_form_add_title', '인증서 추가')}
+            </h2>
+            <button
+              className="text-gray-400 hover:text-gray-700 p-2 touch-manipulation disabled:opacity-50"
+              onClick={onClose}
+              disabled={isLoading}
+              aria-label={t('certificates_form_close', '닫기')}
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
 
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6">
-          {/* 기본 정보 */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">기본 정보</h3>
+          <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6">
+            {/* 기본 정보 */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900">기본 정보</h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('certificates_form_image_url', '이미지 URL')}
+                  </label>
+                  <input
+                    type="text"
+                    value={formValues.image_url || ''}
+                    onChange={(e) => setFormValues({ ...formValues, image_url: e.target.value })}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('certificates_form_category', '카테고리')}
+                  </label>
+                  <select
+                    value={formValues.category || ''}
+                    onChange={(e) => setFormValues({ ...formValues, category: e.target.value })}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                    disabled={isLoading}
+                  >
+                    <option value="">카테고리 선택</option>
+                    <option value="patent">특허/상표</option>
+                    <option value="certification">RIN-COAT 시험성적서</option>
+                    <option value="rin_test">린코리아 시험성적서</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('certificates_form_issue_date', '발급일')}
+                  </label>
+                  <input
+                    type="date"
+                    value={formValues.issue_date || ''}
+                    onChange={(e) => setFormValues({ ...formValues, issue_date: e.target.value })}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('certificates_form_expiry_date', '만료일')}
+                  </label>
+                  <input
+                    type="date"
+                    value={formValues.expiry_date || ''}
+                    onChange={(e) => setFormValues({ ...formValues, expiry_date: e.target.value })}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 인증서명 */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900">인증서명</h3>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('certificates_form_image_url', '이미지 URL')}
+                  인증서명
                 </label>
                 <input
                   type="text"
-                  value={formValues.image_url || ''}
-                  onChange={(e) => setFormValues({ ...formValues, image_url: e.target.value })}
+                  value={formValues.name || ''}
+                  onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="인증서명을 입력하세요"
                   required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('certificates_form_category', '카테고리')}
-                </label>
-                <select
-                  value={formValues.category || ''}
-                  onChange={(e) => setFormValues({ ...formValues, category: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                >
-                  <option value="">카테고리 선택</option>
-                  <option value="patent">특허/상표</option>
-                  <option value="certification">RIN-COAT 시험성적서</option>
-                  <option value="rin_test">린코리아 시험성적서</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('certificates_form_issue_date', '발급일')}
-                </label>
-                <input
-                  type="date"
-                  value={formValues.issue_date || ''}
-                  onChange={(e) => setFormValues({ ...formValues, issue_date: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('certificates_form_expiry_date', '만료일')}
-                </label>
-                <input
-                  type="date"
-                  value={formValues.expiry_date || ''}
-                  onChange={(e) => setFormValues({ ...formValues, expiry_date: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  disabled={isLoading}
                 />
               </div>
             </div>
-          </div>
 
-          {/* 인증서명 */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">인증서명</h3>
+            {/* 설명 */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900">설명</h3>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                인증서명
-              </label>
-              <input
-                type="text"
-                value={formValues.name || ''}
-                onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="인증서명을 입력하세요"
-                required
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  설명
+                </label>
+                <textarea
+                  value={formValues.description || ''}
+                  onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24"
+                  placeholder="인증서 설명을 입력하세요"
+                  rows={3}
+                  disabled={isLoading}
+                />
+              </div>
             </div>
-          </div>
 
-          {/* 설명 */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">설명</h3>
+            {/* 상태 메시지 */}
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                {error}
+              </div>
+            )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                설명
-              </label>
-              <textarea
-                value={formValues.description || ''}
-                onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent h-24"
-                placeholder="인증서 설명을 입력하세요"
-                rows={3}
-              />
+            {success && (
+              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                {success}
+              </div>
+            )}
+
+            {/* 액션 버튼 */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-3 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg touch-manipulation disabled:opacity-50"
+                disabled={isLoading}
+              >
+                {t('cancel', '취소')}
+              </button>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+              >
+                {isLoading ? t('certificates_form_saving', '저장 중...') : t('certificates_form_save', '저장')}
+              </button>
             </div>
-          </div>
-
-          {/* 상태 메시지 */}
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-              {success}
-            </div>
-          )}
-
-          {/* 액션 버튼 */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-3 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg touch-manipulation"
-            >
-              {t('cancel', '취소')}
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
-            >
-              {isLoading ? t('certificates_form_saving', '저장 중...') : t('certificates_form_save', '저장')}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
+    </Portal>
   );
 };
 

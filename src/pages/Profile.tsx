@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { User, Mail, Building, Phone, Save, Trash2, AlertTriangle, Shield } from 'lucide-react';
+import Portal from '@/components/ui/portal';
 
 const Profile = () => {
   const { user, signOut } = useAuth();
@@ -175,6 +176,25 @@ const Profile = () => {
     }
   };
 
+  // ESC 키 이벤트 리스너 추가
+  React.useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && showDeleteConfirm) {
+        setShowDeleteConfirm(false);
+      }
+    };
+
+    if (showDeleteConfirm) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [showDeleteConfirm]);
+
   if (!user) {
     navigate('/auth');
     return null;
@@ -340,33 +360,41 @@ const Profile = () => {
 
       {/* 계정 탈퇴 확인 모달 */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[120]">
-          <div className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-4">
-            <div className="flex items-center gap-2 mb-4">
-              <AlertTriangle className="w-6 h-6 text-red-600" />
-              <h3 className="text-lg sm:text-xl font-bold">계정 탈퇴 확인</h3>
-            </div>
-            <p className="text-sm sm:text-base text-gray-600 mb-6 leading-relaxed">
-              정말로 계정을 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없으며, 모든 데이터가 영구적으로 삭제됩니다.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-end gap-3">
-              <button
-                type="button"
-                className="flex-1 sm:flex-initial px-4 py-2.5 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg touch-manipulation"
-                onClick={() => setShowDeleteConfirm(false)}
-              >
-                취소
-              </button>
-              <button
-                type="button"
-                className="flex-1 sm:flex-initial bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-semibold touch-manipulation"
-                onClick={handleDeleteAccount}
-              >
-                계정 탈퇴
-              </button>
+        <Portal>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[120]"
+            onClick={() => setShowDeleteConfirm(false)}
+          >
+            <div
+              className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
+                <h3 className="text-lg sm:text-xl font-bold">계정 탈퇴 확인</h3>
+              </div>
+              <p className="text-sm sm:text-base text-gray-600 mb-6 leading-relaxed">
+                정말로 계정을 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없으며, 모든 데이터가 영구적으로 삭제됩니다.
+              </p>
+              <div className="flex flex-col sm:flex-row justify-end gap-3">
+                <button
+                  type="button"
+                  className="flex-1 sm:flex-initial px-4 py-2.5 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg touch-manipulation"
+                  onClick={() => setShowDeleteConfirm(false)}
+                >
+                  취소
+                </button>
+                <button
+                  type="button"
+                  className="flex-1 sm:flex-initial bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-semibold touch-manipulation"
+                  onClick={handleDeleteAccount}
+                >
+                  계정 탈퇴
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </Portal>
       )}
 
       <Footer />
