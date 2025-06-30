@@ -6,7 +6,10 @@ import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { SupabaseClient } from '@supabase/supabase-js';
-import Portal from '@/components/ui/portal';
+import { createPortal } from 'react-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertTriangle, Trash2, Shield, Database, Users } from 'lucide-react';
 
 const MB = 1024 * 1024;
 
@@ -26,6 +29,8 @@ const AdminDangerZone = () => {
     const [backupSize, setBackupSize] = useState<number | null>(null);
     const [importing, setImporting] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const modalRef = useRef<HTMLDivElement>(null);
+    const animationFrameRef = useRef<number>();
 
     // 페이지 진입 시 자동으로 백업 파일 크기 계산
     useEffect(() => {
@@ -294,34 +299,32 @@ const AdminDangerZone = () => {
                 </div>
                 {/* 경고/확인 모달 */}
                 {modal.open && (
-                    <Portal>
+                    <div
+                        className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[120]"
+                        onClick={closeModal}
+                    >
                         <div
-                            className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[120]"
-                            onClick={closeModal}
+                            className="bg-white rounded-lg shadow-lg p-8 max-w-xs w-full text-center"
+                            onClick={(e) => e.stopPropagation()}
                         >
-                            <div
-                                className="bg-white rounded-lg shadow-lg p-8 max-w-xs w-full text-center"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                <div className="text-lg font-bold text-red-700 mb-4">경고</div>
-                                <div className="mb-6 text-gray-800">{modal.message}</div>
-                                <div className="flex gap-4 justify-center">
-                                    <button
-                                        onClick={() => {
-                                            if (modal.action) {
-                                                modal.action();
-                                            }
-                                            closeModal();
-                                        }}
-                                        className="bg-red-600 text-white px-4 py-2 rounded"
-                                    >
-                                        확인
-                                    </button>
-                                    <button onClick={closeModal} className="bg-gray-300 text-gray-700 px-4 py-2 rounded">취소</button>
-                                </div>
+                            <div className="text-lg font-bold text-red-700 mb-4">경고</div>
+                            <div className="mb-6 text-gray-800">{modal.message}</div>
+                            <div className="flex gap-4 justify-center">
+                                <button
+                                    onClick={() => {
+                                        if (modal.action) {
+                                            modal.action();
+                                        }
+                                        closeModal();
+                                    }}
+                                    className="bg-red-600 text-white px-4 py-2 rounded"
+                                >
+                                    확인
+                                </button>
+                                <button onClick={closeModal} className="bg-gray-300 text-gray-700 px-4 py-2 rounded">취소</button>
                             </div>
                         </div>
-                    </Portal>
+                    </div>
                 )}
             </div>
             <Footer />

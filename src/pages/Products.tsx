@@ -270,12 +270,10 @@ const Products = memo(() => {
       )}
 
       {showDetailDialog && selectedProduct && (
-        <Suspense fallback={<LoadingFallback />}>
-          <ProductDetailModal
-            product={selectedProduct}
-            onClose={handleCloseDetailDialog}
-          />
-        </Suspense>
+        <ProductDetailModal
+          product={selectedProduct}
+          onClose={handleCloseDetailDialog}
+        />
       )}
 
       <Footer />

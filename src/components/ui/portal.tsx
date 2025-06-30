@@ -18,9 +18,18 @@ function Portal({ children, container }: PortalProps) {
         return null;
     }
 
+    // 컨테이너가 지정되지 않으면 body를 사용
+    const targetContainer = container || document.body;
+
+    // body가 존재하는지 확인
+    if (!targetContainer) {
+        console.warn('Portal: Target container not found');
+        return null;
+    }
+
     return createPortal(
         children,
-        container || document.body
+        targetContainer
     );
 }
 

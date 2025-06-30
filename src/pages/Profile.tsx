@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -8,8 +8,11 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { User, Mail, Building, Phone, Save, Trash2, AlertTriangle, Shield } from 'lucide-react';
-import Portal from '@/components/ui/portal';
+import { User, Mail, Building, Phone, Save, Trash2, AlertTriangle, Shield, Edit, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const Profile = () => {
   const { user, signOut } = useAuth();
@@ -18,6 +21,9 @@ const Profile = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isEditing, setIsEditing] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const animationFrameRef = useRef<number>();
 
   const [name, setName] = useState(profile?.name || '');
   const [company, setCompany] = useState(profile?.company || '');
@@ -360,41 +366,39 @@ const Profile = () => {
 
       {/* 계정 탈퇴 확인 모달 */}
       {showDeleteConfirm && (
-        <Portal>
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[120]"
+          onClick={() => setShowDeleteConfirm(false)}
+        >
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[120]"
-            onClick={() => setShowDeleteConfirm(false)}
+            className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
           >
-            <div
-              className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
-                <h3 className="text-lg sm:text-xl font-bold">계정 탈퇴 확인</h3>
-              </div>
-              <p className="text-sm sm:text-base text-gray-600 mb-6 leading-relaxed">
-                정말로 계정을 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없으며, 모든 데이터가 영구적으로 삭제됩니다.
-              </p>
-              <div className="flex flex-col sm:flex-row justify-end gap-3">
-                <button
-                  type="button"
-                  className="flex-1 sm:flex-initial px-4 py-2.5 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg touch-manipulation"
-                  onClick={() => setShowDeleteConfirm(false)}
-                >
-                  취소
-                </button>
-                <button
-                  type="button"
-                  className="flex-1 sm:flex-initial bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-semibold touch-manipulation"
-                  onClick={handleDeleteAccount}
-                >
-                  계정 탈퇴
-                </button>
-              </div>
+            <div className="flex items-center gap-2 mb-4">
+              <AlertTriangle className="w-6 h-6 text-red-600" />
+              <h3 className="text-lg sm:text-xl font-bold">계정 탈퇴 확인</h3>
+            </div>
+            <p className="text-sm sm:text-base text-gray-600 mb-6 leading-relaxed">
+              정말로 계정을 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없으며, 모든 데이터가 영구적으로 삭제됩니다.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-end gap-3">
+              <button
+                type="button"
+                className="flex-1 sm:flex-initial px-4 py-2.5 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg touch-manipulation"
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                className="flex-1 sm:flex-initial bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-semibold touch-manipulation"
+                onClick={handleDeleteAccount}
+              >
+                계정 탈퇴
+              </button>
             </div>
           </div>
-        </Portal>
+        </div>
       )}
 
       <Footer />
