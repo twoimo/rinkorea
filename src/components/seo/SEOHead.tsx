@@ -31,7 +31,7 @@ export function SEOHead({
     title,
     description,
     keywords,
-    image = '/images/site-icon-512.png',
+    image = '/images/optimized/site-icon-512.webp',
     url,
     type = 'website',
     siteName = '린코리아',
@@ -161,7 +161,7 @@ export function SEOHead({
                     "@type": "Organization",
                     "name": finalSiteName,
                     "url": window.location.origin,
-                    "logo": new URL('/images/site-icon-512.png', window.location.origin).href,
+                    "logo": new URL('/images/optimized/site-icon-512.webp', window.location.origin).href,
                     "description": finalDescription,
                     "address": {
                         "@type": "PostalAddress",

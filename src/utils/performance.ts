@@ -73,7 +73,7 @@ export const preloadCriticalResources = () => {
         // 중요한 이미지 preload
         const criticalImages = [
             '/images/optimized/site-icon-512.webp',
-            '/images/site-icon-512.png',
+            '/images/optimized/site-icon-512.webp',
         ];
 
         criticalImages.forEach(src => {

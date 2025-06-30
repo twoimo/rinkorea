@@ -500,7 +500,7 @@ const Equipment = () => {
                         </div>
                         <div className="w-full md:w-1/2">
                             <img
-                                src="/images/js-floor-systems.png"
+                                src="/images/optimized/js-floor-systems.webp"
                                 alt="Shanghai JS Floor Systems Partnership"
                                 className="w-full h-auto rounded-lg shadow-xl"
                                 loading="lazy"

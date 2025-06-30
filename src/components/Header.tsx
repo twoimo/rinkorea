@@ -86,7 +86,7 @@ const Header = () => {
         <div className="flex items-center justify-between h-16 sm:h-20">
           <Link to="/" className="flex items-center">
             <img
-              src={shouldBeTransparent ? "/images/rin-korea-logo-white.png" : "/images/rin-korea-logo-black.png"}
+              src={shouldBeTransparent ? "/images/optimized/rin-korea-logo-white.webp" : "/images/optimized/rin-korea-logo-black.webp"}
               alt="린코리아 로고"
               className="h-8 sm:h-10 w-auto transition-all duration-200"
             />

@@ -139,7 +139,7 @@ const Contact = () => {
                   aria-label="Instagram"
                 >
                   <OptimizedImage
-                    src="/images/instagram-icon.png"
+                    src="/images/optimized/instagram-icon.webp"
                     alt="Instagram"
                     className="h-8 w-8 md:h-6 md:w-6 mb-2 md:mb-0 md:mr-2"
                     loadingClassName="bg-white"
@@ -155,7 +155,7 @@ const Contact = () => {
                   aria-label="Naver Blog"
                 >
                   <OptimizedImage
-                    src="/images/blog-logo-hq.png"
+                    src="/images/optimized/blog-logo-hq.webp"
                     alt="Naver Blog"
                     className="h-8 w-8 md:h-6 md:w-6 mb-2 md:mb-0 md:mr-2"
                     loadingClassName="bg-white"
@@ -171,7 +171,7 @@ const Contact = () => {
                   aria-label="YouTube"
                 >
                   <OptimizedImage
-                    src="/images/youtube-icon.png"
+                    src="/images/optimized/youtube-icon.webp"
                     alt="YouTube"
                     className="h-8 w-8 md:h-6 md:w-6 mb-2 md:mb-0 md:mr-2"
                     loadingClassName="bg-white"

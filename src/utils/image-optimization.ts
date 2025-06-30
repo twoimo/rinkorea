@@ -65,7 +65,7 @@ export const preloadImage = (src: string, options: ImageOptimizationOptions = {}
 export const preloadCriticalImages = async () => {
     const criticalImages = [
         '/images/optimized/site-icon-512.webp',
-        '/images/site-icon-512.png', // fallback
+        '/images/optimized/site-icon-512.webp', // fallback
     ];
 
     try {

@@ -91,7 +91,7 @@ const Footer = () => {
                 className="text-gray-300 hover:text-white transition-colors transform hover:scale-110"
               >
                 <OptimizedImage
-                  src="/images/instagram-icon.png"
+                  src="/images/optimized/instagram-icon.webp"
                   alt="Instagram"
                   className="h-8 w-8"
                   loadingClassName="bg-gray-800"
@@ -105,7 +105,7 @@ const Footer = () => {
                 className="text-gray-300 hover:text-white transition-colors transform hover:scale-110"
               >
                 <OptimizedImage
-                  src="/images/blog-logo-hq.png"
+                  src="/images/optimized/blog-logo-hq.webp"
                   alt="Naver Blog"
                   className="h-8 w-8"
                   loadingClassName="bg-gray-800"
@@ -119,7 +119,7 @@ const Footer = () => {
                 className="text-gray-300 hover:text-white transition-colors transform hover:scale-110"
               >
                 <OptimizedImage
-                  src="/images/youtube-icon.png"
+                  src="/images/optimized/youtube-icon.webp"
                   alt="YouTube"
                   className="h-8 w-8"
                   loadingClassName="bg-gray-800"

@@ -106,7 +106,7 @@ const CompanyOverview = () => {
               {/* Main Image Container */}
               <div className="relative rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-700">
                 <OptimizedImage
-                  src="/images/company_intro.jpg"
+                  src="/images/optimized/company_intro.webp"
                   alt="린코리아 제품"
                   className="w-full h-auto object-contain"
                   loadingClassName="bg-gray-100"
