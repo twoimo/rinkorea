@@ -24,7 +24,6 @@
 - **Styling**: Tailwind CSS 3.4.11
 - **Icons**: Lucide React
 - **Animations**: Framer Motion
-- **다국어 지원**: i18next (한/영/중/인도네시아어)
 
 ### Backend & Database
 - **Database**: Supabase (PostgreSQL)
