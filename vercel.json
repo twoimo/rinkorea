@@ -1,6 +1,9 @@
 {
-    "buildCommand": "npm run build",
+    "version": 2,
+    "buildCommand": "npm run build:prod",
     "outputDirectory": "dist",
+    "installCommand": "npm install",
+    "framework": "vite",
     "rewrites": [
         {
             "source": "/(.*)",
@@ -8,6 +11,76 @@
         }
     ],
     "headers": [
+        {
+            "source": "/assets/js/(.*)",
+            "headers": [
+                {
+                    "key": "Content-Type",
+                    "value": "application/javascript; charset=utf-8"
+                },
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=31536000, immutable"
+                }
+            ]
+        },
+        {
+            "source": "/assets/(.*).js",
+            "headers": [
+                {
+                    "key": "Content-Type",
+                    "value": "application/javascript; charset=utf-8"
+                },
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=31536000, immutable"
+                }
+            ]
+        },
+        {
+            "source": "/assets/(.*).tsx",
+            "headers": [
+                {
+                    "key": "Content-Type",
+                    "value": "application/javascript; charset=utf-8"
+                }
+            ]
+        },
+        {
+            "source": "/assets/(.*).css",
+            "headers": [
+                {
+                    "key": "Content-Type",
+                    "value": "text/css; charset=utf-8"
+                },
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=31536000, immutable"
+                }
+            ]
+        },
+        {
+            "source": "/assets/images/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=31536000, immutable"
+                }
+            ]
+        },
+        {
+            "source": "/sw.js",
+            "headers": [
+                {
+                    "key": "Content-Type",
+                    "value": "application/javascript; charset=utf-8"
+                },
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=0, must-revalidate"
+                }
+            ]
+        },
         {
             "source": "/index.html",
             "headers": [
@@ -46,6 +119,12 @@
                     "value": "img-src 'self' https://*.pstatic.net data:;"
                 }
             ]
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/index.html"
         }
     ]
 }

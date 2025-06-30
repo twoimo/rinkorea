@@ -32,6 +32,8 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Ensure TypeScript files are not included as assets
+  assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.svg', '**/*.webp', '**/*.ico', '**/*.woff', '**/*.woff2', '**/*.eot', '**/*.ttf', '**/*.otf'],
   optimizeDeps: {
     include: [
       '@dnd-kit/core',
@@ -58,6 +60,9 @@ export default defineConfig(({ mode }) => ({
 
     // Advanced code splitting configuration
     rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html')
+      },
       output: {
         // Create separate chunks for vendors and core functionality
         manualChunks: {
@@ -109,23 +114,37 @@ export default defineConfig(({ mode }) => ({
           'utils': ['clsx', 'tailwind-merge', 'class-variance-authority']
         },
 
-        // Optimize asset naming for better caching
+
+
+        // Ensure all chunks are .js files
+        chunkFileNames: (chunkInfo) => {
+          return 'assets/js/[name]-[hash].js';
+        },
+        entryFileNames: (chunkInfo) => {
+          return 'assets/js/[name]-[hash].js';
+        },
         assetFileNames: (assetInfo) => {
+          // Force all assets to have proper extensions
           if (!assetInfo.name) return `assets/[name]-[hash][extname]`;
+
+          // If it's a .tsx file somehow, treat it as .js
+          if (assetInfo.name.endsWith('.tsx')) {
+            return `assets/js/[name]-[hash].js`;
+          }
 
           const info = assetInfo.name.split('.');
           const ext = info[info.length - 1];
-          if (/\.(png|jpe?g|svg|gif|tiff|bmp|ico)$/i.test(assetInfo.name)) {
+          if (/\.(png|jpe?g|svg|gif|tiff|bmp|ico|webp)$/i.test(assetInfo.name)) {
             return `assets/images/[name]-[hash][extname]`;
           }
           if (/\.(woff2?|eot|ttf|otf)$/i.test(assetInfo.name)) {
             return `assets/fonts/[name]-[hash][extname]`;
           }
+          if (/\.(css)$/i.test(assetInfo.name)) {
+            return `assets/[name]-[hash][extname]`;
+          }
           return `assets/[name]-[hash][extname]`;
         },
-
-        chunkFileNames: 'assets/js/[name]-[hash].js',
-        entryFileNames: 'assets/js/[name]-[hash].js',
       },
 
       // External dependencies that should not be bundled
