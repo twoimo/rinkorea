@@ -7,20 +7,16 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const CompanyOverview = () => {
   const { t } = useLanguage();
 
-  // Get location text and create JSX separately
-  const locationTextRaw = t('company_overview_location_value', '인천광역시 서구 백범로 707 (주안국가산업단지)\n천안 테크노파크 산업단지 입주예정 (2026~)');
-  const locationText = typeof locationTextRaw === 'string' ? locationTextRaw : String(locationTextRaw);
-  const locationElements = locationText.split('\n').map((line, index) => (
-    <span key={index} className="block">
-      {line}
-    </span>
-  ));
-
   const companyInfo = [
     {
       icon: <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />,
       label: String(t('company_overview_location_label', '본사 위치')),
-      value: locationElements,
+      value: String(t('company_overview_location_value', '인천광역시 서구 백범로 707 (주안국가산업단지)\n천안 테크노파크 산업단지 입주예정 (2026~)')).split('\n').map((line, index) => (
+        <React.Fragment key={index}>
+          {line}
+          {index === 0 && <br />}
+        </React.Fragment>
+      )),
       color: "text-blue-600"
     },
     {
