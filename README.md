@@ -101,7 +101,8 @@ npm run optimize-images
 ```
 rinkorea/
 ├── public/                     # 정적 파일
-│   ├── images/                # 이미지 리소스
+│   ├── images/
+│   │   └── optimized/        # 최적화된 WebP 이미지
 │   └── locales/              # 다국어 번역 파일
 ├── src/
 │   ├── components/           # React 컴포넌트
@@ -166,15 +167,3 @@ vercel --prod
 - **문서 지능 검색**: PDF/이미지 OCR, 의미 기반 검색
 - **금융 AI 분석**: 매출 예측, 리스크 평가, 투자 최적화
 
-### 📅 개발 일정 (예정)
-1. **Week 1**: AI 챗봇 시스템 구축
-2. **Week 2**: 워크플로우 자동화
-3. **Week 3**: 스마트 견적 + 금융 AI
-4. **Week 4**: 문서 검색 + 배포
-
-*자세한 개발 계획은 `roadmaps/` 폴더를 참고하세요.*
-
-> **📂 roadmaps 폴더 안내**  
-> - 모든 AI/LLM 관련 가이드는 **향후 개발 계획**입니다
-> - 현재 구현된 것은 기본 웹사이트 기능들입니다
-> - AI 기능 개발 시작 전 `roadmaps/README.md`를 먼저 읽어보세요
