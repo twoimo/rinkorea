@@ -58,6 +58,9 @@ export default defineConfig(({ mode }) => ({
     reportCompressedSize: true,
     chunkSizeWarningLimit: 1000,
 
+    // Prevent inlining of JavaScript files as data URLs
+    assetsInlineLimit: 0,
+
     // Advanced code splitting configuration
     rollupOptions: {
       input: {

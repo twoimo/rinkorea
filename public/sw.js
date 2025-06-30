@@ -221,13 +221,16 @@ async function staleWhileRevalidate(request) {
         .then(networkResponse => {
             if (networkResponse.ok) {
                 const cache = caches.open(cacheName);
-                cache.then(c => c.put(request, networkResponse.clone()));
+                // Clone the response before using it
+                const responseClone = networkResponse.clone();
+                cache.then(c => c.put(request, responseClone));
             }
             return networkResponse;
         })
         .catch(err => {
             console.log('[SW] Background fetch failed:', err);
-            return cachedResponse;
+            // Return null instead of potentially undefined cachedResponse
+            return null;
         });
 
     // Return cached version immediately if available
