@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Settings, Wrench, Award, Star, Plus, Edit, Trash2, X, EyeOff, Eye, GripVertical } from 'lucide-react';
@@ -10,7 +11,6 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import Portal from '@/components/ui/portal';
 
 interface Equipment {
     id: string;
@@ -502,212 +502,214 @@ const Equipment = () => {
             )}
 
             {/* Equipment Form Modal - 모바일 최적화 */}
-            {showForm && (
-                <Portal>
+            {showForm && createPortal(
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[120] p-4"
+                    onClick={!formLoading ? closeForm : undefined}
+                >
                     <div
-                        className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[120] p-4"
-                        onClick={!formLoading ? closeForm : undefined}
+                        className="bg-white rounded-lg shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto relative"
+                        onClick={(e) => e.stopPropagation()}
                     >
-                        <div
-                            className="bg-white rounded-lg shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto relative"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 md:p-6">
-                                <button
-                                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 touch-manipulation"
-                                    onClick={closeForm}
-                                    disabled={formLoading}
-                                >
-                                    <X className="w-6 h-6" />
-                                </button>
-                                <h2 className="text-xl md:text-2xl font-bold pr-8">
-                                    {editingEquipment ? t('equipment_edit_modal_title', '기계 수정') : t('equipment_add_modal_title', '기계 추가')}
-                                </h2>
-                            </div>
-                            <div className="p-4 md:p-6">
-                                <form onSubmit={handleFormSave} className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('equipment_form_name', '이름')}</label>
-                                        <input
-                                            type="text"
-                                            value={formValues.name || ''}
-                                            onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
-                                            className="w-full px-3 py-3 md:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
-                                            required
-                                            disabled={formLoading}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('equipment_form_description', '설명')}</label>
-                                        <textarea
-                                            value={formValues.description || ''}
-                                            onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
-                                            className="w-full px-3 py-3 md:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
-                                            rows={3}
-                                            required
-                                            disabled={formLoading}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('equipment_form_image', '이미지 URL')}</label>
-                                        <input
-                                            type="text"
-                                            value={formValues.image_url || ''}
-                                            onChange={(e) => setFormValues({ ...formValues, image_url: e.target.value })}
-                                            className="w-full px-3 py-3 md:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
-                                            required
-                                            disabled={formLoading}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('equipment_form_icon', '아이콘')}</label>
-                                        <select
-                                            value={formValues.icon || ''}
-                                            onChange={(e) => setFormValues({ ...formValues, icon: e.target.value })}
-                                            className="w-full px-3 py-3 md:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
-                                            required
-                                            disabled={formLoading}
-                                        >
-                                            <option value="">{t('select', '선택하세요')}</option>
-                                            <option value="none">None</option>
-                                            <option value="settings">Settings</option>
-                                            <option value="wrench">Wrench</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('equipment_form_category', '카테고리')}</label>
-                                        <select
-                                            value={formValues.category || ''}
-                                            onChange={(e) => setFormValues({ ...formValues, category: e.target.value })}
-                                            className="w-full px-3 py-3 md:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
-                                            required
-                                            disabled={formLoading}
-                                        >
-                                            <option value="">{t('select', '선택하세요')}</option>
-                                            <option value="premium">{t('equipment_category_premium', '최신형 콘크리트 연삭기')}</option>
-                                            <option value="professional">{t('equipment_category_professional', '콘크리트 연삭기')}</option>
-                                            <option value="diatool">{t('equipment_category_diatool', '다이아툴')}</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">특징</label>
-                                        <div className="space-y-2">
-                                            <div className="flex gap-2">
-                                                <input
-                                                    type="text"
-                                                    className="flex-1 border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
-                                                    value={newFeature}
-                                                    onChange={e => setNewFeature(e.target.value)}
-                                                    placeholder="새로운 특징을 입력하세요"
-                                                    disabled={formLoading}
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={handleAddFeature}
-                                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-                                                    disabled={formLoading}
-                                                >
-                                                    <Plus className="w-5 h-5" />
-                                                </button>
-                                            </div>
-                                            <DndContext
-                                                sensors={sensors}
-                                                collisionDetection={closestCenter}
-                                                onDragEnd={handleDragEnd}
-                                            >
-                                                <SortableContext
-                                                    items={formValues.features || []}
-                                                    strategy={verticalListSortingStrategy}
-                                                >
-                                                    <ul className="space-y-2">
-                                                        {formValues.features?.map((feature, index) => (
-                                                            <SortableItem key={feature} id={feature}>
-                                                                <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                                                                    <span className="flex-1">{feature}</span>
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => handleRemoveFeature(index)}
-                                                                        className="text-red-600 hover:text-red-700 disabled:opacity-50"
-                                                                        disabled={formLoading}
-                                                                    >
-                                                                        <X className="w-4 h-4" />
-                                                                    </button>
-                                                                </div>
-                                                            </SortableItem>
-                                                        ))}
-                                                    </ul>
-                                                </SortableContext>
-                                            </DndContext>
-                                        </div>
-                                    </div>
-                                    {formError && (
-                                        <div className="text-red-600 text-sm">{formError}</div>
-                                    )}
-                                    {formSuccess && (
-                                        <div className="text-green-600 text-sm">{formSuccess}</div>
-                                    )}
-                                    <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 pt-4">
-                                        <button
-                                            type="button"
-                                            onClick={closeForm}
-                                            className="w-full sm:w-auto px-6 py-3 text-gray-600 hover:text-gray-800 touch-manipulation disabled:opacity-50"
-                                            disabled={formLoading}
-                                        >
-                                            {t('cancel', '취소')}
-                                        </button>
-                                        <button
-                                            type="submit"
-                                            disabled={formLoading}
-                                            className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 touch-manipulation"
-                                        >
-                                            {formLoading ? t('saving', '저장 중...') : t('save', '저장')}
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
+                        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 md:p-6">
+                            <button
+                                className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 touch-manipulation"
+                                onClick={closeForm}
+                                disabled={formLoading}
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                            <h2 className="text-xl md:text-2xl font-bold pr-8">
+                                {editingEquipment ? t('equipment_edit_modal_title', '기계 수정') : t('equipment_add_modal_title', '기계 추가')}
+                            </h2>
                         </div>
-                    </div>
-                </Portal>
-            )}
-
-            {/* Delete Confirmation Modal - 모바일 최적화 */}
-            {showDeleteConfirm && deleteTarget && (
-                <Portal>
-                    <div
-                        className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[120] p-4"
-                        onClick={closeDeleteConfirm}
-                    >
-                        <div
-                            className="bg-white rounded-lg shadow-lg w-full max-w-md"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <div className="p-6 md:p-8">
-                                <h2 className="text-xl md:text-2xl font-bold mb-4">{t('equipment_delete_modal_title', '기계 삭제')}</h2>
-                                <p className="text-gray-600 mb-6">
-                                    {t('equipment_delete_confirm', '정말로 기계를 삭제하시겠습니까?')} "{deleteTarget.name}"
-                                </p>
-                                <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4">
+                        <div className="p-4 md:p-6">
+                            <form onSubmit={handleFormSave} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('equipment_form_name', '이름')}</label>
+                                    <input
+                                        type="text"
+                                        value={formValues.name || ''}
+                                        onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
+                                        className="w-full px-3 py-3 md:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+                                        required
+                                        disabled={formLoading}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('equipment_form_description', '설명')}</label>
+                                    <textarea
+                                        value={formValues.description || ''}
+                                        onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
+                                        className="w-full px-3 py-3 md:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+                                        rows={3}
+                                        required
+                                        disabled={formLoading}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('equipment_form_image', '이미지 URL')}</label>
+                                    <input
+                                        type="text"
+                                        value={formValues.image_url || ''}
+                                        onChange={(e) => setFormValues({ ...formValues, image_url: e.target.value })}
+                                        className="w-full px-3 py-3 md:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+                                        required
+                                        disabled={formLoading}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('equipment_form_icon', '아이콘')}</label>
+                                    <select
+                                        value={formValues.icon || ''}
+                                        onChange={(e) => setFormValues({ ...formValues, icon: e.target.value })}
+                                        className="w-full px-3 py-3 md:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+                                        required
+                                        disabled={formLoading}
+                                    >
+                                        <option value="">{t('select', '선택하세요')}</option>
+                                        <option value="none">None</option>
+                                        <option value="settings">Settings</option>
+                                        <option value="wrench">Wrench</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('equipment_form_category', '카테고리')}</label>
+                                    <select
+                                        value={formValues.category || ''}
+                                        onChange={(e) => setFormValues({ ...formValues, category: e.target.value })}
+                                        className="w-full px-3 py-3 md:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+                                        required
+                                        disabled={formLoading}
+                                    >
+                                        <option value="">{t('select', '선택하세요')}</option>
+                                        <option value="premium">{t('equipment_category_premium', '최신형 콘크리트 연삭기')}</option>
+                                        <option value="professional">{t('equipment_category_professional', '콘크리트 연삭기')}</option>
+                                        <option value="diatool">{t('equipment_category_diatool', '다이아툴')}</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">특징</label>
+                                    <div className="space-y-2">
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                className="flex-1 border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+                                                value={newFeature}
+                                                onChange={e => setNewFeature(e.target.value)}
+                                                placeholder="새로운 특징을 입력하세요"
+                                                disabled={formLoading}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={handleAddFeature}
+                                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                                                disabled={formLoading}
+                                            >
+                                                <Plus className="w-5 h-5" />
+                                            </button>
+                                        </div>
+                                        <DndContext
+                                            sensors={sensors}
+                                            collisionDetection={closestCenter}
+                                            onDragEnd={handleDragEnd}
+                                        >
+                                            <SortableContext
+                                                items={formValues.features || []}
+                                                strategy={verticalListSortingStrategy}
+                                            >
+                                                <ul className="space-y-2">
+                                                    {formValues.features?.map((feature, index) => (
+                                                        <SortableItem key={feature} id={feature}>
+                                                            <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                                                                <span className="flex-1">{feature}</span>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleRemoveFeature(index)}
+                                                                    className="text-red-600 hover:text-red-700 disabled:opacity-50"
+                                                                    disabled={formLoading}
+                                                                >
+                                                                    <X className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+                                                        </SortableItem>
+                                                    ))}
+                                                </ul>
+                                            </SortableContext>
+                                        </DndContext>
+                                    </div>
+                                </div>
+                                {formError && (
+                                    <div className="text-red-600 text-sm">{formError}</div>
+                                )}
+                                {formSuccess && (
+                                    <div className="text-green-600 text-sm">{formSuccess}</div>
+                                )}
+                                <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 pt-4">
                                     <button
-                                        onClick={closeDeleteConfirm}
-                                        className="w-full sm:w-auto px-6 py-3 text-gray-600 hover:text-gray-800 touch-manipulation"
+                                        type="button"
+                                        onClick={closeForm}
+                                        className="w-full sm:w-auto px-6 py-3 text-gray-600 hover:text-gray-800 touch-manipulation disabled:opacity-50"
+                                        disabled={formLoading}
                                     >
                                         {t('cancel', '취소')}
                                     </button>
                                     <button
-                                        onClick={handleDelete}
-                                        className="w-full sm:w-auto px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 touch-manipulation"
+                                        type="submit"
+                                        disabled={formLoading}
+                                        className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 touch-manipulation"
                                     >
-                                        {t('delete', '삭제')}
+                                        {formLoading ? t('saving', '저장 중...') : t('save', '저장')}
                                     </button>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
+                </div>
                 </Portal>
-            )}
+    )
+}
 
-            <Footer />
-        </div>
+{/* Delete Confirmation Modal - 모바일 최적화 */ }
+{
+    showDeleteConfirm && deleteTarget && (
+        <Portal>
+            <div
+                className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[120] p-4"
+                onClick={closeDeleteConfirm}
+            >
+                <div
+                    className="bg-white rounded-lg shadow-lg w-full max-w-md"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="p-6 md:p-8">
+                        <h2 className="text-xl md:text-2xl font-bold mb-4">{t('equipment_delete_modal_title', '기계 삭제')}</h2>
+                        <p className="text-gray-600 mb-6">
+                            {t('equipment_delete_confirm', '정말로 기계를 삭제하시겠습니까?')} "{deleteTarget.name}"
+                        </p>
+                        <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4">
+                            <button
+                                onClick={closeDeleteConfirm}
+                                className="w-full sm:w-auto px-6 py-3 text-gray-600 hover:text-gray-800 touch-manipulation"
+                            >
+                                {t('cancel', '취소')}
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                className="w-full sm:w-auto px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 touch-manipulation"
+                            >
+                                {t('delete', '삭제')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Portal>
+    )
+}
+
+<Footer />
+        </div >
     );
 };
 

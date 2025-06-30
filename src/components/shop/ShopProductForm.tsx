@@ -186,7 +186,7 @@ const ShopProductForm: React.FC<ShopProductFormProps> = ({
       onClick={!loading ? onClose : undefined}
     >
       <div
-        className="bg-white rounded-lg shadow-lg w-full max-w-4xl my-4 sm:my-8"
+        className="bg-white rounded-lg shadow-lg w-full max-w-6xl my-4 sm:my-8"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="sticky top-0 bg-white px-6 py-4 border-b flex items-center justify-between">
@@ -200,160 +200,167 @@ const ShopProductForm: React.FC<ShopProductFormProps> = ({
           </button>
         </div>
 
-        <form className="p-6 space-y-6" onSubmit={onSubmit}>
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">{t('shop_form_basic_info', '기본 정보')}</h3>
+        <form className="p-6 space-y-8" onSubmit={onSubmit}>
+          {/* 기본 정보 섹션을 2열로 배치 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* 좌측: 이미지 및 URL 정보 */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900">{t('shop_form_basic_info', '기본 정보')}</h3>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">{t('shop_form_image_url', '이미지 URL 또는 파일명')}</label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
-                value={formValues.image_url || ''}
-                onChange={e => onFormValueChange('image_url', e.target.value)}
-                placeholder={t('shop_form_image_placeholder', '예: image.jpg 또는 https://example.com/image.jpg')}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                {t('shop_form_image_note', '파일명만 입력하면 자동으로 /images/ 경로가 추가됩니다')}
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">{t('shop_form_naver_url', '네이버 스토어 URL')}</label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
-                value={formValues.naver_url || ''}
-                onChange={e => onFormValueChange('naver_url', e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">제품명</h3>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">{t('shop_form_product_name', '상품명')}</label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
-                value={formValues.name || ''}
-                onChange={e => onFormValueChange('name', e.target.value)}
-                placeholder="제품명을 입력하세요"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">제품 설명</h3>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">{t('shop_form_description', '설명')}</label>
-              <textarea
-                className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation min-h-[100px]"
-                value={formValues.description || ''}
-                onChange={e => onFormValueChange('description', e.target.value)}
-                placeholder="제품 설명을 입력하세요"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">{t('shop_form_price_info', '가격 및 재고 정보')}</h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2">{t('shop_form_price', '판매가(원)')}</label>
+                <label className="block text-sm font-medium mb-2">{t('shop_form_image_url', '이미지 URL 또는 파일명')}</label>
                 <input
-                  type="number"
+                  type="text"
                   className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
-                  value={formValues.price || ''}
-                  onChange={e => onFormValueChange('price', Number(e.target.value))}
+                  value={formValues.image_url || ''}
+                  onChange={e => onFormValueChange('image_url', e.target.value)}
+                  placeholder={t('shop_form_image_placeholder', '예: image.jpg 또는 https://example.com/image.jpg')}
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  {t('shop_form_image_note', '파일명만 입력하면 자동으로 /images/ 경로가 추가됩니다')}
+                </p>
               </div>
+
               <div>
-                <label className="block text-sm font-medium mb-2">{t('shop_form_original_price', '정가(원)')}</label>
+                <label className="block text-sm font-medium mb-2">{t('shop_form_naver_url', '네이버 스토어 URL')}</label>
                 <input
-                  type="number"
+                  type="text"
                   className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
-                  value={formValues.original_price || ''}
-                  onChange={e => onFormValueChange('original_price', Number(e.target.value))}
+                  value={formValues.naver_url || ''}
+                  onChange={e => onFormValueChange('naver_url', e.target.value)}
                 />
               </div>
+            </div>
+
+            {/* 우측: 제품명 및 설명 */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900">제품 정보</h3>
+
               <div>
-                <label className="block text-sm font-medium mb-2">{t('shop_form_discount', '할인율(%)')}</label>
+                <label className="block text-sm font-medium mb-2">{t('shop_form_product_name', '상품명')}</label>
                 <input
-                  type="number"
-                  className="w-full border border-gray-300 px-3 py-3 rounded-lg bg-gray-100 text-base"
-                  value={formValues.discount || ''}
-                  readOnly
-                  tabIndex={-1}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">{t('shop_form_stock', '재고')}</label>
-                <input
-                  type="number"
+                  type="text"
                   className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
-                  value={formValues.stock_quantity || ''}
-                  onChange={e => onFormValueChange('stock_quantity', Number(e.target.value))}
+                  value={formValues.name || ''}
+                  onChange={e => onFormValueChange('name', e.target.value)}
+                  placeholder="제품명을 입력하세요"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">{t('shop_form_description', '설명')}</label>
+                <textarea
+                  className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation min-h-[120px]"
+                  value={formValues.description || ''}
+                  onChange={e => onFormValueChange('description', e.target.value)}
+                  placeholder="제품 설명을 입력하세요"
                 />
               </div>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">{t('shop_form_review_info', '평점 및 리뷰 정보')}</h3>
+          {/* 가격 및 기타 정보 섹션 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* 좌측: 가격 및 재고 정보 */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900">{t('shop_form_price_info', '가격 및 재고 정보')}</h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">{t('shop_form_rating', '평점')}</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
-                  value={formValues.rating || ''}
-                  onChange={e => onFormValueChange('rating', Number(e.target.value))}
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">{t('shop_form_price', '판매가(원)')}</label>
+                  <input
+                    type="number"
+                    className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
+                    value={formValues.price || ''}
+                    onChange={e => onFormValueChange('price', Number(e.target.value))}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">{t('shop_form_original_price', '정가(원)')}</label>
+                  <input
+                    type="number"
+                    className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
+                    value={formValues.original_price || ''}
+                    onChange={e => onFormValueChange('original_price', Number(e.target.value))}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">{t('shop_form_discount', '할인율(%)')}</label>
+                  <input
+                    type="number"
+                    className="w-full border border-gray-300 px-3 py-3 rounded-lg bg-gray-100 text-base"
+                    value={formValues.discount || ''}
+                    readOnly
+                    tabIndex={-1}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">{t('shop_form_stock', '재고')}</label>
+                  <input
+                    type="number"
+                    className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
+                    value={formValues.stock_quantity || ''}
+                    onChange={e => onFormValueChange('stock_quantity', Number(e.target.value))}
+                  />
+                </div>
               </div>
+            </div>
+
+            {/* 우측: 평점 및 리뷰 정보 */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900">{t('shop_form_review_info', '평점 및 리뷰 정보')}</h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">{t('shop_form_rating', '평점')}</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
+                    value={formValues.rating || ''}
+                    onChange={e => onFormValueChange('rating', Number(e.target.value))}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">{t('shop_form_reviews', '리뷰 수')}</label>
+                  <input
+                    type="number"
+                    className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
+                    value={formValues.reviews || ''}
+                    onChange={e => onFormValueChange('reviews', Number(e.target.value))}
+                  />
+                </div>
+              </div>
+
+              {/* 제품 옵션을 여기로 이동 */}
               <div>
-                <label className="block text-sm font-medium mb-2">{t('shop_form_reviews', '리뷰 수')}</label>
-                <input
-                  type="number"
-                  className="w-full border border-gray-300 px-3 py-3 rounded-lg text-base touch-manipulation"
-                  value={formValues.reviews || ''}
-                  onChange={e => onFormValueChange('reviews', Number(e.target.value))}
-                />
+                <h4 className="text-md font-semibold text-gray-900 mb-3">{t('shop_form_product_options', '제품 옵션')}</h4>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <label className="inline-flex items-center gap-2 touch-manipulation">
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4"
+                      checked={!!formValues.is_new}
+                      onChange={e => onFormValueChange('is_new', e.target.checked)}
+                    />
+                    <span className="text-sm font-medium">{t('shop_form_new_product', '신상품')}</span>
+                  </label>
+                  <label className="inline-flex items-center gap-2 touch-manipulation">
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4"
+                      checked={!!formValues.is_best}
+                      onChange={e => onFormValueChange('is_best', e.target.checked)}
+                    />
+                    <span className="text-sm font-medium">{t('shop_form_best_product', '베스트')}</span>
+                  </label>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">{t('shop_form_product_options', '제품 옵션')}</h3>
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              <label className="inline-flex items-center gap-2 touch-manipulation">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4"
-                  checked={!!formValues.is_new}
-                  onChange={e => onFormValueChange('is_new', e.target.checked)}
-                />
-                <span className="text-sm font-medium">{t('shop_form_new_product', '신상품')}</span>
-              </label>
-              <label className="inline-flex items-center gap-2 touch-manipulation">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4"
-                  checked={!!formValues.is_best}
-                  onChange={e => onFormValueChange('is_best', e.target.checked)}
-                />
-                <span className="text-sm font-medium">{t('shop_form_best_product', '베스트')}</span>
-              </label>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          {/* 버튼 섹션 */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
             <button
               type="button"
               className="w-full sm:w-auto px-6 py-3 rounded-lg bg-gray-200 text-gray-700 font-medium touch-manipulation"
