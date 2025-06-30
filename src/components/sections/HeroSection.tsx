@@ -14,20 +14,25 @@ const HeroSection = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
   const [isChina, setIsChina] = useState(false);
-  const [locationLoading, setLocationLoading] = useState(true);
+  const [locationLoading, setLocationLoading] = useState(false);
 
-  // Check if user is accessing from China
-  const checkUserLocation = async () => {
+  // Check if user is accessing from China using browser language/timezone as fallback
+  const checkUserLocation = () => {
     try {
-      setLocationLoading(true);
-      const response = await fetch('https://ipapi.co/json/');
-      const data = await response.json();
-      setIsChina(data.country_code === 'CN');
+      // Simple check using browser language and timezone
+      const language = navigator.language.toLowerCase();
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      // Check if user might be from China based on language or timezone
+      const isLikelyChina = language.includes('zh-cn') ||
+        timezone.includes('Asia/Shanghai') ||
+        timezone.includes('Asia/Beijing');
+
+      setIsChina(isLikelyChina);
+      console.log('Location detection (fallback):', { language, timezone, isLikelyChina });
     } catch (error) {
       console.log('Failed to detect location, defaulting to YouTube video');
       setIsChina(false);
-    } finally {
-      setLocationLoading(false);
     }
   };
 
