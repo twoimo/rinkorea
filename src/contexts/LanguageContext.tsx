@@ -202,6 +202,18 @@ const translations = {
         equipment_updated_success: '기계가 수정되었습니다.',
         equipment_added_success: '기계가 추가되었습니다.',
 
+        // Equipment page additional translations
+        equipment_form_select_placeholder: '선택하세요',
+        equipment_form_icon_none: 'None',
+        equipment_form_icon_settings: 'Settings',
+        equipment_form_icon_wrench: 'Wrench',
+        equipment_form_category_premium: '최신형 콘크리트 연삭기',
+        equipment_form_category_professional: '콘크리트 연삭기',
+        equipment_form_category_diatool: '다이아툴',
+        equipment_form_features_placeholder: '새로운 특징을 입력하세요',
+        equipment_form_features_empty: '특징을 추가해보세요',
+        equipment_delete_confirm_text: '정말로 기계를 삭제하시겠습니까?',
+
         // Products Page
         products_hero_title: '제품소개',
         products_hero_subtitle: '린코리아의 혁신적인 세라믹 코팅재와 친환경 건설재료를 만나보세요.',
@@ -741,6 +753,18 @@ const translations = {
         equipment_updated_success: 'Equipment has been updated.',
         equipment_added_success: 'Equipment has been added.',
 
+        // Equipment page additional translations
+        equipment_form_select_placeholder: 'Please select',
+        equipment_form_icon_none: 'None',
+        equipment_form_icon_settings: 'Settings',
+        equipment_form_icon_wrench: 'Wrench',
+        equipment_form_category_premium: 'Latest Concrete Grinders',
+        equipment_form_category_professional: 'Concrete Grinders',
+        equipment_form_category_diatool: 'Diamond Tools',
+        equipment_form_features_placeholder: 'Enter a new feature',
+        equipment_form_features_empty: 'Add some features',
+        equipment_delete_confirm_text: 'Are you sure you want to delete this equipment?',
+
         // Products Page
         products_hero_title: 'Products',
         products_hero_subtitle: 'Discover RIN Korea\'s innovative ceramic coating materials and eco-friendly construction materials.',
@@ -1266,6 +1290,18 @@ const translations = {
         equipment_saving: '保存中...',
         equipment_updated_success: '设备已更新。',
         equipment_added_success: '设备已添加。',
+
+        // Equipment page additional translations
+        equipment_form_select_placeholder: '请选择',
+        equipment_form_icon_none: '无',
+        equipment_form_icon_settings: '设置',
+        equipment_form_icon_wrench: '扳手',
+        equipment_form_category_premium: '最新型混凝土研磨机',
+        equipment_form_category_professional: '混凝土研磨机',
+        equipment_form_category_diatool: '钻石工具',
+        equipment_form_features_placeholder: '输入新特征',
+        equipment_form_features_empty: '添加一些特征',
+        equipment_delete_confirm_text: '确定要删除此设备吗？',
 
         // Products Page
         products_hero_title: '产品介绍',
