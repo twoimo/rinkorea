@@ -198,20 +198,14 @@ const Header = () => {
 
             {/* Language Selector */}
             <LanguageSelector
-              variant={shouldBeTransparent ? "minimal" : "default"}
-              size="default"
-              showFlag={true}
-              showNativeName={true}
+              variant="flag-only"
             />
           </div>
 
           {/* Mobile menu button and language selector */}
           <div className="flex items-center space-x-2 xl:hidden">
             <LanguageSelector
-              variant={shouldBeTransparent ? "minimal" : "default"}
-              size="default"
-              showFlag={true}
-              showNativeName={true}
+              variant="flag-only"
             />
             <button
               className={cn(

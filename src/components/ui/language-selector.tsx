@@ -77,12 +77,12 @@ export function LanguageSelector({
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button
-                        variant="ghost"
+                        variant="secondary"
                         size="icon"
-                        className={`${getButtonSize()} rounded-full hover:bg-gray-100 transition-colors`}
+                        className={`w-10 h-10 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors`}
                         aria-label="언어 선택"
                     >
-                        <span className="text-lg">{currentLanguage?.flag}</span>
+                        <Globe className="w-5 h-5" />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-[150px]">
@@ -110,14 +110,11 @@ export function LanguageSelector({
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button
-                        variant="ghost"
-                        className={`${getButtonSize()} gap-1 hover:bg-gray-100 transition-colors`}
+                        variant="secondary"
+                        className={`w-10 h-10 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors`}
                         aria-label="언어 선택"
                     >
-                        {showFlag && <span>{currentLanguage?.flag}</span>}
-                        <span className="font-medium">
-                            {showNativeName ? currentLanguage?.nativeName : currentLanguage?.code.toUpperCase()}
-                        </span>
+                        <Globe className="w-5 h-5" />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-[150px]">
@@ -145,15 +142,11 @@ export function LanguageSelector({
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button
-                    variant="outline"
-                    className={`${getButtonSize()} gap-2 hover:bg-gray-50 border-gray-200 transition-colors`}
+                    variant="secondary"
+                    className={`w-10 h-10 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors`}
                     aria-label="언어 선택"
                 >
-                    <Globe className="w-4 h-4" />
-                    {showFlag && <span>{currentLanguage?.flag}</span>}
-                    <span className="font-medium">
-                        {showNativeName ? currentLanguage?.nativeName : currentLanguage?.code.toUpperCase()}
-                    </span>
+                    <Globe className="w-5 h-5" />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-[180px]">
