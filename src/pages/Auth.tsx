@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -17,6 +18,7 @@ const Auth = () => {
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (user) {
@@ -35,20 +37,20 @@ const Auth = () => {
           // 더 구체적인 에러 메시지 처리
           let errorMessage = error.message;
           if (error.message.includes('Invalid login credentials')) {
-            errorMessage = '이메일 또는 비밀번호가 올바르지 않습니다.';
+            errorMessage = t('auth_invalid_credentials');
           } else if (error.message.includes('Email not confirmed')) {
-            errorMessage = '이메일 확인이 필요합니다. 이메일을 확인해주세요.';
+            errorMessage = t('auth_email_not_confirmed');
           }
 
           toast({
-            title: "로그인 실패",
+            title: t('auth_login_failed'),
             description: errorMessage,
             variant: "destructive"
           });
         } else {
           toast({
-            title: "로그인 성공",
-            description: "환영합니다!"
+            title: t('auth_login_success'),
+            description: t('auth_welcome')
           });
           navigate('/');
         }
@@ -57,18 +59,18 @@ const Auth = () => {
         if (error) {
           let errorMessage = error.message;
           if (error.message.includes('User already registered')) {
-            errorMessage = '이미 가입된 이메일입니다.';
+            errorMessage = t('auth_user_exists');
           }
 
           toast({
-            title: "회원가입 실패",
+            title: t('auth_signup_failed'),
             description: errorMessage,
             variant: "destructive"
           });
         } else {
           toast({
-            title: "회원가입 완료",
-            description: "이메일을 확인하여 계정을 활성화해주세요."
+            title: t('auth_signup_success'),
+            description: t('auth_confirm_email')
           });
           // 회원가입 후 로그인 페이지로 자동 전환
           setIsLogin(true);
@@ -77,8 +79,8 @@ const Auth = () => {
       }
     } catch (error) {
       toast({
-        title: "오류 발생",
-        description: "다시 시도해주세요.",
+        title: t('auth_error_occurred'),
+        description: t('auth_try_again'),
         variant: "destructive"
       });
     } finally {
@@ -95,17 +97,17 @@ const Auth = () => {
           <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
             <div className="text-center mb-8">
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                {isLogin ? '로그인' : '회원가입'}
+                {isLogin ? t('auth_login_title') : t('auth_signup_title')}
               </h1>
               <p className="text-gray-600">
-                린코리아 서비스를 이용하시려면 {isLogin ? '로그인' : '회원가입'}해주세요
+                {isLogin ? t('auth_login_subtitle') : t('auth_signup_subtitle')}
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {!isLogin && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="name">이름</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="name">{t('auth_name_label')}</label>
                   <input
                     id="name"
                     type="text"
@@ -114,12 +116,12 @@ const Auth = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                     autoComplete="name"
-                    aria-label="이름"
+                    aria-label={t('auth_name_label')}
                   />
                 </div>
               )}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="email">이메일</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="email">{t('auth_email_label')}</label>
                 <input
                   id="email"
                   type="email"
@@ -128,11 +130,11 @@ const Auth = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                   autoComplete="email"
-                  aria-label="이메일"
+                  aria-label={t('auth_email_label')}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="password">비밀번호</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="password">{t('auth_password_label')}</label>
                 <div className="relative">
                   <input
                     id="password"
@@ -143,13 +145,13 @@ const Auth = () => {
                     required
                     minLength={6}
                     autoComplete={isLogin ? "current-password" : "new-password"}
-                    aria-label="비밀번호"
+                    aria-label={t('auth_password_label')}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 표시'}
+                    aria-label={showPassword ? t('auth_password_hide') : t('auth_password_show')}
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4 text-gray-400" aria-hidden="true" />
@@ -160,7 +162,7 @@ const Auth = () => {
                 </div>
                 {!isLogin && (
                   <p className="text-xs text-gray-500 mt-1">
-                    비밀번호는 최소 6자 이상이어야 합니다.
+                    {t('auth_password_min_length')}
                   </p>
                 )}
               </div>
@@ -168,17 +170,17 @@ const Auth = () => {
                 type="submit"
                 disabled={loading}
                 className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 flex items-center justify-center cursor-pointer transition-colors"
-                aria-label={isLogin ? '로그인' : '회원가입'}
+                aria-label={isLogin ? t('auth_login_button') : t('auth_signup_button')}
                 onClick={(e) => {
                   console.log('로그인/회원가입 버튼 클릭됨', { isLogin, loading });
                 }}
               >
                 {loading ? (
-                  "처리 중..."
+                  t('auth_processing')
                 ) : (
                   <>
                     {isLogin ? <LogIn className="w-4 h-4 mr-2" aria-hidden="true" /> : <UserPlus className="w-4 h-4 mr-2" aria-hidden="true" />}
-                    {isLogin ? '로그인' : '회원가입'}
+                    {isLogin ? t('auth_login_button') : t('auth_signup_button')}
                   </>
                 )}
               </button>
@@ -193,9 +195,9 @@ const Auth = () => {
                   setPassword(''); // 모드 변경 시 비밀번호 초기화
                 }}
                 className="text-blue-600 hover:text-blue-700 text-sm cursor-pointer transition-colors"
-                aria-label={isLogin ? '회원가입으로 전환' : '로그인으로 전환'}
+                aria-label={isLogin ? t('auth_switch_to_signup') : t('auth_switch_to_login')}
               >
-                {isLogin ? '계정이 없으신가요? 회원가입' : '이미 계정이 있으신가요? 로그인'}
+                {isLogin ? t('auth_switch_to_signup') : t('auth_switch_to_login')}
               </button>
             </div>
           </div>
