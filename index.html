@@ -4,6 +4,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="cache-bust" content="20250128-1531" />
   <meta name="theme-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -69,9 +73,7 @@
   <meta name="rating" content="General" />
   <meta name="target" content="all" />
 
-  <!-- Preload critical assets -->
-  <link rel="preload" href="/src/main.tsx" as="script" />
-  <link rel="preload" href="/src/index.css" as="style" />
+  <!-- Preconnect for external resources only -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
@@ -142,7 +144,7 @@
 
 <body>
   <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
+  <script type="module" src="/src/main.tsx?v=20250128-1531&cache=false"></script>
 </body>
 
 </html>
