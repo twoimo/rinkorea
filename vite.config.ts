@@ -8,11 +8,18 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    fs: {
+      strict: false
+    },
+    hmr: {
+      overlay: true
+    }
   },
   plugins: [
     react(),
-    mode === 'development' &&
-    componentTagger(),
+    // Temporarily disabled to fix React Fragment warnings
+    // mode === 'development' &&
+    // componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {

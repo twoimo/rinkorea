@@ -1,7 +1,7 @@
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import CompanyOverview from '@/components/sections/CompanyOverview';
+import CompanyOverview from '@/components/sections/CompanyOverviewFixed';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { SEOHead } from '@/components/seo/SEOHead';
 

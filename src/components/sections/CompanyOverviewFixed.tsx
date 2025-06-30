@@ -4,23 +4,41 @@ import { MapPin, FileText, Building2, ArrowRight, Phone, Mail } from 'lucide-rea
 import { OptimizedImage } from '@/components/ui/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-const CompanyOverview = () => {
+interface CompanyInfoItem {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  isMultiline?: boolean;
+  color: string;
+}
+
+const CompanyOverview: React.FC = () => {
   const { t } = useLanguage();
 
-  // Get location text and create JSX separately
+  // Force refresh: 2025-01-28-15:45
+
+  // Get location text
   const locationTextRaw = t('company_overview_location_value', '인천광역시 서구 백범로 707 (주안국가산업단지)\n천안 테크노파크 산업단지 입주예정 (2026~)');
   const locationText = typeof locationTextRaw === 'string' ? locationTextRaw : String(locationTextRaw);
-  const locationElements = locationText.split('\n').map((line, index) => (
-    <span key={index} className="block">
-      {line}
-    </span>
-  ));
 
-  const companyInfo = [
+  const renderLocationText = () => {
+    return (
+      <div className="location-text">
+        {locationText.split('\n').map((line, index) => (
+          <div key={`location-line-${index}`} className="block">
+            {line}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const companyInfo: CompanyInfoItem[] = [
     {
       icon: <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />,
       label: String(t('company_overview_location_label', '본사 위치')),
-      value: locationElements,
+      value: locationText,
+      isMultiline: true,
       color: "text-blue-600"
     },
     {
@@ -37,6 +55,13 @@ const CompanyOverview = () => {
     }
   ];
 
+  const renderInfoValue = (info: CompanyInfoItem) => {
+    if (info.isMultiline) {
+      return renderLocationText();
+    }
+    return <div className="info-value">{info.value}</div>;
+  };
+
   return (
     <section className="py-12 sm:py-16 lg:py-20 bg-white relative">
       {/* Background Elements */}
@@ -51,19 +76,19 @@ const CompanyOverview = () => {
           {/* Content */}
           <div className="order-2 lg:order-1">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-4 sm:mb-6 leading-tight">
-              {String(t('company_overview_title_reliable', '신뢰할 수 있는'))}
-              <span className="text-red-600"> {String(t('company_overview_title_partner', '파트너'))}</span>
+              <span className="title-part-1">{String(t('company_overview_title_reliable', '신뢰할 수 있는'))}</span>
+              <span className="text-red-600 title-part-2"> {String(t('company_overview_title_partner', '파트너'))}</span>
             </h2>
 
             <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 leading-relaxed">
-              {String(t('company_overview_description', '린코리아는 건설재료사업부와 2024년 신설된 건설기계사업부를 통해 종합적인 건설 솔루션을 제공합니다.'))}
+              <span className="description-text">{String(t('company_overview_description', '린코리아는 건설재료사업부와 2024년 신설된 건설기계사업부를 통해 종합적인 건설 솔루션을 제공합니다.'))}</span>
             </p>
 
             {/* Company Info Cards */}
             <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-              {companyInfo.map((info, index) => (
+              {companyInfo.map((info: CompanyInfoItem, index: number) => (
                 <div
-                  key={index}
+                  key={`company-info-${index}`}
                   className="group bg-gray-50 hover:bg-white rounded-xl p-4 sm:p-5 transition-all duration-300 border border-gray-100 hover:border-gray-200 hover:shadow-lg touch-manipulation"
                 >
                   <div className="flex items-start gap-3 sm:gap-4">
@@ -71,8 +96,12 @@ const CompanyOverview = () => {
                       {info.icon}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">{info.label}</div>
-                      <div className="text-sm sm:text-base text-gray-900 font-medium break-words">{info.value}</div>
+                      <div className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">
+                        <span className="label-text">{info.label}</span>
+                      </div>
+                      <div className="text-sm sm:text-base text-gray-900 font-medium break-words">
+                        {renderInfoValue(info)}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -86,7 +115,7 @@ const CompanyOverview = () => {
                 onClick={() => window.scrollTo(0, 0)}
                 className="group bg-red-600 hover:bg-red-700 text-white px-6 py-4 sm:px-8 rounded-xl font-bold transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-red-500/25 hover:scale-105 touch-manipulation text-sm sm:text-base"
               >
-                {String(t('company_overview_learn_more', '회사소개 자세히 보기'))}
+                <span className="button-text-1">{String(t('company_overview_learn_more', '회사소개 자세히 보기'))}</span>
                 <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
@@ -95,7 +124,7 @@ const CompanyOverview = () => {
                 className="group bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-200 hover:border-gray-300 px-6 py-4 sm:px-8 rounded-xl font-bold transition-all duration-300 flex items-center justify-center hover:scale-105 touch-manipulation text-sm sm:text-base"
               >
                 <Phone className="mr-2 w-4 h-4 sm:w-5 sm:h-5" />
-                {String(t('company_overview_contact', '연락하기'))}
+                <span className="button-text-2">{String(t('company_overview_contact', '연락하기'))}</span>
               </Link>
             </div>
           </div>
