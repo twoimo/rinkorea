@@ -4,6 +4,7 @@ import Footer from '../components/Footer';
 import ResourcesHero from '../components/resources/ResourcesHero';
 import ResourcesList from '../components/resources/ResourcesList';
 import ResourceForm from '../components/resources/ResourceForm';
+import ResourcesSkeleton from '../components/resources/ResourcesSkeleton';
 import { useResources } from '@/hooks/useResources';
 import { useResourcesAdmin } from '@/hooks/useResourcesAdmin';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -68,6 +69,16 @@ const Resources = () => {
     const handleDownload = async (resourceId: string, fileName: string, fileUrl: string) => {
         await downloadResource(resourceId, fileName, fileUrl);
     };
+
+    if (loading) {
+        return (
+            <>
+                <Header />
+                <ResourcesSkeleton />
+                <Footer />
+            </>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-white flex flex-col">

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import EquipmentSkeleton from '@/components/equipment/EquipmentSkeleton';
 import { Settings, Wrench, Award, Star, Plus, Edit, Trash2, X, EyeOff, Eye, GripVertical } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -443,6 +444,16 @@ const Equipment = () => {
             features: prev.features?.filter((_, i) => i !== index) || []
         }));
     };
+
+    if (loading) {
+        return (
+            <>
+                <Header />
+                <EquipmentSkeleton />
+                <Footer />
+            </>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-white">

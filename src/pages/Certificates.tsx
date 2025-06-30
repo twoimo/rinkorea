@@ -6,6 +6,7 @@ import CertificateForm from '@/components/certificates/CertificateForm';
 import DeleteConfirmModal from '@/components/certificates/DeleteConfirmModal';
 import CertificateTypeCard from '@/components/certificates/CertificateTypeCard';
 import CertificateSection from '@/components/certificates/CertificateSection';
+import CertificatesSkeleton from '@/components/certificates/CertificatesSkeleton';
 import { Award, FileText, Shield, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -218,6 +219,16 @@ const Certificates = () => {
     const localizedName = getLocalizedCertificateName(certificate);
     handleImageClick(certificate.image_url, localizedName, localizedName);
   };
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <CertificatesSkeleton />
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">

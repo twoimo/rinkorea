@@ -15,7 +15,7 @@ import PageSkeleton from "@/components/ui/page-skeleton";
 const Index = lazy(() => import("./pages/Index"));
 const About = lazy(() => import("./pages/About"));
 const Products = lazy(() => import("./pages/Products"));
-// Equipment page temporarily removed due to missing file
+const Equipment = lazy(() => import("./pages/Equipment"));
 const Projects = lazy(() => import("./pages/Projects"));
 const Certificates = lazy(() => import("./pages/Certificates"));
 const QnA = lazy(() => import("./pages/QnA"));
@@ -74,7 +74,7 @@ const App = () => {
                         <Route path="/" element={<Index />} />
                         <Route path="/about" element={<About />} />
                         <Route path="/products" element={<Products />} />
-                        {/* Equipment route temporarily removed */}
+                        <Route path="/equipment" element={<Equipment />} />
                         <Route path="/projects" element={<Projects />} />
                         <Route path="/certificates" element={<Certificates />} />
                         <Route path="/qna" element={<QnA />} />

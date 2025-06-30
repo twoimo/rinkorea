@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ProfileSkeleton from '@/components/profile/ProfileSkeleton';
 import { User, Mail, Building, Phone, Save, Trash2, AlertTriangle, Shield, Edit, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -208,13 +209,11 @@ const Profile = () => {
 
   if (loading || roleLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <>
         <Header />
-        <div className="flex items-center justify-center py-20">
-          <div className="text-lg">{t('loading', '로딩 중...')}</div>
-        </div>
+        <ProfileSkeleton />
         <Footer />
-      </div>
+      </>
     );
   }
 

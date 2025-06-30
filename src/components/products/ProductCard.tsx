@@ -17,10 +17,17 @@ interface ProductCardProps {
 
 const iconMap = {
   'Shield': Shield,
+  'shield': Shield,
   'Palette': Palette,
+  'palette': Palette,
   'Star': Star,
+  'star': Star,
   'Zap': Zap,
-  'Leaf': Leaf
+  'zap': Zap,
+  'Leaf': Leaf,
+  'leaf': Leaf,
+  'none': null,
+  'None': null
 } as const;
 
 const ProductCard = memo(({
@@ -37,7 +44,7 @@ const ProductCard = memo(({
   const [isExpanded, setIsExpanded] = useState(false);
   const IconComponent = iconMap[product.icon as keyof typeof iconMap];
 
-  if (!IconComponent) {
+  if (!IconComponent && product.icon && product.icon !== 'none' && product.icon !== 'None') {
     console.warn(`Unknown icon type: ${product.icon}`);
   }
 

@@ -8,6 +8,7 @@ import QnAEditForm from '@/components/qna/QnAEditForm';
 import QnAItem from '@/components/qna/QnAItem';
 import QnAHero from '@/components/qna/QnAHero';
 import QnAEmptyState from '@/components/qna/QnAEmptyState';
+import QnASkeleton from '@/components/qna/QnASkeleton';
 import { useInquiries } from '@/hooks/useInquiries';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -115,9 +116,7 @@ const QnA = () => {
             />
 
             {loading ? (
-              <div className="text-center py-12">
-                <p className="text-gray-500">{t('loading', '로딩 중...')}</p>
-              </div>
+              <QnASkeleton />
             ) : filteredInquiries.length === 0 ? (
               <QnAEmptyState
                 searchTerm={searchTerm}
