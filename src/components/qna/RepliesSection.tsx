@@ -108,7 +108,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
               <User className="w-3 h-3 md:w-4 md:h-4 text-blue-600 mr-1" />
               <span className="text-xs md:text-sm font-medium text-blue-900">{t('admin_reply')}</span>
             </div>
-            <span className="text-xs text-gray-400">{new Date(reply.created_at).toLocaleString(language === 'ko' ? 'ko-KR' : language === 'zh' ? 'zh-CN' : 'en-US')}</span>
+            <span className="text-xs text-gray-400">{new Date(reply.created_at).toLocaleString(language === 'ko' ? 'ko-KR' : language === 'zh' ? 'zh-CN' : 'en-US', { timeZone: language === 'ko' ? 'Asia/Seoul' : language === 'zh' ? 'Asia/Shanghai' : 'America/New_York' })}</span>
           </div>
           <div className="text-blue-800 leading-relaxed whitespace-pre-wrap text-sm md:text-base">
             {editingId === reply.id ? (

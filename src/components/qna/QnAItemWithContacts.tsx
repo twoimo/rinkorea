@@ -41,12 +41,14 @@ const QnAItemWithContacts: React.FC<QnAItemProps> = ({ inquiry, user, onEdit, on
 
     const formatDate = (dateString: string) => {
         const locale = language === 'ko' ? 'ko-KR' : language === 'zh' ? 'zh-CN' : 'en-US';
+        const timeZone = language === 'ko' ? 'Asia/Seoul' : language === 'zh' ? 'Asia/Shanghai' : 'America/New_York';
         return new Date(dateString).toLocaleDateString(locale, {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
+            timeZone: timeZone
         });
     };
 
