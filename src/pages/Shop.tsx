@@ -6,6 +6,7 @@ import ShopControls from '@/components/shop/ShopControls';
 import ShopProductGrid from '@/components/shop/ShopProductGrid';
 import ShopProductForm from '@/components/shop/ShopProductForm';
 import ShopDeleteModal from '@/components/shop/ShopDeleteModal';
+import { ShopProductGridSkeleton } from '@/components/shop/ShopProductSkeleton';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -386,17 +387,21 @@ const Shop = () => {
               onGridApply={handleGridApply}
             />
 
-            <ShopProductGrid
-              products={getVisibleProducts()}
-              gridCols={gridCols}
-              hiddenProductIds={hiddenProductIds}
-              isAdmin={isAdmin}
-              formLoading={formLoading}
-              onProductClick={handleProductClick}
-              onEditProduct={openForm}
-              onDeleteProduct={openDeleteConfirm}
-              onToggleHide={handleToggleHide}
-            />
+            {loading ? (
+              <ShopProductGridSkeleton gridCols={gridCols} />
+            ) : (
+              <ShopProductGrid
+                products={getVisibleProducts()}
+                gridCols={gridCols}
+                hiddenProductIds={hiddenProductIds}
+                isAdmin={isAdmin}
+                formLoading={formLoading}
+                onProductClick={handleProductClick}
+                onEditProduct={openForm}
+                onDeleteProduct={openDeleteConfirm}
+                onToggleHide={handleToggleHide}
+              />
+            )}
           </div>
         </section>
       </main>

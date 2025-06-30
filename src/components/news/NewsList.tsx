@@ -1,5 +1,6 @@
 import React from 'react';
 import NewsListItem from './NewsListItem';
+import { NewsListSkeleton } from './NewsCardSkeleton';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface NewsListProps {
@@ -30,11 +31,7 @@ const NewsList: React.FC<NewsListProps> = ({
   const { t } = useLanguage();
 
   if (loading) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">{t('loading', '로딩 중...')}</p>
-      </div>
-    );
+    return <NewsListSkeleton />;
   }
 
   if (news.length === 0) {

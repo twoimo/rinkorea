@@ -20,4 +20,5 @@ export interface ProductFormData {
     features: string[];
     detail_images?: string[];
     is_active?: boolean;
+    [key: string]: unknown;
 } 

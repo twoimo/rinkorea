@@ -12,6 +12,7 @@ import ProjectsHero from '@/components/projects/ProjectsHero';
 import ProjectsStats from '@/components/projects/ProjectsStats';
 import ProjectsGrid from '@/components/projects/ProjectsGrid';
 import ProjectForm from '@/components/projects/ProjectForm';
+import { ProjectsGridSkeleton } from '@/components/projects/ProjectCardSkeleton';
 
 const Projects = () => {
   const { projects, loading, deleteProject } = useProjects();
@@ -106,6 +107,25 @@ const Projects = () => {
     if (isAdmin) return projects;
     return projects.filter(p => !hiddenProjectIds.includes(p.id));
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Header />
+
+        <ProjectsHero
+          isAdmin={isAdmin}
+          onAddProject={() => openForm()}
+        />
+
+        <ProjectsGridSkeleton category="construction" />
+        <ProjectsStats />
+        <ProjectsGridSkeleton category="other" />
+
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">

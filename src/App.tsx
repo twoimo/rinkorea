@@ -9,12 +9,13 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import ErrorBoundary from "@/components/error-boundary";
 import LoadingFallback from "@/components/LoadingFallback";
+import PageSkeleton from "@/components/ui/page-skeleton";
 
 // Lazy load pages with prefetch
 const Index = lazy(() => import("./pages/Index"));
 const About = lazy(() => import("./pages/About"));
 const Products = lazy(() => import("./pages/Products"));
-const Equipment = lazy(() => import("./pages/Equipment"));
+// Equipment page temporarily removed due to missing file
 const Projects = lazy(() => import("./pages/Projects"));
 const Certificates = lazy(() => import("./pages/Certificates"));
 const QnA = lazy(() => import("./pages/QnA"));
@@ -41,15 +42,8 @@ const queryClient = new QueryClient({
   },
 });
 
-// Simplified loading fallback component
-const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-screen bg-white">
-    <div className="text-center">
-      <LoadingSpinner className="w-8 h-8 mx-auto" />
-      <p className="mt-2 text-gray-600">로딩 중...</p>
-    </div>
-  </div>
-);
+// Enhanced loading fallback component with skeleton UI
+const PageLoader = () => <PageSkeleton />;
 
 // Simplified mobile optimization (no performance interference)
 const useMobileOptimization = () => {
@@ -80,7 +74,7 @@ const App = () => {
                         <Route path="/" element={<Index />} />
                         <Route path="/about" element={<About />} />
                         <Route path="/products" element={<Products />} />
-                        <Route path="/equipment" element={<Equipment />} />
+                        {/* Equipment route temporarily removed */}
                         <Route path="/projects" element={<Projects />} />
                         <Route path="/certificates" element={<Certificates />} />
                         <Route path="/qna" element={<QnA />} />

@@ -6,8 +6,9 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { useProductsOptimized } from '@/hooks/useProductsOptimized';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Product } from '@/types/product';
+import { Product, ProductFormData } from '@/types/product';
 import { SEOHead } from '@/components/seo/SEOHead';
+import ProductCardSkeleton from '@/components/products/ProductCardSkeleton';
 
 // Lazy load components for better performance
 const ProductCard = React.lazy(() => import('@/components/products/ProductCard'));
@@ -104,7 +105,7 @@ const Products = memo(() => {
     setShowDetailDialog(false);
   }, []);
 
-  const handleFormSave = useCallback(async (formData: Partial<Product>) => {
+  const handleFormSave = useCallback(async (formData: ProductFormData) => {
     setFormLoading(true);
     setFormError(null);
     setFormSuccess(null);
@@ -158,9 +159,30 @@ const Products = memo(() => {
           image="/images/optimized/RIN-COAT-scaled.webp"
         />
         <Header />
-        <div className="flex items-center justify-center py-20">
-          <LoadingSpinner className="w-8 h-8" />
-        </div>
+
+        {/* Hero Section Skeleton */}
+        <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12 sm:py-16 lg:py-20">
+          <div className="container mx-auto px-4">
+            <div className="text-center">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 lg:mb-6">{t('products_hero_title')}</h1>
+              <p className="text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
+                {t('products_hero_subtitle')}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Products Grid Skeleton */}
+        <section className="py-12 sm:py-16 lg:py-20">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+              {Array(6).fill(0).map((_, index) => (
+                <ProductCardSkeleton key={index} />
+              ))}
+            </div>
+          </div>
+        </section>
+
         <Footer />
       </div>
     );
