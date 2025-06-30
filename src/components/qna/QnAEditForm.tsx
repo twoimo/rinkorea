@@ -12,7 +12,7 @@ interface QnAItem {
   title: string;
   content: string;
   is_private: boolean;
-  category: string;
+  category?: string;
   created_at: string;
   status: string;
 }

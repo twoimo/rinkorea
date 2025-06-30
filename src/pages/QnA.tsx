@@ -81,6 +81,23 @@ const QnA = () => {
     }
   };
 
+  const handleUpdateInquiry = async (inquiryData: {
+    name: string;
+    email: string;
+    phone: string;
+    title: string;
+    content: string;
+    is_private: boolean;
+  }): Promise<void> => {
+    if (!editingInquiry) return;
+
+    const result = await updateInquiry(editingInquiry, inquiryData);
+
+    if (result.error) {
+      throw new Error('문의 수정에 실패했습니다.');
+    }
+  };
+
   console.log('🔍 QnA Debug Info:', {
     loading,
     inquiriesCount: inquiries.length,
@@ -154,7 +171,7 @@ const QnA = () => {
         <QnAEditForm
           inquiry={editingInquiryData}
           onClose={() => setEditingInquiry(null)}
-          onSave={updateInquiry}
+          onSave={handleUpdateInquiry}
           onRefetch={refetch}
         />
       )}
