@@ -537,4 +537,4 @@ rinkorea.com (카페24 - 기존 유지)
 
 ---
 
-**Made with ❤️ by RIN Korea Development Team**
+**Made with ❤️ by RIN Korea Development Team.**
