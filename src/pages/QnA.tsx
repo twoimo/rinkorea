@@ -98,15 +98,6 @@ const QnA = () => {
     }
   };
 
-  console.log('🔍 QnA Debug Info:', {
-    loading,
-    inquiriesCount: inquiries.length,
-    filteredCount: filteredInquiries.length,
-    selectedStatus,
-    searchTerm,
-    firstInquiry: inquiries[0]
-  });
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />

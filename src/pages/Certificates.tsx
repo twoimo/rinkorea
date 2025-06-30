@@ -142,7 +142,7 @@ const Certificates = () => {
         setShowDeleteConfirm(false);
       }
     } catch (error) {
-      console.error('Error:', error);
+      // Error is already handled by toast notification
     }
   };
 

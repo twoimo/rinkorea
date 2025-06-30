@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { User } from 'lucide-react';
 import { useInquiries } from '@/hooks/useInquiries';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { logger } from '@/utils/logger';
 
 interface RepliesSectionProps {
   inquiryId: string;
@@ -19,7 +20,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
   const [replyText, setReplyText] = useState('');
   const [editingId, setEditingId] = useState(null);
 
-  console.log('🔍 RepliesSection render:', {
+  logger.debug('RepliesSection render:', {
     inquiryId,
     canView,
     isAdmin,
@@ -30,18 +31,18 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
 
   const loadReplies = useCallback(async () => {
     if (!canView || !inquiryId) {
-      console.log('❌ loadReplies skipped:', { canView, inquiryId });
+      logger.debug('loadReplies skipped:', { canView, inquiryId });
       return;
     }
 
     try {
-      console.log('🔄 loadReplies starting for inquiry:', inquiryId);
+      logger.debug('loadReplies starting for inquiry:', inquiryId);
       setError(null);
       const data = await getReplies(inquiryId);
-      console.log('✅ loadReplies success:', data?.length || 0, 'replies');
+      logger.success('loadReplies success:', data?.length || 0, 'replies');
       setReplies(data || []);
     } catch (err) {
-      console.error('❌ loadReplies error:', err);
+      logger.error('loadReplies error:', err);
       setError(t('reply_load_failed'));
       setReplies([]);
     }
@@ -50,9 +51,9 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
   // 초기 로딩만 한 번 수행
   useEffect(() => {
     if (initialLoading && canView && inquiryId) {
-      console.log('🔄 Initial load for inquiry:', inquiryId);
+      logger.debug('Initial load for inquiry:', inquiryId);
       loadReplies().finally(() => {
-        console.log('✅ Initial load completed');
+        logger.success('Initial load completed');
         setInitialLoading(false);
       });
     }
@@ -72,7 +73,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
       setReplyText('');
       await refreshReplies();
     } catch (error) {
-      console.error('Error creating reply:', error);
+      logger.error('Error creating reply:', error);
       setError(t('reply_create_failed'));
     }
   }, [replyText, createReply, inquiryId, refreshReplies, t]);
@@ -84,7 +85,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
       setReplyText('');
       await loadReplies();
     } catch (error) {
-      console.error('Error updating reply:', error);
+      logger.error('Error updating reply:', error);
       setError(t('reply_update_failed'));
     }
   }, [updateReply, loadReplies, t]);
@@ -94,7 +95,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
       await deleteReply(replyId);
       await refreshReplies();
     } catch (error) {
-      console.error('Error deleting reply:', error);
+      logger.error('Error deleting reply:', error);
       setError(t('reply_delete_failed'));
     }
   }, [deleteReply, refreshReplies, t]);

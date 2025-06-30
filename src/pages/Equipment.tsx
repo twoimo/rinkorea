@@ -375,7 +375,7 @@ const Equipment = () => {
                 closeDeleteConfirm();
             }
         } catch (error) {
-            console.error('Error:', error);
+            // Error is already handled by toast notification
         }
     };
 
@@ -399,7 +399,7 @@ const Equipment = () => {
                 }
             }
         } catch (error) {
-            console.error('Error toggling equipment visibility:', error);
+            // Error is already handled by toast notification
         }
     };
 

@@ -156,14 +156,14 @@ const Profile = () => {
         .rpc('delete_user_account');
 
       if (deleteError) {
-        console.error('계정 삭제 실패:', deleteError);
+        // Error is already handled by toast notification
         throw deleteError;
       }
 
       // 2. 로컬에서 로그아웃
       const { error: signOutError } = await signOut();
       if (signOutError) {
-        console.error('로그아웃 실패:', signOutError);
+        // Error is already handled by toast notification
         throw signOutError;
       }
 
@@ -174,7 +174,7 @@ const Profile = () => {
 
       navigate('/');
     } catch (error) {
-      console.error('계정 탈퇴 중 오류 발생:', error);
+      // Error is already handled by toast notification
       toast({
         title: t('profile_delete_failed'),
         description: error instanceof Error ? error.message : "다시 시도해주세요.",

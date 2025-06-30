@@ -140,7 +140,7 @@ const Products = memo(() => {
         handleCloseDeleteConfirm();
       }
     } catch (err) {
-      console.error('Error deleting product:', err);
+      // Error is already handled by toast notification
     }
   }, [deleteTarget, deleteProduct, handleCloseDeleteConfirm]);
 
