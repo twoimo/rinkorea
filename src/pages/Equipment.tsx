@@ -408,15 +408,16 @@ const Equipment = () => {
                                 <Award className="w-6 h-6 md:w-8 md:h-8 text-blue-600 mr-0 sm:mr-3 mb-2 sm:mb-0" />
                                 <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{t('equipment_partnership_title', 'Shanghai JS Floor Systems 공식 파트너')}</h2>
                             </div>
-                            <p className="text-base md:text-lg text-gray-600 leading-relaxed">
-                                {t('equipment_partnership_desc', 'Shanghai JS Floor Systems의 공식 파트너사로서 한국 공식 판매업체 및 서비스센터를 운영하고 있습니다. 세계적인 공사 현장에서 사용되는 콘크리트 연삭기 시장의 선두주자입니다.')}
-                                <br /><br />
+                            <div className="text-base md:text-lg text-gray-600 leading-relaxed">
+                                <p className="mb-4">
+                                    {t('equipment_partnership_desc', 'Shanghai JS Floor Systems의 공식 파트너사로서 한국 공식 판매업체 및 서비스센터를 운영하고 있습니다. 세계적인 공사 현장에서 사용되는 콘크리트 연삭기 시장의 선두주자입니다.')}
+                                </p>
                                 <div>
                                     {String(t('equipment_partnership_contact', '한국 공식판매 & 공식서비스센터(AS)\n주소: 인천\n문의전화: 032-571-1023')).split('\n').map((line, i) => (
                                         <span key={i}>{line}{i < 2 && <br />}</span>
                                     ))}
                                 </div>
-                            </p>
+                            </div>
                         </div>
                         <div className="w-full md:w-1/2">
                             <img

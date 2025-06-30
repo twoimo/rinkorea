@@ -6,9 +6,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import { StagewiseToolbar } from "@stagewise/toolbar-react";
-import { ReactPlugin } from "@stagewise-plugins/react";
-import { createPortal } from "react-dom";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import ErrorBoundary from "@/components/error-boundary";
 
@@ -43,23 +40,6 @@ const queryClient = new QueryClient({
   },
 });
 
-const ToolbarPortal = () => {
-  if (typeof window === 'undefined') return null;
-  const isDev = import.meta.env.DEV;
-  if (!isDev) return null;
-
-  return createPortal(
-    <div className="stagewise-toolbar-wrapper fixed top-0 right-0 z-[9999]">
-      <StagewiseToolbar
-        config={{
-          plugins: [ReactPlugin]
-        }}
-      />
-    </div>,
-    document.body
-  );
-};
-
 // Optimized loading fallback component
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-screen bg-background">
@@ -93,7 +73,6 @@ const App = () => {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <ToolbarPortal />
           <div className="app-content">
             <Toaster />
             <Sonner />

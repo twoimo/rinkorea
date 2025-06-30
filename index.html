@@ -4,13 +4,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-  <meta name="cache-bust" content="20250128-2030" />
+
+  <!-- Performance Optimization - Enable proper caching -->
+  <meta http-equiv="Cache-Control" content="public, max-age=31536000, stale-while-revalidate=86400" />
+
   <meta name="theme-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+  <!-- Critical Resource Preloading -->
+  <link rel="preload" href="/src/main.tsx" as="script" />
+  <link rel="preload" href="/src/index.css" as="style" />
+  <link rel="modulepreload" href="/src/App.tsx" />
+  <link rel="modulepreload" href="/src/pages/Index.tsx" />
+
+  <!-- DNS Prefetch for external resources -->
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+  <link rel="dns-prefetch" href="https://api.rinkorea.com" />
+
+  <!-- Preconnect for critical external resources -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
   <!-- Primary Meta Tags -->
   <title>린코리아 - 세라믹 코팅의 모든 것</title>
@@ -37,9 +52,10 @@
   <link rel="alternate" hreflang="zh-CN" href="https://rinkorea.com/?lang=zh" />
   <link rel="alternate" hreflang="x-default" href="https://rinkorea.com/" />
 
-  <!-- Favicon -->
+  <!-- Optimized Favicon with proper formats -->
+  <link rel="icon" href="/images/optimized/site-icon-512.webp" type="image/webp">
   <link rel="icon" href="/images/site-icon-512.png" type="image/png">
-  <link rel="apple-touch-icon" href="/images/site-icon-512.png" />
+  <link rel="apple-touch-icon" href="/images/optimized/site-icon-512.webp" />
   <link rel="canonical" href="https://rinkorea.com" />
 
   <!-- Open Graph / Facebook -->
@@ -47,7 +63,7 @@
   <meta property="og:url" content="https://rinkorea.com" />
   <meta property="og:title" content="린코리아 - 세라믹 코팅의 모든 것" />
   <meta property="og:description" content="친환경 불연재(1액형) 신소재 세라믹 코팅제 전문 제조업체" />
-  <meta property="og:image" content="https://rinkorea.com/images/site-icon-512.png" />
+  <meta property="og:image" content="https://rinkorea.com/images/optimized/site-icon-512.webp" />
   <meta property="og:site_name" content="린코리아" />
   <meta property="og:locale" content="ko_KR" />
   <meta property="og:locale:alternate" content="en_US" />
@@ -58,12 +74,12 @@
   <meta name="twitter:url" content="https://rinkorea.com" />
   <meta name="twitter:title" content="린코리아 - 세라믹 코팅의 모든 것" />
   <meta name="twitter:description" content="친환경 불연재(1액형) 신소재 세라믹 코팅제 전문 제조업체" />
-  <meta name="twitter:image" content="https://rinkorea.com/images/site-icon-512.png" />
+  <meta name="twitter:image" content="https://rinkorea.com/images/optimized/site-icon-512.webp" />
 
   <!-- Additional SEO Meta Tags -->
   <meta name="application-name" content="린코리아" />
   <meta name="msapplication-TileColor" content="#1e40af" />
-  <meta name="msapplication-TileImage" content="/images/site-icon-512.png" />
+  <meta name="msapplication-TileImage" content="/images/optimized/site-icon-512.webp" />
   <meta name="format-detection" content="telephone=no" />
 
   <!-- Industry and Business Meta Tags -->
@@ -73,11 +89,51 @@
   <meta name="rating" content="General" />
   <meta name="target" content="all" />
 
-  <!-- Preconnect for external resources only -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Critical CSS Inlining placeholder - Vite will handle this -->
+  <style>
+    /* Critical CSS for initial render */
+    #root {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-  <!-- Structured Data -->
+    /* Loading spinner styles to prevent layout shift */
+    .loading-spinner {
+      width: 2rem;
+      height: 2rem;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Prevent flash of unstyled content */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #ffffff;
+      color: #000000;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root">
+    <!-- Inline loading state to prevent flash -->
+    <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #ffffff;">
+      <div class="loading-spinner"></div>
+    </div>
+  </div>
+
+  <!-- Structured Data - Moved to end for non-blocking -->
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -85,7 +141,7 @@
       "name": "린코리아",
       "alternateName": "RIN Korea",
       "url": "https://rinkorea.com",
-      "logo": "https://rinkorea.com/images/site-icon-512.png",
+      "logo": "https://rinkorea.com/images/optimized/site-icon-512.webp",
       "description": "친환경 불연재(1액형) 신소재 세라믹 코팅제 전문 제조업체",
       "foundingDate": "2019",
       "address": {
@@ -140,10 +196,7 @@
       }
     }
   </script>
-</head>
 
-<body>
-  <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
 </body>
 
