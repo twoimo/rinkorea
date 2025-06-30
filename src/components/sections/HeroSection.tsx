@@ -13,6 +13,23 @@ const HeroSection = () => {
   const [editLink, setEditLink] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
+  const [isChina, setIsChina] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(true);
+
+  // Check if user is accessing from China
+  const checkUserLocation = async () => {
+    try {
+      setLocationLoading(true);
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
+      setIsChina(data.country_code === 'CN');
+    } catch (error) {
+      console.log('Failed to detect location, defaulting to YouTube video');
+      setIsChina(false);
+    } finally {
+      setLocationLoading(false);
+    }
+  };
 
   const loadYoutubeLink = async () => {
     try {
@@ -31,6 +48,7 @@ const HeroSection = () => {
   };
 
   useEffect(() => {
+    checkUserLocation();
     loadYoutubeLink();
   }, []);
 
@@ -75,23 +93,46 @@ const HeroSection = () => {
     <section className="relative min-h-screen overflow-hidden -mt-16 sm:-mt-20">
       {/* Background Video */}
       <div className="absolute inset-0 w-full h-full">
-        <iframe
-          className="absolute top-1/2 left-1/2"
-          style={{
-            width: '100vw',
-            height: '56.25vw',
-            minHeight: '100vh',
-            minWidth: '177.78vh',
-            transform: 'translate(-50%, -50%) scale(1.27)',
-            objectFit: 'cover',
-            pointerEvents: 'none'
-          }}
-          src={youtubeLink}
-          title="RIN-COAT Introduction"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        ></iframe>
+        {locationLoading ? (
+          // Loading state
+          <div className="absolute inset-0 bg-gray-900 flex items-center justify-center">
+            <Loader2 className="w-8 h-8 text-white animate-spin" />
+          </div>
+        ) : isChina ? (
+          // Local video for China
+          <video
+            className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto object-cover"
+            style={{
+              transform: 'translate(-50%, -50%)',
+            }}
+            autoPlay
+            muted
+            loop
+            playsInline
+          >
+            <source src="/videos/intro_video.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        ) : (
+          // YouTube video for other regions
+          <iframe
+            className="absolute top-1/2 left-1/2"
+            style={{
+              width: '100vw',
+              height: '56.25vw',
+              minHeight: '100vh',
+              minWidth: '177.78vh',
+              transform: 'translate(-50%, -50%) scale(1.27)',
+              objectFit: 'cover',
+              pointerEvents: 'none'
+            }}
+            src={youtubeLink}
+            title="RIN-COAT Introduction"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+        )}
       </div>
 
       {/* Enhanced Overlay */}
