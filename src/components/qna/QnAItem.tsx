@@ -34,13 +34,33 @@ interface QnAItemProps {
 
 const QnAItem: React.FC<QnAItemProps> = ({ inquiry, user, onEdit, onDelete, onRefetch }) => {
   const { isAdmin } = useUserRole();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  // 카테고리 매핑 함수
+  const getCategoryTranslation = (category: string) => {
+    const categoryMapping: { [key: string]: string } = {
+      '일반 문의': 'qna_category_general',
+      '일반문의': 'qna_category_general',
+      '제품 문의': 'qna_category_product',
+      '제품문의': 'qna_category_product',
+      '기술 문의': 'qna_category_technical',
+      '기술문의': 'qna_category_technical',
+      '서비스 문의': 'qna_category_service',
+      '서비스문의': 'qna_category_service',
+      '기계 문의': 'qna_category_technical',
+      '주문 문의': 'qna_category_service',
+    };
+
+    const translationKey = categoryMapping[category];
+    return translationKey ? t(translationKey) : category;
+  };
 
   const canView = !inquiry.is_private || isAdmin || (user && user.id === inquiry.user_id);
   const canEdit = user && (user.id === inquiry.user_id || isAdmin);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ko-KR', {
+    const locale = language === 'ko' ? 'ko-KR' : language === 'zh' ? 'zh-CN' : 'en-US';
+    return new Date(dateString).toLocaleDateString(locale, {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
@@ -85,7 +105,7 @@ const QnAItem: React.FC<QnAItemProps> = ({ inquiry, user, onEdit, onDelete, onRe
           <div className="flex-1">
             <div className="flex items-center space-x-2 mb-2">
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                {inquiry.category || t('qna_category_general', '일반문의')}
+                {inquiry.category ? getCategoryTranslation(inquiry.category) : t('qna_category_general')}
               </span>
               {getStatusBadge(inquiry.status)}
               {inquiry.is_private && (
@@ -115,7 +135,7 @@ const QnAItem: React.FC<QnAItemProps> = ({ inquiry, user, onEdit, onDelete, onRe
                     onClick={() => navigator.clipboard.writeText(inquiry.email || '')}
                     className="ml-1 text-xs px-1 py-0.5 bg-yellow-200 text-yellow-900 rounded hover:bg-yellow-300 transition-colors"
                   >
-                    복사
+                    {t('copy')}
                   </button>
                 </div>
               )}
@@ -127,7 +147,7 @@ const QnAItem: React.FC<QnAItemProps> = ({ inquiry, user, onEdit, onDelete, onRe
                     onClick={() => navigator.clipboard.writeText(inquiry.phone || '')}
                     className="ml-1 text-xs px-1 py-0.5 bg-yellow-200 text-yellow-900 rounded hover:bg-yellow-300 transition-colors"
                   >
-                    복사
+                    {t('copy')}
                   </button>
                 </div>
               )}
@@ -169,7 +189,7 @@ const QnAItem: React.FC<QnAItemProps> = ({ inquiry, user, onEdit, onDelete, onRe
             <div className="border-l-4 border-blue-500 bg-blue-50 p-4 rounded-lg ml-4">
               <div className="flex items-center mb-2">
                 <Shield className="w-4 h-4 text-blue-600 mr-2" />
-                <span className="text-sm font-medium text-blue-800">관리자 답변</span>
+                <span className="text-sm font-medium text-blue-800">{t('admin_reply')}</span>
               </div>
               <div className="prose prose-sm max-w-none">
                 <p className="text-blue-700 whitespace-pre-wrap">{inquiry.admin_reply}</p>

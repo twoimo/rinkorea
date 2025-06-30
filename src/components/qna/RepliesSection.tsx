@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { User } from 'lucide-react';
 import { useInquiries } from '@/hooks/useInquiries';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface RepliesSectionProps {
   inquiryId: string;
@@ -11,6 +12,7 @@ interface RepliesSectionProps {
 
 const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView, isAdmin, onRefetch }) => {
   const { getReplies, createReply, updateReply, deleteReply } = useInquiries();
+  const { t, language } = useLanguage();
   const [replies, setReplies] = useState([]);
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +42,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
       setReplies(data || []);
     } catch (err) {
       console.error('❌ loadReplies error:', err);
-      setError('답변을 불러오는데 실패했습니다.');
+      setError(t('reply_load_failed'));
       setReplies([]);
     }
   }, [inquiryId, canView, getReplies]);
@@ -71,7 +73,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
       await refreshReplies();
     } catch (error) {
       console.error('Error creating reply:', error);
-      setError('답변 등록에 실패했습니다.');
+      setError(t('reply_create_failed'));
     }
   }, [replyText, createReply, inquiryId, refreshReplies]);
 
@@ -83,7 +85,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
       await loadReplies();
     } catch (error) {
       console.error('Error updating reply:', error);
-      setError('답변 수정에 실패했습니다.');
+      setError(t('reply_update_failed'));
     }
   }, [updateReply, loadReplies]);
 
@@ -93,7 +95,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
       await refreshReplies();
     } catch (error) {
       console.error('Error deleting reply:', error);
-      setError('답변 삭제에 실패했습니다.');
+      setError(t('reply_delete_failed'));
     }
   }, [deleteReply, refreshReplies]);
 
@@ -104,9 +106,9 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
           <div className="flex flex-col sm:flex-row sm:items-center mb-1 gap-1 sm:gap-2">
             <div className="flex items-center">
               <User className="w-3 h-3 md:w-4 md:h-4 text-blue-600 mr-1" />
-              <span className="text-xs md:text-sm font-medium text-blue-900">관리자 답변</span>
+              <span className="text-xs md:text-sm font-medium text-blue-900">{t('admin_reply')}</span>
             </div>
-            <span className="text-xs text-gray-400">{new Date(reply.created_at).toLocaleString('ko-KR')}</span>
+            <span className="text-xs text-gray-400">{new Date(reply.created_at).toLocaleString(language === 'ko' ? 'ko-KR' : language === 'zh' ? 'zh-CN' : 'en-US')}</span>
           </div>
           <div className="text-blue-800 leading-relaxed whitespace-pre-wrap text-sm md:text-base">
             {editingId === reply.id ? (
@@ -127,13 +129,13 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
                   onClick={() => handleUpdateReply(reply.id, replyText)}
                   className="text-blue-600 text-xs px-2 py-1 hover:bg-blue-100 rounded"
                 >
-                  저장
+                  {t('save')}
                 </button>
                 <button
                   onClick={() => { setEditingId(null); setReplyText(''); }}
                   className="text-gray-400 text-xs px-2 py-1 hover:bg-gray-100 rounded"
                 >
-                  취소
+                  {t('cancel')}
                 </button>
               </>
             ) : (
@@ -142,13 +144,13 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
                   onClick={() => { setEditingId(reply.id); setReplyText(reply.content); }}
                   className="text-blue-600 text-xs px-2 py-1 hover:bg-blue-100 rounded"
                 >
-                  수정
+                  {t('edit')}
                 </button>
                 <button
                   onClick={() => handleDeleteReply(reply.id)}
                   className="text-red-600 text-xs px-2 py-1 hover:bg-red-100 rounded"
                 >
-                  삭제
+                  {t('delete')}
                 </button>
               </>
             )}
@@ -163,7 +165,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
   return (
     <div className="mt-4 md:mt-6">
       {initialLoading ? (
-        <div className="text-gray-400 text-sm md:text-base">답변 불러오는 중...</div>
+        <div className="text-gray-400 text-sm md:text-base">{t('replies_loading')}</div>
       ) : error ? (
         <div className="text-red-500 text-sm md:text-base">
           {error}
@@ -174,30 +176,30 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
             }}
             className="ml-2 text-blue-600 hover:underline"
           >
-            다시 시도
+            {t('try_again')}
           </button>
         </div>
       ) : (
         <>
           {replies.length === 0 ? (
             <div className="space-y-4">
-              <div className="text-gray-400 text-sm md:text-base">아직 답변이 없습니다.</div>
+              <div className="text-gray-400 text-sm md:text-base">{t('no_replies_yet')}</div>
               {isAdmin && (
                 <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">답변 작성</h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">{t('write_reply')}</h4>
                   <textarea
                     value={replyText}
                     onChange={e => setReplyText(e.target.value)}
                     className="w-full p-2 rounded border text-sm md:text-base"
                     rows={3}
-                    placeholder="답변을 입력하세요..."
+                    placeholder={t('reply_placeholder')}
                   />
                   <div className="mt-2 flex justify-end">
                     <button
                       onClick={handleCreateReply}
                       className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors text-sm md:text-base"
                     >
-                      답변 등록
+                      {t('post_reply')}
                     </button>
                   </div>
                 </div>
@@ -208,20 +210,20 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
               {replyElements}
               {isAdmin && (
                 <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">추가 답변 작성</h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">{t('additional_reply')}</h4>
                   <textarea
                     value={replyText}
                     onChange={e => setReplyText(e.target.value)}
                     className="w-full p-2 rounded border text-sm md:text-base"
                     rows={3}
-                    placeholder="답변을 입력하세요..."
+                    placeholder={t('reply_placeholder')}
                   />
                   <div className="mt-2 flex justify-end">
                     <button
                       onClick={handleCreateReply}
                       className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors text-sm md:text-base"
                     >
-                      답변 등록
+                      {t('post_reply')}
                     </button>
                   </div>
                 </div>

@@ -34,13 +34,14 @@ interface QnAItemProps {
 
 const QnAItemWithContacts: React.FC<QnAItemProps> = ({ inquiry, user, onEdit, onDelete, onRefetch }) => {
     const { isAdmin } = useUserRole();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
 
     const canView = !inquiry.is_private || isAdmin || (user && user.id === inquiry.user_id);
     const canEdit = user && (user.id === inquiry.user_id || isAdmin);
 
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('ko-KR', {
+        const locale = language === 'ko' ? 'ko-KR' : language === 'zh' ? 'zh-CN' : 'en-US';
+        return new Date(dateString).toLocaleDateString(locale, {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
