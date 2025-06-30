@@ -79,10 +79,10 @@ export function LanguageSelector({
                     <Button
                         variant="secondary"
                         size="icon"
-                        className={`w-10 h-10 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors`}
+                        className="flex items-center justify-center w-10 h-10 rounded-md transition-all duration-200 hover:scale-105 touch-manipulation focus:outline-none focus:ring-2 focus:ring-offset-2 bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm focus:ring-white/50"
                         aria-label="언어 선택"
                     >
-                        <Globe className="w-5 h-5" />
+                        <Globe className="w-6 h-6" />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-[150px]">
@@ -111,10 +111,10 @@ export function LanguageSelector({
                 <DropdownMenuTrigger asChild>
                     <Button
                         variant="secondary"
-                        className={`w-10 h-10 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors`}
+                        className="flex items-center justify-center w-10 h-10 rounded-md transition-all duration-200 hover:scale-105 touch-manipulation focus:outline-none focus:ring-2 focus:ring-offset-2 bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm focus:ring-white/50"
                         aria-label="언어 선택"
                     >
-                        <Globe className="w-5 h-5" />
+                        <Globe className="w-6 h-6" />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-[150px]">
@@ -143,10 +143,10 @@ export function LanguageSelector({
             <DropdownMenuTrigger asChild>
                 <Button
                     variant="secondary"
-                    className={`w-10 h-10 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors`}
+                    className="flex items-center justify-center w-10 h-10 rounded-md transition-all duration-200 hover:scale-105 touch-manipulation focus:outline-none focus:ring-2 focus:ring-offset-2 bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm focus:ring-white/50"
                     aria-label="언어 선택"
                 >
-                    <Globe className="w-5 h-5" />
+                    <Globe className="w-6 h-6" />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-[180px]">
