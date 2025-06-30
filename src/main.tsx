@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
+import { initPerformanceMonitoring } from './utils/performance'
 
 // Register Service Worker for performance optimization
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
@@ -28,5 +29,10 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
             });
     });
 }
+
+// Initialize performance monitoring (delayed to ensure React renders first)
+setTimeout(() => {
+    initPerformanceMonitoring();
+}, 100);
 
 createRoot(document.getElementById("root")!).render(<App />);

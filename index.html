@@ -17,6 +17,11 @@
   <link rel="preload" href="/src/index.css" as="style" />
   <link rel="modulepreload" href="/src/App.tsx" />
   <link rel="modulepreload" href="/src/pages/Index.tsx" />
+  <link rel="modulepreload" href="/src/utils/performance.ts" />
+
+  <!-- Critical Images Preload -->
+  <link rel="preload" href="/images/optimized/site-icon-512.webp" as="image" type="image/webp" />
+  <link rel="preload" href="/images/optimized/rin-korea-logo-white.webp" as="image" type="image/webp" />
 
   <!-- DNS Prefetch for external resources -->
   <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
@@ -51,6 +56,9 @@
   <link rel="alternate" hreflang="en" href="https://rinkorea.com/?lang=en" />
   <link rel="alternate" hreflang="zh-CN" href="https://rinkorea.com/?lang=zh" />
   <link rel="alternate" hreflang="x-default" href="https://rinkorea.com/" />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json" />
 
   <!-- Optimized Favicon with proper formats -->
   <link rel="icon" href="/images/optimized/site-icon-512.webp" type="image/webp">
@@ -89,7 +97,7 @@
   <meta name="rating" content="General" />
   <meta name="target" content="all" />
 
-  <!-- Critical CSS Inlining placeholder - Vite will handle this -->
+  <!-- Critical CSS Inlining for above-the-fold content -->
   <style>
     /* Critical CSS for initial render */
     #root {
@@ -121,6 +129,39 @@
       font-family: system-ui, -apple-system, sans-serif;
       background-color: #ffffff;
       color: #000000;
+      /* Enable smooth scrolling for mobile */
+      -webkit-overflow-scrolling: touch;
+      /* Optimize paint performance */
+      contain: layout style;
+    }
+
+    /* Mobile optimization */
+    @media (max-width: 768px) {
+      body {
+        /* Prevent double-tap zoom */
+        touch-action: manipulation;
+        /* Optimize scrolling */
+        overscroll-behavior: contain;
+      }
+    }
+
+    /* Slow network optimizations */
+    html[data-network="slow"] img {
+      /* Reduce image quality on slow networks */
+      image-rendering: optimizeSpeed;
+    }
+
+    /* Reduce motion for users who prefer it */
+    @media (prefers-reduced-motion: reduce) {
+      .loading-spinner {
+        animation: none;
+      }
+
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>

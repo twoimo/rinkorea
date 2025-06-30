@@ -1,0 +1,96 @@
+{
+    "name": "린코리아 - 세라믹 코팅의 모든 것",
+    "short_name": "린코리아",
+    "description": "친환경 불연재(1액형) 신소재 세라믹 코팅제 전문 제조업체",
+    "theme_color": "#1e40af",
+    "background_color": "#ffffff",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "lang": "ko-KR",
+    "dir": "ltr",
+    "categories": [
+        "business",
+        "construction",
+        "manufacturing"
+    ],
+    "icons": [
+        {
+            "src": "/images/optimized/site-icon-512.webp",
+            "sizes": "512x512",
+            "type": "image/webp",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/images/site-icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/optimized/site-icon-512.webp",
+            "sizes": "192x192",
+            "type": "image/webp",
+            "purpose": "any maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "제품 보기",
+            "short_name": "제품",
+            "description": "린코리아 세라믹 코팅 제품 보기",
+            "url": "/products",
+            "icons": [
+                {
+                    "src": "/images/optimized/site-icon-512.webp",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "시공 사례",
+            "short_name": "시공사례",
+            "description": "린코리아 시공 프로젝트 사례 보기",
+            "url": "/projects",
+            "icons": [
+                {
+                    "src": "/images/optimized/site-icon-512.webp",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "연락처",
+            "short_name": "연락처",
+            "description": "린코리아에 문의하기",
+            "url": "/contact",
+            "icons": [
+                {
+                    "src": "/images/optimized/site-icon-512.webp",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ],
+    "prefer_related_applications": false,
+    "edge_side_includes": false,
+    "iarc_rating_id": "",
+    "related_applications": [],
+    "screenshots": [
+        {
+            "src": "/images/optimized/린코트 카탈로그_2025(한글&영문)_1.webp",
+            "sizes": "1280x720",
+            "type": "image/webp",
+            "platform": "wide",
+            "label": "린코리아 제품 카탈로그"
+        },
+        {
+            "src": "/images/optimized/현대건설기계 군산공장001.webp",
+            "sizes": "750x1334",
+            "type": "image/webp",
+            "platform": "narrow",
+            "label": "린코리아 시공 사례"
+        }
+    ]
+}
