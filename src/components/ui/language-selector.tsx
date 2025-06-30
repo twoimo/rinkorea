@@ -42,13 +42,15 @@ interface LanguageSelectorProps {
     size?: 'sm' | 'default' | 'lg';
     showFlag?: boolean;
     showNativeName?: boolean;
+    isTransparent?: boolean;
 }
 
 export function LanguageSelector({
     variant = 'default',
     size = 'default',
     showFlag = true,
-    showNativeName = true
+    showNativeName = true,
+    isTransparent = false
 }: LanguageSelectorProps) {
     const { language, setLanguage } = useLanguage();
 
@@ -79,7 +81,10 @@ export function LanguageSelector({
                     <Button
                         variant="secondary"
                         size="icon"
-                        className="flex items-center justify-center w-10 h-10 rounded-md transition-all duration-200 hover:scale-105 touch-manipulation focus:outline-none focus:ring-2 focus:ring-offset-2 bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm focus:ring-white/50"
+                        className={`flex items-center justify-center w-10 h-10 rounded-md transition-all duration-200 hover:scale-105 touch-manipulation focus:outline-none focus:ring-2 focus:ring-offset-2 ${isTransparent
+                            ? 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm focus:ring-white/50'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-400'
+                            }`}
                         aria-label="언어 선택"
                     >
                         <Globe className="w-6 h-6" />

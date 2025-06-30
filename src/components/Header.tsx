@@ -199,6 +199,7 @@ const Header = () => {
             {/* Language Selector */}
             <LanguageSelector
               variant="flag-only"
+              isTransparent={shouldBeTransparent}
             />
           </div>
 
@@ -206,6 +207,7 @@ const Header = () => {
           <div className="flex items-center space-x-2 xl:hidden">
             <LanguageSelector
               variant="flag-only"
+              isTransparent={shouldBeTransparent}
             />
             <button
               className={cn(
