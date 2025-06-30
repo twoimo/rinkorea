@@ -45,7 +45,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
       setError(t('reply_load_failed'));
       setReplies([]);
     }
-  }, [inquiryId, canView, getReplies]);
+  }, [inquiryId, canView, getReplies, t]);
 
   // 초기 로딩만 한 번 수행
   useEffect(() => {
@@ -75,7 +75,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
       console.error('Error creating reply:', error);
       setError(t('reply_create_failed'));
     }
-  }, [replyText, createReply, inquiryId, refreshReplies]);
+  }, [replyText, createReply, inquiryId, refreshReplies, t]);
 
   const handleUpdateReply = useCallback(async (replyId: string, content: string) => {
     try {
@@ -87,7 +87,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
       console.error('Error updating reply:', error);
       setError(t('reply_update_failed'));
     }
-  }, [updateReply, loadReplies]);
+  }, [updateReply, loadReplies, t]);
 
   const handleDeleteReply = useCallback(async (replyId: string) => {
     try {
@@ -97,7 +97,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
       console.error('Error deleting reply:', error);
       setError(t('reply_delete_failed'));
     }
-  }, [deleteReply, refreshReplies]);
+  }, [deleteReply, refreshReplies, t]);
 
   const replyElements = useMemo(() => {
     return replies.map(reply => (
@@ -158,7 +158,7 @@ const RepliesSection: React.FC<RepliesSectionProps> = memo(({ inquiryId, canView
         )}
       </div>
     ));
-  }, [replies, editingId, replyText, isAdmin, handleUpdateReply, handleDeleteReply]);
+  }, [replies, editingId, replyText, isAdmin, handleUpdateReply, handleDeleteReply, t, language]);
 
   if (!canView) return null;
 

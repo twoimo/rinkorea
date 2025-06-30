@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
 interface LazyImageProps {
@@ -40,7 +40,7 @@ const LazyImage = ({
     };
 
     // WebP 경로 생성
-    const getOptimizedSrc = (originalSrc: string) => {
+    const getOptimizedSrc = useCallback((originalSrc: string) => {
         if (supportsWebP() && !originalSrc.includes('.webp')) {
             // 경로를 WebP로 변환 시도
             const pathParts = originalSrc.split('/');
@@ -52,7 +52,7 @@ const LazyImage = ({
             }
         }
         return originalSrc;
-    };
+    }, []);
 
     // Intersection Observer for lazy loading
     useEffect(() => {
@@ -112,7 +112,7 @@ const LazyImage = ({
             }
         };
         img.src = optimizedSrc;
-    }, [isInView, src, onLoad, onError]);
+    }, [isInView, src, onLoad, onError, getOptimizedSrc]);
 
     if (hasError) {
         return (
