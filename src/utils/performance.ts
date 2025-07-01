@@ -14,7 +14,7 @@ export const reportWebVitals = () => {
                             }
                         }
                     }).observe({ type: 'layout-shift', buffered: true });
-                } catch (e) {
+                } catch {
                     console.warn('Layout shift measurement not supported');
                 }
 
@@ -25,7 +25,7 @@ export const reportWebVitals = () => {
                         const lastEntry = entries[entries.length - 1];
                         console.log('LCP:', lastEntry.startTime);
                     }).observe({ type: 'largest-contentful-paint', buffered: true });
-                } catch (e) {
+                } catch {
                     console.warn('LCP measurement not supported');
                 }
 
@@ -37,7 +37,7 @@ export const reportWebVitals = () => {
                             console.log('FID:', (fidEntry.processingStart || 0) - entry.startTime);
                         }
                     }).observe({ type: 'first-input', buffered: true });
-                } catch (e) {
+                } catch {
                     console.warn('FID measurement not supported');
                 }
             }
@@ -106,7 +106,7 @@ export const optimizeConnections = () => {
 };
 
 // 이미지 최적화 유틸리티
-export const getOptimizedImageSrc = (src: string, width?: number, quality = 75) => {
+export const getOptimizedImageSrc = (src: string, width?: number, _quality = 75) => {
     // WebP 지원 확인
     const supportsWebP = () => {
         if (typeof window === 'undefined') return false;

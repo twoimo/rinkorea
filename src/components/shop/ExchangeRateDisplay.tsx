@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, DollarSign, CircleDollarSign } from 'lucide-react';
+import { DollarSign } from 'lucide-react';
 import { useCurrency } from '@/hooks/useCurrency';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -32,7 +32,7 @@ const ExchangeRateDisplay = () => {
                 };
             case 'zh':
                 return {
-                    icon: <CircleDollarSign className="w-3 h-3" />,
+                    icon: <DollarSign className="w-3 h-3" />,
                     rate: formatRateForDisplay(exchangeRates.CNY, 'CNY'),
                     color: 'text-red-600'
                 };

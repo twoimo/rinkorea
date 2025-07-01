@@ -60,7 +60,7 @@ const NewsForm: React.FC<NewsFormProps> = ({
         setFormError(null);
         try {
             await onSave(formData);
-        } catch (err) {
+        } catch {
             setFormError(t('submit_error', '저장에 실패했습니다.'));
         }
     };

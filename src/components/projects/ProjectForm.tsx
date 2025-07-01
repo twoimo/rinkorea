@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Plus, Save } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useProjects, type Project } from '@/hooks/useProjects';
+import { useProjects } from '@/hooks/useProjects';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -16,7 +16,7 @@ interface ProjectFormProps {
 const ProjectForm: React.FC<ProjectFormProps> = ({ isOpen, editingProject, onClose, onSuccess }) => {
   const { projects, createProject, updateProject } = useProjects();
   const isMobile = useIsMobile();
-  const { language } = useLanguage();
+  const { language: _language } = useLanguage();
   const modalRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number>();
 

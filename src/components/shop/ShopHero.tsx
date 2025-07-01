@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, ShoppingBag } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ShopHeroProps {

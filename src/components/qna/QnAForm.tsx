@@ -16,7 +16,7 @@ interface QnAFormProps {
 }
 
 const QnAForm: React.FC<QnAFormProps> = ({ onClose, onSave, onRefetch }) => {
-  const { user } = useAuth();
+  const { user: _user } = useAuth();
   const { t } = useLanguage();
   const modalRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number>();
@@ -158,7 +158,8 @@ const QnAForm: React.FC<QnAFormProps> = ({ onClose, onSave, onRefetch }) => {
       await onSave(formData);
       onRefetch();
       onClose();
-    } catch (err) {
+    } catch (_err) {
+      console.error('Error creating QnA:', _err);
       setError(t('submit_error', '문의 등록에 실패했습니다.'));
     } finally {
       setLoading(false);

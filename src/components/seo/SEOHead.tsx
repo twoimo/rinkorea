@@ -37,7 +37,7 @@ export function SEOHead({
     siteName = '린코리아',
     alternateUrls
 }: SEOHeadProps) {
-    const { language, t } = useLanguage();
+    const { language } = useLanguage();
 
     // Default SEO content by language
     const defaultSEO = {

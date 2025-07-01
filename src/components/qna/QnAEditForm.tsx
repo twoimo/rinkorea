@@ -30,7 +30,7 @@ const QnAEditForm: React.FC<QnAEditFormProps> = ({
   onClose,
   onRefetch
 }) => {
-  const { user } = useAuth();
+  const { user: _user } = useAuth();
   const { t } = useLanguage();
   const modalRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number>();
@@ -66,7 +66,8 @@ const QnAEditForm: React.FC<QnAEditFormProps> = ({
       });
       onRefetch();
       onClose();
-    } catch (err) {
+    } catch (_err) {
+      console.error('Error updating QnA:', _err);
       setError(t('submit_error', '문의 수정에 실패했습니다.'));
     } finally {
       setLoading(false);

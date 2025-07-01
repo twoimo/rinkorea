@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useUserRole } from '@/hooks/useUserRole';
-import { useProductsOptimized } from '@/hooks/useProductsOptimized';
+import { useProducts } from '@/hooks/useProducts';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Product, ProductFormData } from '@/types/product';
@@ -36,7 +36,7 @@ const Products = memo(() => {
     createProduct,
     updateProduct,
     deleteProduct
-  } = useProductsOptimized();
+  } = useProducts();
   const { t, language } = useLanguage();
 
   // UI state
@@ -124,7 +124,8 @@ const Products = memo(() => {
         setFormSuccess(editingProduct ? t('products_save_success', '제품이 수정되었습니다.') : t('products_add_success', '제품이 추가되었습니다.'));
         setTimeout(handleCloseForm, 1500);
       }
-    } catch (err) {
+    } catch (_err) {
+      console.error('Error updating product:', _err);
       setFormError(t('products_error_occurred', '오류가 발생했습니다.'));
     } finally {
       setFormLoading(false);
@@ -139,8 +140,8 @@ const Products = memo(() => {
       if (!result?.error) {
         handleCloseDeleteConfirm();
       }
-    } catch (err) {
-      // Error is already handled by toast notification
+    } catch (_err) {
+      console.error('Error deleting product:', _err);
     }
   }, [deleteTarget, deleteProduct, handleCloseDeleteConfirm]);
 

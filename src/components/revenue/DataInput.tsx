@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Upload, Download, Plus, X, Save, FileSpreadsheet, ChevronDown } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Upload, Download, Plus, X, Save, FileSpreadsheet } from 'lucide-react';
 import { RevenueData, RevenueCategory } from '@/types/revenue';
 import * as Papa from 'papaparse';
+
 
 interface DataInputProps {
     categories: RevenueCategory[];
@@ -165,22 +166,27 @@ const DataInput: React.FC<DataInputProps> = ({
             return;
         }
 
-        const result = await onDataSubmit(validData as Omit<RevenueData, 'id' | 'created_at' | 'updated_at' | 'created_by'>[]);
-        if (result.success) {
-            setUploadSuccess(`${validData.length}개 항목이 저장되었습니다.`);
-            setTableData([{
-                date: new Date().toISOString().split('T')[0],
-                category: '',
-                product_name: '',
-                revenue: 0,
-                quantity: 0,
-                unit_price: 0,
-                region: '',
-                customer_type: '',
-                notes: ''
-            }]);
-            setTimeout(() => setUploadSuccess(null), 3000);
-        } else {
+        try {
+            const result = await onDataSubmit(validData as Omit<RevenueData, 'id' | 'created_at' | 'updated_at' | 'created_by'>[]);
+            if (result.success) {
+                setUploadSuccess(`${validData.length}개 항목이 저장되었습니다.`);
+                setTableData([{
+                    date: new Date().toISOString().split('T')[0],
+                    category: '',
+                    product_name: '',
+                    revenue: 0,
+                    quantity: 0,
+                    unit_price: 0,
+                    region: '',
+                    customer_type: '',
+                    notes: ''
+                }]);
+                setTimeout(() => setUploadSuccess(null), 3000);
+            } else {
+                setUploadError('데이터 저장 중 오류가 발생했습니다.');
+            }
+        } catch (_error) {
+            console.error('Error saving data:', _error);
             setUploadError('데이터 저장 중 오류가 발생했습니다.');
         }
     };
@@ -225,7 +231,8 @@ const DataInput: React.FC<DataInputProps> = ({
                     } else {
                         setUploadError('데이터 업로드 중 오류가 발생했습니다.');
                     }
-                } catch (error) {
+                } catch (_error) {
+                    console.error('Error processing file:', _error);
                     setUploadError('파일 처리 중 오류가 발생했습니다.');
                 }
             },

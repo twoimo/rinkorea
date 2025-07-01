@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,9 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import ErrorBoundary from "@/components/error-boundary";
-import LoadingFallback from "@/components/LoadingFallback";
 import PageSkeleton from "@/components/ui/page-skeleton";
 
 // Lazy load pages with prefetch
@@ -45,17 +43,7 @@ const queryClient = new QueryClient({
 // Enhanced loading fallback component with skeleton UI
 const PageLoader = () => <PageSkeleton />;
 
-// Simplified mobile optimization (no performance interference)
-const useMobileOptimization = () => {
-  useEffect(() => {
-    // Minimal mobile optimizations only
-    console.log('Mobile optimizations initialized');
-  }, []);
-};
-
 const App = () => {
-  useMobileOptimization();
-
   return (
     <ErrorBoundary>
       {/* LoadingFallback temporarily disabled for debugging NO_FCP */}

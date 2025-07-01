@@ -12,8 +12,8 @@ const LoadingFallback = () => {
             setTimeout(() => {
                 try {
                     initialLoader.remove();
-                } catch (e) {
-                    // 이미 제거된 경우 무시
+                } catch {
+                    // Silently handle any errors during loading state management
                 }
             }, 300);
         }

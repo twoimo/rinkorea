@@ -19,7 +19,7 @@ export const useUserRole = () => {
       } else {
         setRole(data || 'user');
       }
-    } catch (error) {
+    } catch {
       setRole('user');
     } finally {
       setLoading(false);

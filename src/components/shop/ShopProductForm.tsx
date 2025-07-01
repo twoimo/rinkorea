@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Save, AlertCircle, Upload, Plus, Trash2 } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Product {
@@ -57,7 +57,7 @@ const ShopProductForm: React.FC<ShopProductFormProps> = ({
   const { t } = useLanguage();
   const modalRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number>();
-  const [loading, setLoading] = useState(formLoading);
+  const [loading, _setLoading] = useState(formLoading);
 
   useEffect(() => {
     // 스크롤 차단 강화

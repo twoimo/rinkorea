@@ -9,34 +9,30 @@ import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProfileSkeleton from '@/components/profile/ProfileSkeleton';
-import { User, Mail, Building, Phone, Save, Trash2, AlertTriangle, Shield, Edit, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { User, Save, Trash2, AlertTriangle, Shield } from 'lucide-react';
 
 const Profile = () => {
   const { user, signOut } = useAuth();
   const { profile, loading, updateProfile } = useProfile();
-  const { role, isAdmin, loading: roleLoading } = useUserRole();
+  const { role: _role, isAdmin: _isAdmin, loading: roleLoading } = useUserRole();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isEditing, setIsEditing] = useState(false);
-  const modalRef = useRef<HTMLDivElement>(null);
-  const animationFrameRef = useRef<number>();
+  const [_isEditing] = useState(false);
+  const _modalRef = useRef<HTMLDivElement>(null);
+  const _animationFrameRef = useRef<number>();
 
   const [name, setName] = useState(profile?.name || '');
   const [company, setCompany] = useState(profile?.company || '');
   const [phone, setPhone] = useState(profile?.phone || '');
-  const [saving, setSaving] = useState(false);
+  const [_saving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
-  const [changingPassword, setChangingPassword] = useState(false);
+  const [_changingPassword] = useState(false);
 
   // 전화번호 유효성 검사 함수
   const validatePhone = (value: string) => {
@@ -78,7 +74,7 @@ const Profile = () => {
     company !== (profile?.company || '') ||
     phone !== (profile?.phone || '');
   const isPasswordChanged = newPassword.length > 0 || confirmPassword.length > 0 || currentPassword.length > 0;
-  const isAnyChanged = isProfileChanged || isPasswordChanged;
+  const _isAnyChanged = isProfileChanged || isPasswordChanged;
   const [savingAll, setSavingAll] = useState(false);
 
   const handleSaveAll = async (e: React.FormEvent) => {

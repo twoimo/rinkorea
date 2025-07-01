@@ -19,8 +19,8 @@ const OptimizedImage = ({
     width,
     height,
     className,
-    priority = false,
-    quality = 75,
+    priority: _priority = false,
+    quality: _quality = 75,
     loading = "lazy",
     onError,
 }: OptimizedImageProps) => {

@@ -29,7 +29,7 @@ export const checkWebPSupport = (): Promise<boolean> => {
 
 // 최적화된 이미지 URL 생성
 export const getOptimizedImageUrl = (src: string, options: ImageOptimizationOptions = {}): string => {
-    const { width, height, quality = 75, format } = options;
+    const { width: _width, height: _height, quality: _quality = 75, format } = options;
 
     // WebP 변환 로직
     if (format === 'webp' || (format === undefined && webpSupported)) {

@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { useState } from 'react';
 import { Shield, Palette, Star, Zap, Leaf, Edit, Trash2, EyeOff, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/image';
 import { Product } from '@/types/product';
@@ -6,7 +6,7 @@ import { useLanguage, getLocalizedValue, getLocalizedArray } from '@/contexts/La
 
 interface ProductCardProps {
   product: Product;
-  index: number;
+  _index: number;
   isHidden: boolean;
   isAdmin: boolean;
   onEdit: (product: Product) => void;
@@ -30,9 +30,9 @@ const iconMap = {
   'None': null
 } as const;
 
-const ProductCard = memo(({
+const ProductCard: React.FC<ProductCardProps> = React.memo(({
   product,
-  index,
+  _index,
   isHidden,
   isAdmin,
   onEdit,

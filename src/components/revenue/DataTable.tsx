@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Edit, Trash2, X, Save, Calendar, Package, DollarSign, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Edit, Trash2, X, Save, Package, DollarSign, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { RevenueData, RevenueCategory } from '@/types/revenue';
 
 interface DataTableProps {
