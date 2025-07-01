@@ -71,8 +71,6 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
           alt={localizedName}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
-          width={800}
-          height={800}
         />
         {product.icon && IconComponent && (
           <div className="absolute top-3 sm:top-4 left-3 sm:left-4 bg-white p-1.5 sm:p-2 rounded-full">

@@ -125,8 +125,12 @@ export const FastImage: React.FC<FastImageProps> = ({
         }
     }, [hasError, onError]);
 
+    // aspect ratio 클래스가 있는지 확인
+    const hasAspectRatio = className?.includes('aspect-');
+    const containerStyle = hasAspectRatio ? {} : { width, height };
+
     return (
-        <div className={cn('relative overflow-hidden', className)} style={{ width, height }}>
+        <div className={cn('relative overflow-hidden', className)} style={containerStyle}>
             {/* Loading skeleton */}
             {!isLoaded && !hasError && (
                 <div
@@ -153,8 +157,8 @@ export const FastImage: React.FC<FastImageProps> = ({
                 ref={imgRef}
                 src={currentSrc}
                 alt={alt}
-                width={width}
-                height={height}
+                width={hasAspectRatio ? undefined : width}
+                height={hasAspectRatio ? undefined : height}
                 sizes={sizes}
                 loading={loading}
                 className={cn(
