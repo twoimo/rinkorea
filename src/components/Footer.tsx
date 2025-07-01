@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { OptimizedImage } from '@/components/ui/image';
+import { FastImage } from '@/components/ui/fast-image';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const Footer = () => {
@@ -90,12 +90,10 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:text-white transition-colors transform hover:scale-110"
               >
-                <OptimizedImage
-                  src="/images/optimized/instagram-icon.webp"
+                <FastImage
+                  src="/images/instagram-icon"
                   alt="Instagram"
                   className="h-8 w-8"
-                  loadingClassName="bg-gray-800"
-                  errorClassName="bg-gray-800"
                 />
               </a>
               <a
@@ -104,12 +102,10 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:text-white transition-colors transform hover:scale-110"
               >
-                <OptimizedImage
-                  src="/images/optimized/blog-logo-hq.webp"
+                <FastImage
+                  src="/images/blog-logo-hq"
                   alt="Naver Blog"
                   className="h-8 w-8"
-                  loadingClassName="bg-gray-800"
-                  errorClassName="bg-gray-800"
                 />
               </a>
               <a
@@ -118,12 +114,10 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:text-white transition-colors transform hover:scale-110"
               >
-                <OptimizedImage
-                  src="/images/optimized/youtube-icon.webp"
+                <FastImage
+                  src="/images/youtube-icon"
                   alt="YouTube"
                   className="h-8 w-8"
-                  loadingClassName="bg-gray-800"
-                  errorClassName="bg-gray-800"
                 />
               </a>
             </div>

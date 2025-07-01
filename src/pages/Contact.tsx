@@ -2,7 +2,7 @@ import React from 'react';
 import { MapPin, Phone, Mail } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { OptimizedImage } from '@/components/ui/image';
+import { FastImage } from '@/components/ui/fast-image';
 import { useLanguage } from '../contexts/LanguageContext';
 import { SEOHead } from '@/components/seo/SEOHead';
 
@@ -137,12 +137,10 @@ const Contact = () => {
                   className="flex flex-col md:flex-row items-center group p-3 rounded-lg hover:bg-gray-50 transition-colors"
                   aria-label="Instagram"
                 >
-                  <OptimizedImage
-                    src="/images/optimized/instagram-icon.webp"
+                  <FastImage
+                    src="/images/instagram-icon"
                     alt="Instagram"
                     className="h-8 w-8 md:h-6 md:w-6 mb-2 md:mb-0 md:mr-2"
-                    loadingClassName="bg-white"
-                    errorClassName="bg-white"
                   />
                   <span className="text-xs md:text-sm text-gray-600 group-hover:text-gray-900 transition-colors">Instagram</span>
                 </a>
@@ -153,12 +151,10 @@ const Contact = () => {
                   className="flex flex-col md:flex-row items-center group p-3 rounded-lg hover:bg-gray-50 transition-colors"
                   aria-label="Naver Blog"
                 >
-                  <OptimizedImage
-                    src="/images/optimized/blog-logo-hq.webp"
+                  <FastImage
+                    src="/images/blog-logo-hq"
                     alt="Naver Blog"
                     className="h-8 w-8 md:h-6 md:w-6 mb-2 md:mb-0 md:mr-2"
-                    loadingClassName="bg-white"
-                    errorClassName="bg-white"
                   />
                   <span className="text-xs md:text-sm text-gray-600 group-hover:text-gray-900 transition-colors">Blog</span>
                 </a>
@@ -169,12 +165,10 @@ const Contact = () => {
                   className="flex flex-col md:flex-row items-center group p-3 rounded-lg hover:bg-gray-50 transition-colors"
                   aria-label="YouTube"
                 >
-                  <OptimizedImage
-                    src="/images/optimized/youtube-icon.webp"
+                  <FastImage
+                    src="/images/youtube-icon"
                     alt="YouTube"
                     className="h-8 w-8 md:h-6 md:w-6 mb-2 md:mb-0 md:mr-2"
-                    loadingClassName="bg-white"
-                    errorClassName="bg-white"
                   />
                   <span className="text-xs md:text-sm text-gray-600 group-hover:text-gray-900 transition-colors">YouTube</span>
                 </a>

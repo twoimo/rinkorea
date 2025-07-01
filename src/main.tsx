@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
+import { initImagePreloader } from './utils/image-preloader';
 
 // Service Worker temporarily disabled for debugging NO_FCP
 // TODO: Re-enable after confirming basic rendering works
@@ -19,7 +20,7 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 }
 */
 
-// Render React app ONLY - disable all performance optimizations temporarily
+// Render React app with image optimization
 const rootElement = document.getElementById('root');
 if (rootElement) {
   ReactDOM.createRoot(rootElement).render(
@@ -27,6 +28,9 @@ if (rootElement) {
       <App />
     </React.StrictMode>
   );
+
+  // Initialize image preloader after React render
+  initImagePreloader();
 }
 
 // Performance optimizations temporarily disabled for debugging NO_FCP
