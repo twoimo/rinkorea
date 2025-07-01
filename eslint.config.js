@@ -23,7 +23,24 @@ export default tseslint.config(
         "warn",
         { allowConstantExport: true },
       ],
-      "@typescript-eslint/no-unused-vars": "off",
+
+      // TypeScript 규칙 강화
+      "@typescript-eslint/no-unused-vars": ["error", {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "ignoreRestSiblings": true
+      }],
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-non-null-assertion": "warn",
+
+      // 코드 품질 규칙
+      "prefer-const": "error",
+      "no-var": "error",
+      "no-console": ["warn", { "allow": ["warn", "error"] }],
+      "no-debugger": "error",
+
+      // React 베스트 프랙티스
+      "react-hooks/exhaustive-deps": "warn",
     },
   },
   // Shadcn UI 컴포넌트들은 react-refresh 규칙에서 제외
@@ -31,6 +48,7 @@ export default tseslint.config(
     files: ["src/components/ui/**/*.{ts,tsx}"],
     rules: {
       "react-refresh/only-export-components": "off",
+      "@typescript-eslint/no-explicit-any": "off", // UI 컴포넌트에서는 any 허용
     },
   }
 );

@@ -5,23 +5,23 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { SupabaseClient } from '@supabase/supabase-js';
-import { createPortal } from 'react-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, Trash2, Shield, Database, Users } from 'lucide-react';
+import { } from '@supabase/supabase-js';
+import { } from 'react-dom';
+import { } from '@/components/ui/button';
+import { } from '@/components/ui/card';
+import { } from 'lucide-react';
 
 const MB = 1024 * 1024;
 
 const AdminDangerZone = () => {
     // 모든 Hook은 컴포넌트 최상단에서 선언
     const { isAdmin, loading: roleLoading } = useUserRole();
-    const { user } = useAuth();
+    const { user: _user } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState('');
     const [confirmQnA, setConfirmQnA] = useState('');
-    const [confirmNews, setConfirmNews] = useState('');
+    const [confirmNews] = useState('');
     const [confirmUsers, setConfirmUsers] = useState('');
     const [confirmNotice, setConfirmNotice] = useState('');
 
@@ -29,8 +29,8 @@ const AdminDangerZone = () => {
     const [backupSize, setBackupSize] = useState<number | null>(null);
     const [importing, setImporting] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const modalRef = useRef<HTMLDivElement>(null);
-    const animationFrameRef = useRef<number>();
+    const _modalRef = useRef<HTMLDivElement>(null);
+    const _animationFrameRef = useRef<number>();
 
     // 페이지 진입 시 자동으로 백업 파일 크기 계산
     useEffect(() => {
@@ -44,7 +44,7 @@ const AdminDangerZone = () => {
                 const json = JSON.stringify({ inquiries: inq.data, replies: rep.data, news: news.data }, null, 2);
                 const blob = new Blob([json], { type: 'application/json' });
                 setBackupSize(blob.size);
-            } catch (e) {/* ignore */ }
+            } catch {/* ignore */ }
         };
         fetchBackupSize();
     }, []);

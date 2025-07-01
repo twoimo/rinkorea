@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Grid, BarChart3, Settings, Plus, Trash2, Edit3 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { BarChart3, Settings, Plus, Trash2, Edit3 } from 'lucide-react';
 import { ChartConfig, GridLayout } from '@/types/revenue';
 import RevenueChart from './RevenueChart';
 import { ChartData } from '@/types/revenue';
@@ -23,7 +23,9 @@ const ChartGrid: React.FC<ChartGridProps> = ({
     const [editingChart, setEditingChart] = useState<ChartConfig | null>(null);
 
     const gridTemplateColumns = `repeat(${layout.cols}, 1fr)`;
-    const gridTemplateRows = `repeat(${layout.rows}, minmax(400px, 1fr))`;
+    const _gridTemplateRows = useMemo(() => {
+        return `repeat(${Math.ceil(data.length / layout.cols)}, minmax(400px, auto))`;
+    }, [data.length, layout.cols]);
 
     const handleAddChart = () => {
         const newChart: ChartConfig = {
@@ -164,7 +166,7 @@ const ChartGrid: React.FC<ChartGridProps> = ({
                 className="grid gap-4 min-h-[400px]"
                 style={{
                     gridTemplateColumns,
-                    gridTemplateRows: `repeat(${layout.rows}, 400px)` // 고정 높이로 변경
+                    gridTemplateRows: _gridTemplateRows
                 }}
             >
                 {layout.charts.map((chart) => (

@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
-import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -120,10 +119,10 @@ export default defineConfig(({ mode }) => ({
 
 
         // Ensure all chunks are .js files
-        chunkFileNames: (chunkInfo) => {
+        chunkFileNames: () => {
           return 'assets/js/[name]-[hash].js';
         },
-        entryFileNames: (chunkInfo) => {
+        entryFileNames: () => {
           return 'assets/js/[name]-[hash].js';
         },
         assetFileNames: (assetInfo) => {
@@ -136,7 +135,7 @@ export default defineConfig(({ mode }) => ({
           }
 
           const info = assetInfo.name.split('.');
-          const ext = info[info.length - 1];
+          const _ext = info[info.length - 1];
           if (/\.(png|jpe?g|svg|gif|tiff|bmp|ico|webp)$/i.test(assetInfo.name)) {
             return `assets/images/[name]-[hash][extname]`;
           }

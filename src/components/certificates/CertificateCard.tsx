@@ -1,29 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Edit, Trash2, Eye, EyeOff } from 'lucide-react';
-import { useIsMobile } from '../../hooks/use-mobile';
-import { Language, getLocalizedValue } from '@/contexts/LanguageContext';
-
-interface Certificate {
-  id: string;
-  name: string;
-  description: string;
-  image_url: string;
-  category: string;
-  issue_date?: string;
-  expiry_date?: string;
-  is_active?: boolean;
-  created_at?: string;
-  updated_at?: string;
-  // 다국어 필드
-  name_ko?: string;
-  name_en?: string;
-  name_zh?: string;
-  name_id?: string;
-  description_ko?: string;
-  description_en?: string;
-  description_zh?: string;
-  description_id?: string;
-}
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Language } from '@/contexts/LanguageContext';
+import { Certificate } from '@/types/certificate';
 
 interface CertificateCardProps {
   certificate: Certificate;
@@ -50,7 +29,8 @@ const CertificateCard: React.FC<CertificateCardProps> = ({
   size = 'normal',
   language
 }) => {
-  const isMobile = useIsMobile();
+  const [_isExpanded, _setIsExpanded] = useState(false);
+  const _isMobile = useIsMobile();
 
   const isSmall = size === 'small';
   const cardPadding = isSmall ? 'p-3 sm:p-4' : 'p-4 sm:p-6';

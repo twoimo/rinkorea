@@ -178,7 +178,7 @@ export const useResources = () => {
         return matchesSearch && matchesCategory;
     });
 
-    const handleDownloadResource = async (resourceId: string, fileName: string, fileUrl: string) => {
+    const handleDownloadResource = async (resourceId: string, _fileName: string, _fileUrl: string) => {
         console.log('Download requested for:', resourceId);
 
         // 전체 resources에서 찾기
@@ -194,6 +194,8 @@ export const useResources = () => {
             });
         }
     };
+
+
 
     return {
         resources: filteredResources,

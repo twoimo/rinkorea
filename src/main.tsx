@@ -1,8 +1,7 @@
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
-import { initPerformanceMonitoring } from './utils/performance'
-import { initImageOptimization } from './utils/image-optimization'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.tsx';
+import './index.css';
 
 // Service Worker temporarily disabled for debugging NO_FCP
 // TODO: Re-enable after confirming basic rendering works
@@ -21,7 +20,14 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 */
 
 // Render React app ONLY - disable all performance optimizations temporarily
-createRoot(document.getElementById("root")!).render(<App />);
+const rootElement = document.getElementById('root');
+if (rootElement) {
+  ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+}
 
 // Performance optimizations temporarily disabled for debugging NO_FCP
 // TODO: Re-enable gradually after confirming basic rendering works

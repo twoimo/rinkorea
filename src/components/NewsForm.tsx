@@ -26,7 +26,7 @@ const NewsForm: React.FC<NewsFormProps> = ({ onClose, onSave, initialData, isEdi
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
+  const { toast: _toast } = useToast();
 
   useEffect(() => {
     // 스크롤 차단 강화
@@ -146,7 +146,8 @@ const NewsForm: React.FC<NewsFormProps> = ({ onClose, onSave, initialData, isEdi
     try {
       await onSave(formData);
       onClose();
-    } catch (err) {
+    } catch (_err) {
+      console.error('Error creating news:', _err);
       setError(t('submit_error', '저장에 실패했습니다.'));
     } finally {
       setLoading(false);

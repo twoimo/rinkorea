@@ -10,7 +10,7 @@ import CertificatesSkeleton from '@/components/certificates/CertificatesSkeleton
 import { Award, FileText, Shield, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole } from '@/hooks/useUserRole';
-import { useLanguage, getLocalizedValue } from '@/contexts/LanguageContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 interface Certificate {
@@ -121,7 +121,7 @@ const Certificates = () => {
         setTimeout(closeForm, 1500);
         await fetchCertificates();
       }
-    } catch (error) {
+    } catch {
       setFormError('오류가 발생했습니다.');
     } finally {
       setFormLoading(false);
@@ -141,7 +141,7 @@ const Certificates = () => {
         setCertificates(certificates.filter(c => c.id !== deleteTarget.id));
         setShowDeleteConfirm(false);
       }
-    } catch (error) {
+    } catch {
       // Error is already handled by toast notification
     }
   };

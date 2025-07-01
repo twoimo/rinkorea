@@ -4,15 +4,15 @@ import type { Project } from '../hooks/useProjects';
 interface AutoScrollGridProps {
     items: Project[];
     renderItem: (item: Project) => React.ReactNode;
-    itemsPerRow?: number;
-    scrollSpeed?: number;
+    _scrollDirection?: string;
+    speed?: number;
 }
 
 const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
     items,
     renderItem,
-    itemsPerRow = 4,
-    scrollSpeed = 1,
+    _scrollDirection = 'vertical',
+    speed = 1,
 }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
@@ -22,6 +22,8 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
     const animationFrameRef = useRef<number>();
     const positionRef = useRef(0);
     const lastTimeRef = useRef(performance.now());
+
+    const _itemsPerRow = Math.floor(window.innerWidth / 300);
 
     // Memoize repeated items to prevent unnecessary recalculations
     const repeatedItems = useMemo(() => {
@@ -56,12 +58,12 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
         const delta = now - lastTimeRef.current;
         lastTimeRef.current = now;
 
-        positionRef.current += delta * scrollSpeed * 0.1;
+        positionRef.current += delta * speed * 0.1;
         rowRef.current.style.transform = `translateX(-${positionRef.current}px)`;
 
         resetPosition();
         animationFrameRef.current = requestAnimationFrame(animate);
-    }, [isHovered, isDragging, scrollSpeed, resetPosition]);
+    }, [isHovered, isDragging, speed, resetPosition]);
 
     useEffect(() => {
         if (!isHovered && !isDragging) {

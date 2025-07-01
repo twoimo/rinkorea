@@ -7,7 +7,7 @@ interface ProjectCardProps {
   project: Project;
   isAdmin: boolean;
   isHidden: boolean;
-  isMobile: boolean;
+  _isMobile: boolean;
   formLoading: boolean;
   onEdit: (project: Project) => void;
   onDelete: (id: string) => void;
@@ -18,7 +18,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   project,
   isAdmin,
   isHidden,
-  isMobile,
+  _isMobile,
   formLoading,
   onEdit,
   onDelete,

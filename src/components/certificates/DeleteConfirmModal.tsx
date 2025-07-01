@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { useIsMobile } from '../../hooks/use-mobile';
-import { useLanguage, getLocalizedValue } from '@/contexts/LanguageContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Certificate {
   id: string;
@@ -38,7 +37,6 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   onClose,
   onConfirm
 }) => {
-  const isMobile = useIsMobile();
   const { t, language } = useLanguage();
   const modalRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number>();

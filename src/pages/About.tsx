@@ -2,7 +2,7 @@ import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { SEOHead } from '../components/seo/SEOHead';
-import { Building, Users, Target, Award, MapPin, Phone, Mail, Calendar, CheckCircle } from 'lucide-react';
+import { Building, Users, Target, Award, MapPin, Phone, Mail, CheckCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const About = () => {

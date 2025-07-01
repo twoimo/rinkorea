@@ -1,6 +1,5 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
-import { useCounter } from '@/hooks/useCounter';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ProjectsHeroProps {

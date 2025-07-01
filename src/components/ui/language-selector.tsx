@@ -42,15 +42,15 @@ interface LanguageSelectorProps {
 export function LanguageSelector({
     variant = 'default',
     size = 'default',
-    showFlag = true,
-    showNativeName = true,
+    showFlag: _showFlag = true,
+    showNativeName: _showNativeName = true,
     isTransparent = false
 }: LanguageSelectorProps) {
     const { language, setLanguage } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const currentLanguage = languages.find(lang => lang.code === language);
+    const _currentLanguage = languages.find(lang => lang.code === language);
 
     const handleLanguageChange = (langCode: Language) => {
         setLanguage(langCode);
@@ -92,7 +92,7 @@ export function LanguageSelector({
         };
     }, [isOpen]);
 
-    const getButtonSize = () => {
+    const _getButtonSize = () => {
         switch (size) {
             case 'sm': return 'h-8 px-2 text-xs';
             case 'lg': return 'h-12 px-4 text-base';

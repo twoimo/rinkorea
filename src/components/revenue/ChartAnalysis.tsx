@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { BarChart3, TrendingUp, PieChart, AreaChart, Plus, X, Eye, EyeOff, Maximize2, Package, Target } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BarChart3, TrendingUp, PieChart, AreaChart, Plus, X, Eye, EyeOff, Maximize2, Package } from 'lucide-react';
 import { ChartData, RevenueCategory } from '@/types/revenue';
 import RevenueChart from './RevenueChart';
 import { useLanguage } from '@/contexts/LanguageContext';
+
 
 interface ChartAnalysisProps {
     data: ChartData[];

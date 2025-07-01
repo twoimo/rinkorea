@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo, useCallback, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Filter, Download, BarChart3, Coins } from 'lucide-react';
+import { Calendar, Download, BarChart3, Coins } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useRevenue } from '@/hooks/useRevenue';
 import RevenueDashboard from '@/components/revenue/RevenueDashboard';
-import { GridLayout, ChartConfig } from '@/types/revenue';
+import { } from '@/types/revenue';
 
 import RevenueChart from '@/components/revenue/RevenueChart';
 
@@ -117,7 +117,7 @@ const RevenueManagement = () => {
         start: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         end: new Date().toISOString().split('T')[0]
     }));
-    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [selectedCategories] = useState<string[]>([]);
 
     // 빠른 기간 선택 함수 - useCallback으로 최적화
     const setQuickDateRange = useCallback((period: string) => {

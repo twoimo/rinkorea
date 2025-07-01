@@ -58,12 +58,8 @@ const Projects = () => {
         if (error) throw error;
       }
       await fetchHiddenProjects();
-    } catch (e) {
-      toast({
-        title: 'Error',
-        description: '숨김 처리 중 오류가 발생했습니다.',
-        variant: 'destructive'
-      });
+    } catch (_e) {
+      console.error('Error deleting project:', _e);
     }
     setFormLoading(false);
   };

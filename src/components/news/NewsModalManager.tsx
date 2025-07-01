@@ -28,7 +28,7 @@ const NewsModalManager: React.FC<NewsModalManagerProps> = ({
   onCreateNews,
   onUpdateNews
 }) => {
-  const { t } = useLanguage();
+  const { t: _t } = useLanguage();
 
   return (
     <>

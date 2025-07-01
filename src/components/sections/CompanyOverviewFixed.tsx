@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, FileText, Building2, ArrowRight, Phone, Mail } from 'lucide-react';
+import { MapPin, FileText, Building2, ArrowRight, Phone } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 

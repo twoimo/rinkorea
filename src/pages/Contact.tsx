@@ -1,8 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { MapPin, Phone, Mail } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { MapPin, Phone, Mail, Building2, User } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/image';
 import { useLanguage } from '../contexts/LanguageContext';
 import { SEOHead } from '@/components/seo/SEOHead';

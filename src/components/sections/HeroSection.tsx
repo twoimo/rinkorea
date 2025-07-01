@@ -14,7 +14,7 @@ const HeroSection = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
   const [isChina, setIsChina] = useState(false);
-  const [locationLoading, setLocationLoading] = useState(false);
+  const [locationLoading] = useState(false);
 
   // Check if user is accessing from China using browser language/timezone as fallback
   const checkUserLocation = () => {
@@ -30,7 +30,7 @@ const HeroSection = () => {
 
       setIsChina(isLikelyChina);
       console.log('Location detection (fallback):', { language, timezone, isLikelyChina });
-    } catch (error) {
+    } catch {
       console.log('Failed to detect location, defaulting to YouTube video');
       setIsChina(false);
     }
@@ -47,7 +47,7 @@ const HeroSection = () => {
         setYoutubeLink(data.value);
         setEditLink(data.value);
       }
-    } catch (e) {
+    } catch {
       // 기본값 유지
     }
   };
@@ -88,8 +88,8 @@ const HeroSection = () => {
         setYoutubeLink(embedUrl);
         setResult('success:' + t('hero_save_success'));
       }
-    } catch (e) {
-      setResult('error:' + ((e as Error).message || e));
+    } catch (error) {
+      setResult('error:' + ((error as Error).message || error));
     }
     setLoading(false);
   };

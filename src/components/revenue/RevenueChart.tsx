@@ -62,8 +62,8 @@ const RevenueChart: React.FC<RevenueChartProps> = ({
             return (
                 <div className="bg-white border border-gray-300 rounded-lg p-3 shadow-xl">
                     <p className="text-gray-800 font-semibold mb-2">{formatDate(label || '')}</p>
-                    {payload.map((entry, index: number) => (
-                        <div key={index} className="flex items-center gap-2">
+                    {payload.map((entry, _index) => (
+                        <div key={_index} className="flex items-center gap-2">
                             <div
                                 className="w-3 h-3 rounded-full"
                                 style={{ backgroundColor: entry.color }}
@@ -90,8 +90,8 @@ const RevenueChart: React.FC<RevenueChartProps> = ({
                 return (
                     <LineChart {...commonProps}>
                         <defs>
-                            {categories.map((category, index) => (
-                                <linearGradient key={category} id={`gradient-${config.id}-${index}`} x1="0" y1="0" x2="0" y2="1">
+                            {categories.map((category, _index) => (
+                                <linearGradient key={category} id={`gradient-${config.id}-${_index}`} x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor={categoryColors[category]} stopOpacity={0.8} />
                                     <stop offset="95%" stopColor={categoryColors[category]} stopOpacity={0.1} />
                                 </linearGradient>
@@ -111,7 +111,7 @@ const RevenueChart: React.FC<RevenueChartProps> = ({
                         />
                         <Tooltip content={<CustomTooltip />} />
                         {categories.length > 1 && <Legend />}
-                        {categories.map((category, index) => (
+                        {categories.map((category) => (
                             <Line
                                 key={category}
                                 type="monotone"
@@ -130,8 +130,8 @@ const RevenueChart: React.FC<RevenueChartProps> = ({
                 return (
                     <AreaChart {...commonProps}>
                         <defs>
-                            {categories.map((category, index) => (
-                                <linearGradient key={category} id={`areaGradient-${index}`} x1="0" y1="0" x2="0" y2="1">
+                            {categories.map((category, _index) => (
+                                <linearGradient key={category} id={`areaGradient-${_index}`} x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor={categoryColors[category]} stopOpacity={0.8} />
                                     <stop offset="95%" stopColor={categoryColors[category]} stopOpacity={0.1} />
                                 </linearGradient>
@@ -151,14 +151,14 @@ const RevenueChart: React.FC<RevenueChartProps> = ({
                         />
                         <Tooltip content={<CustomTooltip />} />
                         <Legend />
-                        {categories.map((category, index) => (
+                        {categories.map((category, _index) => (
                             <Area
                                 key={category}
                                 type="monotone"
                                 dataKey={category}
                                 stackId="1"
                                 stroke={categoryColors[category]}
-                                fill={`url(#areaGradient-${index})`}
+                                fill={`url(#areaGradient-${_index})`}
                                 strokeWidth={2}
                             />
                         ))}
@@ -215,8 +215,8 @@ const RevenueChart: React.FC<RevenueChartProps> = ({
                             dataKey="value"
                             label={({ name, percent }) => `${name} ${(percent * 100).toFixed(1)}%`}
                         >
-                            {pieData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.color} />
+                            {pieData.map((entry, _index) => (
+                                <Cell key={`cell-${_index}`} fill={entry.color} />
                             ))}
                         </Pie>
                         <Tooltip formatter={(value) => formatCurrency(value as number)} />

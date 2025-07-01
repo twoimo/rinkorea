@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Plus, GripVertical, Trash2 } from 'lucide-react';
 import type { DragEndEvent } from '@dnd-kit/core';
@@ -10,7 +10,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import type { SortableContextProps } from '@dnd-kit/sortable';
+
 import {
   arrayMove,
   SortableContext,
@@ -20,7 +20,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Product, ProductFormData } from '@/types/product';
-import { useLanguage } from '@/contexts/LanguageContext';
+
 
 interface ProductFormProps {
   product?: Product;
@@ -91,7 +91,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     detail_images: product?.detail_images || [],
     is_active: product?.is_active ?? true
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [_isSubmitting, setIsSubmitting] = useState(false);
 
   const [newFeature, setNewFeature] = useState('');
   const [newImage, setNewImage] = useState('');
@@ -235,8 +235,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
         detail_images: Array.isArray(formValues.detail_images) ? formValues.detail_images : [],
         is_active: true
       };
-      console.log('Submitting payload:', payload);
-
       await onSave(payload);
       onClose();
     } catch (err) {
