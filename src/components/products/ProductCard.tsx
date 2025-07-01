@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Shield, Palette, Star, Zap, Leaf, Edit, Trash2, EyeOff, Eye, ChevronDown, ChevronUp } from 'lucide-react';
-import { OptimizedImage } from '@/components/ui/image';
+import { FastImage } from '@/components/ui/fast-image';
 import { Product } from '@/types/product';
 import { useLanguage, getLocalizedValue, getLocalizedArray } from '@/contexts/LanguageContext';
 
@@ -66,7 +66,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow flex flex-col">
       <div className="relative aspect-square overflow-hidden">
-        <OptimizedImage
+        <FastImage
           src={getImageUrl(product.image_url)}
           alt={localizedName}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"

@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
-import { OptimizedImage } from '@/components/ui/image';
+import { FastImage } from '@/components/ui/fast-image';
 
 interface Product {
   id: string;
@@ -238,7 +238,7 @@ const ProductDetailModal = memo(({ product, onClose }: ProductDetailModalProps) 
             {product.detail_images && product.detail_images.length > 0 ? (
               product.detail_images.map((image, index) => (
                 <div key={index} style={{ width: '100%' }}>
-                  <OptimizedImage
+                  <FastImage
                     src={getImageUrl(image)}
                     alt={`${product.name} 상세 이미지 ${index + 1}`}
                     style={{

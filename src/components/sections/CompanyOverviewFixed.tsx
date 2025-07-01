@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, FileText, Building2, ArrowRight, Phone } from 'lucide-react';
-import { OptimizedImage } from '@/components/ui/image';
+import { FastImage } from '@/components/ui/fast-image';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const CompanyOverview = () => {
@@ -105,12 +105,11 @@ const CompanyOverview = () => {
             <div className="relative">
               {/* Main Image Container */}
               <div className="relative rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-700">
-                <OptimizedImage
-                  src="/images/optimized/company_intro.webp"
+                <FastImage
+                  src="/images/company_intro"
                   alt="린코리아 제품"
                   className="w-full h-auto object-contain"
-                  loadingClassName="bg-gray-100"
-                  errorClassName="bg-gray-100"
+                  priority={true}
                 />
 
                 {/* Overlay Content */}

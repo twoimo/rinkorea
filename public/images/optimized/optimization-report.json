@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-07-01T04:58:33.171Z",
+  "processedFiles": 131,
+  "originalSizeMB": "0.00",
+  "optimizedSizeMB": "11.91",
+  "savingsPercent": 0,
+  "generatedSizes": [
+    "thumbnail",
+    "small",
+    "medium",
+    "large",
+    "xlarge",
+    "original"
+  ]
+}
