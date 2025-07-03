@@ -17,15 +17,6 @@ const envSchema = z.object({
     // 외부 서비스
     VITE_GA_TRACKING_ID: z.string().optional(),
     VITE_SENTRY_DSN: z.string().url().optional(),
-
-    // AI API Configuration
-    VITE_MISTRAL_API_KEY: z.string().min(1).optional(),
-    VITE_CLAUDE_API_KEY: z.string().min(1).optional(),
-    VITE_CHANNEL_TALK_PLUGIN_KEY: z.string().min(1).optional(),
-    VITE_AI_CHATBOT_ENABLED: z.string().optional(),
-    VITE_MAX_MESSAGE_LENGTH: z.string().optional(),
-    VITE_AI_RESPONSE_TIMEOUT: z.string().optional(),
-    VITE_ADMIN_ROLE_REQUIRED: z.string().optional(),
 });
 
 type Env = z.infer<typeof envSchema>;
@@ -58,55 +49,5 @@ declare global {
         readonly VITE_APP_NAME: string;
         readonly VITE_GA_TRACKING_ID?: string;
         readonly VITE_SENTRY_DSN?: string;
-        readonly VITE_MISTRAL_API_KEY?: string;
-        readonly VITE_CLAUDE_API_KEY?: string;
-        readonly VITE_CHANNEL_TALK_PLUGIN_KEY?: string;
-        readonly VITE_AI_CHATBOT_ENABLED?: string;
-        readonly VITE_MAX_MESSAGE_LENGTH?: string;
-        readonly VITE_AI_RESPONSE_TIMEOUT?: string;
-        readonly VITE_ADMIN_ROLE_REQUIRED?: string;
     }
-}
-
-// AI API Configuration
-export const AI_CONFIG = {
-    MISTRAL_API_KEY: env.VITE_MISTRAL_API_KEY,
-    CLAUDE_API_KEY: env.VITE_CLAUDE_API_KEY,
-    CHANNEL_TALK_PLUGIN_KEY: env.VITE_CHANNEL_TALK_PLUGIN_KEY,
-    AI_CHATBOT_ENABLED: env.VITE_AI_CHATBOT_ENABLED === 'true',
-    MAX_MESSAGE_LENGTH: parseInt(env.VITE_MAX_MESSAGE_LENGTH || '2000'),
-    AI_RESPONSE_TIMEOUT: parseInt(env.VITE_AI_RESPONSE_TIMEOUT || '30000'),
-    ADMIN_ROLE_REQUIRED: env.VITE_ADMIN_ROLE_REQUIRED || 'admin',
-} as const;
-
-// Validation
-export function validateAIConfig() {
-    const errors: string[] = [];
-
-    if (!AI_CONFIG.MISTRAL_API_KEY) {
-        errors.push('VITE_MISTRAL_API_KEY is required');
-    }
-
-    if (!AI_CONFIG.CLAUDE_API_KEY) {
-        errors.push('VITE_CLAUDE_API_KEY is required');
-    }
-
-    if (!AI_CONFIG.CHANNEL_TALK_PLUGIN_KEY) {
-        errors.push('VITE_CHANNEL_TALK_PLUGIN_KEY is required');
-    }
-
-    if (errors.length > 0) {
-        throw new Error(`AI Configuration errors: ${errors.join(', ')}`);
-    }
-}
-
-// Types
-export interface AIConfig {
-    MISTRAL_API_KEY: string;
-    CLAUDE_API_KEY: string;
-    CHANNEL_TALK_PLUGIN_KEY: string;
-    AI_CHATBOT_ENABLED: boolean;
-    MAX_MESSAGE_LENGTH: number;
-    AI_RESPONSE_TIMEOUT: number;
-    ADMIN_ROLE_REQUIRED: string;
 } 
