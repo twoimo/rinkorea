@@ -1,7 +1,9 @@
+import { supabase } from '@/integrations/supabase/client';
 import { AI_CONFIG } from '../lib/env';
-import type { ChannelTalkConfig, ChatMessage } from '../types/chatbot';
+import type { ChannelTalkConfig, ChatMessage, AIResponse } from '../types/chatbot';
 import { AIClientService } from './ai-client';
 import { getCurrentUser } from './auth-simple';
+import { RevenueService } from './revenue-service';
 
 // 채널톡 글로벌 객체 타입 정의
 declare global {
@@ -32,7 +34,8 @@ export class ChannelTalkService {
     private static instance: ChannelTalkService;
     private aiClient: AIClientService;
     private isInitialized = false;
-    private currentUser: { name?: string; email?: string; phone?: string; role?: string } | null = null;
+    private currentUser: any = null;
+    private currentSessionId: string | null = null;
 
     private constructor() {
         this.aiClient = AIClientService.getInstance();
@@ -132,16 +135,11 @@ export class ChannelTalkService {
     }
 
     // 새 채팅 처리
-    private async handleNewChat(): Promise<void> {
+    private handleNewChat(): void {
         try {
-            const user = await getCurrentUser();
-            const isAdmin = user?.isAdmin || false;
-
-            // 환영 메시지 생성
-            const welcomeMessage = this.generateWelcomeMessage(isAdmin);
-
-            // 채널톡을 통해 환영 메시지 전송 (실제로는 관리자가 수동으로 해야 함)
-            console.log('Welcome Message:', welcomeMessage);
+            // 초기 환영 메시지는 채널톡의 자동화 규칙으로 처리하는 것을 권장합니다.
+            // 필요하다면 여기서 첫 메시지를 보낼 수 있습니다.
+            // 예: this.sendBotMessage("안녕하세요! 무엇을 도와드릴까요?");
         } catch (error) {
             console.error('Failed to handle new chat:', error);
         }
@@ -150,50 +148,40 @@ export class ChannelTalkService {
     // 후속 메시지 처리 (AI 응답 생성)
     private async handleFollowUpMessage(event: Record<string, unknown>): Promise<void> {
         try {
-            if (event.type === 'user_message') {
-                const userMessage = event.message as string;
-                const chatHistory = this.getChatHistory();
-
-                // 사용자 권한 확인
-                const user = await getCurrentUser();
-                const isAdmin = user?.isAdmin || false;
-
-                // AI 응답 생성
-                const response = await this.generateAIResponse(userMessage, chatHistory, isAdmin);
-
-                // 응답을 채널톡으로 전송 (실제 구현에서는 웹훅이나 API 필요)
-                // 예: sendChannelTalkMessage(response.content);
-
-                // 로컬 저장소에 대화 저장
-                this.saveChatMessage({
-                    id: this.generateMessageId(),
-                    content: userMessage,
-                    sender: 'user',
-                    timestamp: new Date(),
-                });
-
-                this.saveChatMessage({
-                    id: this.generateMessageId(),
-                    content: response.content,
-                    sender: 'assistant',
-                    timestamp: new Date(),
-                    metadata: response.metadata,
-                });
+            if (event.type !== 'user_message' || !event.message) {
+                return;
             }
+
+            const userMessage = event.message as string;
+            const user = await getCurrentUser();
+
+            if (!user) {
+                this.sendBotMessage("채팅 기능은 로그인 후 이용 가능합니다.");
+                return;
+            }
+
+            const chatHistory = await this.getChatHistoryFromDB(user.id);
+            const isAdmin = user.isAdmin || false;
+
+            const response = await this.generateAIResponse(userMessage, chatHistory, isAdmin);
+
+            this.sendBotMessage(response.content);
+            await this.saveConversationToDB(user.id, userMessage, response);
+
         } catch (error) {
             console.error('Failed to handle follow-up message:', error);
+            this.sendBotMessage("죄송합니다. 답변을 생성하는 중에 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
         }
     }
 
-    // AI 응답 생성
+    // AI 응답 생성 로직
     private async generateAIResponse(
         message: string,
         chatHistory: ChatMessage[],
         isAdmin: boolean
-    ): Promise<any> {
+    ): Promise<AIResponse> {
         const systemPrompt = this.aiClient.generateSystemPrompt(isAdmin);
 
-        // 현재 메시지를 히스토리에 추가
         const messages: ChatMessage[] = [
             ...chatHistory,
             {
@@ -204,76 +192,62 @@ export class ChannelTalkService {
             }
         ];
 
-        // 관리자 전용 기능 처리
+        // 관리자 전용 기능 감지 및 처리
         if (isAdmin && this.isAdminQuery(message)) {
             return await this.handleAdminQuery(message, messages);
         }
 
-        // 일반 AI 응답 생성
         return await this.aiClient.generateResponse(messages, 'mistral', systemPrompt);
     }
 
-    // 관리자 쿼리 감지
+    // 관리자 전용 쿼리 처리
+    private async handleAdminQuery(message: string, messages: ChatMessage[]): Promise<AIResponse> {
+        const revenueService = RevenueService.getInstance();
+        let revenueSummary = "매출 데이터를 가져올 수 없습니다.";
+
+        try {
+            // 우선 최근 1년치 데이터를 기본으로 조회
+            const endDate = new Date();
+            const startDate = new Date(new Date().setFullYear(endDate.getFullYear() - 1));
+
+            const revenueData = await revenueService.getRevenueData({
+                startDate: startDate.toISOString().split('T')[0],
+                endDate: endDate.toISOString().split('T')[0],
+            });
+            revenueSummary = revenueService.summarizeRevenueForAI(revenueData);
+
+        } catch (error) {
+            console.error("Error fetching revenue data for AI:", error);
+            if (error instanceof Error) {
+                revenueSummary = `매출 데이터 조회 중 오류 발생: ${error.message}`;
+            }
+        }
+
+        const adminSystemPrompt = `${this.aiClient.generateSystemPrompt(true)}
+        
+현재 "${message}" 라는 관리자 요청을 받았습니다. 아래의 실제 매출 데이터를 기반으로 전문적인 분석과 답변을 생성하세요.
+
+${revenueSummary}`;
+
+        // 실제 데이터를 기반으로 분석을 요청
+        return await this.aiClient.generateResponse(messages, 'claude', adminSystemPrompt);
+    }
+
+    // 관리자 쿼리인지 확인
     private isAdminQuery(message: string): boolean {
         const adminKeywords = ['매출', '분석', '예측', '리포트', '성과', '데이터', '통계'];
         return adminKeywords.some(keyword => message.includes(keyword));
     }
 
-    // 관리자 쿼리 처리
-    private async handleAdminQuery(message: string, messages: ChatMessage[]): Promise<any> {
-        const adminSystemPrompt = `
-${this.aiClient.generateSystemPrompt(true)}
-
-현재 매출 분석 요청을 받았습니다. 다음 데이터를 참고하여 전문적인 분석을 제공하세요:
-- 월 평균 매출: 약 5억원
-- 주요 고객: 건설업체, 제조업체
-- 성장률: 전년 대비 15% 증가
-- 주력 제품: 린코트 (전체 매출의 60%)
-
-요청에 따라 상세한 분석과 인사이트를 제공하세요.
-`;
-
-        return await this.aiClient.generateResponse(messages, 'claude', adminSystemPrompt);
-    }
-
-    // 환영 메시지 생성
-    private generateWelcomeMessage(isAdmin: boolean): string {
-        const baseMessage = `
-안녕하세요! 린코리아 AI 어시스턴트입니다. 🏗️
-
-저희는 콘크리트 바닥재 전문 기업으로, 다음과 같은 도움을 드릴 수 있습니다:
-
-📋 제품 문의 (린코트, 린하드, 린씰)
-🔧 시공 상담 및 기술 지원
-📞 견적 요청 및 전문가 연결
-❓ 일반적인 질문 답변
-
-궁금한 점이 있으시면 언제든 말씀해 주세요!
-`;
-
-        if (isAdmin) {
-            return baseMessage + `\n\n🔐 관리자 전용 기능도 이용 가능합니다:
-• 매출 분석 및 예측
-• 고객 데이터 분석
-• 성과 리포트 생성`;
-        }
-
-        return baseMessage;
-    }
-
     // 사용자 정보 업데이트
-    async updateUser(userInfo: { name?: string; email?: string; phone?: string; role?: string }): Promise<void> {
-        this.currentUser = userInfo;
+    async updateUser(userInfo: {
+        profile?: { name?: string; email?: string; mobileNumber?: string; };
+        tags?: string[];
+    }): Promise<void> {
+        this.currentUser = { ...this.currentUser, ...userInfo.profile };
 
         if (window.ChannelIO) {
-            window.ChannelIO.updateUser({
-                profile: {
-                    name: userInfo.name,
-                    email: userInfo.email,
-                    mobileNumber: userInfo.phone,
-                },
-                language: 'ko',
-            });
+            window.ChannelIO.updateUser(userInfo);
 
             // 사용자 권한에 따른 태그 추가
             const user = await getCurrentUser();
@@ -283,26 +257,100 @@ ${this.aiClient.generateSystemPrompt(true)}
         }
     }
 
-    // 채팅 히스토리 가져오기
-    private getChatHistory(): ChatMessage[] {
+    // DB에서 채팅 세션 가져오거나 생성
+    private async getOrCreateDBSession(userId: string): Promise<string> {
+        if (this.currentSessionId) {
+            return this.currentSessionId;
+        }
+
+        const { data, error } = await supabase
+            .from('chat_sessions')
+            .select('id')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+        if (data && !error) {
+            this.currentSessionId = data.id;
+            return data.id;
+        }
+
+        const { data: newSession, error: newSessionError } = await supabase
+            .from('chat_sessions')
+            .insert({ user_id: userId, session_type: (await getCurrentUser())?.isAdmin ? 'admin' : 'user' })
+            .select('id')
+            .single();
+
+        if (newSessionError || !newSession) {
+            throw new Error('Failed to create a new chat session.');
+        }
+
+        this.currentSessionId = newSession.id;
+        return newSession.id;
+    }
+
+    // DB에서 채팅 기록 가져오기
+    private async getChatHistoryFromDB(userId: string): Promise<ChatMessage[]> {
         try {
-            const stored = localStorage.getItem('rinkorea_chat_history');
-            return stored ? JSON.parse(stored) : [];
+            const sessionId = await this.getOrCreateDBSession(userId);
+            const { data, error } = await supabase
+                .from('chat_messages')
+                .select('content, sender, created_at, metadata')
+                .eq('session_id', sessionId)
+                .order('created_at', { ascending: true })
+                .limit(20);
+
+            if (error) throw error;
+
+            return (data || []).map(msg => ({
+                id: '', // DB id is not needed for history context
+                content: msg.content,
+                sender: msg.sender as 'user' | 'assistant' | 'system',
+                timestamp: new Date(msg.created_at),
+                metadata: msg.metadata || undefined,
+            }));
         } catch (error) {
-            console.error('Failed to get chat history:', error);
+            console.error('Failed to get chat history from DB:', error);
             return [];
         }
     }
 
-    // 채팅 메시지 저장
-    private saveChatMessage(message: ChatMessage): void {
+    // DB에 대화 내용 저장
+    private async saveConversationToDB(userId: string, userMessage: string, aiResponse: AIResponse): Promise<void> {
         try {
-            const history = this.getChatHistory();
-            const updatedHistory = [...history, message].slice(-50); // 최근 50개만 유지
-            localStorage.setItem('rinkorea_chat_history', JSON.stringify(updatedHistory));
+            const sessionId = await this.getOrCreateDBSession(userId);
+            const messagesToInsert = [
+                {
+                    session_id: sessionId,
+                    message_id: `user_${Date.now()}`,
+                    content: userMessage,
+                    sender: 'user',
+                },
+                {
+                    session_id: sessionId,
+                    message_id: `asst_${Date.now()}`,
+                    content: aiResponse.content,
+                    sender: 'assistant',
+                    metadata: aiResponse.metadata,
+                    tokens_used: aiResponse.usage?.tokens,
+                },
+            ];
+
+            const { error } = await supabase.from('chat_messages').insert(messagesToInsert);
+            if (error) throw error;
+
         } catch (error) {
-            console.error('Failed to save chat message:', error);
+            console.error('Failed to save conversation to DB:', error);
         }
+    }
+
+    // 채널톡에 봇 메시지 전송 (실제로는 서버-사이드 API 필요)
+    private sendBotMessage(message: string): void {
+        // 중요: 현재 클라이언트 측에서는 메시지를 직접 보낼 수 없습니다.
+        // 이는 데모를 위한 로깅이며, 실제 구현에서는
+        // 웹훅(Webhook)을 수신하는 서버에서 채널톡의 Send bot message API를 호출해야 합니다.
+        console.log("🤖 AI Bot Response (to be sent via server):", message);
     }
 
     // 메시지 ID 생성
