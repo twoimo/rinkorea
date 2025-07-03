@@ -263,7 +263,7 @@ ${revenueSummary}`;
             return this.currentSessionId;
         }
 
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('chat_sessions')
             .select('id')
             .eq('user_id', userId)
@@ -276,7 +276,7 @@ ${revenueSummary}`;
             return data.id;
         }
 
-        const { data: newSession, error: newSessionError } = await supabase
+        const { data: newSession, error: newSessionError } = await (supabase as any)
             .from('chat_sessions')
             .insert({ user_id: userId, session_type: (await getCurrentUser())?.isAdmin ? 'admin' : 'user' })
             .select('id')
@@ -294,7 +294,7 @@ ${revenueSummary}`;
     private async getChatHistoryFromDB(userId: string): Promise<ChatMessage[]> {
         try {
             const sessionId = await this.getOrCreateDBSession(userId);
-            const { data, error } = await supabase
+            const { data, error } = await (supabase as any)
                 .from('chat_messages')
                 .select('content, sender, created_at, metadata')
                 .eq('session_id', sessionId)
@@ -303,7 +303,7 @@ ${revenueSummary}`;
 
             if (error) throw error;
 
-            return (data || []).map(msg => ({
+            return (data || []).map((msg: any) => ({
                 id: '', // DB id is not needed for history context
                 content: msg.content,
                 sender: msg.sender as 'user' | 'assistant' | 'system',
@@ -337,7 +337,7 @@ ${revenueSummary}`;
                 },
             ];
 
-            const { error } = await supabase.from('chat_messages').insert(messagesToInsert);
+            const { error } = await (supabase as any).from('chat_messages').insert(messagesToInsert);
             if (error) throw error;
 
         } catch (error) {
