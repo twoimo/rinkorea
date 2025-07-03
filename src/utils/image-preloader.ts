@@ -33,6 +33,12 @@ class ImagePreloader {
 
     // 최적화된 URL 생성
     getOptimizedUrl(src: string): { webpUrl: string; originalUrl: string } {
+        // 이미 최적화된 경로인 경우 그대로 반환
+        if (src.includes('/optimized/')) {
+            const originalUrl = src.replace('/optimized/', '/').replace('.webp', '.jpg'); // 또는 원본 확장자로
+            return { webpUrl: src, originalUrl };
+        }
+
         const pathParts = src.split('/');
         const filename = pathParts.pop();
 
@@ -42,9 +48,7 @@ class ImagePreloader {
         const basePath = pathParts.join('/');
 
         let webpUrl: string;
-        if (basePath === '/images' || basePath === 'images') {
-            webpUrl = `/images/optimized/${nameWithoutExt}.webp`;
-        } else if (basePath === '') {
+        if (basePath === '/images' || basePath === 'images' || basePath === '') {
             webpUrl = `/images/optimized/${nameWithoutExt}.webp`;
         } else {
             webpUrl = `${basePath}/optimized/${nameWithoutExt}.webp`;
@@ -208,13 +212,14 @@ class ImagePreloader {
 
     // 크리티컬 이미지 프리로드
     async preloadCriticalImages(): Promise<void> {
-        const criticalImages = [
-            '/images/optimized/rin-korea-logo-black.webp',
-            '/images/optimized/main-hero-bg.webp', // 메인 히어로 이미지
-            '/images/optimized/product-showcase.webp', // 주요 제품 이미지
+        const criticalImages: string[] = [
+            // 현재는 비워둠. 필요시 실제 존재하는 중요한 이미지 경로 추가
+            // 예: '/images/optimized/your-critical-image.webp'
         ];
 
-        await this.preloadImages(criticalImages, true);
+        if (criticalImages.length > 0) {
+            await this.preloadImages(criticalImages, true);
+        }
     }
 
     // 캐시 정보 출력 (디버깅용)
