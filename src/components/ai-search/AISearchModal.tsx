@@ -239,17 +239,16 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
             functionType: functionToUse || 'customer_chat',
         };
 
-        setMessages(prev => [...prev, userMessage]);
-        if (typeof messageContent !== 'string') {
-            setInputMessage('');
-        }
+        const updatedMessages = [...messages, userMessage];
+        setMessages(updatedMessages);
+        setInputMessage('');
         setIsLoading(true);
 
         try {
             const result = await aiAgent.processRequest(
                 functionToUse,
                 content,
-                { user_id: user?.id },
+                { user_id: user?.id, history: updatedMessages.slice(0, -1) },
                 isAdmin
             );
 

@@ -78,7 +78,7 @@ class LocalAIServer {
     }
 
     async processRequest(request: LocalAIRequest): Promise<LocalAIResponse> {
-        const { message, is_admin = false } = request;
+        const { message, context = {}, is_admin = false } = request;
         let function_type = request.function_type;
 
         if (!function_type) {
@@ -88,7 +88,7 @@ class LocalAIServer {
         const typed_function_type = function_type as AIFunctionType;
 
         try {
-            const response = await this.callMistralAPI(typed_function_type, message, is_admin);
+            const response = await this.callMistralAPI(typed_function_type, message, is_admin, false, context.history);
 
             return {
                 success: true,
@@ -102,7 +102,7 @@ class LocalAIServer {
             console.error('Local AI Server Error:', error);
 
             try {
-                const fallbackResponse = await this.callClaudeAPI(typed_function_type, message, is_admin);
+                const fallbackResponse = await this.callClaudeAPI(typed_function_type, message, is_admin, context.history);
                 return {
                     success: true,
                     response: fallbackResponse.response,
@@ -125,9 +125,12 @@ class LocalAIServer {
     }
 
     // Modified callMistralAPI to handle routing prompts
-    private async callMistralAPI(functionTypeOrPrompt: AIFunctionType | string, message: string, isAdmin: boolean, isRouting: boolean = false): Promise<{ response: string, follow_up_questions: string[] }> {
+    private async callMistralAPI(functionTypeOrPrompt: AIFunctionType | string, message: string, isAdmin: boolean, isRouting: boolean = false, history: any[] = []): Promise<{ response: string, follow_up_questions: string[] }> {
         const systemPrompt = isRouting ? functionTypeOrPrompt : this.getSystemPrompt(functionTypeOrPrompt as AIFunctionType, isAdmin);
         const userMessage = isRouting ? "" : message;
+
+        // Format history for the API
+        const formattedHistory = history.map(h => ({ role: h.role, content: h.content }));
 
         const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
             method: 'POST',
@@ -139,6 +142,7 @@ class LocalAIServer {
                 model: 'mistral-large-latest',
                 messages: [
                     { role: 'system', content: systemPrompt },
+                    ...formattedHistory,
                     { role: 'user', content: userMessage }
                 ].filter(msg => msg.content), // Filter out empty messages for routing
                 temperature: 0.1, // Lower temperature for deterministic routing
@@ -172,8 +176,11 @@ class LocalAIServer {
         return { response: mainResponse, follow_up_questions: followUpQuestions };
     }
 
-    private async callClaudeAPI(functionType: AIFunctionType, message: string, isAdmin: boolean): Promise<{ response: string, follow_up_questions: string[] }> {
+    private async callClaudeAPI(functionType: AIFunctionType, message: string, isAdmin: boolean, history: any[] = []): Promise<{ response: string, follow_up_questions: string[] }> {
         const systemPrompt = this.getSystemPrompt(functionType, isAdmin);
+
+        // Format history for the API
+        const formattedHistory = history.map(h => ({ role: h.role, content: h.content }));
 
         const response = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
@@ -187,6 +194,7 @@ class LocalAIServer {
                 max_tokens: 1000,
                 system: systemPrompt,
                 messages: [
+                    ...formattedHistory,
                     { role: 'user', content: message }
                 ],
             }),
