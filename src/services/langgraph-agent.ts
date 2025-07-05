@@ -29,6 +29,25 @@ export class RinKoreaAIAgent {
         context?: any,
         isAdmin: boolean = false
     ): Promise<AIResponse> {
+        // function_type에 따라 적절한 systemPrompt를 생성합니다.
+        const getSystemPrompt = (type: AIFunctionType | null): string => {
+            switch (type) {
+                case 'customer_chat':
+                    return 'You are a friendly and helpful customer support assistant for RinKorea, a company specializing in concrete floor finishing solutions.';
+                case 'qna_automation':
+                    return 'You are an intelligent Q&A assistant. Your goal is to accurately answer questions based on the provided company documents and knowledge base.';
+                case 'smart_quote':
+                    return 'You are a smart quotation assistant. Generate a detailed quote based on the user\'s request for RinKorea products. Include itemized costs, quantities, and totals.';
+                case 'document_search':
+                    return 'You are a powerful document search assistant. Search through RinKorea\'s internal documents to find the most relevant information for the user\'s query.';
+                case 'financial_analysis':
+                    return 'You are a sophisticated financial analyst AI. Provide insights and analysis on RinKorea\'s financial data. This is a restricted function.';
+                default:
+                    // functionType이 null이거나 정의되지 않은 경우, 일반적인 상담원으로 작동
+                    return 'You are a general AI assistant for RinKorea. First, understand the user\'s intent and then route to the most appropriate function if necessary.';
+            }
+        };
+
         try {
             // 로컬 개발 환경에서는 로컬 AI 서버 사용
             if (this.isDevelopment) {
@@ -43,16 +62,16 @@ export class RinKoreaAIAgent {
             }
 
             // 프로덕션 환경에서는 Vercel 서버리스 함수 사용
+            const systemPrompt = getSystemPrompt(functionType);
+
             const response = await fetch(this.apiEndpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    function_type: functionType,
-                    message,
-                    context,
-                    is_admin: isAdmin,
+                    message, // 사용자 메시지
+                    systemPrompt, // 생성된 시스템 프롬프트
                 }),
             });
 
@@ -61,13 +80,16 @@ export class RinKoreaAIAgent {
                 throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
             }
 
-            const data: AIResponse = await response.json();
+            // 서버 응답 형식에 맞게 클라이언트 응답 객체를 재구성합니다.
+            const data = await response.json();
 
-            if (!data.success) {
-                throw new Error(data.error || 'AI request failed');
-            }
-
-            return data;
+            return {
+                success: true,
+                response: data.response,
+                function_type: functionType || 'customer_chat',
+                timestamp: new Date().toISOString(),
+                follow_up_questions: [], // 서버가 이 정보를 제공하지 않으므로 빈 배열로 설정
+            };
         } catch (error) {
             console.error('AI request error:', error);
 
