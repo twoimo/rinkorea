@@ -385,51 +385,65 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                         </div>
                     ) : (
                         <>
-                            {messages.map((message, index) => (
-                                <React.Fragment key={message.id}>
-                                    <div
-                                        className={cn("flex", message.role === 'user' ? 'justify-end' : 'justify-start')}
-                                    >
-                                        <div
-                                            className={cn(
-                                                "max-w-[80%] p-4 rounded-lg",
-                                                message.role === 'user'
-                                                    ? 'bg-blue-600 text-white'
-                                                    : 'bg-gray-100 text-gray-800'
-                                            )}
-                                        >
-                                            {message.role === 'assistant' ? (
-                                                renderMessageContent(message)
-                                            ) : (
-                                                <p className="whitespace-pre-wrap">{message.content}</p>
-                                            )}
-                                            <p className={cn(
-                                                "text-xs mt-2",
-                                                message.role === 'user'
-                                                    ? 'text-blue-200'
-                                                    : 'text-gray-500'
-                                            )}>
-                                                {message.timestamp.toLocaleTimeString()}
-                                            </p>
-                                        </div>
-                                    </div>
+                            {messages.map((message, index) => {
+                                const funcInfo = message.role === 'assistant'
+                                    ? aiFunctions.find(f => f.id === message.functionType)
+                                    : null;
 
-                                    {/* Render follow-up questions for the last assistant message */}
-                                    {message.role === 'assistant' && index === messages.length - 1 && message.followUpQuestions && message.followUpQuestions.length > 0 && (
-                                        <div className="mt-4 flex flex-wrap justify-start gap-2">
-                                            {message.followUpQuestions.map((question, qIndex) => (
-                                                <button
-                                                    key={qIndex}
-                                                    onClick={() => handleSendMessage(question, message.functionType)}
-                                                    className="px-4 py-2 bg-blue-50 text-blue-700 rounded-full hover:bg-blue-100 transition-colors text-sm"
-                                                >
-                                                    {question}
-                                                </button>
-                                            ))}
+                                return (
+                                    <React.Fragment key={message.id}>
+                                        <div
+                                            className={cn("flex", message.role === 'user' ? 'justify-end' : 'justify-start')}
+                                        >
+                                            <div
+                                                className={cn(
+                                                    "max-w-[80%] p-4 rounded-lg",
+                                                    message.role === 'user'
+                                                        ? 'bg-blue-600 text-white'
+                                                        : 'bg-gray-100 text-gray-800'
+                                                )}
+                                            >
+                                                {message.role === 'assistant' ? (
+                                                    <>
+                                                        {funcInfo && (
+                                                            <div className="flex items-center space-x-2 mb-2 pb-2 border-b border-gray-200">
+                                                                <funcInfo.icon className={cn("w-5 h-5", funcInfo.color.replace('bg-', 'text-'))} />
+                                                                <span className="text-sm font-semibold text-gray-800">{funcInfo.name}</span>
+                                                            </div>
+                                                        )}
+                                                        {renderMessageContent(message)}
+                                                    </>
+                                                ) : (
+                                                    <p className="whitespace-pre-wrap">{message.content}</p>
+                                                )}
+                                                <p className={cn(
+                                                    "text-xs mt-2",
+                                                    message.role === 'user'
+                                                        ? 'text-blue-200'
+                                                        : 'text-gray-500'
+                                                )}>
+                                                    {message.timestamp.toLocaleTimeString()}
+                                                </p>
+                                            </div>
                                         </div>
-                                    )}
-                                </React.Fragment>
-                            ))}
+
+                                        {/* Render follow-up questions for the last assistant message */}
+                                        {message.role === 'assistant' && index === messages.length - 1 && message.followUpQuestions && message.followUpQuestions.length > 0 && (
+                                            <div className="mt-4 flex flex-wrap justify-start gap-2">
+                                                {message.followUpQuestions.map((question, qIndex) => (
+                                                    <button
+                                                        key={qIndex}
+                                                        onClick={() => handleSendMessage(question, message.functionType)}
+                                                        className="px-4 py-2 bg-blue-50 text-blue-700 rounded-full hover:bg-blue-100 transition-colors text-sm"
+                                                    >
+                                                        {question}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </React.Fragment>
+                                )
+                            })}
                             {isLoading && (
                                 <div className="flex justify-start">
                                     <div className="bg-gray-100 p-4 rounded-lg">
