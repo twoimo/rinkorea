@@ -1,11 +1,10 @@
 {
   "name": "vite_react_shadcn_ts",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "version": "1.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc && vite build",
     "build:dev": "vite build --mode development",
     "build:analyze": "vite build --mode production && npx vite-bundle-analyzer dist",
     "build:prod": "vite build --mode production && node scripts/fix-build-extensions.js",
