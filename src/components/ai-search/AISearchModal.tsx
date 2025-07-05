@@ -28,6 +28,7 @@ interface Message {
     content: string;
     timestamp: Date;
     functionType?: AIFunctionType;
+    followUpQuestions?: string[];
 }
 
 // 새로운 인터페이스: 예시 질문
@@ -218,25 +219,27 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
         setInputMessage(question);
     }, []);
 
-    const handleSendMessage = useCallback(async () => {
-        if (!inputMessage.trim() || isLoading) return;
+    const handleSendMessage = useCallback(async (messageContent?: string | React.MouseEvent<HTMLButtonElement>) => {
+        const content = typeof messageContent === 'string' ? messageContent : inputMessage.trim();
+        if (!content || isLoading) return;
 
         const userMessage: Message = {
             id: Date.now().toString(),
             role: 'user',
-            content: inputMessage.trim(),
+            content: content,
             timestamp: new Date(),
-            functionType: selectedFunction,
         };
 
         setMessages(prev => [...prev, userMessage]);
-        setInputMessage('');
+        if (typeof messageContent !== 'string') {
+            setInputMessage('');
+        }
         setIsLoading(true);
 
         try {
-            const response = await aiAgent.processRequest(
+            const result = await aiAgent.processRequest(
                 selectedFunction,
-                inputMessage.trim(),
+                content,
                 { user_id: user?.id },
                 isAdmin
             );
@@ -244,21 +247,21 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
             const assistantMessage: Message = {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
-                content: response,
+                content: result.response,
                 timestamp: new Date(),
-                functionType: selectedFunction,
+                functionType: result.function_type as AIFunctionType,
+                followUpQuestions: result.follow_up_questions
             };
 
             setMessages(prev => [...prev, assistantMessage]);
-        } catch {
+        } catch (error) {
+            console.error('AI request failed:', error);
             const errorMessage: Message = {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
                 content: '죄송합니다. 요청을 처리하는 중에 오류가 발생했습니다. 다시 시도해주세요.',
                 timestamp: new Date(),
-                functionType: selectedFunction,
             };
-
             setMessages(prev => [...prev, errorMessage]);
         } finally {
             setIsLoading(false);
@@ -375,34 +378,50 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                         </div>
                     ) : (
                         <>
-                            {messages.map((message) => (
-                                <div
-                                    key={message.id}
-                                    className={cn("flex", message.role === 'user' ? 'justify-end' : 'justify-start')}
-                                >
+                            {messages.map((message, index) => (
+                                <React.Fragment key={message.id}>
                                     <div
-                                        className={cn(
-                                            "max-w-[80%] p-4 rounded-lg",
-                                            message.role === 'user'
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-gray-100 text-gray-800'
-                                        )}
+                                        className={cn("flex", message.role === 'user' ? 'justify-end' : 'justify-start')}
                                     >
-                                        {message.role === 'assistant' ? (
-                                            renderMessageContent(message)
-                                        ) : (
-                                            <p className="whitespace-pre-wrap">{message.content}</p>
-                                        )}
-                                        <p className={cn(
-                                            "text-xs mt-2",
-                                            message.role === 'user'
-                                                ? 'text-blue-200'
-                                                : 'text-gray-500'
-                                        )}>
-                                            {message.timestamp.toLocaleTimeString()}
-                                        </p>
+                                        <div
+                                            className={cn(
+                                                "max-w-[80%] p-4 rounded-lg",
+                                                message.role === 'user'
+                                                    ? 'bg-blue-600 text-white'
+                                                    : 'bg-gray-100 text-gray-800'
+                                            )}
+                                        >
+                                            {message.role === 'assistant' ? (
+                                                renderMessageContent(message)
+                                            ) : (
+                                                <p className="whitespace-pre-wrap">{message.content}</p>
+                                            )}
+                                            <p className={cn(
+                                                "text-xs mt-2",
+                                                message.role === 'user'
+                                                    ? 'text-blue-200'
+                                                    : 'text-gray-500'
+                                            )}>
+                                                {message.timestamp.toLocaleTimeString()}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
+
+                                    {/* Render follow-up questions for the last assistant message */}
+                                    {message.role === 'assistant' && index === messages.length - 1 && message.followUpQuestions && message.followUpQuestions.length > 0 && (
+                                        <div className="mt-4 flex flex-wrap justify-start gap-2">
+                                            {message.followUpQuestions.map((question, qIndex) => (
+                                                <button
+                                                    key={qIndex}
+                                                    onClick={() => handleSendMessage(question)}
+                                                    className="px-4 py-2 bg-blue-50 text-blue-700 rounded-full hover:bg-blue-100 transition-colors text-sm"
+                                                >
+                                                    {question}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </React.Fragment>
                             ))}
                             {isLoading && (
                                 <div className="flex justify-start">
@@ -432,7 +451,7 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                             disabled={isLoading}
                         />
                         <button
-                            onClick={handleSendMessage}
+                            onClick={() => handleSendMessage()}
                             disabled={!inputMessage.trim() || isLoading}
                             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
                         >

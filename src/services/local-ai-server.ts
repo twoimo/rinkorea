@@ -23,9 +23,10 @@ export interface LocalAIRequest {
 export interface LocalAIResponse {
     success: boolean;
     response: string;
-    function_type: string;
+    function_type: AIFunctionType;
     timestamp: string;
     error?: string;
+    follow_up_questions: string[];
 }
 
 class LocalAIServer {
@@ -63,9 +64,8 @@ class LocalAIServer {
           Function ID:`;
 
         try {
-            const response = await this.callMistralAPI(routingPrompt, query, false, true); // Use a minimal call for routing
-            // Extract the function ID from the response. It should be one of the IDs above.
-            const functionId = response.trim().replace(/['"`]/g, '');
+            const response = await this.callMistralAPI(routingPrompt, query, false, true);
+            const functionId = response.response.trim().replace(/['"`]/g, '');
             if (['customer_chat', 'qna_automation', 'smart_quote', 'document_search', 'financial_analysis'].includes(functionId)) {
                 return functionId as AIFunctionType;
             }
@@ -91,22 +91,23 @@ class LocalAIServer {
         try {
             const response = await this.callMistralAPI(typed_function_type, message, is_admin);
 
-            let enhancedResponse = response;
+            let enhancedResponse = response.response;
 
             if (typed_function_type === 'document_search') {
                 const searchResults = await this.performDocumentSearch(message);
-                enhancedResponse = `${response}\n\n검색 결과:\n${searchResults}`;
+                enhancedResponse = `${response.response}\n\n검색 결과:\n${searchResults}`;
             } else if (typed_function_type === 'smart_quote') {
                 const quoteData = await this.generateQuote(message, context);
-                enhancedResponse = `${response}\n\n${quoteData}`;
+                enhancedResponse = `${response.response}\n\n${quoteData}`;
             } else if (typed_function_type === 'financial_analysis' && is_admin) {
                 const analysisData = await this.performFinancialAnalysis(message, context);
-                enhancedResponse = `${response}\n\n분석 결과:\n${analysisData}`;
+                enhancedResponse = `${response.response}\n\n분석 결과:\n${analysisData}`;
             }
 
             return {
                 success: true,
                 response: enhancedResponse,
+                follow_up_questions: response.follow_up_questions,
                 function_type: typed_function_type,
                 timestamp: new Date().toISOString()
             };
@@ -118,9 +119,10 @@ class LocalAIServer {
                 const fallbackResponse = await this.callClaudeAPI(typed_function_type, message, is_admin);
                 return {
                     success: true,
-                    response: fallbackResponse,
+                    response: fallbackResponse.response,
                     function_type: typed_function_type,
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    follow_up_questions: fallbackResponse.follow_up_questions
                 };
             } catch (fallbackError) {
                 console.error('Fallback AI service failed:', fallbackError);
@@ -129,14 +131,15 @@ class LocalAIServer {
                     response: '',
                     function_type: typed_function_type,
                     timestamp: new Date().toISOString(),
-                    error: '현재 AI 서비스가 일시적으로 이용할 수 없습니다. 잠시 후 다시 시도해주세요.'
+                    error: '현재 AI 서비스가 일시적으로 이용할 수 없습니다. 잠시 후 다시 시도해주세요.',
+                    follow_up_questions: []
                 };
             }
         }
     }
 
     // Modified callMistralAPI to handle routing prompts
-    private async callMistralAPI(functionTypeOrPrompt: AIFunctionType | string, message: string, isAdmin: boolean, isRouting: boolean = false): Promise<string> {
+    private async callMistralAPI(functionTypeOrPrompt: AIFunctionType | string, message: string, isAdmin: boolean, isRouting: boolean = false): Promise<{ response: string, follow_up_questions: string[] }> {
         const systemPrompt = isRouting ? functionTypeOrPrompt : this.getSystemPrompt(functionTypeOrPrompt as AIFunctionType, isAdmin);
         const userMessage = isRouting ? "" : message;
 
@@ -162,10 +165,23 @@ class LocalAIServer {
         }
 
         const data = await response.json();
-        return data.choices[0]?.message?.content || 'AI 응답을 받을 수 없습니다.';
+        const content = data.choices[0]?.message?.content || 'AI 응답을 받을 수 없습니다.';
+
+        // Extract follow-up questions from the content
+        const followUpRegex = /\["([^"]*)", ?"([^"]*)", ?"([^"]*)"\]/;
+        const match = content.match(followUpRegex);
+        let followUpQuestions: string[] = [];
+        let mainResponse = content;
+
+        if (match) {
+            followUpQuestions = JSON.parse(match[0]);
+            mainResponse = mainResponse.replace(followUpRegex, '').trim();
+        }
+
+        return { response: mainResponse, follow_up_questions: followUpQuestions };
     }
 
-    private async callClaudeAPI(functionType: string, message: string, isAdmin: boolean): Promise<string> {
+    private async callClaudeAPI(functionType: AIFunctionType, message: string, isAdmin: boolean): Promise<{ response: string, follow_up_questions: string[] }> {
         const systemPrompt = this.getSystemPrompt(functionType, isAdmin);
 
         const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -190,10 +206,23 @@ class LocalAIServer {
         }
 
         const data = await response.json();
-        return data.content[0]?.text || 'AI 응답을 받을 수 없습니다.';
+        const content = data.content[0]?.text || 'AI 응답을 받을 수 없습니다.';
+
+        // Extract follow-up questions from the content
+        const followUpRegex = /\["([^"]*)", ?"([^"]*)", ?"([^"]*)"\]/;
+        const match = content.match(followUpRegex);
+        let followUpQuestions: string[] = [];
+        let mainResponse = content;
+
+        if (match) {
+            followUpQuestions = JSON.parse(match[0]);
+            mainResponse = mainResponse.replace(followUpRegex, '').trim();
+        }
+
+        return { response: mainResponse, follow_up_questions: followUpQuestions };
     }
 
-    private getSystemPrompt(functionType: string, isAdmin: boolean): string {
+    private getSystemPrompt(functionType: AIFunctionType, isAdmin: boolean): string {
         const basePrompt = `
 당신은 린코리아(RIN Korea)의 AI 어시스턴트입니다. 린코리아는 혁신적인 세라믹 코팅재와 친환경 건설재료를 전문으로 하는 회사입니다.
 
