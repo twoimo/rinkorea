@@ -27,6 +27,12 @@ interface Message {
     functionType?: AIFunctionType;
 }
 
+// 새로운 인터페이스: 예시 질문
+interface ExampleQuestion {
+    text: string;
+    adminOnly?: boolean;
+}
+
 const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
     const modalRef = useRef<HTMLDivElement>(null);
     const animationFrameRef = useRef<number>();
@@ -40,13 +46,18 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
     const [inputMessage, setInputMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    const aiFunctions: AIFunction[] = [
+    const aiFunctions: (AIFunction & { examples: ExampleQuestion[] })[] = [
         {
             id: 'customer_chat',
             name: 'AI 고객 상담 챗봇',
             description: '제품 문의, 기술 지원, 일반 상담을 위한 AI 어시스턴트',
             icon: MessageCircle,
             color: 'bg-blue-500',
+            examples: [
+                { text: '린코트 제품의 특징은 무엇인가요?' },
+                { text: '콘크리트 바닥에 사용할 수 있는 제품을 추천해주세요.' },
+                { text: '제품 구매는 어떻게 하나요?' },
+            ],
         },
         {
             id: 'qna_automation',
@@ -54,6 +65,11 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
             description: '자주 묻는 질문에 대한 자동 답변 및 Q&A 관리',
             icon: HelpCircle,
             color: 'bg-green-500',
+            examples: [
+                { text: '제품 시공 방법이 궁금합니다.' },
+                { text: '시험성적서를 받을 수 있나요?' },
+                { text: '불연재 관련 인증 자료를 찾아주세요.' },
+            ],
         },
         {
             id: 'smart_quote',
@@ -61,6 +77,11 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
             description: '제품 및 서비스에 대한 자동 견적 생성',
             icon: Calculator,
             color: 'bg-purple-500',
+            examples: [
+                { text: '100제곱미터 면적에 린코트를 시공할 때 예상 비용은?' },
+                { text: '린하드플러스 10통에 대한 견적을 내주세요.' },
+                { text: '대량 구매 시 할인 혜택이 있나요?' },
+            ],
         },
         {
             id: 'document_search',
@@ -68,6 +89,11 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
             description: '회사 문서, 매뉴얼, 자료에서 정보 검색',
             icon: Search,
             color: 'bg-orange-500',
+            examples: [
+                { text: '린씰플러스의 기술 데이터 시트를 찾아줘.' },
+                { text: '최근에 진행된 주요 프로젝트 목록을 보여줘.' },
+                { text: '2024년 2분기 매출 보고서를 요약해줘.', adminOnly: true },
+            ],
         },
         {
             id: 'financial_analysis',
@@ -76,6 +102,11 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
             icon: TrendingUp,
             color: 'bg-red-500',
             adminOnly: true,
+            examples: [
+                { text: '지난 분기 대비 매출 증감률을 알려줘.', adminOnly: true },
+                { text: '가장 수익성이 높은 제품군은 무엇인가?', adminOnly: true },
+                { text: '올해 연말 매출을 예측해줘.', adminOnly: true },
+            ],
         },
     ];
 
@@ -247,6 +278,10 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
         }
     }, [handleSendMessage]);
 
+    const handleExampleQuestionClick = useCallback((question: string) => {
+        setInputMessage(question);
+    }, []);
+
     const selectedFunctionInfo = selectedFunction
         ? aiFunctions.find(f => f.id === selectedFunction)
         : null;
@@ -350,6 +385,21 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                                     <p className="text-sm text-gray-500">
                                         무엇을 도와드릴까요? 메시지를 입력해주세요.
                                     </p>
+                                    {/* Example Questions */}
+                                    <div className="mt-8">
+                                        <h4 className="text-sm font-semibold text-gray-500 mb-4">예시 질문</h4>
+                                        <div className="flex flex-wrap justify-center gap-2">
+                                            {selectedFunctionInfo?.examples.filter(ex => !ex.adminOnly || isAdmin).map((example, index) => (
+                                                <button
+                                                    key={index}
+                                                    onClick={() => handleExampleQuestionClick(example.text)}
+                                                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors text-sm"
+                                                >
+                                                    {example.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                             ) : (
                                 <>
