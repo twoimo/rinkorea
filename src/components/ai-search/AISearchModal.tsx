@@ -5,6 +5,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { aiAgent, AIFunctionType } from '@/services/langgraph-agent';
 import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import QuoteDisplay from './QuoteDisplay';
 
 interface AISearchModalProps {
     onClose: () => void;
@@ -255,8 +258,7 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
             };
 
             setMessages(prev => [...prev, assistantMessage]);
-        } catch (error) {
-            console.error('AI request failed:', error);
+        } catch {
             const errorMessage: Message = {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
@@ -285,6 +287,46 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
     const selectedFunctionInfo = selectedFunction
         ? aiFunctions.find(f => f.id === selectedFunction)
         : null;
+
+    const renderMessageContent = (message: Message) => {
+        // Regular expression to find a JSON object or array within the string
+        const jsonRegex = /({.*}|\[.*\])/s;
+        const match = message.content.match(jsonRegex);
+
+        if (match) {
+            const jsonString = match[0];
+            const precedingText = message.content.substring(0, match.index);
+
+            try {
+                const parsedData = JSON.parse(jsonString);
+                if (parsedData && (parsedData.products || parsedData.total)) {
+                    return (
+                        <>
+                            {precedingText.trim() && (
+                                <div className="prose prose-sm max-w-none mb-4">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                        {precedingText}
+                                    </ReactMarkdown>
+                                </div>
+                            )}
+                            <QuoteDisplay data={parsedData} />
+                        </>
+                    );
+                }
+            } catch {
+                // Not a valid JSON, fall through to default rendering
+            }
+        }
+
+        // Default rendering for user messages or non-quote assistant messages
+        return (
+            <div className="prose prose-sm max-w-none">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {message.content}
+                </ReactMarkdown>
+            </div>
+        );
+    };
 
     const modalContent = (
         <div ref={modalRef} onClick={onClose}>
@@ -416,7 +458,11 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                                                         : 'bg-gray-100 text-gray-800'
                                                 )}
                                             >
-                                                <p className="whitespace-pre-wrap">{message.content}</p>
+                                                {message.role === 'assistant' ? (
+                                                    renderMessageContent(message)
+                                                ) : (
+                                                    <p className="whitespace-pre-wrap">{message.content}</p>
+                                                )}
                                                 <p className={cn(
                                                     "text-xs mt-2",
                                                     message.role === 'user'
