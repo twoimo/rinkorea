@@ -37,7 +37,6 @@ class UnifiedAIAgent {
     }
 
     private async route(query: string): Promise<AIFunctionType> {
-        // ... (local-ai-server.ts의 route 함수와 동일한 로직)
         const routingPrompt = `
           Given the user query, determine the most appropriate function to use.
           You must return only the function ID, and nothing else.
@@ -59,8 +58,20 @@ class UnifiedAIAgent {
                 return functionId as AIFunctionType;
             }
         } catch (error) {
-            console.error("Routing failed:", error);
+            console.error("Routing with Mistral failed, trying Claude:", error);
+            // Fallback to Claude for routing
+            try {
+                const response = await this.callClaudeAPI(routingPrompt, query, false, true);
+                const functionId = response.response.trim().replace(/['"`]/g, '');
+                if (['customer_chat', 'qna_automation', 'smart_quote', 'document_search', 'financial_analysis'].includes(functionId)) {
+                    return functionId as AIFunctionType;
+                }
+            } catch (claudeError) {
+                console.error("Routing with Claude also failed:", claudeError);
+            }
         }
+
+        // Default to customer_chat if all routing fails
         return 'customer_chat';
     }
 
@@ -113,8 +124,13 @@ class UnifiedAIAgent {
         return this.extractFollowUpQuestions(content);
     }
 
-    private async callClaudeAPI(functionType: AIFunctionType, message: string, isAdmin: boolean, history: any[] = []): Promise<{ response: string, follow_up_questions: string[] }> {
-        const systemPrompt = this.getSystemPrompt(functionType, isAdmin);
+    private async callClaudeAPI(functionTypeOrPrompt: AIFunctionType | string, message: string, isAdmin: boolean, isRouting: boolean = false, history: any[] = []): Promise<{ response: string, follow_up_questions: string[] }> {
+        if (!CLAUDE_API_KEY) {
+            throw new Error("Claude API key is not configured.");
+        }
+
+        const systemPrompt = isRouting ? functionTypeOrPrompt as string : this.getSystemPrompt(functionTypeOrPrompt as AIFunctionType, isAdmin);
+        const userMessage = isRouting ? "" : message;
         const formattedHistory = history.map(h => ({ role: h.role, content: h.content }));
 
         const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -122,15 +138,21 @@ class UnifiedAIAgent {
             headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-version': '2023-06-01' },
             body: JSON.stringify({
                 model: 'claude-3-5-sonnet-20240620',
-                max_tokens: 1000,
+                max_tokens: isRouting ? 20 : 1000,
                 system: systemPrompt,
-                messages: [...formattedHistory, { role: 'user', content: message }],
+                messages: [...formattedHistory, { role: 'user', content: userMessage }].filter(msg => msg.content),
+                temperature: isRouting ? 0 : 0.2,
             }),
         });
 
         if (!response.ok) throw new Error(`Claude API error: ${response.status}`);
         const data = await response.json();
         const content = data.content[0]?.text || 'AI 응답을 받을 수 없습니다.';
+
+        if (isRouting) {
+            return { response: content, follow_up_questions: [] };
+        }
+
         return this.extractFollowUpQuestions(content);
     }
 
