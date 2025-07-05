@@ -5,7 +5,7 @@
     "installCommand": "npm install",
     "framework": "vite",
     "functions": {
-        "api/*.ts": {
+        "api/ai-chat.cts": {
             "runtime": "@vercel/node@5.3.2"
         }
     },
