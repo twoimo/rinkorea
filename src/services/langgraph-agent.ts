@@ -76,15 +76,17 @@ export class RinKoreaAIAgent {
             });
 
             if (!response.ok) {
-                let errorMessage = `서버 요청 실패: status ${response.status}`;
+                // 서버 응답을 텍스트로 한번만 읽습니다.
+                const responseText = await response.text();
+                let errorMessage = `서버 오류 (Status: ${response.status})`;
+
                 try {
-                    // 서버가 JSON 형태의 에러 메시지를 보냈는지 확인
-                    const errorData = await response.json();
-                    errorMessage = errorData.error || JSON.stringify(errorData);
+                    // 텍스트를 JSON으로 파싱 시도
+                    const errorData = JSON.parse(responseText);
+                    errorMessage = errorData.error || `서버 응답: ${JSON.stringify(errorData)}`;
                 } catch {
-                    // JSON 파싱에 실패하면, 응답을 텍스트로 처리
-                    const textError = await response.text();
-                    errorMessage = textError.substring(0, 100); // 너무 길지 않게 자름
+                    // 파싱 실패 시, 텍스트 응답 자체를 오류 메시지로 사용 (Vercel 오류 페이지 등)
+                    errorMessage = responseText.substring(0, 200); // 너무 길지 않게 자릅니다.
                 }
                 throw new Error(errorMessage);
             }
