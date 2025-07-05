@@ -329,7 +329,7 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
     const modalContent = (
         <div ref={modalRef} onClick={onClose}>
             <div
-                className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col"
+                className="bg-white rounded-lg shadow-xl w-full h-full sm:max-w-6xl sm:max-h-[90vh] sm:h-auto overflow-hidden flex flex-col"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
