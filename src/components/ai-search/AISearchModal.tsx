@@ -285,146 +285,137 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                     </button>
                 </div>
 
-                {/* Content */}
-                <div className="flex-1 overflow-hidden">
-                    {!selectedFunction ? (
-                        /* Function Selection */
-                        <div className="p-6 h-full overflow-y-auto">
-                            <div className="text-center mb-8">
-                                <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                                    어떤 도움이 필요하신가요?
-                                </h3>
-                                <p className="text-gray-600">
-                                    원하는 AI 기능을 선택하여 시작하세요
-                                </p>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {availableFunctions.map((func) => (
-                                    <button
-                                        key={func.id}
-                                        onClick={() => handleFunctionSelect(func.id)}
-                                        className="p-6 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all duration-200 text-left group"
-                                    >
-                                        <div className="flex items-start space-x-4">
-                                            <div className={cn(
-                                                "p-3 rounded-lg text-white",
-                                                func.color
-                                            )}>
-                                                <func.icon className="w-6 h-6" />
-                                            </div>
-                                            <div className="flex-1">
-                                                <h4 className="font-semibold text-gray-800 mb-2 group-hover:text-blue-600">
-                                                    {func.name}
-                                                </h4>
-                                                <p className="text-sm text-gray-600">
-                                                    {func.description}
-                                                </p>
-                                                {func.adminOnly && (
-                                                    <span className="inline-block mt-2 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                                                        관리자 전용
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
+                {/* Content: Restructured for proper flexbox behavior */}
+                {!selectedFunction ? (
+                    /* Function Selection View */
+                    <div className="flex-1 p-6 overflow-y-auto">
+                        <div className="text-center mb-8">
+                            <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                                어떤 도움이 필요하신가요?
+                            </h3>
+                            <p className="text-gray-600">
+                                원하는 AI 기능을 선택하여 시작하세요
+                            </p>
                         </div>
-                    ) : (
-                        /* Chat Interface */
-                        <div className="flex flex-col h-full">
-                            {/* Chat Messages */}
-                            <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4">
-                                {messages.length === 0 ? (
-                                    <div className="text-center py-8">
-                                        <div className={cn(
-                                            "w-16 h-16 mx-auto rounded-full flex items-center justify-center text-white mb-4",
-                                            selectedFunctionInfo?.color
-                                        )}>
-                                            {selectedFunctionInfo?.icon && (
-                                                <selectedFunctionInfo.icon className="w-8 h-8" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {availableFunctions.map((func) => (
+                                <button
+                                    key={func.id}
+                                    onClick={() => handleFunctionSelect(func.id)}
+                                    className="p-6 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all duration-200 text-left group"
+                                >
+                                    <div className="flex items-start space-x-4">
+                                        <div className={cn("p-3 rounded-lg text-white", func.color)}>
+                                            <func.icon className="w-6 h-6" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <h4 className="font-semibold text-gray-800 mb-2 group-hover:text-blue-600">
+                                                {func.name}
+                                            </h4>
+                                            <p className="text-sm text-gray-600">
+                                                {func.description}
+                                            </p>
+                                            {func.adminOnly && (
+                                                <span className="inline-block mt-2 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                                                    관리자 전용
+                                                </span>
                                             )}
                                         </div>
-                                        <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                                            {selectedFunctionInfo?.name}
-                                        </h3>
-                                        <p className="text-gray-600 mb-4">
-                                            {selectedFunctionInfo?.description}
-                                        </p>
-                                        <p className="text-sm text-gray-500">
-                                            무엇을 도와드릴까요? 메시지를 입력해주세요.
-                                        </p>
                                     </div>
-                                ) : (
-                                    <>
-                                        {messages.map((message) => (
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    /* Chat Interface View */
+                    <>
+                        {/* Chat Messages */}
+                        <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4">
+                            {messages.length === 0 ? (
+                                <div className="text-center py-8">
+                                    <div className={cn(
+                                        "w-16 h-16 mx-auto rounded-full flex items-center justify-center text-white mb-4",
+                                        selectedFunctionInfo?.color
+                                    )}>
+                                        {selectedFunctionInfo?.icon && (
+                                            <selectedFunctionInfo.icon className="w-8 h-8" />
+                                        )}
+                                    </div>
+                                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                                        {selectedFunctionInfo?.name}
+                                    </h3>
+                                    <p className="text-gray-600 mb-4">
+                                        {selectedFunctionInfo?.description}
+                                    </p>
+                                    <p className="text-sm text-gray-500">
+                                        무엇을 도와드릴까요? 메시지를 입력해주세요.
+                                    </p>
+                                </div>
+                            ) : (
+                                <>
+                                    {messages.map((message) => (
+                                        <div
+                                            key={message.id}
+                                            className={cn("flex", message.role === 'user' ? 'justify-end' : 'justify-start')}
+                                        >
                                             <div
-                                                key={message.id}
                                                 className={cn(
-                                                    "flex",
-                                                    message.role === 'user' ? 'justify-end' : 'justify-start'
+                                                    "max-w-[80%] p-4 rounded-lg",
+                                                    message.role === 'user'
+                                                        ? 'bg-blue-600 text-white'
+                                                        : 'bg-gray-100 text-gray-800'
                                                 )}
                                             >
-                                                <div
-                                                    className={cn(
-                                                        "max-w-[80%] p-4 rounded-lg",
-                                                        message.role === 'user'
-                                                            ? 'bg-blue-600 text-white'
-                                                            : 'bg-gray-100 text-gray-800'
-                                                    )}
-                                                >
-                                                    <p className="whitespace-pre-wrap">{message.content}</p>
-                                                    <p className={cn(
-                                                        "text-xs mt-2",
-                                                        message.role === 'user'
-                                                            ? 'text-blue-200'
-                                                            : 'text-gray-500'
-                                                    )}>
-                                                        {message.timestamp.toLocaleTimeString()}
-                                                    </p>
+                                                <p className="whitespace-pre-wrap">{message.content}</p>
+                                                <p className={cn(
+                                                    "text-xs mt-2",
+                                                    message.role === 'user'
+                                                        ? 'text-blue-200'
+                                                        : 'text-gray-500'
+                                                )}>
+                                                    {message.timestamp.toLocaleTimeString()}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {isLoading && (
+                                        <div className="flex justify-start">
+                                            <div className="bg-gray-100 p-4 rounded-lg">
+                                                <div className="flex items-center space-x-2">
+                                                    <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                                                    <span className="text-gray-600">AI가 답변을 생성하고 있습니다...</span>
                                                 </div>
                                             </div>
-                                        ))}
-                                        {isLoading && (
-                                            <div className="flex justify-start">
-                                                <div className="bg-gray-100 p-4 rounded-lg">
-                                                    <div className="flex items-center space-x-2">
-                                                        <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-                                                        <span className="text-gray-600">AI가 답변을 생성하고 있습니다...</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </>
-                                )}
-                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </div>
 
-                            {/* Input Area */}
-                            <div className="border-t border-gray-200 p-4">
-                                <div className="flex space-x-4">
-                                    <textarea
-                                        value={inputMessage}
-                                        onChange={(e) => setInputMessage(e.target.value)}
-                                        onKeyPress={handleInputKeyPress}
-                                        placeholder="메시지를 입력하세요..."
-                                        className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                                        rows={2}
-                                        disabled={isLoading}
-                                    />
-                                    <button
-                                        onClick={handleSendMessage}
-                                        disabled={!inputMessage.trim() || isLoading}
-                                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
-                                    >
-                                        <Send className="w-4 h-4" />
-                                        <span>전송</span>
-                                    </button>
-                                </div>
+                        {/* Input Area */}
+                        <div className="border-t border-gray-200 p-4">
+                            <div className="flex space-x-4">
+                                <textarea
+                                    value={inputMessage}
+                                    onChange={(e) => setInputMessage(e.target.value)}
+                                    onKeyPress={handleInputKeyPress}
+                                    placeholder="메시지를 입력하세요..."
+                                    className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                                    rows={2}
+                                    disabled={isLoading}
+                                />
+                                <button
+                                    onClick={handleSendMessage}
+                                    disabled={!inputMessage.trim() || isLoading}
+                                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                                >
+                                    <Send className="w-4 h-4" />
+                                    <span>전송</span>
+                                </button>
                             </div>
                         </div>
-                    )}
-                </div>
+                    </>
+                )}
             </div>
         </div>
     );
