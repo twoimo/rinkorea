@@ -40,6 +40,7 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
     const modalRef = useRef<HTMLDivElement>(null);
     const animationFrameRef = useRef<number>();
     const chatContainerRef = useRef<HTMLDivElement>(null);
+    const chatEndRef = useRef<HTMLDivElement>(null);
     const prevMessagesLength = useRef(0);
     const { user } = useAuth();
     const { isAdmin } = useUserRole();
@@ -113,7 +114,8 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
         },
     ];
 
-    const availableFunctions = aiFunctions.filter(func => !func.adminOnly || isAdmin);
+    const allExamples = aiFunctions.flatMap(f => f.examples.filter(ex => !ex.adminOnly || isAdmin));
+    const exampleQuestionsToShow = allExamples.slice(0, 12);
 
     useEffect(() => {
         const originalBodyOverflow = document.body.style.overflow;
@@ -205,29 +207,19 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
     }, [onClose, isLoading]);
 
     useEffect(() => {
-        // 새 메시지가 추가될 때만 스크롤을 맨 아래로 이동
-        if (chatContainerRef.current && messages.length > prevMessagesLength.current) {
-            // scrollIntoView() 대신 scrollTop을 직접 조작하여 페이지 스크롤 방지
-            const chatContainer = chatContainerRef.current;
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+        // Scroll to the bottom when new messages are added
+        if (chatEndRef.current && messages.length > prevMessagesLength.current) {
+            chatEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
         prevMessagesLength.current = messages.length;
     }, [messages]);
 
-    const handleFunctionSelect = useCallback((functionType: AIFunctionType) => {
-        setSelectedFunction(functionType);
-        setMessages([]);
-        setInputMessage('');
-    }, []);
-
-    const handleBackToFunctions = useCallback(() => {
-        setSelectedFunction(null);
-        setMessages([]);
-        setInputMessage('');
+    const handleExampleQuestionClick = useCallback((question: string) => {
+        setInputMessage(question);
     }, []);
 
     const handleSendMessage = useCallback(async () => {
-        if (!inputMessage.trim() || !selectedFunction || isLoading) return;
+        if (!inputMessage.trim() || isLoading) return;
 
         const userMessage: Message = {
             id: Date.now().toString(),
@@ -280,10 +272,6 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
         }
     }, [handleSendMessage]);
 
-    const handleExampleQuestionClick = useCallback((question: string) => {
-        setInputMessage(question);
-    }, []);
-
     const selectedFunctionInfo = selectedFunction
         ? aiFunctions.find(f => f.id === selectedFunction)
         : null;
@@ -335,11 +323,11 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+                <div className="flex-shrink-0 sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                         {selectedFunction && (
                             <button
-                                onClick={handleBackToFunctions}
+                                onClick={() => setSelectedFunction(null)}
                                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                             >
                                 <X className="w-5 h-5 rotate-45" />
@@ -362,156 +350,97 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                     </button>
                 </div>
 
-                {/* Content: Restructured for proper flexbox behavior */}
-                {!selectedFunction ? (
-                    /* Function Selection View */
-                    <div className="flex-1 p-6 overflow-y-auto">
-                        <div className="text-center mb-8">
-                            <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                                어떤 도움이 필요하신가요?
+                {/* Chat Messages */}
+                <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4">
+                    {messages.length === 0 ? (
+                        <div className="text-center py-8">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                                무엇을 도와드릴까요?
                             </h3>
-                            <p className="text-gray-600">
-                                원하는 AI 기능을 선택하여 시작하세요
+                            <p className="text-gray-600 mb-8">
+                                질문을 입력하시면 AI가 가장 적절한 기능으로 답변해 드립니다.
                             </p>
+                            {/* Static Example Questions */}
+                            <div className="flex flex-wrap justify-center gap-2">
+                                {exampleQuestionsToShow.map((example, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => handleExampleQuestionClick(example.text)}
+                                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors text-sm"
+                                    >
+                                        {example.text}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {availableFunctions.map((func) => (
-                                <button
-                                    key={func.id}
-                                    onClick={() => handleFunctionSelect(func.id)}
-                                    className="p-6 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all duration-200 text-left group"
+                    ) : (
+                        <>
+                            {messages.map((message) => (
+                                <div
+                                    key={message.id}
+                                    className={cn("flex", message.role === 'user' ? 'justify-end' : 'justify-start')}
                                 >
-                                    <div className="flex items-start space-x-4">
-                                        <div className={cn("p-3 rounded-lg text-white", func.color)}>
-                                            <func.icon className="w-6 h-6" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <h4 className="font-semibold text-gray-800 mb-2 group-hover:text-blue-600">
-                                                {func.name}
-                                            </h4>
-                                            <p className="text-sm text-gray-600">
-                                                {func.description}
-                                            </p>
-                                            {func.adminOnly && (
-                                                <span className="inline-block mt-2 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                                                    관리자 전용
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                ) : (
-                    /* Chat Interface View */
-                    <>
-                        {/* Chat Messages */}
-                        <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4">
-                            {messages.length === 0 ? (
-                                <div className="text-center py-8">
-                                    <div className={cn(
-                                        "w-16 h-16 mx-auto rounded-full flex items-center justify-center text-white mb-4",
-                                        selectedFunctionInfo?.color
-                                    )}>
-                                        {selectedFunctionInfo?.icon && (
-                                            <selectedFunctionInfo.icon className="w-8 h-8" />
+                                    <div
+                                        className={cn(
+                                            "max-w-[80%] p-4 rounded-lg",
+                                            message.role === 'user'
+                                                ? 'bg-blue-600 text-white'
+                                                : 'bg-gray-100 text-gray-800'
                                         )}
+                                    >
+                                        {message.role === 'assistant' ? (
+                                            renderMessageContent(message)
+                                        ) : (
+                                            <p className="whitespace-pre-wrap">{message.content}</p>
+                                        )}
+                                        <p className={cn(
+                                            "text-xs mt-2",
+                                            message.role === 'user'
+                                                ? 'text-blue-200'
+                                                : 'text-gray-500'
+                                        )}>
+                                            {message.timestamp.toLocaleTimeString()}
+                                        </p>
                                     </div>
-                                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                                        {selectedFunctionInfo?.name}
-                                    </h3>
-                                    <p className="text-gray-600 mb-4">
-                                        {selectedFunctionInfo?.description}
-                                    </p>
-                                    <p className="text-sm text-gray-500">
-                                        무엇을 도와드릴까요? 메시지를 입력해주세요.
-                                    </p>
-                                    {/* Example Questions */}
-                                    <div className="mt-8">
-                                        <h4 className="text-sm font-semibold text-gray-500 mb-4">예시 질문</h4>
-                                        <div className="flex flex-wrap justify-center gap-2">
-                                            {selectedFunctionInfo?.examples.filter(ex => !ex.adminOnly || isAdmin).map((example, index) => (
-                                                <button
-                                                    key={index}
-                                                    onClick={() => handleExampleQuestionClick(example.text)}
-                                                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors text-sm"
-                                                >
-                                                    {example.text}
-                                                </button>
-                                            ))}
+                                </div>
+                            ))}
+                            {isLoading && (
+                                <div className="flex justify-start">
+                                    <div className="bg-gray-100 p-4 rounded-lg">
+                                        <div className="flex items-center space-x-2">
+                                            <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                                            <span className="text-gray-600">AI가 답변을 생성하고 있습니다...</span>
                                         </div>
                                     </div>
                                 </div>
-                            ) : (
-                                <>
-                                    {messages.map((message) => (
-                                        <div
-                                            key={message.id}
-                                            className={cn("flex", message.role === 'user' ? 'justify-end' : 'justify-start')}
-                                        >
-                                            <div
-                                                className={cn(
-                                                    "max-w-[80%] p-4 rounded-lg",
-                                                    message.role === 'user'
-                                                        ? 'bg-blue-600 text-white'
-                                                        : 'bg-gray-100 text-gray-800'
-                                                )}
-                                            >
-                                                {message.role === 'assistant' ? (
-                                                    renderMessageContent(message)
-                                                ) : (
-                                                    <p className="whitespace-pre-wrap">{message.content}</p>
-                                                )}
-                                                <p className={cn(
-                                                    "text-xs mt-2",
-                                                    message.role === 'user'
-                                                        ? 'text-blue-200'
-                                                        : 'text-gray-500'
-                                                )}>
-                                                    {message.timestamp.toLocaleTimeString()}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                    {isLoading && (
-                                        <div className="flex justify-start">
-                                            <div className="bg-gray-100 p-4 rounded-lg">
-                                                <div className="flex items-center space-x-2">
-                                                    <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-                                                    <span className="text-gray-600">AI가 답변을 생성하고 있습니다...</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </>
                             )}
-                        </div>
+                        </>
+                    )}
+                    <div ref={chatEndRef} />
+                </div>
 
-                        {/* Input Area */}
-                        <div className="border-t border-gray-200 p-4">
-                            <div className="flex space-x-4">
-                                <textarea
-                                    value={inputMessage}
-                                    onChange={(e) => setInputMessage(e.target.value)}
-                                    onKeyPress={handleInputKeyPress}
-                                    placeholder="메시지를 입력하세요..."
-                                    className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                                    rows={2}
-                                    disabled={isLoading}
-                                />
-                                <button
-                                    onClick={handleSendMessage}
-                                    disabled={!inputMessage.trim() || isLoading}
-                                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
-                                >
-                                    <Send className="w-4 h-4" />
-                                    <span>전송</span>
-                                </button>
-                            </div>
-                        </div>
-                    </>
-                )}
+                {/* Input Area */}
+                <div className="flex-shrink-0 border-t border-gray-200 p-4">
+                    <div className="flex space-x-4">
+                        <textarea
+                            value={inputMessage}
+                            onChange={(e) => setInputMessage(e.target.value)}
+                            onKeyPress={handleInputKeyPress}
+                            placeholder="메시지를 입력하세요..."
+                            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                            rows={2}
+                            disabled={isLoading}
+                        />
+                        <button
+                            onClick={handleSendMessage}
+                            disabled={!inputMessage.trim() || isLoading}
+                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                        >
+                            <Send className="w-4 h-4" />
+                            <span>전송</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );

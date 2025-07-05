@@ -5,8 +5,16 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 const MISTRAL_API_KEY = import.meta.env.VITE_MISTRAL_API_KEY;
 const CLAUDE_API_KEY = import.meta.env.VITE_CLAUDE_API_KEY;
 
+// Interfaces moved inside to remove external dependencies
+export type AIFunctionType =
+    | 'customer_chat'
+    | 'qna_automation'
+    | 'smart_quote'
+    | 'document_search'
+    | 'financial_analysis';
+
 export interface LocalAIRequest {
-    function_type: string;
+    function_type?: string;
     message: string;
     context?: any;
     is_admin?: boolean;
@@ -38,23 +46,60 @@ class LocalAIServer {
         return this.supabase;
     }
 
-    async processRequest(request: LocalAIRequest): Promise<LocalAIResponse> {
-        const { function_type, message, context = {}, is_admin = false } = request;
+    // Function to determine the best AI function for a given query
+    private async route(query: string): Promise<AIFunctionType> {
+        const routingPrompt = `
+          Given the user query, determine the most appropriate function to use.
+          You must return only the function ID, and nothing else.
+          
+          Available functions:
+          - customer_chat: For general product inquiries, technical support, and assistance.
+          - qna_automation: For answering frequently asked questions based on existing data.
+          - smart_quote: For generating quotes and cost estimations for products and services.
+          - document_search: For searching and retrieving information from internal documents, manuals, and reports.
+          - financial_analysis: For analyzing sales, revenue, trends, and providing financial insights. (Use for financial questions)
+
+          User Query: "${query}"
+          Function ID:`;
 
         try {
-            // Mistral AI API 호출
-            const response = await this.callMistralAPI(function_type, message, is_admin);
+            const response = await this.callMistralAPI(routingPrompt, query, false, true); // Use a minimal call for routing
+            // Extract the function ID from the response. It should be one of the IDs above.
+            const functionId = response.trim().replace(/['"`]/g, '');
+            if (['customer_chat', 'qna_automation', 'smart_quote', 'document_search', 'financial_analysis'].includes(functionId)) {
+                return functionId as AIFunctionType;
+            }
+        } catch (error) {
+            console.error("Routing failed:", error);
+        }
 
-            // 특수 기능별 추가 처리
+        // Default to customer_chat if routing fails
+        return 'customer_chat';
+    }
+
+    async processRequest(request: LocalAIRequest): Promise<LocalAIResponse> {
+        const { message, context = {}, is_admin = false } = request;
+        let function_type = request.function_type;
+
+        // If function_type is not provided, route the request
+        if (!function_type) {
+            function_type = await this.route(message);
+        }
+
+        const typed_function_type = function_type as AIFunctionType;
+
+        try {
+            const response = await this.callMistralAPI(typed_function_type, message, is_admin);
+
             let enhancedResponse = response;
 
-            if (function_type === 'document_search') {
+            if (typed_function_type === 'document_search') {
                 const searchResults = await this.performDocumentSearch(message);
                 enhancedResponse = `${response}\n\n검색 결과:\n${searchResults}`;
-            } else if (function_type === 'smart_quote') {
+            } else if (typed_function_type === 'smart_quote') {
                 const quoteData = await this.generateQuote(message, context);
                 enhancedResponse = `${response}\n\n${quoteData}`;
-            } else if (function_type === 'financial_analysis' && is_admin) {
+            } else if (typed_function_type === 'financial_analysis' && is_admin) {
                 const analysisData = await this.performFinancialAnalysis(message, context);
                 enhancedResponse = `${response}\n\n분석 결과:\n${analysisData}`;
             }
@@ -62,20 +107,19 @@ class LocalAIServer {
             return {
                 success: true,
                 response: enhancedResponse,
-                function_type,
+                function_type: typed_function_type,
                 timestamp: new Date().toISOString()
             };
 
         } catch (error) {
             console.error('Local AI Server Error:', error);
 
-            // Claude API로 폴백 시도
             try {
-                const fallbackResponse = await this.callClaudeAPI(function_type, message, is_admin);
+                const fallbackResponse = await this.callClaudeAPI(typed_function_type, message, is_admin);
                 return {
                     success: true,
                     response: fallbackResponse,
-                    function_type,
+                    function_type: typed_function_type,
                     timestamp: new Date().toISOString()
                 };
             } catch (fallbackError) {
@@ -83,7 +127,7 @@ class LocalAIServer {
                 return {
                     success: false,
                     response: '',
-                    function_type,
+                    function_type: typed_function_type,
                     timestamp: new Date().toISOString(),
                     error: '현재 AI 서비스가 일시적으로 이용할 수 없습니다. 잠시 후 다시 시도해주세요.'
                 };
@@ -91,8 +135,10 @@ class LocalAIServer {
         }
     }
 
-    private async callMistralAPI(functionType: string, message: string, isAdmin: boolean): Promise<string> {
-        const systemPrompt = this.getSystemPrompt(functionType, isAdmin);
+    // Modified callMistralAPI to handle routing prompts
+    private async callMistralAPI(functionTypeOrPrompt: AIFunctionType | string, message: string, isAdmin: boolean, isRouting: boolean = false): Promise<string> {
+        const systemPrompt = isRouting ? functionTypeOrPrompt : this.getSystemPrompt(functionTypeOrPrompt as AIFunctionType, isAdmin);
+        const userMessage = isRouting ? "" : message;
 
         const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
             method: 'POST',
@@ -104,10 +150,10 @@ class LocalAIServer {
                 model: 'mistral-large-latest',
                 messages: [
                     { role: 'system', content: systemPrompt },
-                    { role: 'user', content: message }
-                ],
-                temperature: 0.7,
-                max_tokens: 1000,
+                    { role: 'user', content: userMessage }
+                ].filter(msg => msg.content), // Filter out empty messages for routing
+                temperature: 0.1, // Lower temperature for deterministic routing
+                max_tokens: isRouting ? 20 : 1000,
             }),
         });
 
@@ -152,9 +198,9 @@ class LocalAIServer {
 당신은 린코리아(RIN Korea)의 AI 어시스턴트입니다. 린코리아는 혁신적인 세라믹 코팅재와 친환경 건설재료를 전문으로 하는 회사입니다.
 
 주요 제품:
-- 린코트(RIN-COAT): 1액형 세라믹 코팅제
-- 린하드플러스(RIN-HARD PLUS): 고성능 경화제
-- 린씰플러스(RIN-SEAL PLUS): 침투성 방수제
+- 린코트(RIN-COAT): 1액형 콘크리트 침투 강화 세라믹 코팅제
+- 린하드플러스(RIN-HARD PLUS): 콘크리트 강화제(액상하드너)
+- 린씰플러스(RIN-SEAL PLUS): 콘크리트 코팅제(실러)
 
 항상 정확하고 전문적인 답변을 제공하며, 고객의 요구사항을 정확히 파악하여 최적의 솔루션을 제안해주세요.
 ${isAdmin ? '관리자 권한으로 모든 기능과 데이터에 접근할 수 있습니다.' : ''}
