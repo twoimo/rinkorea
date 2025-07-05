@@ -37,7 +37,7 @@ class UnifiedAIAgent {
     }
 
     private async route(query: string): Promise<AIFunctionType> {
-        const routingPrompt = `
+        const routingInstructions = `
           Given the user query, determine the most appropriate function to use.
           You must return only the function ID, and nothing else.
           
@@ -46,22 +46,18 @@ class UnifiedAIAgent {
           - qna_automation: For answering frequently asked questions based on existing data.
           - smart_quote: For generating quotes and cost estimations for products and services.
           - document_search: For searching and retrieving information from internal documents, manuals, and reports.
-          - financial_analysis: For analyzing sales, revenue, trends, and providing financial insights. (Use for financial questions)
-
-          User Query: "${query}"
-          Function ID:`;
+          - financial_analysis: For analyzing sales, revenue, trends, and providing financial insights. (Use for financial questions)`;
 
         try {
-            const response = await this.callMistralAPI(routingPrompt, query, false, true);
+            const response = await this.callMistralAPI(routingInstructions, query, false, true);
             const functionId = response.response.trim().replace(/['"`]/g, '');
             if (['customer_chat', 'qna_automation', 'smart_quote', 'document_search', 'financial_analysis'].includes(functionId)) {
                 return functionId as AIFunctionType;
             }
         } catch (error) {
             console.error("Routing with Mistral failed, trying Claude:", error);
-            // Fallback to Claude for routing
             try {
-                const response = await this.callClaudeAPI(routingPrompt, query, false, true);
+                const response = await this.callClaudeAPI(routingInstructions, query, false, true);
                 const functionId = response.response.trim().replace(/['"`]/g, '');
                 if (['customer_chat', 'qna_automation', 'smart_quote', 'document_search', 'financial_analysis'].includes(functionId)) {
                     return functionId as AIFunctionType;
@@ -70,8 +66,6 @@ class UnifiedAIAgent {
                 console.error("Routing with Claude also failed:", claudeError);
             }
         }
-
-        // Default to customer_chat if all routing fails
         return 'customer_chat';
     }
 
@@ -104,7 +98,6 @@ class UnifiedAIAgent {
     // ... (callMistralAPI, callClaudeAPI, getSystemPrompt 등 local-ai-server.ts의 나머지 메소드들)
     private async callMistralAPI(functionTypeOrPrompt: AIFunctionType | string, message: string, isAdmin: boolean, isRouting: boolean = false, history: any[] = []): Promise<{ response: string, follow_up_questions: string[] }> {
         const systemPrompt = isRouting ? functionTypeOrPrompt : this.getSystemPrompt(functionTypeOrPrompt as AIFunctionType, isAdmin);
-        const userMessage = isRouting ? "" : message;
         const formattedHistory = history.map(h => ({ role: h.role, content: h.content }));
 
         const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
@@ -112,7 +105,7 @@ class UnifiedAIAgent {
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${MISTRAL_API_KEY}` },
             body: JSON.stringify({
                 model: 'mistral-large-latest',
-                messages: [{ role: 'system', content: systemPrompt }, ...formattedHistory, { role: 'user', content: userMessage }].filter(msg => msg.content),
+                messages: [{ role: 'system', content: systemPrompt }, ...formattedHistory, { role: 'user', content: message }],
                 temperature: 0.1,
                 max_tokens: isRouting ? 20 : 1000,
             }),
@@ -136,7 +129,6 @@ class UnifiedAIAgent {
         }
 
         const systemPrompt = isRouting ? functionTypeOrPrompt as string : this.getSystemPrompt(functionTypeOrPrompt as AIFunctionType, isAdmin);
-        const userMessage = isRouting ? "" : message;
         const formattedHistory = history.map(h => ({ role: h.role, content: h.content }));
 
         const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -146,7 +138,7 @@ class UnifiedAIAgent {
                 model: 'claude-3-5-sonnet-20240620',
                 max_tokens: isRouting ? 20 : 1000,
                 system: systemPrompt,
-                messages: [...formattedHistory, { role: 'user', content: userMessage }].filter(msg => msg.content),
+                messages: [...formattedHistory, { role: 'user', content: message }],
                 temperature: isRouting ? 0 : 0.2,
             }),
         });
