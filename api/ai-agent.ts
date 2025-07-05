@@ -81,12 +81,14 @@ class UnifiedAIAgent {
 
         try {
             // Mistral API 우선 호출
-            return await this.callMistralAPI(typed_function_type, message, is_admin, false, context.history);
+            const llmResponse = await this.callMistralAPI(typed_function_type, message, is_admin, false, context.history);
+            return { ...llmResponse, function_type: typed_function_type };
         } catch (error) {
             console.error('Unified AI Agent primary error:', error);
             try {
                 // 실패 시 Claude API 호출
-                return await this.callClaudeAPI(typed_function_type, message, is_admin, context.history);
+                const llmResponse = await this.callClaudeAPI(typed_function_type, message, is_admin, context.history);
+                return { ...llmResponse, function_type: typed_function_type };
             } catch (fallbackError) {
                 console.error('Unified AI Agent fallback error:', fallbackError);
                 // 최종 실패 처리

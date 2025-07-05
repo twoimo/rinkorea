@@ -62,7 +62,7 @@ export class RinKoreaAIAgent {
             return {
                 success: true,
                 response: data.response,
-                function_type: functionType || 'customer_chat', // 라우팅된 타입은 서버에서 결정하지만, 클라이언트 상태와 일관성 유지
+                function_type: data.function_type, // 서버에서 결정된 function_type을 사용
                 timestamp: new Date().toISOString(),
                 follow_up_questions: data.follow_up_questions || [],
             };
