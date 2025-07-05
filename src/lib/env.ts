@@ -5,6 +5,10 @@ const envSchema = z.object({
     VITE_API_URL: z.string().url(),
     VITE_API_KEY: z.string().min(1),
 
+    // Supabase
+    VITE_SUPABASE_URL: z.string().url(),
+    VITE_SUPABASE_ANON_KEY: z.string().min(1),
+
     // 인증 관련
     VITE_AUTH_DOMAIN: z.string().min(1),
     VITE_AUTH_CLIENT_ID: z.string().min(1),
@@ -46,6 +50,8 @@ declare global {
     interface ImportMetaEnv {
         readonly VITE_API_URL: string;
         readonly VITE_API_KEY: string;
+        readonly VITE_SUPABASE_URL: string;
+        readonly VITE_SUPABASE_ANON_KEY: string;
         readonly VITE_AUTH_DOMAIN: string;
         readonly VITE_AUTH_CLIENT_ID: string;
         readonly VITE_MISTRAL_API_KEY: string;
