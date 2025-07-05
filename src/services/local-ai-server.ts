@@ -78,10 +78,9 @@ class LocalAIServer {
     }
 
     async processRequest(request: LocalAIRequest): Promise<LocalAIResponse> {
-        const { message, context = {}, is_admin = false } = request;
+        const { message, is_admin = false } = request;
         let function_type = request.function_type;
 
-        // If function_type is not provided, route the request
         if (!function_type) {
             function_type = await this.route(message);
         }
@@ -91,22 +90,9 @@ class LocalAIServer {
         try {
             const response = await this.callMistralAPI(typed_function_type, message, is_admin);
 
-            let enhancedResponse = response.response;
-
-            if (typed_function_type === 'document_search') {
-                const searchResults = await this.performDocumentSearch(message);
-                enhancedResponse = `${response.response}\n\n검색 결과:\n${searchResults}`;
-            } else if (typed_function_type === 'smart_quote') {
-                const quoteData = await this.generateQuote(message, context);
-                enhancedResponse = `${response.response}\n\n${quoteData}`;
-            } else if (typed_function_type === 'financial_analysis' && is_admin) {
-                const analysisData = await this.performFinancialAnalysis(message, context);
-                enhancedResponse = `${response.response}\n\n분석 결과:\n${analysisData}`;
-            }
-
             return {
                 success: true,
-                response: enhancedResponse,
+                response: response.response,
                 follow_up_questions: response.follow_up_questions,
                 function_type: typed_function_type,
                 timestamp: new Date().toISOString()
@@ -167,15 +153,20 @@ class LocalAIServer {
         const data = await response.json();
         const content = data.choices[0]?.message?.content || 'AI 응답을 받을 수 없습니다.';
 
-        // Extract follow-up questions from the content
-        const followUpRegex = /\["([^"]*)", ?"([^"]*)", ?"([^"]*)"\]/;
+        // More flexible regex for follow-up questions
+        const followUpRegex = /(\s*\[\s*".*?"(?:,\s*".*?")*\s*\])/s;
         const match = content.match(followUpRegex);
         let followUpQuestions: string[] = [];
         let mainResponse = content;
 
-        if (match) {
-            followUpQuestions = JSON.parse(match[0]);
-            mainResponse = mainResponse.replace(followUpRegex, '').trim();
+        if (match && match[0]) {
+            try {
+                followUpQuestions = JSON.parse(match[0]);
+                mainResponse = mainResponse.replace(followUpRegex, '').trim();
+            } catch (e) {
+                console.error("Failed to parse follow-up questions:", e);
+                // If parsing fails, leave the response as is.
+            }
         }
 
         return { response: mainResponse, follow_up_questions: followUpQuestions };
@@ -208,15 +199,20 @@ class LocalAIServer {
         const data = await response.json();
         const content = data.content[0]?.text || 'AI 응답을 받을 수 없습니다.';
 
-        // Extract follow-up questions from the content
-        const followUpRegex = /\["([^"]*)", ?"([^"]*)", ?"([^"]*)"\]/;
+        // More flexible regex for follow-up questions
+        const followUpRegex = /(\s*\[\s*".*?"(?:,\s*".*?")*\s*\])/s;
         const match = content.match(followUpRegex);
         let followUpQuestions: string[] = [];
         let mainResponse = content;
 
-        if (match) {
-            followUpQuestions = JSON.parse(match[0]);
-            mainResponse = mainResponse.replace(followUpRegex, '').trim();
+        if (match && match[0]) {
+            try {
+                followUpQuestions = JSON.parse(match[0]);
+                mainResponse = mainResponse.replace(followUpRegex, '').trim();
+            } catch (e) {
+                console.error("Failed to parse follow-up questions:", e);
+                // If parsing fails, leave the response as is.
+            }
         }
 
         return { response: mainResponse, follow_up_questions: followUpQuestions };
@@ -244,7 +240,18 @@ ${isAdmin ? '당신은 관리자 권한으로 모든 기능과 데이터에 접�
 
             case 'smart_quote':
                 return `${basePrompt}
-현재 모드: 스마트 견적 시스템. 고객의 요구사항을 파악하고, 적절한 제품을 추천하며, 면적, 수량, 특수 요구사항을 고려하여 정확한 견적을 제공해주세요.`;
+현재 모드: 스마트 견적 시스템. 고객의 요구사항을 파악하고, 적절한 제품을 추천하며, 면적, 수량, 특수 요구사항을 고려하여 정확한 견적을 제공해주세요.
+답변에는 반드시 상세한 설명과 함께, 아래와 같이 [QUOTE_START]와 [QUOTE_END] 마커로 감싸진 JSON 객체를 포함해야 합니다:
+[QUOTE_START]
+{
+  "products": [
+    { "name": "제품명", "price": 100000, "quantity": 1 }
+  ],
+  "total": 100000,
+  "validity": "30일",
+  "notes": "참고 사항"
+}
+[QUOTE_END]`;
 
             case 'document_search':
                 return `${basePrompt}

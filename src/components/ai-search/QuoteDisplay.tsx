@@ -22,6 +22,14 @@ const QuoteDisplay: React.FC<QuoteDisplayProps> = ({ data }) => {
         return <p>견적 정보를 표시할 수 없습니다.</p>;
     }
 
+    // Calculate the subtotal for each product and the overall total
+    const productsWithSubtotal = data.products.map(product => ({
+        ...product,
+        subtotal: product.price * product.quantity,
+    }));
+
+    const calculatedTotal = productsWithSubtotal.reduce((sum, product) => sum + product.subtotal, 0);
+
     return (
         <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm my-4">
             <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
@@ -40,7 +48,7 @@ const QuoteDisplay: React.FC<QuoteDisplayProps> = ({ data }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {data.products.map((product, index) => (
+                        {productsWithSubtotal.map((product, index) => (
                             <tr key={index} className="border-b hover:bg-gray-50">
                                 <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">
                                     {product.name}
@@ -52,7 +60,7 @@ const QuoteDisplay: React.FC<QuoteDisplayProps> = ({ data }) => {
                                     ₩{product.price.toLocaleString()}
                                 </td>
                                 <td className="px-4 py-3 text-right font-medium">
-                                    ₩{(product.price * product.quantity).toLocaleString()}
+                                    ₩{product.subtotal.toLocaleString()}
                                 </td>
                             </tr>
                         ))}
@@ -66,7 +74,7 @@ const QuoteDisplay: React.FC<QuoteDisplayProps> = ({ data }) => {
                     <div className="flex justify-between">
                         <span className="text-gray-600">합계</span>
                         <span className="font-semibold text-gray-800">
-                            ₩{data.total.toLocaleString()}
+                            ₩{calculatedTotal.toLocaleString()}
                         </span>
                     </div>
                     <div className="flex justify-between text-lg font-bold text-blue-600 border-t pt-2">

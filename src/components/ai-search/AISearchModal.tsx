@@ -27,7 +27,7 @@ interface Message {
     role: 'user' | 'assistant';
     content: string;
     timestamp: Date;
-    functionType?: AIFunctionType;
+    functionType: AIFunctionType;
     followUpQuestions?: string[];
 }
 
@@ -219,15 +219,24 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
         setInputMessage(question);
     }, []);
 
-    const handleSendMessage = useCallback(async (messageContent?: string | React.MouseEvent<HTMLButtonElement>) => {
+    const handleSendMessage = useCallback(async (messageContent?: string, funcType?: AIFunctionType) => {
         const content = typeof messageContent === 'string' ? messageContent : inputMessage.trim();
         if (!content || isLoading) return;
+
+        let functionToUse = funcType || selectedFunction;
+        if (!functionToUse && messages.length > 0) {
+            const lastAiMessage = [...messages].reverse().find(m => m.role === 'assistant');
+            if (lastAiMessage) {
+                functionToUse = lastAiMessage.functionType;
+            }
+        }
 
         const userMessage: Message = {
             id: Date.now().toString(),
             role: 'user',
             content: content,
             timestamp: new Date(),
+            functionType: functionToUse || 'customer_chat',
         };
 
         setMessages(prev => [...prev, userMessage]);
@@ -238,7 +247,7 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
 
         try {
             const result = await aiAgent.processRequest(
-                selectedFunction,
+                functionToUse,
                 content,
                 { user_id: user?.id },
                 isAdmin
@@ -261,12 +270,13 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                 role: 'assistant',
                 content: '죄송합니다. 요청을 처리하는 중에 오류가 발생했습니다. 다시 시도해주세요.',
                 timestamp: new Date(),
+                functionType: 'customer_chat'
             };
             setMessages(prev => [...prev, errorMessage]);
         } finally {
             setIsLoading(false);
         }
-    }, [inputMessage, selectedFunction, isLoading, user?.id, isAdmin]);
+    }, [inputMessage, selectedFunction, isLoading, user?.id, isAdmin, messages]);
 
     const handleInputKeyPress = useCallback((e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -280,42 +290,40 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
         : null;
 
     const renderMessageContent = (message: Message) => {
-        // Regular expression to find a JSON object or array within the string
-        const jsonRegex = /({.*}|\[.*\])/s;
-        const match = message.content.match(jsonRegex);
+        let content = message.content;
+        let quoteData = null;
 
-        if (match) {
-            const jsonString = match[0];
-            const precedingText = message.content.substring(0, match.index);
+        // Use markers to find and extract the quote JSON
+        const startMarker = '[QUOTE_START]';
+        const endMarker = '[QUOTE_END]';
+        const startIndex = content.indexOf(startMarker);
+        const endIndex = content.indexOf(endMarker);
 
+        if (startIndex !== -1 && endIndex !== -1) {
+            const jsonString = content.substring(startIndex + startMarker.length, endIndex).trim();
             try {
-                const parsedData = JSON.parse(jsonString);
-                if (parsedData && (parsedData.products || parsedData.total)) {
-                    return (
-                        <>
-                            {precedingText.trim() && (
-                                <div className="prose prose-sm max-w-none mb-4">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                        {precedingText}
-                                    </ReactMarkdown>
-                                </div>
-                            )}
-                            <QuoteDisplay data={parsedData} />
-                        </>
-                    );
+                const parsed = JSON.parse(jsonString);
+                if (parsed && parsed.products) {
+                    quoteData = parsed;
+                    // Remove the quote part (including markers) from the content string
+                    content = content.substring(0, startIndex).trim();
                 }
-            } catch {
-                // Not a valid JSON, fall through to default rendering
+            } catch (e) {
+                console.error("Failed to parse quote JSON:", e);
             }
         }
 
-        // Default rendering for user messages or non-quote assistant messages
         return (
-            <div className="prose prose-sm max-w-none">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {message.content}
-                </ReactMarkdown>
-            </div>
+            <>
+                {content && (
+                    <div className="prose prose-sm max-w-none">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {content}
+                        </ReactMarkdown>
+                    </div>
+                )}
+                {quoteData && <QuoteDisplay data={quoteData} />}
+            </>
         );
     };
 
@@ -413,7 +421,7 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                                             {message.followUpQuestions.map((question, qIndex) => (
                                                 <button
                                                     key={qIndex}
-                                                    onClick={() => handleSendMessage(question)}
+                                                    onClick={() => handleSendMessage(question, message.functionType)}
                                                     className="px-4 py-2 bg-blue-50 text-blue-700 rounded-full hover:bg-blue-100 transition-colors text-sm"
                                                 >
                                                     {question}
