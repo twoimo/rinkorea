@@ -38,6 +38,16 @@ export default async function handler(
         return;
     }
 
+    // API Key Validation
+    if (!MISTRAL_API_KEY && !CLAUDE_API_KEY) {
+        console.error('AI Chat API Error: MISTRAL_API_KEY and CLAUDE_API_KEY are not set.');
+        res.status(503).json({
+            error: 'AI 서비스가 설정되지 않았습니다. 관리자에게 문의하세요.',
+            details: '필수 API 키가 누락되었습니다.'
+        });
+        return;
+    }
+
     if (req.method !== 'POST') {
         res.status(405).json({ error: 'Method not allowed' });
         return;
@@ -98,9 +108,10 @@ export default async function handler(
 
     } catch (error) {
         console.error('AI Chat API Error:', error);
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
         res.status(500).json({
             error: 'AI 서비스 처리 중 오류가 발생했습니다.',
-            details: error instanceof Error ? error.message : 'Unknown error'
+            details: errorMessage
         });
     }
 }
@@ -153,7 +164,7 @@ async function performDocumentSearch(query: string): Promise<string> {
     try {
         // Search in products, projects, news, resources
         const tables = ['products', 'projects', 'news', 'resources'];
-        const results = [];
+        const results: string[] = [];
 
         for (const table of tables) {
             const { data, error } = await supabase
