@@ -1,4 +1,4 @@
-import { localAIServer, LocalAIRequest } from './local-ai-server';
+// import { localAIServer, LocalAIRequest } from './local-ai-server'; // 삭제
 
 // AI 기능 유형 정의
 export type AIFunctionType =
@@ -8,7 +8,7 @@ export type AIFunctionType =
     | 'document_search'
     | 'financial_analysis';
 
-// API 응답 인터페이스
+// API 응답 인터페이스 (클라이언트용)
 export interface AIResponse {
     success: boolean;
     response: string;
@@ -20,91 +20,55 @@ export interface AIResponse {
 
 // 에이전트 설정
 export class RinKoreaAIAgent {
-    private apiEndpoint = '/api/ai-chat';
-    private isDevelopment = import.meta.env.DEV;
+    private apiEndpoint = '/api/ai-agent'; // 새로운 통합 API 엔드포인트로 변경
+    // private isDevelopment = import.meta.env.DEV; // 삭제
 
     async processRequest(
-        functionType: AIFunctionType | null, // Allow null for routing
+        functionType: AIFunctionType | null,
         message: string,
         context?: any,
         isAdmin: boolean = false
     ): Promise<AIResponse> {
-        // function_type에 따라 적절한 systemPrompt를 생성합니다.
-        const getSystemPrompt = (type: AIFunctionType | null): string => {
-            switch (type) {
-                case 'customer_chat':
-                    return 'You are a friendly and helpful customer support assistant for RinKorea, a company specializing in concrete floor finishing solutions.';
-                case 'qna_automation':
-                    return 'You are an intelligent Q&A assistant. Your goal is to accurately answer questions based on the provided company documents and knowledge base.';
-                case 'smart_quote':
-                    return 'You are a smart quotation assistant. Generate a detailed quote based on the user\'s request for RinKorea products. Include itemized costs, quantities, and totals.';
-                case 'document_search':
-                    return 'You are a powerful document search assistant. Search through RinKorea\'s internal documents to find the most relevant information for the user\'s query.';
-                case 'financial_analysis':
-                    return 'You are a sophisticated financial analyst AI. Provide insights and analysis on RinKorea\'s financial data. This is a restricted function.';
-                default:
-                    // functionType이 null이거나 정의되지 않은 경우, 일반적인 상담원으로 작동
-                    return 'You are a general AI assistant for RinKorea. First, understand the user\'s intent and then route to the most appropriate function if necessary.';
-            }
-        };
-
         try {
-            // 로컬 개발 환경에서는 로컬 AI 서버 사용
-            if (this.isDevelopment) {
-                const request: LocalAIRequest = {
-                    function_type: functionType || undefined,
-                    message,
-                    context,
-                    is_admin: isAdmin,
-                };
-
-                return await localAIServer.processRequest(request);
-            }
-
-            // 프로덕션 환경에서는 Vercel 서버리스 함수 사용
-            const systemPrompt = getSystemPrompt(functionType);
-
+            // isDevelopment 분기 로직 제거
             const response = await fetch(this.apiEndpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    message, // 사용자 메시지
-                    systemPrompt, // 생성된 시스템 프롬프트
+                    function_type: functionType,
+                    message,
+                    context,
+                    is_admin: isAdmin,
                 }),
             });
 
             if (!response.ok) {
-                // 서버 응답을 텍스트로 한번만 읽습니다.
                 const responseText = await response.text();
                 let errorMessage = `서버 오류 (Status: ${response.status})`;
-
                 try {
-                    // 텍스트를 JSON으로 파싱 시도
                     const errorData = JSON.parse(responseText);
                     errorMessage = errorData.error || `서버 응답: ${JSON.stringify(errorData)}`;
                 } catch {
-                    // 파싱 실패 시, 텍스트 응답 자체를 오류 메시지로 사용 (Vercel 오류 페이지 등)
-                    errorMessage = responseText.substring(0, 200); // 너무 길지 않게 자릅니다.
+                    errorMessage = responseText.substring(0, 200);
                 }
                 throw new Error(errorMessage);
             }
 
-            // 서버 응답 형식에 맞게 클라이언트 응답 객체를 재구성합니다.
+            // 새로운 API 응답 형식에 맞게 데이터 파싱
             const data = await response.json();
 
             return {
                 success: true,
                 response: data.response,
-                function_type: functionType || 'customer_chat',
+                function_type: functionType || 'customer_chat', // 라우팅된 타입은 서버에서 결정하지만, 클라이언트 상태와 일관성 유지
                 timestamp: new Date().toISOString(),
-                follow_up_questions: [], // 서버가 이 정보를 제공하지 않으므로 빈 배열로 설정
+                follow_up_questions: data.follow_up_questions || [],
             };
+
         } catch (error) {
             console.error('AI request error:', error);
-
-            // 에러 메시지 개선
             const errorMessage = error instanceof Error
                 ? (error.message.includes('fetch')
                     ? '네트워크 연결을 확인해주세요. 잠시 후 다시 시도해주세요.'
