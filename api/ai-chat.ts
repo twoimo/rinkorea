@@ -3,31 +3,17 @@ import { ChatMistralAI } from '@langchain/mistralai';
 import { ChatAnthropic } from '@langchain/anthropic';
 import { createClient } from '@supabase/supabase-js';
 
-// Environment variables
-const MISTRAL_API_KEY = process.env.VITE_MISTRAL_API_KEY || '';
-const CLAUDE_API_KEY = process.env.VITE_CLAUDE_API_KEY || '';
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || '';
-
-// Initialize clients
-const mistralModel = new ChatMistralAI({
-    model: "mistral-large-latest",
-    apiKey: MISTRAL_API_KEY,
-    temperature: 0.7,
-});
-
-const claudeModel = new ChatAnthropic({
-    model: "claude-3-5-sonnet-20241022",
-    apiKey: CLAUDE_API_KEY,
-    temperature: 0.7,
-});
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export default async function handler(
     req: VercelRequest,
     res: VercelResponse
 ) {
+    const MISTRAL_API_KEY = process.env.VITE_MISTRAL_API_KEY || '';
+    const CLAUDE_API_KEY = process.env.VITE_CLAUDE_API_KEY || '';
+
     // Enable CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -62,29 +48,46 @@ export default async function handler(
         }
 
         const systemPrompt = getSystemPrompt(function_type, is_admin);
+        const messages = [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: message }
+        ];
 
-        let response;
-        try {
-            // Try Mistral first
-            const mistralResponse = await mistralModel.invoke([
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: message }
-            ]);
-            response = mistralResponse.content;
-        } catch (mistralError) {
-            console.warn('Mistral failed, trying Claude:', mistralError);
+        let response: any;
 
+        // Try Mistral first
+        if (MISTRAL_API_KEY) {
             try {
-                // Fallback to Claude
-                const claudeResponse = await claudeModel.invoke([
-                    { role: 'system', content: systemPrompt },
-                    { role: 'user', content: message }
-                ]);
+                const mistralModel = new ChatMistralAI({
+                    model: "mistral-large-latest",
+                    apiKey: MISTRAL_API_KEY,
+                    temperature: 0.7,
+                });
+                const mistralResponse = await mistralModel.invoke(messages);
+                response = mistralResponse.content;
+            } catch (mistralError) {
+                console.warn('Mistral failed, trying Claude:', mistralError);
+            }
+        }
+
+        // Fallback to Claude if Mistral was skipped or failed
+        if (!response && CLAUDE_API_KEY) {
+            try {
+                const claudeModel = new ChatAnthropic({
+                    model: "claude-3-5-sonnet-20241022",
+                    apiKey: CLAUDE_API_KEY,
+                    temperature: 0.7,
+                });
+                const claudeResponse = await claudeModel.invoke(messages);
                 response = claudeResponse.content;
             } catch (claudeError) {
                 console.error('Both AI models failed:', claudeError);
                 throw new Error('AI service temporarily unavailable');
             }
+        }
+
+        if (!response) {
+            throw new Error('AI service not available, no API keys configured or models failed.');
         }
 
         // Handle special functions that need database access
