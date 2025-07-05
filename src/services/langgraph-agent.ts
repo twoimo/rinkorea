@@ -76,8 +76,17 @@ export class RinKoreaAIAgent {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                let errorMessage = `서버 요청 실패: status ${response.status}`;
+                try {
+                    // 서버가 JSON 형태의 에러 메시지를 보냈는지 확인
+                    const errorData = await response.json();
+                    errorMessage = errorData.error || JSON.stringify(errorData);
+                } catch {
+                    // JSON 파싱에 실패하면, 응답을 텍스트로 처리
+                    const textError = await response.text();
+                    errorMessage = textError.substring(0, 100); // 너무 길지 않게 자름
+                }
+                throw new Error(errorMessage);
             }
 
             // 서버 응답 형식에 맞게 클라이언트 응답 객체를 재구성합니다.

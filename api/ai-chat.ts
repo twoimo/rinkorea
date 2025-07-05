@@ -56,46 +56,63 @@ async function callClaudeAPI(systemPrompt: string, userMessage: string): Promise
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+    console.log("--- AI Chat Handler: Execution Started ---");
+
     // CORS Headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     if (req.method === 'OPTIONS') {
+        console.log("AI Chat Handler: Handling OPTIONS request.");
         return res.status(200).end();
     }
 
     if (req.method !== 'POST') {
+        console.error(`AI Chat Handler: Invalid method - ${req.method}`);
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
     try {
+        console.log("AI Chat Handler: Parsing request body...");
         const { message, systemPrompt: customSystemPrompt } = req.body;
+        console.log("AI Chat Handler: Request body parsed successfully.");
 
         if (!message) {
+            console.error("AI Chat Handler: Validation failed - Message is required.");
             return res.status(400).json({ error: 'Message is required' });
         }
 
         const systemPrompt = customSystemPrompt || 'You are a helpful assistant.';
+        console.log(`AI Chat Handler: System prompt is set. Length: ${systemPrompt.length}`);
+
+        console.log(`AI Chat Handler: Mistral Key available: ${!!MISTRAL_API_KEY}`);
+        console.log(`AI Chat Handler: Claude Key available: ${!!CLAUDE_API_KEY}`);
+
         let responseContent: string;
 
         try {
+            console.log("AI Chat Handler: Attempting to call Mistral API...");
             responseContent = await callMistralAPI(systemPrompt, message);
+            console.log("AI Chat Handler: Mistral API call successful.");
         } catch (mistralError) {
-            console.warn('Mistral failed, trying Claude as fallback:', mistralError);
+            console.warn("AI Chat Handler: Mistral API failed. Trying Claude fallback.", mistralError);
 
             try {
+                console.log("AI Chat Handler: Attempting to call Claude API as fallback...");
                 responseContent = await callClaudeAPI(systemPrompt, message);
+                console.log("AI Chat Handler: Claude API call successful.");
             } catch (claudeError) {
-                console.error('Both AI models failed:', claudeError);
+                console.error("AI Chat Handler: Both AI models failed.", claudeError);
                 return res.status(503).json({ error: 'AI service is temporarily unavailable.' });
             }
         }
 
+        console.log("AI Chat Handler: Sending successful response.");
         return res.status(200).json({ response: responseContent });
 
     } catch (error) {
-        console.error('Error in ai-chat handler:', error);
+        console.error('AI Chat Handler: FATAL Error in handler.', error);
         return res.status(500).json({ error: 'An internal server error occurred.' });
     }
 } 
