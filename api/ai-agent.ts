@@ -118,7 +118,13 @@ class UnifiedAIAgent {
             }),
         });
 
-        if (!response.ok) throw new Error(`Mistral API error: ${response.status}`);
+        if (!response.ok) {
+            const errorBody = await response.json().catch(() => response.text());
+            console.error('Mistral API Error Body:', errorBody);
+            const errorMessage = typeof errorBody === 'string' ? errorBody : (errorBody?.error?.message || JSON.stringify(errorBody));
+            throw new Error(`Mistral API error: ${response.status} - ${errorMessage}`);
+        }
+
         const data = await response.json();
         const content = data.choices[0]?.message?.content || 'AI 응답을 받을 수 없습니다.';
         return this.extractFollowUpQuestions(content);
@@ -145,7 +151,13 @@ class UnifiedAIAgent {
             }),
         });
 
-        if (!response.ok) throw new Error(`Claude API error: ${response.status}`);
+        if (!response.ok) {
+            const errorBody = await response.json().catch(() => response.text());
+            console.error('Claude API Error Body:', errorBody);
+            const errorMessage = typeof errorBody === 'string' ? errorBody : (errorBody?.error?.message || JSON.stringify(errorBody));
+            throw new Error(`Claude API error: ${response.status} - ${errorMessage}`);
+        }
+
         const data = await response.json();
         const content = data.content[0]?.text || 'AI 응답을 받을 수 없습니다.';
 
