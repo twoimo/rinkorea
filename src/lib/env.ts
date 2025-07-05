@@ -9,6 +9,10 @@ const envSchema = z.object({
     VITE_AUTH_DOMAIN: z.string().min(1),
     VITE_AUTH_CLIENT_ID: z.string().min(1),
 
+    // AI 관련
+    VITE_MISTRAL_API_KEY: z.string().min(1),
+    VITE_CLAUDE_API_KEY: z.string().min(1),
+
     // 기타 설정
     VITE_APP_ENV: z.enum(["development", "production", "test"]),
     VITE_APP_VERSION: z.string(),
@@ -44,6 +48,8 @@ declare global {
         readonly VITE_API_KEY: string;
         readonly VITE_AUTH_DOMAIN: string;
         readonly VITE_AUTH_CLIENT_ID: string;
+        readonly VITE_MISTRAL_API_KEY: string;
+        readonly VITE_CLAUDE_API_KEY: string;
         readonly VITE_APP_ENV: "development" | "production" | "test";
         readonly VITE_APP_VERSION: string;
         readonly VITE_APP_NAME: string;
