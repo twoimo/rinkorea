@@ -1,11 +1,10 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { ChatMistralAI } from '@langchain/mistralai';
 import { ChatAnthropic } from '@langchain/anthropic';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || '';
-const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || '';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Supabase 클라이언트를 핸들러 외부에서 선언만 합니다.
+let supabase: SupabaseClient;
 
 export default async function handler(
     req: VercelRequest,
@@ -13,6 +12,21 @@ export default async function handler(
 ) {
     const MISTRAL_API_KEY = process.env.VITE_MISTRAL_API_KEY || '';
     const CLAUDE_API_KEY = process.env.VITE_CLAUDE_API_KEY || '';
+    const SUPABASE_URL = process.env.VITE_SUPABASE_URL || '';
+    const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || '';
+
+    // --- 디버깅 로그 시작 ---
+    console.log('--- AI Chat Handler: Environment Variable Check ---');
+    console.log(`Vercel Environment: ${process.env.VERCEL_ENV}`);
+    console.log(`Mistral Key is present: ${MISTRAL_API_KEY ? 'Yes' : 'No'}`);
+    console.log(`Claude Key is present: ${CLAUDE_API_KEY ? 'Yes' : 'No'}`);
+    console.log(`Supabase URL is present: ${SUPABASE_URL ? 'Yes' : 'No'}`);
+    console.log(`Supabase Key is present: ${SUPABASE_ANON_KEY ? 'Yes' : 'No'}`);
+    console.log('--- End of Check ---');
+    // --- 디버깅 로그 끝 ---
+
+    // Supabase 클라이언트 초기화 (요청이 들어올 때마다)
+    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // Enable CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
