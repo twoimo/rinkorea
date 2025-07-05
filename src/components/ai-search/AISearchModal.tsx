@@ -30,7 +30,8 @@ interface Message {
 const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
     const modalRef = useRef<HTMLDivElement>(null);
     const animationFrameRef = useRef<number>();
-    const chatEndRef = useRef<HTMLDivElement>(null);
+    const chatContainerRef = useRef<HTMLDivElement>(null);
+    const prevMessagesLength = useRef(0);
     const { user } = useAuth();
     const { isAdmin } = useUserRole();
 
@@ -170,10 +171,13 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
     }, [onClose, isLoading]);
 
     useEffect(() => {
-        // 새 메시지가 추가될 때 스크롤을 맨 아래로
-        if (chatEndRef.current) {
-            chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        // 새 메시지가 추가될 때만 스크롤을 맨 아래로 이동
+        if (chatContainerRef.current && messages.length > prevMessagesLength.current) {
+            // scrollIntoView() 대신 scrollTop을 직접 조작하여 페이지 스크롤 방지
+            const chatContainer = chatContainerRef.current;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
+        prevMessagesLength.current = messages.length;
     }, [messages]);
 
     const handleFunctionSelect = useCallback((functionType: AIFunctionType) => {
@@ -331,7 +335,7 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                         /* Chat Interface */
                         <div className="flex flex-col h-full">
                             {/* Chat Messages */}
-                            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                            <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4">
                                 {messages.length === 0 ? (
                                     <div className="text-center py-8">
                                         <div className={cn(
@@ -394,7 +398,6 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                                         )}
                                     </>
                                 )}
-                                <div ref={chatEndRef} />
                             </div>
 
                             {/* Input Area */}
