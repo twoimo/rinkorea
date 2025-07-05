@@ -1,33 +1,33 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { ChatMistralAI } from '@langchain/mistralai';
 import { ChatAnthropic } from '@langchain/anthropic';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 
-// Supabase 클라이언트를 핸들러 외부에서 선언만 합니다.
-let supabase: SupabaseClient;
+// Environment variables
+const MISTRAL_API_KEY = process.env.VITE_MISTRAL_API_KEY || '';
+const CLAUDE_API_KEY = process.env.VITE_CLAUDE_API_KEY || '';
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || '';
+
+// Initialize clients
+const mistralModel = new ChatMistralAI({
+    model: "mistral-large-latest",
+    apiKey: MISTRAL_API_KEY,
+    temperature: 0.7,
+});
+
+const claudeModel = new ChatAnthropic({
+    model: "claude-3-5-sonnet-20241022",
+    apiKey: CLAUDE_API_KEY,
+    temperature: 0.7,
+});
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export default async function handler(
     req: VercelRequest,
     res: VercelResponse
 ) {
-    const MISTRAL_API_KEY = process.env.VITE_MISTRAL_API_KEY || '';
-    const CLAUDE_API_KEY = process.env.VITE_CLAUDE_API_KEY || '';
-    const SUPABASE_URL = process.env.VITE_SUPABASE_URL || '';
-    const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || '';
-
-    // --- 디버깅 로그 시작 ---
-    console.log('--- AI Chat Handler: Environment Variable Check ---');
-    console.log(`Vercel Environment: ${process.env.VERCEL_ENV}`);
-    console.log(`Mistral Key is present: ${MISTRAL_API_KEY ? 'Yes' : 'No'}`);
-    console.log(`Claude Key is present: ${CLAUDE_API_KEY ? 'Yes' : 'No'}`);
-    console.log(`Supabase URL is present: ${SUPABASE_URL ? 'Yes' : 'No'}`);
-    console.log(`Supabase Key is present: ${SUPABASE_ANON_KEY ? 'Yes' : 'No'}`);
-    console.log('--- End of Check ---');
-    // --- 디버깅 로그 끝 ---
-
-    // Supabase 클라이언트 초기화 (요청이 들어올 때마다)
-    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
     // Enable CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -35,16 +35,6 @@ export default async function handler(
 
     if (req.method === 'OPTIONS') {
         res.status(200).end();
-        return;
-    }
-
-    // API Key Validation
-    if (!MISTRAL_API_KEY && !CLAUDE_API_KEY) {
-        console.error('AI Chat API Error: MISTRAL_API_KEY and CLAUDE_API_KEY are not set.');
-        res.status(503).json({
-            error: 'AI 서비스가 설정되지 않았습니다. 관리자에게 문의하세요.',
-            details: '필수 API 키가 누락되었습니다.'
-        });
         return;
     }
 
@@ -62,46 +52,29 @@ export default async function handler(
         }
 
         const systemPrompt = getSystemPrompt(function_type, is_admin);
-        const messages = [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: message }
-        ];
 
-        let response: any;
+        let response;
+        try {
+            // Try Mistral first
+            const mistralResponse = await mistralModel.invoke([
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: message }
+            ]);
+            response = mistralResponse.content;
+        } catch (mistralError) {
+            console.warn('Mistral failed, trying Claude:', mistralError);
 
-        // Try Mistral first
-        if (MISTRAL_API_KEY) {
             try {
-                const mistralModel = new ChatMistralAI({
-                    model: "mistral-large-latest",
-                    apiKey: MISTRAL_API_KEY,
-                    temperature: 0.7,
-                });
-                const mistralResponse = await mistralModel.invoke(messages);
-                response = mistralResponse.content;
-            } catch (mistralError) {
-                console.warn('Mistral failed, trying Claude:', mistralError);
-            }
-        }
-
-        // Fallback to Claude if Mistral was skipped or failed
-        if (!response && CLAUDE_API_KEY) {
-            try {
-                const claudeModel = new ChatAnthropic({
-                    model: "claude-3-5-sonnet-20241022",
-                    apiKey: CLAUDE_API_KEY,
-                    temperature: 0.7,
-                });
-                const claudeResponse = await claudeModel.invoke(messages);
+                // Fallback to Claude
+                const claudeResponse = await claudeModel.invoke([
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: message }
+                ]);
                 response = claudeResponse.content;
             } catch (claudeError) {
                 console.error('Both AI models failed:', claudeError);
                 throw new Error('AI service temporarily unavailable');
             }
-        }
-
-        if (!response) {
-            throw new Error('AI service not available, no API keys configured or models failed.');
         }
 
         // Handle special functions that need database access
@@ -125,10 +98,9 @@ export default async function handler(
 
     } catch (error) {
         console.error('AI Chat API Error:', error);
-        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
         res.status(500).json({
             error: 'AI 서비스 처리 중 오류가 발생했습니다.',
-            details: errorMessage
+            details: error instanceof Error ? error.message : 'Unknown error'
         });
     }
 }
@@ -181,7 +153,7 @@ async function performDocumentSearch(query: string): Promise<string> {
     try {
         // Search in products, projects, news, resources
         const tables = ['products', 'projects', 'news', 'resources'];
-        const results: string[] = [];
+        const results = [];
 
         for (const table of tables) {
             const { data, error } = await supabase
