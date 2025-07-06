@@ -249,7 +249,7 @@ const Products = memo(() => {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  _index={index}
+                  index={index}
                   isHidden={hiddenProductIds.includes(product.id)}
                   isAdmin={isAdmin}
                   onEdit={handleOpenForm}

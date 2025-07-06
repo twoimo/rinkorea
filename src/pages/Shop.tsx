@@ -263,27 +263,17 @@ const Shop = () => {
         result = await (supabase as unknown as SupabaseClient)
           .from('products')
           .update(payload)
-          .eq('id', editingProduct.id)
-          .select('*')
-          .single();
+          .eq('id', editingProduct.id);
       } else {
         result = await (supabase as unknown as SupabaseClient)
           .from('products')
-          .insert([{ ...payload, created_at: new Date().toISOString(), is_active: true }])
-          .select('*')
-          .single();
+          .insert([{ ...payload, created_at: new Date().toISOString(), is_active: true }]);
       }
       if (result.error) {
         setFormError(result.error.message);
       } else {
-        // 즉시 상태 업데이트
-        if (editingProduct) {
-          setProducts(prev => prev.map(p => p.id === editingProduct.id ? result.data : p));
-        } else {
-          setProducts(prev => [...prev, result.data]);
-        }
-        
         setFormSuccess(t('saved_success', '저장되었습니다.'));
+        await refreshProducts();
         setTimeout(() => {
           setShowForm(false);
           setEditingProduct(null);
@@ -310,9 +300,8 @@ const Shop = () => {
       if (result.error) {
         setFormError(result.error.message);
       } else {
-        // 즉시 상태 업데이트
-        setProducts(prev => prev.filter(p => p.id !== deleteTarget.id));
         setFormSuccess(t('shop_deleted_success', '삭제되었습니다.'));
+        await refreshProducts();
         setTimeout(() => {
           setShowDeleteConfirm(false);
           setDeleteTarget(null);
@@ -348,25 +337,16 @@ const Shop = () => {
           .from('product_hidden')
           .delete()
           .eq('product_id', product.id);
-        if (error) {
-          setFormError(error.message);
-        } else {
-          // 즉시 상태 업데이트
-          setHiddenProductIds(prev => prev.filter(id => id !== product.id));
-          setFormSuccess('노출되었습니다.');
-        }
+        if (error) setFormError(error.message);
+        else setFormSuccess('노출되었습니다.');
       } else {
         const { error } = await (supabase as unknown as SupabaseClient)
           .from('product_hidden')
           .upsert({ product_id: product.id });
-        if (error) {
-          setFormError(error.message);
-        } else {
-          // 즉시 상태 업데이트
-          setHiddenProductIds(prev => [...prev, product.id]);
-          setFormSuccess('숨김 처리되었습니다.');
-        }
+        if (error) setFormError(error.message);
+        else setFormSuccess('숨김 처리되었습니다.');
       }
+      await fetchHiddenProducts();
       setTimeout(() => setFormSuccess(null), 700);
     } catch (e) {
       setFormError(e instanceof Error ? e.message : String(e));
