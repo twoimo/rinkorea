@@ -38,15 +38,14 @@ class UnifiedAIAgent {
 
     private async route(query: string): Promise<AIFunctionType> {
         const routingInstructions = `
-          Given the user query, determine the most appropriate function to use.
-          You must return only the function ID, and nothing else.
-          
-          Available functions:
-          - customer_chat: For general product inquiries, technical support, and assistance.
-          - qna_automation: For answering frequently asked questions based on existing data.
-          - smart_quote: For generating quotes and cost estimations for products and services.
-          - document_search: For searching and retrieving information from internal documents, manuals, and reports.
-          - financial_analysis: For analyzing sales, revenue, trends, and providing financial insights. (Use for financial questions)`;
+        Given the user query, determine the most appropriate function to use.
+        You must return only the function ID, and nothing else.
+        Available functions:
+         - customer_chat: For general product inquiries, technical support, and assistance.
+         - qna_automation: For answering frequently asked questions based on existing data.
+         - smart_quote: For generating quotes and cost estimations for products and services.
+         - document_search: For searching and retrieving information from internal documents, manuals, and reports.
+         - financial_analysis: For analyzing sales, revenue, trends, and providing financial insights. (Use for financial questions)`;
 
         try {
             const response = await this.callMistralAPI(routingInstructions, query, false, true);
