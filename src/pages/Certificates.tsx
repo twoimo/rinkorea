@@ -33,6 +33,7 @@ interface Certificate {
   description_en?: string;
   description_zh?: string;
   description_id?: string;
+  [key: string]: unknown;
 }
 
 const Certificates = () => {
@@ -107,19 +108,31 @@ const Certificates = () => {
         result = await (supabase as unknown as SupabaseClient)
           .from('certificates')
           .update(payload)
-          .eq('id', editingCertificate.id);
+          .eq('id', editingCertificate.id)
+          .select('*')
+          .single();
       } else {
         result = await (supabase as unknown as SupabaseClient)
           .from('certificates')
-          .insert([{ ...payload, created_at: new Date().toISOString(), is_active: true }]);
+          .insert([{ ...payload, created_at: new Date().toISOString(), is_active: true }])
+          .select('*')
+          .single();
       }
 
       if (result.error) {
         setFormError(result.error.message);
       } else {
+        // 즉시 상태 업데이트
+        if (editingCertificate) {
+          setCertificates(prev => prev.map(cert => 
+            cert.id === editingCertificate.id ? result.data : cert
+          ));
+        } else {
+          setCertificates(prev => [...prev, result.data]);
+        }
+        
         setFormSuccess(editingCertificate ? t('certificates_updated', '인증서가 수정되었습니다.') : t('certificates_added', '인증서가 추가되었습니다.'));
         setTimeout(closeForm, 1500);
-        await fetchCertificates();
       }
     } catch {
       setFormError('오류가 발생했습니다.');
@@ -156,16 +169,25 @@ const Certificates = () => {
           .from('certificate_hidden')
           .delete()
           .eq('certificate_id', certificate.id);
-        if (error) setFormError(error.message);
-        else setFormSuccess('노출되었습니다.');
+        if (error) {
+          setFormError(error.message);
+        } else {
+          // 즉시 상태 업데이트
+          setHiddenCertificateIds(prev => prev.filter(id => id !== certificate.id));
+          setFormSuccess('노출되었습니다.');
+        }
       } else {
         const { error } = await (supabase as unknown as SupabaseClient)
           .from('certificate_hidden')
           .upsert({ certificate_id: certificate.id });
-        if (error) setFormError(error.message);
-        else setFormSuccess('숨김 처리되었습니다.');
+        if (error) {
+          setFormError(error.message);
+        } else {
+          // 즉시 상태 업데이트
+          setHiddenCertificateIds(prev => [...prev, certificate.id]);
+          setFormSuccess('숨김 처리되었습니다.');
+        }
       }
-      await fetchHiddenCertificates();
       setTimeout(() => setFormSuccess(null), 700);
     } catch (e) {
       setFormError(e instanceof Error ? e.message : String(e));

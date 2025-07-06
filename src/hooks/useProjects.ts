@@ -26,6 +26,7 @@ export interface Project {
     features_ko?: string[];
     features_en?: string[];
     features_zh?: string[];
+    [key: string]: unknown;
 }
 
 const SELECT_COLUMNS = `
@@ -72,28 +73,28 @@ export const useProjects = () => {
         }
     };
 
-    const createProject = async (project: Omit<Project, 'id' | 'created_at' | 'updated_at'>) => {
-        try {
-            const { data, error } = await supabase
-                .from('projects')
-                .insert({
-                    ...project,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                })
-                .select(SELECT_COLUMNS)
-                .single();
+  const createProject = async (project: Omit<Project, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .insert({
+          ...project,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select(SELECT_COLUMNS)
+        .single();
 
-            if (error) {
-                return { error };
-            }
+      if (error) {
+        return { error };
+      }
 
-            setProjects(prev => [...prev, data]);
-            return { data };
-        } catch (error) {
-            return { error };
-        }
-    };
+      setProjects(prev => [...prev, data]);
+      return { data };
+    } catch (error) {
+      return { error };
+    }
+  };
 
     const updateProject = async (id: string, updates: Partial<Omit<Project, 'id' | 'created_at' | 'updated_at'>>) => {
         try {
