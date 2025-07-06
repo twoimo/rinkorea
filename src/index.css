@@ -178,3 +178,22 @@
     z-index: 10000 !important;
   }
 }
+
+/* Remove scrollbar for all elements */
+* {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+*::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, and Opera */
+}
+
+html,
+body {
+  overflow: -moz-scrollbars-none;
+  /* Firefox */
+}
