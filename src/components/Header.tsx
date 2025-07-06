@@ -1,18 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, User, LogOut, Settings, AlertTriangle, BarChart3 } from 'lucide-react';
+import { Menu, X, User, LogOut, Settings, AlertTriangle, BarChart3, Search } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useProfile } from '@/hooks/useProfile';
 import { LanguageSelector } from '@/components/ui/language-selector';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 import { cn } from '@/lib/utils';
+
+// Lazy load the AI Search Modal
+const AISearchModal = React.lazy(() => import('@/components/ai-search/AISearchModal'));
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isAISearchOpen, setIsAISearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -77,6 +82,14 @@ const Header = () => {
     setIsMenuOpen(false);
   };
 
+  const handleAISearchOpen = () => {
+    setIsAISearchOpen(true);
+  };
+
+  const handleAISearchClose = () => {
+    setIsAISearchOpen(false);
+  };
+
   return (
     <header className={cn(
       "sticky top-0 z-[100] transition-colors duration-200",
@@ -115,28 +128,53 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Desktop User Menu and Language Selector */}
+          {/* Desktop User Menu and Controls */}
           <div className="hidden xl:flex items-center space-x-3">
+            {/* AI Search Button */}
+            <button
+              onClick={handleAISearchOpen}
+              className={cn(
+                "p-2 rounded-lg transition-colors",
+                shouldBeTransparent
+                  ? "text-white hover:bg-white/20"
+                  : "text-gray-700 hover:bg-gray-100"
+              )}
+              aria-label="AI 검색"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
+            {/* Language Selector */}
+            <LanguageSelector
+              variant="flag-only"
+              isTransparent={shouldBeTransparent}
+            />
+
+            {/* User Account */}
             {user ? (
               <div className="relative">
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   className={cn(
-                    "inline-flex items-center px-3 py-2 rounded-full text-sm font-semibold transition-colors",
+                    "p-2 rounded-lg transition-colors flex items-center justify-center",
                     isAdmin
-                      ? "bg-red-100 text-red-800"
+                      ? "bg-red-100 hover:bg-red-200"
                       : shouldBeTransparent
-                        ? "bg-white/20 text-white hover:bg-white/30"
-                        : "bg-blue-100 text-blue-800"
+                        ? "bg-white/20 hover:bg-white/30"
+                        : "bg-gray-100 hover:bg-gray-200"
                   )}
+                  aria-label="사용자 메뉴"
                 >
-                  <User className="w-4 h-4 mr-2" />
-                  <span className="hidden xl:inline">
-                    {isAdmin ? t('admin') : (profile?.name || t('user'))}
-                  </span>
+                  <User className={cn(
+                    "w-5 h-5",
+                    isAdmin ? "text-red-600" : (shouldBeTransparent ? "text-white" : "text-gray-700")
+                  )} />
                 </button>
                 {isUserMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-[110]">
+                    <div className="px-4 py-2 text-sm text-gray-500 border-b border-gray-100">
+                      {isAdmin ? t('admin') : (profile?.name || t('user'))}
+                    </div>
                     {isAdmin && (
                       <>
                         <Link
@@ -195,20 +233,31 @@ const Header = () => {
                 {t('login')}
               </button>
             )}
-
-            {/* Language Selector */}
-            <LanguageSelector
-              variant="flag-only"
-              isTransparent={shouldBeTransparent}
-            />
           </div>
 
-          {/* Mobile menu button and language selector */}
+          {/* Mobile menu button and controls */}
           <div className="flex items-center space-x-2 xl:hidden">
+            {/* Mobile AI Search Button */}
+            <button
+              onClick={handleAISearchOpen}
+              className={cn(
+                "p-2 rounded-md transition-colors touch-manipulation",
+                shouldBeTransparent
+                  ? "text-white hover:bg-white/20"
+                  : "text-gray-700 hover:bg-gray-100"
+              )}
+              aria-label="AI 검색"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
+            {/* Mobile Language Selector */}
             <LanguageSelector
               variant="flag-only"
               isTransparent={shouldBeTransparent}
             />
+
+            {/* Mobile Menu Toggle */}
             <button
               className={cn(
                 "p-2 rounded-md transition-colors touch-manipulation touch-feedback",
@@ -321,6 +370,17 @@ const Header = () => {
           className="fixed inset-0 bg-black bg-opacity-25 z-[80]"
           onClick={() => setIsUserMenuOpen(false)}
         />
+      )}
+
+      {/* AI Search Modal */}
+      {isAISearchOpen && (
+        <Suspense fallback={
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-[200] flex items-center justify-center">
+            <LoadingSpinner className="w-8 h-8 text-white" />
+          </div>
+        }>
+          <AISearchModal onClose={handleAISearchClose} />
+        </Suspense>
       )}
     </header>
   );

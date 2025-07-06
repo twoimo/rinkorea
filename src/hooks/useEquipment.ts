@@ -121,13 +121,13 @@ export const useEquipment = () => {
             }
 
             if (data && data[0]) {
-                setEquipment(prev => prev.map(e => e.id === id ? data[0] : e));
+                await fetchEquipment();
                 return { data: data[0] };
             }
         } catch (error) {
             return { error };
         }
-    }, []);
+    }, [fetchEquipment]);
 
     const deleteEquipment = useCallback(async (id: string) => {
         try {
