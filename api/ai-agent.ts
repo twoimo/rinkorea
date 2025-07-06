@@ -105,7 +105,7 @@ class UnifiedAIAgent {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${MISTRAL_API_KEY}` },
             body: JSON.stringify({
-                model: 'mistral-medium-latest',
+                model: 'mistral-small-latest',
                 messages: [{ role: 'system', content: systemPrompt }, ...formattedHistory, { role: 'user', content: message }],
                 temperature: 0.1,
                 max_tokens: isRouting ? 20 : 1000,
