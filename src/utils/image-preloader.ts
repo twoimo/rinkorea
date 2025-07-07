@@ -42,7 +42,12 @@ class ImagePreloader {
         const basePath = pathParts.join('/');
 
         let webpUrl: string;
-        if (basePath === '/images' || basePath === 'images') {
+
+        // 이미 optimized 경로가 포함되어 있는지 확인
+        if (basePath.includes('/optimized')) {
+            // 이미 최적화된 경로인 경우 그대로 사용
+            webpUrl = `${basePath}/${nameWithoutExt}.webp`;
+        } else if (basePath === '/images' || basePath === 'images') {
             webpUrl = `/images/optimized/${nameWithoutExt}.webp`;
         } else if (basePath === '') {
             webpUrl = `/images/optimized/${nameWithoutExt}.webp`;
@@ -206,12 +211,12 @@ class ImagePreloader {
         await Promise.allSettled(promises);
     }
 
-    // 크리티컬 이미지 프리로드
+    // 크리티컬 이미지 프리로드 - 실제 존재하는 이미지들로 변경
     async preloadCriticalImages(): Promise<void> {
         const criticalImages = [
             '/images/optimized/rin-korea-logo-black.webp',
-            '/images/optimized/main-hero-bg.webp', // 메인 히어로 이미지
-            '/images/optimized/product-showcase.webp', // 주요 제품 이미지
+            '/images/optimized/company_intro.webp', // 실제 존재하는 이미지로 변경
+            '/images/optimized/경기도 광주 건업리 물류창고 신축001.webp', // 프로젝트 대표 이미지
         ];
 
         await this.preloadImages(criticalImages, true);
