@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "vite",
+    "dev:vercel": "vercel dev",
     "build": "tsc && vite build",
     "build:dev": "vite build --mode development",
     "build:analyze": "vite build --mode production && npx vite-bundle-analyzer dist",
@@ -117,6 +118,7 @@
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "uuid": "^11.1.0",
+    "vercel": "^37.33.3",
     "vite": "^5.4.1",
     "vite-bundle-analyzer": "^0.23.0",
     "vitest": "^3.2.4"
