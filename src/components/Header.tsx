@@ -106,14 +106,14 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden xl:flex space-x-6 2xl:space-x-8">
+          <nav className="hidden xl:flex space-x-4 2xl:space-x-6">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 to={item.path}
                 onClick={() => handleNavigation(item.path)}
                 className={cn(
-                  "text-sm font-medium transition-colors whitespace-nowrap",
+                  "text-sm font-medium transition-colors text-center",
                   location.pathname === item.path
                     ? shouldBeTransparent
                       ? "text-blue-400 border-b-2 border-blue-400"
@@ -275,8 +275,8 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="xl:hidden border-t bg-white fixed inset-x-0 top-[4rem] sm:top-[5rem] z-[90] max-h-[80vh] overflow-hidden mobile-menu shadow-lg rounded-b-lg">
-            <nav className="h-full overflow-y-auto pb-4 mobile-dropdown">
+          <div className="xl:hidden border-t bg-white fixed inset-x-0 top-[4rem] sm:top-[5rem] z-[90] max-h-[85vh] overflow-y-auto mobile-menu shadow-lg rounded-b-lg">
+            <nav className="h-full pb-4 mobile-dropdown">
               <div className="py-2">
                 {navItems.map((item) => (
                   <Link
@@ -297,9 +297,9 @@ const Header = () => {
               </div>
 
               {/* Mobile User Section */}
-              <div className="border-t mt-4 pt-4 mx-2 mobile-portrait-padding">
+              <div className="border-t mt-4 pt-4 mx-2 pb-4">
                 {user ? (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div className="px-4 py-2 text-sm text-gray-600 font-medium">
                       {isAdmin ? t('admin_account') : t('welcome', `환영합니다, ${profile?.name || t('user')}님`)}
                     </div>
