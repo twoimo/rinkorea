@@ -133,7 +133,17 @@ export const useProjects = () => {
             }
 
             console.log('Project created successfully!');
-            setProjects(prev => [...prev, data]);
+            // 불변성을 보장하면서 새 프로젝트 추가
+            setProjects(prev => {
+                const newProjects = [...prev, { ...data }];
+                console.log('Added new project to state:', {
+                    previousLength: prev.length,
+                    newLength: newProjects.length,
+                    newProject: data,
+                    newProjectTitle: data.title
+                });
+                return newProjects;
+            });
 
             // 캐시 무효화 - 즉시 UI 반영
             invalidateQueries.projects();
@@ -186,7 +196,17 @@ export const useProjects = () => {
             }
 
             console.log('Project updated successfully!');
-            setProjects(prev => prev.map(p => p.id === id ? data : p));
+            // 불변성을 보장하면서 상태 업데이트
+            setProjects(prev => {
+                const newProjects = prev.map(p => p.id === id ? { ...data } : p);
+                console.log('Updated projects state:', {
+                    previousLength: prev.length,
+                    newLength: newProjects.length,
+                    updatedProject: data,
+                    updatedProjectTitle: data.title
+                });
+                return newProjects;
+            });
 
             // 캐시 무효화 - 즉시 UI 반영
             invalidateQueries.projects();

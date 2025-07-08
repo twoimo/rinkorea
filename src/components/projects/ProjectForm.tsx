@@ -200,8 +200,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ isOpen, editingProject, onClo
       } else {
         console.log('Project form saved successfully!');
         setFormSuccess('저장되었습니다.');
-        setTimeout(() => {
-          onSuccess();
+        // 성공 메시지를 보여준 후 데이터 새로고침과 함께 폼 닫기
+        setTimeout(async () => {
+          console.log('Calling onSuccess callback to refresh data...');
+          await onSuccess();
         }, 700);
       }
     } catch (e) {

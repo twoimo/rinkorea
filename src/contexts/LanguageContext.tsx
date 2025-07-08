@@ -285,7 +285,7 @@ const translations = {
         // Shop Page
         shop_hero_title: '온라인 스토어',
         shop_hero_subtitle: '린코리아 제품을 온라인으로 주문하고 구매할 수 있습니다.',
-        shop_add_product: '제품 추가',
+        shop_add_product: '상품 추가',
 
         // Shop sorting options
         shop_sort_popularity: '인기도순',

@@ -15,7 +15,7 @@ import ProjectForm from '@/components/projects/ProjectForm';
 import { ProjectsGridSkeleton } from '@/components/projects/ProjectCardSkeleton';
 
 const Projects = () => {
-  const { projects, loading, deleteProject } = useProjects();
+  const { projects, loading, deleteProject, refetch } = useProjects();
   const { isAdmin } = useUserRole();
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -24,6 +24,7 @@ const Projects = () => {
   const [editingProject, setEditingProject] = useState<string | null>(null);
   const [formLoading, setFormLoading] = useState(false);
   const [hiddenProjectIds, setHiddenProjectIds] = useState<string[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0); // 강제 리렌더링용
 
   // 숨김 프로젝트 목록 불러오기
   const fetchHiddenProjects = async () => {
@@ -90,6 +91,21 @@ const Projects = () => {
     setEditingProject(null);
   };
 
+  // 폼 성공 처리 (데이터 새로고침 포함)
+  const handleFormSuccess = async () => {
+    console.log('Project form success - refreshing data...');
+    setShowForm(false);
+    setEditingProject(null);
+
+    // 데이터 새로고침
+    console.log('Refetching projects data...');
+    await refetch();
+
+    // 강제 리렌더링을 위한 키 변경
+    setRefreshKey(prev => prev + 1);
+    console.log('Projects data refreshed successfully!');
+  };
+
   const handleDeleteProject = async (id: string) => {
     if (!window.confirm(t('projects_delete_confirm', '정말로 이 프로젝트를 삭제하시겠습니까?'))) return;
 
@@ -143,6 +159,7 @@ const Projects = () => {
       />
 
       <ProjectsGrid
+        key={`construction-${refreshKey}`}
         projects={getVisibleProjects()}
         category="construction"
         title=""
@@ -159,6 +176,7 @@ const Projects = () => {
       <ProjectsStats />
 
       <ProjectsGrid
+        key={`other-${refreshKey}`}
         projects={getVisibleProjects()}
         category="other"
         title={t('projects_various_title')}
@@ -176,7 +194,7 @@ const Projects = () => {
         isOpen={showForm}
         editingProject={editingProject}
         onClose={handleFormClose}
-        onSuccess={handleFormClose}
+        onSuccess={handleFormSuccess}
       />
 
       <Footer />
