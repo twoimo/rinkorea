@@ -95,6 +95,7 @@ export const useProjects = () => {
             console.log('Starting project creation...', { project, language });
 
             // 현재 언어에 맞는 다국어 컬럼도 함께 설정
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const enhancedProject: any = {
                 ...project,
                 created_at: new Date().toISOString(),
@@ -160,6 +161,7 @@ export const useProjects = () => {
             console.log('Starting project update...', { id, updates, language });
 
             // 현재 언어에 맞는 다국어 컬럼도 함께 업데이트
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const enhancedUpdates: any = {
                 ...updates,
                 updated_at: new Date().toISOString()

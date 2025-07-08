@@ -56,7 +56,7 @@ export function EquipmentCard({
             updated_at: equipment.updated_at,
             getLocalizedValueResult: getLocalizedValue(equipment, 'name', language)
         });
-    }, [equipment.name, equipment.name_ko, equipment.name_en, equipment.name_zh, localizedName, language, equipment.updated_at, equipment.id]);
+    }, [equipment, localizedName, language]);
 
     return (
         <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">

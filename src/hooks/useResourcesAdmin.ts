@@ -28,6 +28,7 @@ export function useResourcesAdmin() {
             setLoading(true);
 
             // 현재 언어에 맞는 다국어 컬럼도 함께 설정
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const enhancedResourceData: any = {
                 ...resourceData,
                 author_id: (await supabase.auth.getUser()).data.user?.id
@@ -84,6 +85,7 @@ export function useResourcesAdmin() {
             setLoading(true);
 
             // 현재 언어에 맞는 다국어 컬럼도 함께 업데이트
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const enhancedResourceData: any = {
                 ...resourceData,
                 updated_at: new Date().toISOString()

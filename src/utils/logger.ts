@@ -3,7 +3,7 @@
  * 프로덕션 환경에서는 로그가 출력되지 않습니다.
  */
 
-const isDevelopment = import.meta.env.DEV;
+const isDevelopment = import.meta.env.MODE === 'development';
 
 export const logger = {
     /**
@@ -55,6 +55,15 @@ export const logger = {
     success: (message: string, ...args: unknown[]) => {
         if (isDevelopment) {
             console.log(`✅ [SUCCESS] ${message}`, ...args);
+        }
+    },
+
+    /**
+     * 간단한 로그 출력 (개발환경에서만)
+     */
+    log: (...args: unknown[]) => {
+        if (isDevelopment) {
+            console.log(...args);
         }
     }
 };

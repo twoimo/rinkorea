@@ -58,6 +58,7 @@ export const useRevenue = () => {
         });
 
         return unsubscribe;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // 매출 데이터 조회

@@ -72,7 +72,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
         getLocalizedValueResult: getLocalizedValue(product, 'name', language)
       });
     }
-  }, [product.name, product.name_ko, product.name_en, product.name_zh, localizedName, language, product.updated_at, product.id]);
+  }, [product, localizedName, language]);
 
   const handleToggleExpand = (e: React.MouseEvent) => {
     e.stopPropagation();
