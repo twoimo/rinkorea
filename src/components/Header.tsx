@@ -275,7 +275,7 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="xl:hidden border-t bg-white fixed inset-x-0 top-[4rem] sm:top-[5rem] bottom-0 z-[90] overflow-hidden mobile-menu safe-area-inset-bottom">
+          <div className="xl:hidden border-t bg-white fixed inset-x-0 top-[4rem] sm:top-[5rem] z-[90] max-h-[80vh] overflow-hidden mobile-menu shadow-lg rounded-b-lg">
             <nav className="h-full overflow-y-auto pb-4 mobile-dropdown">
               <div className="py-2">
                 {navItems.map((item) => (
