@@ -1,6 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { queryClient, QUERY_KEYS } from '@/lib/query-client';
 
 interface NewsItem {
   id: string;
@@ -18,6 +18,26 @@ export const useNews = () => {
 
   useEffect(() => {
     fetchNews();
+  }, []);
+
+  // React Query 캐시 변경 이벤트 구독
+  useEffect(() => {
+    const unsubscribe = queryClient.getQueryCache().subscribe(({ query, type }) => {
+      // News 관련 쿼리 캐시가 무효화되면 데이터 새로고침
+      if (type === 'removed' || type === 'updated') {
+        const queryKey = query.queryKey[0];
+        if (typeof queryKey === 'string' && (
+          queryKey === QUERY_KEYS.NEWS.ALL ||
+          queryKey === QUERY_KEYS.NEWS.PUBLISHED ||
+          queryKey.startsWith('news-')
+        )) {
+          console.log('News cache invalidated, refetching...');
+          fetchNews();
+        }
+      }
+    });
+
+    return unsubscribe;
   }, []);
 
   const fetchNews = async () => {

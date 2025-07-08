@@ -1,8 +1,8 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { invalidateQueries } from '@/lib/query-client';
 
 export const useNewsAdmin = () => {
   const [loading, setLoading] = useState(false);
@@ -33,6 +33,8 @@ export const useNewsAdmin = () => {
         });
         return { error };
       }
+
+      invalidateQueries.news();
 
       toast({
         title: "공지사항이 작성되었습니다",
@@ -78,6 +80,9 @@ export const useNewsAdmin = () => {
         return { error };
       }
 
+      invalidateQueries.news();
+      invalidateQueries.newsItem(id);
+
       toast({
         title: "공지사항이 수정되었습니다",
         description: "변경사항이 저장되었습니다."
@@ -112,6 +117,9 @@ export const useNewsAdmin = () => {
         });
         return { error };
       }
+
+      invalidateQueries.news();
+      invalidateQueries.newsItem(id);
 
       toast({
         title: "공지사항이 삭제되었습니다",

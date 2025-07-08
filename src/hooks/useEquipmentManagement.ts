@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Equipment, EquipmentFormData } from '@/types/equipment';
+import { invalidateQueries, queryClient, QUERY_KEYS } from '@/lib/query-client';
 
 interface UseEquipmentManagementReturn {
     equipment: Equipment[];
@@ -61,6 +62,27 @@ export function useEquipmentManagement(): UseEquipmentManagementReturn {
         }
     }, []);
 
+    // React Query 캐시 변경 이벤트 구독
+    useEffect(() => {
+        const unsubscribe = queryClient.getQueryCache().subscribe(({ query, type }) => {
+            // Equipment 관련 쿼리 캐시가 무효화되면 데이터 새로고침
+            if (type === 'removed' || type === 'updated') {
+                const queryKey = query.queryKey[0];
+                if (typeof queryKey === 'string' && (
+                    queryKey === QUERY_KEYS.EQUIPMENT.ALL ||
+                    queryKey === QUERY_KEYS.EQUIPMENT.VISIBLE ||
+                    queryKey === QUERY_KEYS.EQUIPMENT.HIDDEN ||
+                    queryKey.startsWith('equipment-')
+                )) {
+                    console.log('Equipment cache invalidated, refetching...');
+                    refreshData();
+                }
+            }
+        });
+
+        return unsubscribe;
+    }, []);
+
     // Create new equipment
     const createEquipment = useCallback(async (data: EquipmentFormData): Promise<boolean> => {
         try {
@@ -78,6 +100,10 @@ export function useEquipmentManagement(): UseEquipmentManagementReturn {
 
             if (!error && result) {
                 setEquipment(prev => [...prev, result[0]]);
+
+                // 캐시 무효화 - 즉시 UI 반영
+                invalidateQueries.equipment();
+
                 return true;
             }
             return false;
@@ -104,6 +130,11 @@ export function useEquipmentManagement(): UseEquipmentManagementReturn {
                 setEquipment(prev =>
                     prev.map(e => e.id === id ? { ...e, ...payload } : e)
                 );
+
+                // 캐시 무효화 - 즉시 UI 반영
+                invalidateQueries.equipment();
+                invalidateQueries.equipmentItem(id);
+
                 return true;
             }
             return false;
@@ -123,6 +154,11 @@ export function useEquipmentManagement(): UseEquipmentManagementReturn {
 
             if (!error) {
                 setEquipment(prev => prev.filter(e => e.id !== id));
+
+                // 캐시 무효화 - 즉시 UI 반영
+                invalidateQueries.equipment();
+                invalidateQueries.equipmentItem(id);
+
                 return true;
             }
             return false;
@@ -146,6 +182,10 @@ export function useEquipmentManagement(): UseEquipmentManagementReturn {
 
                 if (!error) {
                     setHiddenEquipmentIds(prev => prev.filter(id => id !== equipment.id));
+
+                    // 캐시 무효화 - 즉시 UI 반영
+                    invalidateQueries.equipment();
+
                     return true;
                 }
             } else {
@@ -156,6 +196,10 @@ export function useEquipmentManagement(): UseEquipmentManagementReturn {
 
                 if (!error) {
                     setHiddenEquipmentIds(prev => [...prev, equipment.id]);
+
+                    // 캐시 무효화 - 즉시 UI 반영
+                    invalidateQueries.equipment();
+
                     return true;
                 }
             }
