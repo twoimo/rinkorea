@@ -58,6 +58,22 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
   const localizedDescription = getLocalizedValue(product, 'description', language);
   const localizedFeatures = getLocalizedArray(product, 'features', language);
 
+  // 디버깅: 제품 데이터 확인
+  React.useEffect(() => {
+    if (product.id === '5f9d9c99-89e9-46c1-b69e-15b893f46f6c') { // 수정한 특정 제품만 로그
+      console.log(`🏷️ ProductCard[${product.id}] rendering:`, {
+        productName: product.name,
+        productName_ko: product.name_ko,
+        productName_en: product.name_en,
+        productName_zh: product.name_zh,
+        localizedName,
+        language,
+        updated_at: product.updated_at,
+        getLocalizedValueResult: getLocalizedValue(product, 'name', language)
+      });
+    }
+  }, [product.name, product.name_ko, product.name_en, product.name_zh, localizedName, language, product.updated_at, product.id]);
+
   const handleToggleExpand = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsExpanded(!isExpanded);
