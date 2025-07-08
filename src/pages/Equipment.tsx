@@ -16,7 +16,7 @@ import type { Equipment, ActiveTab, EquipmentFormData } from '@/types/equipment'
 
 const EquipmentPage = (): JSX.Element => {
     const { isAdmin } = useUserRole();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [activeTab, setActiveTab] = useState<ActiveTab>('construction');
 
     // Modal states
@@ -30,6 +30,7 @@ const EquipmentPage = (): JSX.Element => {
 
 
     const {
+        equipment,
         loading,
         hiddenEquipmentIds,
         getVisibleEquipment,
@@ -41,6 +42,17 @@ const EquipmentPage = (): JSX.Element => {
 
     // Get visible equipment based on user role
     const visibleEquipment = getVisibleEquipment(isAdmin);
+
+    // 디버깅: 장비 데이터 변경 감지
+    React.useEffect(() => {
+        console.log('🔧 Equipment data changed:', {
+            visibleEquipment: visibleEquipment.length,
+            totalEquipment: equipment.length,
+            equipmentNames: visibleEquipment.map(e => e.name),
+            equipmentDetails: visibleEquipment.map(e => ({ id: e.id, name: e.name, updated_at: e.updated_at })),
+            timestamp: new Date().toLocaleTimeString()
+        });
+    }, [visibleEquipment, equipment]);
 
     // Handler functions
     const handleAddEquipment = (): void => {
@@ -75,30 +87,48 @@ const EquipmentPage = (): JSX.Element => {
     };
 
     const handleFormSave = async (data: EquipmentFormData): Promise<void> => {
+        console.log('Starting equipment save...', { editingEquipment: editingEquipment?.id, data });
         setFormLoading(true);
         setFormError(null);
         setFormSuccess(null);
 
         try {
+            // 현재 언어에 맞는 다국어 컬럼도 함께 업데이트
+            const enhancedFormData = {
+                ...data,
+                // 현재 언어에 맞는 다국어 컬럼 업데이트
+                [`name_${language}`]: data.name,
+                [`description_${language}`]: data.description,
+                [`features_${language}`]: data.features,
+            };
+
+            console.log('Enhanced equipment form data with multilang:', enhancedFormData);
+
             let success = false;
             if (editingEquipment) {
-                success = await updateEquipment(editingEquipment.id, data);
+                console.log('Updating equipment:', editingEquipment.id);
+                success = await updateEquipment(editingEquipment.id, enhancedFormData);
                 if (success) {
+                    console.log('Equipment update successful!');
                     setFormSuccess(t('equipment_updated_success'));
                     handleCloseFormModal();
                 }
             } else {
-                success = await createEquipment(data);
+                console.log('Creating new equipment');
+                success = await createEquipment(enhancedFormData);
                 if (success) {
+                    console.log('Equipment creation successful!');
                     setFormSuccess(t('equipment_added_success'));
                     handleCloseFormModal();
                 }
             }
 
             if (!success) {
+                console.error('Equipment save failed');
                 setFormError(t('equipment_save_error'));
             }
-        } catch {
+        } catch (error) {
+            console.error('Error in handleFormSave:', error);
             setFormError(t('error'));
         } finally {
             setFormLoading(false);
