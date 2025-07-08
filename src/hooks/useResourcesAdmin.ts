@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { invalidateQueries } from '@/lib/query-client';
 
 export interface CreateResourceData {
     title: string;
@@ -35,6 +36,8 @@ export function useResourcesAdmin() {
                 .single();
 
             if (error) throw error;
+
+            invalidateQueries.resources();
 
             toast({
                 title: "자료 등록 완료",
@@ -71,6 +74,9 @@ export function useResourcesAdmin() {
 
             if (error) throw error;
 
+            invalidateQueries.resources();
+            invalidateQueries.resource(id);
+
             toast({
                 title: "수정 완료",
                 description: "자료가 성공적으로 수정되었습니다."
@@ -100,6 +106,9 @@ export function useResourcesAdmin() {
                 .eq('id', id);
 
             if (error) throw error;
+
+            invalidateQueries.resources();
+            invalidateQueries.resource(id);
 
             toast({
                 title: "삭제 완료",
@@ -135,6 +144,9 @@ export function useResourcesAdmin() {
                 .single();
 
             if (error) throw error;
+
+            invalidateQueries.resources();
+            invalidateQueries.resource(id);
 
             toast({
                 title: isActive ? "자료 활성화" : "자료 비활성화",

@@ -22,10 +22,42 @@ export const QUERY_KEYS = {
     NEWS: {
         ALL: "news-all",
         BY_ID: (id: string) => `news-${id}`,
+        PUBLISHED: "news-published",
     },
     PROJECTS: {
         ALL: "projects-all",
         BY_ID: (id: string) => `project-${id}`,
+        VISIBLE: "projects-visible",
+    },
+    RESOURCES: {
+        ALL: "resources-all",
+        BY_ID: (id: string) => `resource-${id}`,
+        BY_CATEGORY: (category: string) => `resources-category-${category}`,
+        ACTIVE: "resources-active",
+        STATS: "resource-stats",
+    },
+    EQUIPMENT: {
+        ALL: "equipment-all",
+        BY_ID: (id: string) => `equipment-${id}`,
+        VISIBLE: "equipment-visible",
+        HIDDEN: "equipment-hidden",
+    },
+    INQUIRIES: {
+        ALL: "inquiries-all",
+        BY_ID: (id: string) => `inquiry-${id}`,
+        REPLIES: (inquiryId: string) => `inquiry-replies-${inquiryId}`,
+        BY_USER: (userId: string) => `inquiries-user-${userId}`,
+    },
+    CERTIFICATES: {
+        ALL: "certificates-all",
+        BY_ID: (id: string) => `certificate-${id}`,
+        VISIBLE: "certificates-visible",
+    },
+    REVENUE: {
+        ALL: "revenue-all",
+        BY_DATE_RANGE: (start: string, end: string) => `revenue-${start}-${end}`,
+        CATEGORIES: "revenue-categories",
+        STATS: "revenue-stats",
     },
 } as const;
 
@@ -48,16 +80,90 @@ export const queryClient = new QueryClient({
 
 // 캐시 무효화 헬퍼 함수
 export const invalidateQueries = {
+    // 제품 관련
     products: () => {
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS.ALL] });
     },
     product: (id: string) => {
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS.BY_ID(id)] });
     },
+
+    // 뉴스 관련
     news: () => {
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.NEWS.ALL] });
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.NEWS.PUBLISHED] });
     },
+    newsItem: (id: string) => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.NEWS.BY_ID(id)] });
+    },
+
+    // 프로젝트 관련
     projects: () => {
         queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PROJECTS.ALL] });
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PROJECTS.VISIBLE] });
+    },
+    project: (id: string) => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PROJECTS.BY_ID(id)] });
+    },
+
+    // 자료 관련
+    resources: () => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.RESOURCES.ALL] });
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.RESOURCES.ACTIVE] });
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.RESOURCES.STATS] });
+    },
+    resource: (id: string) => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.RESOURCES.BY_ID(id)] });
+    },
+    resourcesByCategory: (category: string) => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.RESOURCES.BY_CATEGORY(category)] });
+    },
+
+    // 장비 관련
+    equipment: () => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.EQUIPMENT.ALL] });
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.EQUIPMENT.VISIBLE] });
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.EQUIPMENT.HIDDEN] });
+    },
+    equipmentItem: (id: string) => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.EQUIPMENT.BY_ID(id)] });
+    },
+
+    // 문의 관련
+    inquiries: () => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.INQUIRIES.ALL] });
+    },
+    inquiry: (id: string) => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.INQUIRIES.BY_ID(id)] });
+    },
+    inquiryReplies: (inquiryId: string) => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.INQUIRIES.REPLIES(inquiryId)] });
+    },
+    inquiriesByUser: (userId: string) => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.INQUIRIES.BY_USER(userId)] });
+    },
+
+    // 인증서 관련
+    certificates: () => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CERTIFICATES.ALL] });
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CERTIFICATES.VISIBLE] });
+    },
+    certificate: (id: string) => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CERTIFICATES.BY_ID(id)] });
+    },
+
+    // 매출 관련
+    revenue: () => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.REVENUE.ALL] });
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.REVENUE.CATEGORIES] });
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.REVENUE.STATS] });
+    },
+    revenueByDateRange: (start: string, end: string) => {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.REVENUE.BY_DATE_RANGE(start, end)] });
+    },
+
+    // 전체 캐시 무효화
+    all: () => {
+        queryClient.invalidateQueries();
     },
 }; 

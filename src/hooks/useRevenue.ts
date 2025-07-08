@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { RevenueData, RevenueCategory, ChartData, RevenueStats } from '@/types/revenue';
 import { useAuth } from '@/contexts/AuthContext';
+import { invalidateQueries, queryClient, QUERY_KEYS } from '@/lib/query-client';
 
 // 재시도 유틸리티 함수
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -36,6 +37,28 @@ export const useRevenue = () => {
     const [stats, setStats] = useState<RevenueStats | null>(null);
     const [error, setError] = useState<string | null>(null);
     const { user } = useAuth();
+
+    // React Query 캐시 변경 이벤트 구독
+    useEffect(() => {
+        const unsubscribe = queryClient.getQueryCache().subscribe(({ query, type }) => {
+            // Revenue 관련 쿼리 캐시가 무효화되면 데이터 새로고침
+            if (type === 'removed' || type === 'updated') {
+                const queryKey = query.queryKey[0];
+                if (typeof queryKey === 'string' && (
+                    queryKey === QUERY_KEYS.REVENUE.ALL ||
+                    queryKey === QUERY_KEYS.REVENUE.CATEGORIES ||
+                    queryKey === QUERY_KEYS.REVENUE.STATS ||
+                    queryKey.startsWith('revenue-')
+                )) {
+                    console.log('Revenue cache invalidated, refetching...');
+                    fetchRevenueData();
+                    fetchCategories();
+                }
+            }
+        });
+
+        return unsubscribe;
+    }, []);
 
     // 매출 데이터 조회
     const fetchRevenueData = useCallback(async (dateRange?: { start: string; end: string }) => {
@@ -270,6 +293,10 @@ export const useRevenue = () => {
                 }]);
 
             if (error) throw error;
+
+            // 캐시 무효화 - 즉시 UI 반영
+            invalidateQueries.revenue();
+
             await fetchRevenueData();
             return { success: true };
         } catch (error) {
@@ -289,6 +316,10 @@ export const useRevenue = () => {
                 })));
 
             if (error) throw error;
+
+            // 캐시 무효화 - 즉시 UI 반영
+            invalidateQueries.revenue();
+
             await fetchRevenueData();
             return { success: true };
         } catch (error) {
@@ -306,6 +337,10 @@ export const useRevenue = () => {
                 .eq('id', id);
 
             if (error) throw error;
+
+            // 캐시 무효화 - 즉시 UI 반영
+            invalidateQueries.revenue();
+
             await fetchRevenueData();
             return { success: true };
         } catch (error) {
@@ -328,6 +363,10 @@ export const useRevenue = () => {
             });
 
             if (error) throw error;
+
+            // 캐시 무효화 - 즉시 UI 반영
+            invalidateQueries.revenue();
+
             await fetchRevenueData();
             return { success: true };
         } catch (error) {
@@ -347,6 +386,10 @@ export const useRevenue = () => {
             });
 
             if (error) throw error;
+
+            // 캐시 무효화 - 즉시 UI 반영
+            invalidateQueries.revenue();
+
             await fetchRevenueData();
             return { success: true };
         } catch (error) {
@@ -383,6 +426,9 @@ export const useRevenue = () => {
                 // 배치 간 짧은 지연
                 await delay(100);
             }
+
+            // 캐시 무효화 - 즉시 UI 반영
+            invalidateQueries.revenue();
 
             await fetchRevenueData();
             return { success: true };

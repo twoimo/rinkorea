@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { invalidateQueries, queryClient, QUERY_KEYS } from '@/lib/query-client';
 
 export interface Project {
     id: string;
@@ -28,21 +29,7 @@ export interface Project {
     features_zh?: string[];
 }
 
-const SELECT_COLUMNS = `
-  *,
-  title_ko,
-  title_en,
-  title_zh,
-  location_ko,
-  location_en,
-  location_zh,
-  description_ko,
-  description_en,
-  description_zh,
-  features_ko,
-  features_en,
-  features_zh
-`;
+const SELECT_COLUMNS = `*`;
 
 export const useProjects = () => {
     const [projects, setProjects] = useState<Project[]>([]);
@@ -52,6 +39,26 @@ export const useProjects = () => {
     useEffect(() => {
         fetchProjects();
     }, [user]);
+
+    // React Query 캐시 변경 이벤트 구독
+    useEffect(() => {
+        const unsubscribe = queryClient.getQueryCache().subscribe(({ query, type }) => {
+            // Projects 관련 쿼리 캐시가 무효화되면 데이터 새로고침
+            if (type === 'removed' || type === 'updated') {
+                const queryKey = query.queryKey[0];
+                if (typeof queryKey === 'string' && (
+                    queryKey === QUERY_KEYS.PROJECTS.ALL ||
+                    queryKey === QUERY_KEYS.PROJECTS.VISIBLE ||
+                    queryKey.startsWith('project-')
+                )) {
+                    console.log('Projects cache invalidated, refetching...');
+                    fetchProjects();
+                }
+            }
+        });
+
+        return unsubscribe;
+    }, []);
 
     const fetchProjects = async () => {
         try {
@@ -89,6 +96,10 @@ export const useProjects = () => {
             }
 
             setProjects(prev => [...prev, data]);
+
+            // 캐시 무효화 - 즉시 UI 반영
+            invalidateQueries.projects();
+
             return { data };
         } catch (error) {
             return { error };
@@ -112,6 +123,11 @@ export const useProjects = () => {
             }
 
             setProjects(prev => prev.map(p => p.id === id ? data : p));
+
+            // 캐시 무효화 - 즉시 UI 반영
+            invalidateQueries.projects();
+            invalidateQueries.project(id);
+
             return { data };
         } catch (error) {
             return { error };
@@ -130,6 +146,11 @@ export const useProjects = () => {
             }
 
             setProjects(prev => prev.filter(p => p.id !== id));
+
+            // 캐시 무효화 - 즉시 UI 반영
+            invalidateQueries.projects();
+            invalidateQueries.project(id);
+
             return { data: null };
         } catch (error) {
             return { error };
