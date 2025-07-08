@@ -22,21 +22,41 @@ export function useResourcesAdmin() {
     const [loading, setLoading] = useState(false);
     const { toast } = useToast();
 
-    const createResource = async (resourceData: CreateResourceData) => {
+    const createResource = async (resourceData: CreateResourceData, language?: string) => {
         try {
+            console.log('Starting resource creation...', { resourceData, language });
             setLoading(true);
+
+            // 현재 언어에 맞는 다국어 컬럼도 함께 설정
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const enhancedResourceData: any = {
+                ...resourceData,
+                author_id: (await supabase.auth.getUser()).data.user?.id
+            };
+
+            // 현재 언어가 있는 경우 다국어 컬럼도 설정
+            if (language) {
+                if (resourceData.title) {
+                    enhancedResourceData[`title_${language}`] = resourceData.title;
+                }
+                if (resourceData.description) {
+                    enhancedResourceData[`description_${language}`] = resourceData.description;
+                }
+            }
+
+            console.log('Enhanced resource creation data with multilang:', enhancedResourceData);
 
             const { data, error } = await supabase
                 .from('resources')
-                .insert({
-                    ...resourceData,
-                    author_id: (await supabase.auth.getUser()).data.user?.id
-                })
+                .insert(enhancedResourceData)
                 .select()
                 .single();
 
+            console.log('Resource creation result:', { data, error });
+
             if (error) throw error;
 
+            console.log('Resource created successfully!');
             invalidateQueries.resources();
 
             toast({
@@ -46,6 +66,7 @@ export function useResourcesAdmin() {
 
             return { data, error: null };
         } catch (err) {
+            console.error('Resource creation error:', err);
             const errorMessage = err instanceof Error ? err.message : '자료 등록에 실패했습니다';
             toast({
                 title: "등록 실패",
@@ -58,22 +79,40 @@ export function useResourcesAdmin() {
         }
     };
 
-    const updateResource = async (id: string, resourceData: UpdateResourceData) => {
+    const updateResource = async (id: string, resourceData: UpdateResourceData, language?: string) => {
         try {
+            console.log('Starting resource update...', { id, resourceData, language });
             setLoading(true);
+
+            // 현재 언어에 맞는 다국어 컬럼도 함께 업데이트
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const enhancedResourceData: any = {
+                ...resourceData,
+                updated_at: new Date().toISOString()
+            };
+
+            // 현재 언어가 있고 해당 필드가 업데이트되는 경우 다국어 컬럼도 업데이트
+            if (language && resourceData.title) {
+                enhancedResourceData[`title_${language}`] = resourceData.title;
+            }
+            if (language && resourceData.description) {
+                enhancedResourceData[`description_${language}`] = resourceData.description;
+            }
+
+            console.log('Enhanced resource form data with multilang:', enhancedResourceData);
 
             const { data, error } = await supabase
                 .from('resources')
-                .update({
-                    ...resourceData,
-                    updated_at: new Date().toISOString()
-                })
+                .update(enhancedResourceData)
                 .eq('id', id)
                 .select()
                 .single();
 
+            console.log('Resource update result:', { data, error });
+
             if (error) throw error;
 
+            console.log('Resource updated successfully!');
             invalidateQueries.resources();
             invalidateQueries.resource(id);
 
@@ -84,6 +123,7 @@ export function useResourcesAdmin() {
 
             return { data, error: null };
         } catch (err) {
+            console.error('Resource update error:', err);
             const errorMessage = err instanceof Error ? err.message : '자료 수정에 실패했습니다';
             toast({
                 title: "수정 실패",

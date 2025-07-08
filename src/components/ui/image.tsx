@@ -96,6 +96,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
         };
 
         loadImage();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [src, skipOptimization, fallbackSrc]);
 
     const handleLoad = () => {

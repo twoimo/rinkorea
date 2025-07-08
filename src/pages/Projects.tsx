@@ -15,7 +15,7 @@ import ProjectForm from '@/components/projects/ProjectForm';
 import { ProjectsGridSkeleton } from '@/components/projects/ProjectCardSkeleton';
 
 const Projects = () => {
-  const { projects, loading, deleteProject } = useProjects();
+  const { projects, loading, deleteProject, refetch } = useProjects();
   const { isAdmin } = useUserRole();
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -24,6 +24,7 @@ const Projects = () => {
   const [editingProject, setEditingProject] = useState<string | null>(null);
   const [formLoading, setFormLoading] = useState(false);
   const [hiddenProjectIds, setHiddenProjectIds] = useState<string[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0); // 강제 리렌더링용
 
   // 숨김 프로젝트 목록 불러오기
   const fetchHiddenProjects = async () => {
@@ -38,6 +39,16 @@ const Projects = () => {
   useEffect(() => {
     fetchHiddenProjects();
   }, []);
+
+  // 디버깅: 프로젝트 데이터 변경 감지 (페이지 레벨)
+  React.useEffect(() => {
+    console.log('🏗️ Projects page data changed:', {
+      totalProjects: projects.length,
+      projectTitles: projects.map(p => p.title),
+      projectDetails: projects.map(p => ({ id: p.id, title: p.title, updated_at: p.updated_at })),
+      timestamp: new Date().toLocaleTimeString()
+    });
+  }, [projects]);
 
   // 숨김/해제 핸들러
   const handleToggleHide = async (projectId: string) => {
@@ -78,6 +89,21 @@ const Projects = () => {
   const handleFormClose = () => {
     setShowForm(false);
     setEditingProject(null);
+  };
+
+  // 폼 성공 처리 (데이터 새로고침 포함)
+  const handleFormSuccess = async () => {
+    console.log('Project form success - refreshing data...');
+    setShowForm(false);
+    setEditingProject(null);
+
+    // 데이터 새로고침
+    console.log('Refetching projects data...');
+    await refetch();
+
+    // 강제 리렌더링을 위한 키 변경
+    setRefreshKey(prev => prev + 1);
+    console.log('Projects data refreshed successfully!');
   };
 
   const handleDeleteProject = async (id: string) => {
@@ -133,6 +159,7 @@ const Projects = () => {
       />
 
       <ProjectsGrid
+        key={`construction-${refreshKey}`}
         projects={getVisibleProjects()}
         category="construction"
         title=""
@@ -149,6 +176,7 @@ const Projects = () => {
       <ProjectsStats />
 
       <ProjectsGrid
+        key={`other-${refreshKey}`}
         projects={getVisibleProjects()}
         category="other"
         title={t('projects_various_title')}
@@ -166,7 +194,7 @@ const Projects = () => {
         isOpen={showForm}
         editingProject={editingProject}
         onClose={handleFormClose}
-        onSuccess={handleFormClose}
+        onSuccess={handleFormSuccess}
       />
 
       <Footer />

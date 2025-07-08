@@ -236,13 +236,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
         is_active: true
       };
       await onSave(payload);
-      onClose();
+      // onSave가 성공하면 onClose는 상위 컴포넌트에서 처리됨
     } catch (err) {
       console.error('Error saving product:', err);
     } finally {
       setIsSubmitting(false);
     }
-  }, [formValues, onSave, onClose]);
+  }, [formValues, onSave]);
 
   const handleAddFeature = useCallback(() => {
     if (newFeature.trim()) {

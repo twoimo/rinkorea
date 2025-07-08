@@ -19,6 +19,19 @@ export interface EquipmentFormData {
     icon?: EquipmentIcon;
     category?: EquipmentCategory;
     features?: string[];
+    // 다국어 지원 필드들
+    name_ko?: string;
+    name_en?: string;
+    name_zh?: string;
+    name_id?: string;
+    description_ko?: string;
+    description_en?: string;
+    description_zh?: string;
+    description_id?: string;
+    features_ko?: string[];
+    features_en?: string[];
+    features_zh?: string[];
+    features_id?: string[];
 }
 
 export interface SortableItemProps {

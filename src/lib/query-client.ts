@@ -71,12 +71,23 @@ export const queryClient = new QueryClient({
             refetchOnWindowFocus: false,
             refetchOnMount: true,
             refetchOnReconnect: true,
+            networkMode: 'offlineFirst', // Optimize for mobile networks
         },
         mutations: {
             retry: 1,
         },
     },
 });
+
+// 캐시 상태 확인용 디버깅 함수
+export const debugQueryCache = () => {
+    const cache = queryClient.getQueryCache();
+    const queries = cache.getAll();
+    console.log('🔍 Current Query Cache State:');
+    queries.forEach(query => {
+        console.log(`📋 Query: ${JSON.stringify(query.queryKey)}, State: ${query.state.status}, Data:`, query.state.data);
+    });
+};
 
 // 캐시 무효화 헬퍼 함수
 export const invalidateQueries = {
