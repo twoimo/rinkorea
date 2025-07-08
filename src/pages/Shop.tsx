@@ -45,7 +45,7 @@ const Shop = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { isAdmin } = useUserRole();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formValues, setFormValues] = useState<Partial<Product>>({});
@@ -121,6 +121,16 @@ const Shop = () => {
   useEffect(() => {
     fetchHiddenProducts();
   }, []);
+
+  // 디버깅: 제품 데이터 변경 감지
+  React.useEffect(() => {
+    console.log('🛒 Shop products data changed:', {
+      totalProducts: products.length,
+      productNames: products.map(p => p.name),
+      productDetails: products.map(p => ({ id: p.id, name: p.name, updated_at: p.updated_at })),
+      timestamp: new Date().toLocaleTimeString()
+    });
+  }, [products]);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -233,10 +243,12 @@ const Shop = () => {
 
   const handleFormSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Starting shop product save...', { editingProduct: editingProduct?.id, formValues });
     setFormLoading(true);
     setFormError(null);
     setFormSuccess(null);
     try {
+      // 현재 언어에 맞는 다국어 컬럼도 함께 업데이트
       const payload = {
         ...formValues,
         image_url: getImageUrl(formValues.image_url || ''),
@@ -257,21 +269,32 @@ const Shop = () => {
         description_en: formValues.description_en || '',
         description_zh: formValues.description_zh || '',
         description_id: formValues.description_id || '',
+        // 현재 언어에 맞는 다국어 컬럼 강제 업데이트
+        [`name_${language}`]: formValues.name || '',
+        [`description_${language}`]: formValues.description || '',
       };
+
+      console.log('Enhanced shop product form data with multilang:', payload);
       let result;
       if (editingProduct) {
+        console.log('Updating shop product:', editingProduct.id);
         result = await (supabase as unknown as SupabaseClient)
           .from('products')
           .update(payload)
           .eq('id', editingProduct.id);
+        console.log('Shop product update result:', result);
       } else {
+        console.log('Creating new shop product');
         result = await (supabase as unknown as SupabaseClient)
           .from('products')
           .insert([{ ...payload, created_at: new Date().toISOString(), is_active: true }]);
+        console.log('Shop product create result:', result);
       }
       if (result.error) {
+        console.error('Shop product save error:', result.error);
         setFormError(result.error.message);
       } else {
+        console.log('Shop product saved successfully!');
         setFormSuccess(t('saved_success', '저장되었습니다.'));
         await refreshProducts();
         setTimeout(() => {

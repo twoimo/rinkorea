@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { invalidateQueries, queryClient, QUERY_KEYS } from '@/lib/query-client';
+import React from 'react';
 
 export interface Project {
     id: string;
@@ -79,22 +80,59 @@ export const useProjects = () => {
         }
     };
 
-    const createProject = async (project: Omit<Project, 'id' | 'created_at' | 'updated_at'>) => {
+    // 디버깅: 프로젝트 데이터 변경 감지
+    React.useEffect(() => {
+        console.log('🏗️ Projects data changed:', {
+            totalProjects: projects.length,
+            projectTitles: projects.map(p => p.title),
+            projectDetails: projects.map(p => ({ id: p.id, title: p.title, updated_at: p.updated_at })),
+            timestamp: new Date().toLocaleTimeString()
+        });
+    }, [projects]);
+
+    const createProject = async (project: Omit<Project, 'id' | 'created_at' | 'updated_at'>, language?: string) => {
         try {
+            console.log('Starting project creation...', { project, language });
+
+            // 현재 언어에 맞는 다국어 컬럼도 함께 설정
+            const enhancedProject: any = {
+                ...project,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            // 현재 언어가 있는 경우 다국어 컬럼도 설정
+            if (language) {
+                if (project.title) {
+                    enhancedProject[`title_${language}`] = project.title;
+                }
+                if (project.location) {
+                    enhancedProject[`location_${language}`] = project.location;
+                }
+                if (project.description) {
+                    enhancedProject[`description_${language}`] = project.description;
+                }
+                if (project.features) {
+                    enhancedProject[`features_${language}`] = project.features;
+                }
+            }
+
+            console.log('Enhanced project creation data with multilang:', enhancedProject);
+
             const { data, error } = await supabase
                 .from('projects')
-                .insert({
-                    ...project,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                })
+                .insert(enhancedProject)
                 .select(SELECT_COLUMNS)
                 .single();
 
+            console.log('Project creation result:', { data, error });
+
             if (error) {
+                console.error('Project creation error:', error);
                 return { error };
             }
 
+            console.log('Project created successfully!');
             setProjects(prev => [...prev, data]);
 
             // 캐시 무효화 - 즉시 UI 반영
@@ -102,26 +140,52 @@ export const useProjects = () => {
 
             return { data };
         } catch (error) {
+            console.error('Project creation exception:', error);
             return { error };
         }
     };
 
-    const updateProject = async (id: string, updates: Partial<Omit<Project, 'id' | 'created_at' | 'updated_at'>>) => {
+    const updateProject = async (id: string, updates: Partial<Omit<Project, 'id' | 'created_at' | 'updated_at'>>, language?: string) => {
         try {
+            console.log('Starting project update...', { id, updates, language });
+
+            // 현재 언어에 맞는 다국어 컬럼도 함께 업데이트
+            const enhancedUpdates: any = {
+                ...updates,
+                updated_at: new Date().toISOString()
+            };
+
+            // 현재 언어가 있고 해당 필드가 업데이트되는 경우 다국어 컬럼도 업데이트
+            if (language && updates.title) {
+                enhancedUpdates[`title_${language}`] = updates.title;
+            }
+            if (language && updates.location) {
+                enhancedUpdates[`location_${language}`] = updates.location;
+            }
+            if (language && updates.description) {
+                enhancedUpdates[`description_${language}`] = updates.description;
+            }
+            if (language && updates.features) {
+                enhancedUpdates[`features_${language}`] = updates.features;
+            }
+
+            console.log('Enhanced project form data with multilang:', enhancedUpdates);
+
             const { data, error } = await supabase
                 .from('projects')
-                .update({
-                    ...updates,
-                    updated_at: new Date().toISOString()
-                })
+                .update(enhancedUpdates)
                 .eq('id', id)
                 .select(SELECT_COLUMNS)
                 .single();
 
+            console.log('Project update result:', { data, error });
+
             if (error) {
+                console.error('Project update error:', error);
                 return { error };
             }
 
+            console.log('Project updated successfully!');
             setProjects(prev => prev.map(p => p.id === id ? data : p));
 
             // 캐시 무효화 - 즉시 UI 반영
@@ -130,6 +194,7 @@ export const useProjects = () => {
 
             return { data };
         } catch (error) {
+            console.error('Project update exception:', error);
             return { error };
         }
     };

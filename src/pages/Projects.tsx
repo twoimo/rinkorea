@@ -39,6 +39,16 @@ const Projects = () => {
     fetchHiddenProjects();
   }, []);
 
+  // 디버깅: 프로젝트 데이터 변경 감지 (페이지 레벨)
+  React.useEffect(() => {
+    console.log('🏗️ Projects page data changed:', {
+      totalProjects: projects.length,
+      projectTitles: projects.map(p => p.title),
+      projectDetails: projects.map(p => ({ id: p.id, title: p.title, updated_at: p.updated_at })),
+      timestamp: new Date().toLocaleTimeString()
+    });
+  }, [projects]);
+
   // 숨김/해제 핸들러
   const handleToggleHide = async (projectId: string) => {
     setFormLoading(true);

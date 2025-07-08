@@ -16,7 +16,7 @@ interface ProjectFormProps {
 const ProjectForm: React.FC<ProjectFormProps> = ({ isOpen, editingProject, onClose, onSuccess }) => {
   const { projects, createProject, updateProject } = useProjects();
   const isMobile = useIsMobile();
-  const { language: _language } = useLanguage();
+  const { language } = useLanguage();
   const modalRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number>();
 
@@ -172,6 +172,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ isOpen, editingProject, onClo
 
   const handleFormSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Starting project form save...', { editingProject, formValues, language });
     setFormLoading(true);
     setFormError(null);
     setFormSuccess(null);
@@ -182,16 +183,22 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ isOpen, editingProject, onClo
         features: formValues.features.filter(f => f.trim() !== '')
       };
 
+      console.log('Project form payload:', payload);
+
       let result;
       if (editingProject) {
-        result = await updateProject(editingProject, payload);
+        console.log('Updating project with language:', language);
+        result = await updateProject(editingProject, payload, language);
       } else {
-        result = await createProject(payload);
+        console.log('Creating new project with language:', language);
+        result = await createProject(payload, language);
       }
 
       if (result.error) {
+        console.error('Project form save error:', result.error);
         setFormError(result.error.message);
       } else {
+        console.log('Project form saved successfully!');
         setFormSuccess('저장되었습니다.');
         setTimeout(() => {
           onSuccess();
