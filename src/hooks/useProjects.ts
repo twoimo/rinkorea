@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { invalidateQueries, queryClient, QUERY_KEYS } from '@/lib/query-client';
+import React from 'react';
 
 export interface Project {
     id: string;
@@ -28,21 +30,7 @@ export interface Project {
     features_zh?: string[];
 }
 
-const SELECT_COLUMNS = `
-  *,
-  title_ko,
-  title_en,
-  title_zh,
-  location_ko,
-  location_en,
-  location_zh,
-  description_ko,
-  description_en,
-  description_zh,
-  features_ko,
-  features_en,
-  features_zh
-`;
+const SELECT_COLUMNS = `*`;
 
 export const useProjects = () => {
     const [projects, setProjects] = useState<Project[]>([]);
@@ -52,6 +40,26 @@ export const useProjects = () => {
     useEffect(() => {
         fetchProjects();
     }, [user]);
+
+    // React Query 캐시 변경 이벤트 구독
+    useEffect(() => {
+        const unsubscribe = queryClient.getQueryCache().subscribe(({ query, type }) => {
+            // Projects 관련 쿼리 캐시가 무효화되면 데이터 새로고침
+            if (type === 'removed' || type === 'updated') {
+                const queryKey = query.queryKey[0];
+                if (typeof queryKey === 'string' && (
+                    queryKey === QUERY_KEYS.PROJECTS.ALL ||
+                    queryKey === QUERY_KEYS.PROJECTS.VISIBLE ||
+                    queryKey.startsWith('project-')
+                )) {
+                    console.log('Projects cache invalidated, refetching...');
+                    fetchProjects();
+                }
+            }
+        });
+
+        return unsubscribe;
+    }, []);
 
     const fetchProjects = async () => {
         try {
@@ -72,48 +80,143 @@ export const useProjects = () => {
         }
     };
 
-    const createProject = async (project: Omit<Project, 'id' | 'created_at' | 'updated_at'>) => {
+    // 디버깅: 프로젝트 데이터 변경 감지
+    React.useEffect(() => {
+        console.log('🏗️ Projects data changed:', {
+            totalProjects: projects.length,
+            projectTitles: projects.map(p => p.title),
+            projectDetails: projects.map(p => ({ id: p.id, title: p.title, updated_at: p.updated_at })),
+            timestamp: new Date().toLocaleTimeString()
+        });
+    }, [projects]);
+
+    const createProject = async (project: Omit<Project, 'id' | 'created_at' | 'updated_at'>, language?: string) => {
         try {
+            console.log('Starting project creation...', { project, language });
+
+            // 현재 언어에 맞는 다국어 컬럼도 함께 설정
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const enhancedProject: any = {
+                ...project,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            // 현재 언어가 있는 경우 다국어 컬럼도 설정
+            if (language) {
+                if (project.title) {
+                    enhancedProject[`title_${language}`] = project.title;
+                }
+                if (project.location) {
+                    enhancedProject[`location_${language}`] = project.location;
+                }
+                if (project.description) {
+                    enhancedProject[`description_${language}`] = project.description;
+                }
+                if (project.features) {
+                    enhancedProject[`features_${language}`] = project.features;
+                }
+            }
+
+            console.log('Enhanced project creation data with multilang:', enhancedProject);
+
             const { data, error } = await supabase
                 .from('projects')
-                .insert({
-                    ...project,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                })
+                .insert(enhancedProject)
                 .select(SELECT_COLUMNS)
                 .single();
 
+            console.log('Project creation result:', { data, error });
+
             if (error) {
+                console.error('Project creation error:', error);
                 return { error };
             }
 
-            setProjects(prev => [...prev, data]);
+            console.log('Project created successfully!');
+            // 불변성을 보장하면서 새 프로젝트 추가
+            setProjects(prev => {
+                const newProjects = [...prev, { ...data }];
+                console.log('Added new project to state:', {
+                    previousLength: prev.length,
+                    newLength: newProjects.length,
+                    newProject: data,
+                    newProjectTitle: data.title
+                });
+                return newProjects;
+            });
+
+            // 캐시 무효화 - 즉시 UI 반영
+            invalidateQueries.projects();
+
             return { data };
         } catch (error) {
+            console.error('Project creation exception:', error);
             return { error };
         }
     };
 
-    const updateProject = async (id: string, updates: Partial<Omit<Project, 'id' | 'created_at' | 'updated_at'>>) => {
+    const updateProject = async (id: string, updates: Partial<Omit<Project, 'id' | 'created_at' | 'updated_at'>>, language?: string) => {
         try {
+            console.log('Starting project update...', { id, updates, language });
+
+            // 현재 언어에 맞는 다국어 컬럼도 함께 업데이트
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const enhancedUpdates: any = {
+                ...updates,
+                updated_at: new Date().toISOString()
+            };
+
+            // 현재 언어가 있고 해당 필드가 업데이트되는 경우 다국어 컬럼도 업데이트
+            if (language && updates.title) {
+                enhancedUpdates[`title_${language}`] = updates.title;
+            }
+            if (language && updates.location) {
+                enhancedUpdates[`location_${language}`] = updates.location;
+            }
+            if (language && updates.description) {
+                enhancedUpdates[`description_${language}`] = updates.description;
+            }
+            if (language && updates.features) {
+                enhancedUpdates[`features_${language}`] = updates.features;
+            }
+
+            console.log('Enhanced project form data with multilang:', enhancedUpdates);
+
             const { data, error } = await supabase
                 .from('projects')
-                .update({
-                    ...updates,
-                    updated_at: new Date().toISOString()
-                })
+                .update(enhancedUpdates)
                 .eq('id', id)
                 .select(SELECT_COLUMNS)
                 .single();
 
+            console.log('Project update result:', { data, error });
+
             if (error) {
+                console.error('Project update error:', error);
                 return { error };
             }
 
-            setProjects(prev => prev.map(p => p.id === id ? data : p));
+            console.log('Project updated successfully!');
+            // 불변성을 보장하면서 상태 업데이트
+            setProjects(prev => {
+                const newProjects = prev.map(p => p.id === id ? { ...data } : p);
+                console.log('Updated projects state:', {
+                    previousLength: prev.length,
+                    newLength: newProjects.length,
+                    updatedProject: data,
+                    updatedProjectTitle: data.title
+                });
+                return newProjects;
+            });
+
+            // 캐시 무효화 - 즉시 UI 반영
+            invalidateQueries.projects();
+            invalidateQueries.project(id);
+
             return { data };
         } catch (error) {
+            console.error('Project update exception:', error);
             return { error };
         }
     };
@@ -130,6 +233,11 @@ export const useProjects = () => {
             }
 
             setProjects(prev => prev.filter(p => p.id !== id));
+
+            // 캐시 무효화 - 즉시 UI 반영
+            invalidateQueries.projects();
+            invalidateQueries.project(id);
+
             return { data: null };
         } catch (error) {
             return { error };

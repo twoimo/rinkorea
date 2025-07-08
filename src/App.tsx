@@ -2,12 +2,13 @@ import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import ErrorBoundary from "@/components/error-boundary";
 import PageSkeleton from "@/components/ui/page-skeleton";
+import { queryClient } from "@/lib/query-client";
 
 // Lazy load pages with prefetch
 const Index = lazy(() => import("./pages/Index"));
@@ -26,19 +27,6 @@ const Profile = lazy(() => import("./pages/Profile"));
 const AdminDangerZone = lazy(() => import("./pages/AdminDangerZone"));
 const RevenueManagement = lazy(() => import("./pages/RevenueManagement"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-
-// Configure QueryClient with optimized settings for mobile
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
-      retry: 1,
-      refetchOnWindowFocus: false,
-      networkMode: 'offlineFirst', // Optimize for mobile networks
-    },
-  },
-});
 
 // Enhanced loading fallback component with skeleton UI
 const PageLoader = () => <PageSkeleton />;

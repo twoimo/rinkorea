@@ -37,6 +37,20 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   const localizedDescription = getLocalizedValue(project, 'description', language);
   const localizedFeatures = getLocalizedArray(project, 'features', language);
 
+  // 디버깅: 프로젝트 카드 데이터 변경 감지
+  React.useEffect(() => {
+    console.log(`🎴 ProjectCard ${project.id} data:`, {
+      projectTitle: project.title,
+      projectData: project,
+      localizedTitle,
+      localizedLocation,
+      localizedDescription,
+      language,
+      updated_at: project.updated_at,
+      timestamp: new Date().toLocaleTimeString()
+    });
+  }, [project, localizedTitle, localizedLocation, localizedDescription, language]);
+
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden group relative w-full h-full flex flex-col">
       <div className="relative w-full h-[210px] sm:h-[260px] overflow-hidden">

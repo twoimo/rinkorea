@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { invalidateQueries, queryClient, QUERY_KEYS } from '@/lib/query-client';
 
 interface Inquiry {
   id: string;
@@ -61,6 +62,26 @@ export const useInquiries = () => {
     fetchInquiries();
   }, [fetchInquiries, user]);
 
+  // React Query 캐시 변경 이벤트 구독
+  useEffect(() => {
+    const unsubscribe = queryClient.getQueryCache().subscribe(({ query, type }) => {
+      // Inquiries 관련 쿼리 캐시가 무효화되면 데이터 새로고침
+      if (type === 'removed' || type === 'updated') {
+        const queryKey = query.queryKey[0];
+        if (typeof queryKey === 'string' && (
+          queryKey === QUERY_KEYS.INQUIRIES.ALL ||
+          queryKey.startsWith('inquiry-') ||
+          queryKey.startsWith('inquiry-replies-')
+        )) {
+          console.log('Inquiries cache invalidated, refetching...');
+          fetchInquiries();
+        }
+      }
+    });
+
+    return unsubscribe;
+  }, [fetchInquiries]);
+
   const createInquiry = async (inquiry: {
     name: string;
     email: string;
@@ -85,6 +106,10 @@ export const useInquiries = () => {
       }
 
       setInquiries(prev => [data, ...prev]);
+
+      // 캐시 무효화 - 즉시 UI 반영
+      invalidateQueries.inquiries();
+
       return { data };
     } catch (error) {
       return { error };
@@ -119,6 +144,11 @@ export const useInquiries = () => {
       setInquiries(prev => prev.map(inquiry =>
         inquiry.id === id ? data : inquiry
       ));
+
+      // 캐시 무효화 - 즉시 UI 반영
+      invalidateQueries.inquiries();
+      invalidateQueries.inquiry(id);
+
       return { data };
     } catch (error) {
       return { error };
@@ -137,6 +167,11 @@ export const useInquiries = () => {
       }
 
       setInquiries(prev => prev.filter(inquiry => inquiry.id !== id));
+
+      // 캐시 무효화 - 즉시 UI 반영
+      invalidateQueries.inquiries();
+      invalidateQueries.inquiry(id);
+
       return { success: true };
     } catch (error) {
       return { error };
@@ -183,6 +218,11 @@ export const useInquiries = () => {
         inquiry.id === inquiryId ? inquiryData : inquiry
       ));
 
+      // 캐시 무효화 - 즉시 UI 반영
+      invalidateQueries.inquiries();
+      invalidateQueries.inquiry(inquiryId);
+      invalidateQueries.inquiryReplies(inquiryId);
+
       return replyData;
     } catch (error) {
       console.error('Error in createReply:', error);
@@ -197,7 +237,12 @@ export const useInquiries = () => {
       .eq('id', replyId)
       .select()
       .single();
+
     if (error) throw error;
+
+    // 캐시 무효화 - 즉시 UI 반영
+    invalidateQueries.inquiries();
+
     return data;
   };
 
@@ -247,6 +292,12 @@ export const useInquiries = () => {
           inquiry.id === reply.inquiry_id ? inquiryData : inquiry
         ));
       }
+
+      // 캐시 무효화 - 즉시 UI 반영
+      invalidateQueries.inquiries();
+      invalidateQueries.inquiry(reply.inquiry_id);
+      invalidateQueries.inquiryReplies(reply.inquiry_id);
+
     } catch (error) {
       console.error('Error in deleteReply:', error);
       throw error;

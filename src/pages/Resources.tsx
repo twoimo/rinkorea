@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ResourcesHero from '../components/resources/ResourcesHero';
@@ -21,7 +21,7 @@ const Resources = () => {
     } = useResourcesAdmin();
 
     const { isAdmin } = useUserRole();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
 
     const [showForm, setShowForm] = useState(false);
     const [editingResource, setEditingResource] = useState<string | null>(null);
@@ -31,7 +31,8 @@ const Resources = () => {
         : null;
 
     const handleCreateResource = async (resourceData: Parameters<typeof createResource>[0]) => {
-        const result = await createResource(resourceData);
+        console.log('Resources page: creating resource with language:', language);
+        const result = await createResource(resourceData, language);
         if (!result.error) {
             setShowForm(false);
             refetch();
@@ -41,7 +42,8 @@ const Resources = () => {
     const handleUpdateResource = async (resourceData: Parameters<typeof updateResource>[1]) => {
         if (!editingResource) return;
 
-        const result = await updateResource(editingResource, resourceData);
+        console.log('Resources page: updating resource with language:', language);
+        const result = await updateResource(editingResource, resourceData, language);
         if (!result.error) {
             setEditingResource(null);
             refetch();
@@ -69,6 +71,16 @@ const Resources = () => {
     const handleDownload = async (resourceId: string, fileName: string, fileUrl: string) => {
         await downloadResource(resourceId, fileName, fileUrl);
     };
+
+    // 디버깅: 자료 데이터 변경 감지
+    useEffect(() => {
+        console.log('📚 Resources data changed:', {
+            totalResources: resources.length,
+            resourceTitles: resources.map(r => r.title),
+            resourceDetails: resources.map(r => ({ id: r.id, title: r.title, updated_at: r.updated_at })),
+            timestamp: new Date().toLocaleTimeString()
+        });
+    }, [resources]);
 
     if (loading) {
         return (

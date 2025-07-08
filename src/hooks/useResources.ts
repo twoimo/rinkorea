@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
+import { queryClient, QUERY_KEYS } from '@/lib/query-client';
 
 export interface Resource {
     id: string;
@@ -89,6 +90,26 @@ export const useResources = () => {
             setLoading(false);
         }
     }, [isAdmin]);
+
+    // React Query 캐시 변경 이벤트 구독
+    useEffect(() => {
+        const unsubscribe = queryClient.getQueryCache().subscribe(({ query, type }) => {
+            // Resources 관련 쿼리 캐시가 무효화되면 데이터 새로고침
+            if (type === 'removed' || type === 'updated') {
+                const queryKey = query.queryKey[0];
+                if (typeof queryKey === 'string' && (
+                    queryKey === QUERY_KEYS.RESOURCES.ALL ||
+                    queryKey === QUERY_KEYS.RESOURCES.ACTIVE ||
+                    queryKey.startsWith('resource-')
+                )) {
+                    console.log('Resources cache invalidated, refetching...');
+                    fetchResources();
+                }
+            }
+        });
+
+        return unsubscribe;
+    }, [fetchResources]);
 
     useEffect(() => {
         fetchResources();
@@ -194,8 +215,6 @@ export const useResources = () => {
             });
         }
     };
-
-
 
     return {
         resources: filteredResources,

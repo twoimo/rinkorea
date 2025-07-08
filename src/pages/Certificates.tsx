@@ -92,31 +92,44 @@ const Certificates = () => {
   };
 
   const handleFormSave = async (formValues: Partial<Certificate>) => {
+    console.log('Starting certificate save...', { editingCertificate: editingCertificate?.id, formValues, language });
     setFormLoading(true);
     setFormError(null);
     setFormSuccess(null);
 
     try {
+      // 현재 언어에 맞는 다국어 컬럼도 함께 업데이트
       const payload = {
         ...formValues,
         updated_at: new Date().toISOString(),
+        // 현재 언어에 맞는 다국어 컬럼 강제 업데이트
+        [`name_${language}`]: formValues.name || '',
+        [`description_${language}`]: formValues.description || '',
       };
+
+      console.log('Enhanced certificate form data with multilang:', payload);
 
       let result;
       if (editingCertificate) {
+        console.log('Updating certificate:', editingCertificate.id);
         result = await (supabase as unknown as SupabaseClient)
           .from('certificates')
           .update(payload)
           .eq('id', editingCertificate.id);
+        console.log('Certificate update result:', result);
       } else {
+        console.log('Creating new certificate');
         result = await (supabase as unknown as SupabaseClient)
           .from('certificates')
           .insert([{ ...payload, created_at: new Date().toISOString(), is_active: true }]);
+        console.log('Certificate create result:', result);
       }
 
       if (result.error) {
+        console.error('Certificate save error:', result.error);
         setFormError(result.error.message);
       } else {
+        console.log('Certificate saved successfully!');
         setFormSuccess(editingCertificate ? t('certificates_updated', '인증서가 수정되었습니다.') : t('certificates_added', '인증서가 추가되었습니다.'));
         setTimeout(closeForm, 1500);
         await fetchCertificates();
@@ -202,6 +215,16 @@ const Certificates = () => {
     };
     loadData();
   }, []);
+
+  // 디버깅: 인증서 데이터 변경 감지
+  React.useEffect(() => {
+    console.log('🏆 Certificates data changed:', {
+      totalCertificates: certificates.length,
+      certificateNames: certificates.map(c => c.name),
+      certificateDetails: certificates.map(c => ({ id: c.id, name: c.name, updated_at: c.updated_at })),
+      timestamp: new Date().toLocaleTimeString()
+    });
+  }, [certificates]);
 
   // 인증서 이미지 클릭 핸들러에 다국어 지원 추가
   const handleCertificateImageClick = (certificate: Certificate) => {

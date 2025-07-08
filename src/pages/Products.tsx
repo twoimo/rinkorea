@@ -35,8 +35,20 @@ const Products = memo(() => {
     toggleProductVisibility,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    products
   } = useProducts();
+
+  // 디버깅: 제품 데이터 변경 감지
+  React.useEffect(() => {
+    console.log('🔍 Products data changed:', {
+      visibleProducts: visibleProducts.length,
+      totalProducts: products.length,
+      productNames: visibleProducts.map(p => p.name),
+      productDetails: visibleProducts.map(p => ({ id: p.id, name: p.name, updated_at: p.updated_at })),
+      timestamp: new Date().toLocaleTimeString()
+    });
+  }, [visibleProducts, products]);
   const { t, language } = useLanguage();
 
   // UI state
@@ -106,31 +118,49 @@ const Products = memo(() => {
   }, []);
 
   const handleFormSave = useCallback(async (formData: ProductFormData) => {
+    console.log('Starting product save...', { editingProduct: editingProduct?.id, formData });
     setFormLoading(true);
     setFormError(null);
     setFormSuccess(null);
 
     try {
+      // 현재 언어에 맞는 다국어 컬럼도 함께 업데이트
+      const enhancedFormData = {
+        ...formData,
+        // 현재 언어에 맞는 다국어 컬럼 업데이트
+        [`name_${language}`]: formData.name,
+        [`description_${language}`]: formData.description,
+        [`features_${language}`]: formData.features,
+      };
+
+      console.log('Enhanced form data with multilang:', enhancedFormData);
+
       let result;
       if (editingProduct) {
-        result = await updateProduct(editingProduct.id, formData);
+        console.log('Updating product:', editingProduct.id);
+        result = await updateProduct(editingProduct.id, enhancedFormData);
+        console.log('Update result:', result);
       } else {
-        result = await createProduct(formData);
+        console.log('Creating new product');
+        result = await createProduct(enhancedFormData);
+        console.log('Create result:', result);
       }
 
       if (result?.error) {
-        setFormError(result.error.message || 'An error occurred');
+        console.error('Product save error:', result.error);
+        setFormError(result.error.message || result.error || 'An error occurred');
       } else {
+        console.log('Product saved successfully!');
         setFormSuccess(editingProduct ? t('products_save_success', '제품이 수정되었습니다.') : t('products_add_success', '제품이 추가되었습니다.'));
         setTimeout(handleCloseForm, 1500);
       }
     } catch (_err) {
-      console.error('Error updating product:', _err);
+      console.error('Error in handleFormSave:', _err);
       setFormError(t('products_error_occurred', '오류가 발생했습니다.'));
     } finally {
       setFormLoading(false);
     }
-  }, [editingProduct, updateProduct, createProduct, handleCloseForm, t]);
+  }, [editingProduct, updateProduct, createProduct, handleCloseForm, t, language]);
 
   const handleDelete = useCallback(async () => {
     if (!deleteTarget) return;
@@ -249,7 +279,7 @@ const Products = memo(() => {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  index={index}
+                  _index={index}
                   isHidden={hiddenProductIds.includes(product.id)}
                   isAdmin={isAdmin}
                   onEdit={handleOpenForm}
