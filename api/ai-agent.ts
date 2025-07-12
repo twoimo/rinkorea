@@ -178,7 +178,7 @@ class UnifiedAIAgent {
         return { response: mainResponse, follow_up_questions: followUpQuestions };
     }
 
-    private getSystemPrompt(functionType: AIFunctionType, isAdmin: boolean): string {
+    private getSystemPrompt(functionType: AIFunctionType, _isAdmin: boolean): string {
         const basePrompt = `
 당신은 건설 화학 소재 전문 기업 린코리아(RIN Korea)의 최고 성능 AI 어시스턴트입니다. 당신의 임무는 고객에게 린코리아의 혁신적인 제품 포트폴리오에 대한 정확하고, 상세하며, 전문적인 정보를 제공하는 것입니다. 항상 전문가적이면서도 친절하고 이해하기 쉬운 톤앤매너를 유지해야 합니다.
 
@@ -210,7 +210,7 @@ class UnifiedAIAgent {
 
 ### 예시 질문/답변/마커
 - 예시 질문: "모든 제품 라인업을 카드로 보여줘"
-- 예시 답변: [SHOW_PRODUCT:1047990b-6c4c-4c32-b1b6-3495558dffd5,1917f9fb-3e1f-44f6-8f96-f46ee2a08c68,2c862bd6-8cda-4abb-9034-9a72111327ff,35648bf3-ff37-4fb1-821d-4c7d8135c2f2,5465f2dc-2a9b-416a-9b70-a28b02cf198f,7d957892-f2b8-4f74-9306-aea307046ec5,ba276c55-586f-436d-b31a-5ef868ef3671,cb2f2e0d-3c46-404d-9eb7-ffb68007bb7b,d8bf80ce-6114-4e65-a13d-848d9e3fca04,df1a1fa3-b2ff-4daf-ab4f-9322237e3ebf,f818ac30-fa89-4639-a7d1-400be62d3e3f]
+- 예시 답변: [SHOW_PRODUCT:05a8179d-4770-43ac-b87b-e9da7292d507,5f9d9c99-89e9-46c1-b69e-15b893f46f6c,845faaf3-823d-480d-84f8-312d766938cb,aa41abd9-ea55-4599-8434-cd5b0fe60c97,ba276c55-586f-436d-b31a-5ef868ef3671,cb2f2e0d-3c46-404d-9eb7-ffb68007bb7b,d8bf80ce-6114-4e65-a13d-848d9e3fca04,df1a1fa3-b2ff-4daf-ab4f-9322237e3ebf,f818ac30-fa89-4639-a7d1-400be62d3e3f]
 - 예시 질문: "모든 장비를 카드로 보여줘"
 - 예시 답변: [SHOW_EQUIPMENT:29256648-164f-4a9d-8d9a-4823096ea935,37fe54be-01a2-43bc-876e-58ead5ddfc5c,3d220418-fd14-47f6-a3fc-7d8eade75dbb,4e621b8c-25fc-434e-93bc-893a4879f16f,51efed24-52f6-43f1-b7aa-9057464301ff,5f695782-96bc-462f-801d-39612ccbf0a7,87b099a3-0e0e-4e01-8bcb-17b6367717ae,92b44fcb-a172-4750-83fb-5e1b38f7cc1b,9317465d-3b3c-493f-a4fd-0631b35c3a37,cd8be494-f97a-4a0f-8389-d7b310865fd8,ee89de11-c38b-4847-afcd-8ba23360ee35,ff1aef86-a395-4c4a-8084-9f2b45e2b116]
 - 예시 질문: "모든 프로젝트를 카드로 보여줘"
@@ -227,12 +227,10 @@ class UnifiedAIAgent {
 ### Knowledge Base (uuid 포함)
 
 #### 제품
-1047990b-6c4c-4c32-b1b6-3495558dffd5: 린코리아 불연 세라믹 코팅제(1액형) 린코트 2KG/4KG
-1917f9fb-3e1f-44f6-8f96-f46ee2a08c68: 린코리아 불연 세라믹 코팅제(1액형) 린코트 18KG
-2c862bd6-8cda-4abb-9034-9a72111327ff: 린코리아 콘크리트 실러 표면코팅제 린씰플러스 20KG
-35648bf3-ff37-4fb1-821d-4c7d8135c2f2: 린코리아 고성능 침투 방수제 18L
-5465f2dc-2a9b-416a-9b70-a28b02cf198f: 린코리아 콘크리트 표면강화제 린하드 플러스 20KG
-7d957892-f2b8-4f74-9306-aea307046ec5: 린코리아 고성능 침투성 방수제 4L
+05a8179d-4770-43ac-b87b-e9da7292d507: RIN-ONE COAT(RK-61)
+5f9d9c99-89e9-46c1-b69e-15b893f46f6c: RIN-SEAL PLUS
+845faaf3-823d-480d-84f8-312d766938cb: RIN-HARD ACE
+aa41abd9-ea55-4599-8434-cd5b0fe60c97: 고성능 침투성 방수제
 ba276c55-586f-436d-b31a-5ef868ef3671: RIN-ONE COAT
 cb2f2e0d-3c46-404d-9eb7-ffb68007bb7b: RIN-HARD PLUS
 d8bf80ce-6114-4e65-a13d-848d9e3fca04: RIN-COAT
