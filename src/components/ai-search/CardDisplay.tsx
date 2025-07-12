@@ -28,6 +28,8 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
     const [certificates, setCertificates] = useState<any[]>([]);
     const [shopProducts, setShopProducts] = useState<any[]>([]);
     const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+    // 여러 마커 그룹 지원
+    const [visibleGroupIndex, setVisibleGroupIndex] = useState(0);
 
     // 이미지 URL 처리 함수
     const getImageUrl = (imagePath: string) => {
@@ -79,7 +81,13 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
 
     useEffect(() => {
         setVisibleCount(PAGE_SIZE); // type/ids 바뀌면 초기화
+        setVisibleGroupIndex(0); // 그룹도 초기화
     }, [data.type, data.ids]);
+
+    // ids가 배열의 배열(그룹)인지 판별
+    const isGrouped = Array.isArray(data.ids) && Array.isArray(data.ids[0]);
+    const groupCount = isGrouped ? data.ids.length : 1;
+    const currentIds = isGrouped ? data.ids[visibleGroupIndex] : data.ids;
 
     // 디버깅: AI 마커 uuid와 프론트 products uuid 비교
     useEffect(() => {
@@ -104,26 +112,28 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
     const filteredItems = useMemo(() => {
         switch (data.type) {
             case 'products':
-                return products.filter(product => data.ids.includes(product.id));
+                return products.filter(product => currentIds.includes(product.id));
             case 'projects':
-                return projects.filter(project => data.ids.includes(project.id));
+                return projects.filter(project => currentIds.includes(project.id));
             case 'equipment':
-                return equipment.filter(eq => data.ids.includes(eq.id));
+                return equipment.filter(eq => currentIds.includes(eq.id));
             case 'resources':
-                return resources.filter(resource => data.ids.includes(resource.id));
+                return resources.filter(resource => currentIds.includes(resource.id));
             case 'certificates':
-                return certificates.filter(cert => data.ids.includes(cert.id));
+                return certificates.filter(cert => currentIds.includes(cert.id));
             case 'shop':
-                return shopProducts.filter(product => data.ids.includes(product.id));
+                return shopProducts.filter(product => currentIds.includes(product.id));
             default:
                 return [];
         }
-    }, [data.type, data.ids, products, projects, equipment, resources, certificates, shopProducts]);
+    }, [data.type, currentIds, products, projects, equipment, resources, certificates, shopProducts]);
 
     // 실제 보여줄 카드 (페이지네이션 적용)
+    // 그룹이 1개일 때만 10개씩 페이지네이션, 그룹이 여러 개면 그룹 단위로만 보여줌
     const pagedItems = useMemo(() => {
+        if (isGrouped) return filteredItems;
         return filteredItems.slice(0, visibleCount);
-    }, [filteredItems, visibleCount]);
+    }, [filteredItems, visibleCount, isGrouped]);
 
     const _handleProductEdit = (_product: any) => {
         // AI 검색 모달에서는 편집 기능 비활성화
@@ -195,7 +205,7 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
                     {data.type === 'resources' && t('related_resources', '관련 자료')}
                     {data.type === 'certificates' && t('related_certificates', '관련 인증서')}
                     {data.type === 'shop' && t('related_shop_products', '관련 온라인 스토어 제품')}
-                    ({filteredItems.length})
+                    {isGrouped ? `(${visibleGroupIndex + 1} / ${groupCount})` : `(${filteredItems.length})`}
                 </h4>
             </div>
 
@@ -576,16 +586,29 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
                     </div>
                 ))}
             </div>
-            {/* 더 보기 버튼 */}
-            {filteredItems.length > visibleCount && (
-                <div className="flex justify-center mt-4">
-                    <button
-                        onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
-                        className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
-                    >
-                        더 보기 ({visibleCount} / {filteredItems.length})
-                    </button>
-                </div>
+            {/* 더 보기 버튼: 그룹이 여러 개면 그룹 단위, 1개면 기존 10개씩 */}
+            {isGrouped ? (
+                visibleGroupIndex < groupCount - 1 && (
+                    <div className="flex justify-center mt-4">
+                        <button
+                            onClick={() => setVisibleGroupIndex(i => i + 1)}
+                            className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
+                        >
+                            더 보기 ({visibleGroupIndex + 1} / {groupCount})
+                        </button>
+                    </div>
+                )
+            ) : (
+                filteredItems.length > visibleCount && (
+                    <div className="flex justify-center mt-4">
+                        <button
+                            onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+                            className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
+                        >
+                            더 보기 ({visibleCount} / {filteredItems.length})
+                        </button>
+                    </div>
+                )
             )}
         </div>
     );
