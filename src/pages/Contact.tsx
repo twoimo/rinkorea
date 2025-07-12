@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import { FastImage } from '@/components/ui/fast-image';
 import { useLanguage } from '../contexts/LanguageContext';
 import { SEOHead } from '@/components/seo/SEOHead';
+import LocationMap from '@/components/ui/LocationMap';
 
 const Contact = () => {
   const { t, language } = useLanguage();
@@ -107,22 +108,32 @@ const Contact = () => {
               </div>
             </div>
 
-            {/* 사업자 정보 */}
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 md:p-6">
-              <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4">{t('contact_business_info')}</h3>
-              <div className="space-y-2 md:space-y-3 text-gray-600">
-                <div className="flex flex-col md:flex-row">
-                  <span className="font-medium text-gray-700 mb-1 md:mb-0 md:mr-2 text-sm md:text-base">{t('contact_company_name')}:</span>
-                  <span className="text-sm md:text-base">{t('contact_company_name_value')}</span>
+            {/* 위치 지도 */}
+            <div className="bg-white border border-gray-200 rounded-xl p-4 md:p-6 shadow-sm">
+              <div className="flex items-center mb-4">
+                <div className="bg-indigo-100 p-3 rounded-lg mr-4 flex-shrink-0">
+                  <MapPin className="w-5 h-5 md:w-6 md:h-6 text-indigo-600" />
                 </div>
-                <div className="flex flex-col md:flex-row">
-                  <span className="font-medium text-gray-700 mb-1 md:mb-0 md:mr-2 text-sm md:text-base">{t('contact_business_number')}:</span>
-                  <span className="text-sm md:text-base">{t('contact_business_number_value')}</span>
+                <div>
+                  <h3 className="text-base md:text-lg font-semibold text-gray-900">
+                    {language === 'ko' ? '오시는 길' :
+                      language === 'en' ? 'Location & Directions' :
+                        '位置及交通路线'}
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {language === 'ko' ? '지도에서 정확한 위치를 확인하세요' :
+                      language === 'en' ? 'Check our exact location on the map' :
+                        '在地图上查看我们的确切位置'}
+                  </p>
                 </div>
-                <div className="flex flex-col md:flex-row">
-                  <span className="font-medium text-gray-700 mb-1 md:mb-0 md:mr-2 text-sm md:text-base">{t('contact_ceo')}:</span>
-                  <span className="text-sm md:text-base">{t('contact_ceo_value')}</span>
-                </div>
+              </div>
+              <LocationMap className="h-96" />
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  {language === 'ko' ? '💡 마커를 클릭하면 구글 지도에서 길찾기를 할 수 있습니다.' :
+                    language === 'en' ? '💡 Click the marker to get directions on Google Maps.' :
+                      '💡 点击标记可在谷歌地图中获取路线指引。'}
+                </p>
               </div>
             </div>
 
@@ -174,6 +185,26 @@ const Contact = () => {
                 </a>
               </div>
             </div>
+
+            {/* 사업자 정보 */}
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 md:p-6">
+              <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4">{t('contact_business_info')}</h3>
+              <div className="space-y-2 md:space-y-3 text-gray-600">
+                <div className="flex flex-col md:flex-row">
+                  <span className="font-medium text-gray-700 mb-1 md:mb-0 md:mr-2 text-sm md:text-base">{t('contact_company_name')}:</span>
+                  <span className="text-sm md:text-base">{t('contact_company_name_value')}</span>
+                </div>
+                <div className="flex flex-col md:flex-row">
+                  <span className="font-medium text-gray-700 mb-1 md:mb-0 md:mr-2 text-sm md:text-base">{t('contact_business_number')}:</span>
+                  <span className="text-sm md:text-base">{t('contact_business_number_value')}</span>
+                </div>
+                <div className="flex flex-col md:flex-row">
+                  <span className="font-medium text-gray-700 mb-1 md:mb-0 md:mr-2 text-sm md:text-base">{t('contact_ceo')}:</span>
+                  <span className="text-sm md:text-base">{t('contact_ceo_value')}</span>
+                </div>
+              </div>
+            </div>
+
 
             {/* 빠른 연락 버튼 - 모바일 전용 */}
             <div className="block md:hidden">

@@ -73,7 +73,7 @@ const translations = {
 
         // Footer
         footer_company_info: '회사 정보',
-        footer_address: '인천광역시 서구 백범로 707 (주안국가산업단지)',
+        footer_address: '인천광역시 서구 백범로 707',
         footer_business_number: '사업자등록번호: 747-42-00526',
         footer_quick_links: '바로가기',
         footer_customer_service: '고객센터',

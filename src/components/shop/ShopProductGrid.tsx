@@ -124,11 +124,11 @@ const ShopProductGrid = ({
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-auto">
                 <div className="flex flex-col">
                   {product.original_price && (
-                    <del className="text-sm text-gray-400">
+                    <del className="text-sm text-gray-400 whitespace-nowrap">
                       {currencyLoading ? '...' : formatPrice(product.original_price)}
                     </del>
                   )}
-                  <span className="text-xl font-bold text-blue-600">
+                  <span className="text-xl font-bold text-blue-600 whitespace-nowrap">
                     {currencyLoading ? '...' : formatPrice(product.price)}
                   </span>
                 </div>
