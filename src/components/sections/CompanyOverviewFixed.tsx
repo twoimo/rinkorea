@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, FileText, Building2, ArrowRight, Phone } from 'lucide-react';
-import { FastImage } from '@/components/ui/fast-image';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const CompanyOverview = () => {
@@ -111,11 +110,14 @@ const CompanyOverview = () => {
             <div className="relative">
               {/* Main Image Container */}
               <div className="relative rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-700">
-                <FastImage
-                  src={getImageUrl("company_intro")}
-                  alt="린코리아 제품"
-                  className="w-full h-auto object-contain"
-                  priority={true}
+                <img
+                  src={getImageUrl("company_intro.jpg")}
+                  alt="린코리아 소개"
+                  className="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                  loading="eager"
+                  onError={(e) => {
+                    console.warn('Company intro image failed to load:', e.currentTarget.src);
+                  }}
                 />
 
                 {/* Overlay Content */}
