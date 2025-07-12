@@ -83,7 +83,15 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
                 console.warn('DB에 없는 uuid:', missing);
             }
         }
-    }, [data.type, data.ids, products]);
+        if (data.type === 'projects') {
+            console.log('AI 마커 uuid:', data.ids);
+            console.log('프론트 projects:', projects.map(p => ({ id: p.id, title: p.title })));
+            const missing = data.ids.filter(id => !projects.some(p => p.id === id));
+            if (missing.length > 0) {
+                console.warn('DB에 없는 프로젝트 uuid:', missing);
+            }
+        }
+    }, [data.type, data.ids, products, projects]);
 
     const filteredItems = useMemo(() => {
         switch (data.type) {
