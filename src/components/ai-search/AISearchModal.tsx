@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import QuoteDisplay from './QuoteDisplay';
+import CardDisplay from './CardDisplay';
 
 interface AISearchModalProps {
     onClose: () => void;
@@ -59,9 +60,9 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
             icon: MessageCircle,
             color: 'bg-blue-500',
             examples: [
-                { text: '린코트 제품의 특징은 무엇인가요?' },
-                { text: '콘크리트 바닥에 사용할 수 있는 제품을 추천해주세요.' },
-                { text: '제품 구매는 어떻게 하나요?' },
+                { text: '린코트 제품을 보여주세요' },
+                { text: '온라인 스토어 제품을 보여주세요' },
+                { text: '모든 제품 라인업을 보여주세요' },
             ],
         },
         {
@@ -71,9 +72,9 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
             icon: HelpCircle,
             color: 'bg-green-500',
             examples: [
-                { text: '제품 시공 방법이 궁금합니다.' },
-                { text: '시험성적서를 받을 수 있나요?' },
-                { text: '불연재 관련 인증 자료를 찾아주세요.' },
+                { text: '린코트 시공 방법과 관련 프로젝트를 보여주세요' },
+                { text: '현대건설기계 군산공장 프로젝트를 보여주세요' },
+                { text: '교육시설 적용 사례를 찾아주세요' },
             ],
         },
         {
@@ -95,9 +96,9 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
             icon: Search,
             color: 'bg-orange-500',
             examples: [
-                { text: '린씰플러스의 기술 데이터 시트를 찾아줘.' },
-                { text: '최근에 진행된 주요 프로젝트 목록을 보여줘.' },
-                { text: '2024년 2분기 매출 보고서를 요약해줘.', adminOnly: true },
+                { text: '콘크리트 연삭기 장비를 보여주세요' },
+                { text: '린코트 카탈로그와 도장사양서를 보여주세요' },
+                { text: '시험성적서와 인증서를 보여주세요' },
             ],
         },
         {
@@ -291,26 +292,87 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
     const renderMessageContent = (message: Message) => {
         let content = message.content;
         let quoteData = null;
+        const cardComponents: JSX.Element[] = [];
 
-        // Use markers to find and extract the quote JSON
-        const startMarker = '[QUOTE_START]';
-        const endMarker = '[QUOTE_END]';
-        const startIndex = content.indexOf(startMarker);
-        const endIndex = content.indexOf(endMarker);
+        // Extract quote data
+        const quoteStartMarker = '[QUOTE_START]';
+        const quoteEndMarker = '[QUOTE_END]';
+        const quoteStartIndex = content.indexOf(quoteStartMarker);
+        const quoteEndIndex = content.indexOf(quoteEndMarker);
 
-        if (startIndex !== -1 && endIndex !== -1) {
-            const jsonString = content.substring(startIndex + startMarker.length, endIndex).trim();
+        if (quoteStartIndex !== -1 && quoteEndIndex !== -1) {
+            const jsonString = content.substring(quoteStartIndex + quoteStartMarker.length, quoteEndIndex).trim();
             try {
                 const parsed = JSON.parse(jsonString);
                 if (parsed && parsed.products) {
                     quoteData = parsed;
                     // Remove the quote part (including markers) from the content string
-                    content = content.substring(0, startIndex).trim();
+                    content = content.substring(0, quoteStartIndex) + content.substring(quoteEndIndex + quoteEndMarker.length);
                 }
             } catch (e) {
                 console.error("Failed to parse quote JSON:", e);
             }
         }
+
+        // Extract NEW SHOW_* markers first
+        const showMarkers = [
+            { regex: /\[SHOW_PRODUCT:([^\]]+)\]/g, type: 'products' as const },
+            { regex: /\[SHOW_EQUIPMENT:([^\]]+)\]/g, type: 'equipment' as const },
+            { regex: /\[SHOW_PROJECT:([^\]]+)\]/g, type: 'projects' as const },
+            { regex: /\[SHOW_CERTIFICATE:([^\]]+)\]/g, type: 'certificates' as const },
+            { regex: /\[SHOW_RESOURCES:([^\]]+)\]/g, type: 'resources' as const },
+            { regex: /\[SHOW_SHOP:([^\]]+)\]/g, type: 'shop' as const }
+        ];
+
+        showMarkers.forEach(marker => {
+            let match;
+            while ((match = marker.regex.exec(content)) !== null) {
+                const idsString = match[1];
+                const ids = idsString.split(',').map(id => id.trim()).filter(id => id);
+
+                if (ids.length > 0) {
+                    cardComponents.push(
+                        <CardDisplay key={`show-${marker.type}-${cardComponents.length}`} data={{ type: marker.type, ids }} />
+                    );
+                }
+            }
+            // Remove all markers from content
+            content = content.replace(marker.regex, '');
+        });
+
+        // Extract card data for different types (existing system)
+        const cardMarkers = [
+            { start: '[PRODUCTS_START]', end: '[PRODUCTS_END]', type: 'products' },
+            { start: '[PROJECTS_START]', end: '[PROJECTS_END]', type: 'projects' },
+            { start: '[EQUIPMENT_START]', end: '[EQUIPMENT_END]', type: 'equipment' },
+            { start: '[SHOP_START]', end: '[SHOP_END]', type: 'shop' },
+            { start: '[CERTIFICATES_START]', end: '[CERTIFICATES_END]', type: 'certificates' },
+            { start: '[RESOURCES_START]', end: '[RESOURCES_END]', type: 'resources' }
+        ];
+
+        cardMarkers.forEach((marker, index) => {
+            const startIndex = content.indexOf(marker.start);
+            const endIndex = content.indexOf(marker.end);
+
+            if (startIndex !== -1 && endIndex !== -1) {
+                const jsonString = content.substring(startIndex + marker.start.length, endIndex).trim();
+                try {
+                    const parsed = JSON.parse(jsonString);
+                    if (parsed && parsed.type === marker.type && parsed.ids && Array.isArray(parsed.ids)) {
+                        cardComponents.push(
+                            <CardDisplay key={`card-${marker.type}-${index}`} data={parsed} />
+                        );
+                        // Remove the card part (including markers) from the content string
+                        content = content.substring(0, startIndex) + content.substring(endIndex + marker.end.length);
+                    }
+                } catch (e) {
+                    console.error(`Failed to parse ${marker.type} card JSON:`, e);
+                }
+            }
+        });
+
+        // Clean up any extra whitespace
+        content = content.trim();
 
         return (
             <>
@@ -322,6 +384,9 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                     </div>
                 )}
                 {quoteData && <QuoteDisplay data={quoteData} />}
+                {cardComponents.map((component, index) => (
+                    <React.Fragment key={index}>{component}</React.Fragment>
+                ))}
             </>
         );
     };
