@@ -108,25 +108,6 @@ const Contact = () => {
               </div>
             </div>
 
-            {/* 사업자 정보 */}
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 md:p-6">
-              <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4">{t('contact_business_info')}</h3>
-              <div className="space-y-2 md:space-y-3 text-gray-600">
-                <div className="flex flex-col md:flex-row">
-                  <span className="font-medium text-gray-700 mb-1 md:mb-0 md:mr-2 text-sm md:text-base">{t('contact_company_name')}:</span>
-                  <span className="text-sm md:text-base">{t('contact_company_name_value')}</span>
-                </div>
-                <div className="flex flex-col md:flex-row">
-                  <span className="font-medium text-gray-700 mb-1 md:mb-0 md:mr-2 text-sm md:text-base">{t('contact_business_number')}:</span>
-                  <span className="text-sm md:text-base">{t('contact_business_number_value')}</span>
-                </div>
-                <div className="flex flex-col md:flex-row">
-                  <span className="font-medium text-gray-700 mb-1 md:mb-0 md:mr-2 text-sm md:text-base">{t('contact_ceo')}:</span>
-                  <span className="text-sm md:text-base">{t('contact_ceo_value')}</span>
-                </div>
-              </div>
-            </div>
-
             {/* 위치 지도 */}
             <div className="bg-white border border-gray-200 rounded-xl p-4 md:p-6 shadow-sm">
               <div className="flex items-center mb-4">
@@ -204,6 +185,26 @@ const Contact = () => {
                 </a>
               </div>
             </div>
+
+            {/* 사업자 정보 */}
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 md:p-6">
+              <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-4">{t('contact_business_info')}</h3>
+              <div className="space-y-2 md:space-y-3 text-gray-600">
+                <div className="flex flex-col md:flex-row">
+                  <span className="font-medium text-gray-700 mb-1 md:mb-0 md:mr-2 text-sm md:text-base">{t('contact_company_name')}:</span>
+                  <span className="text-sm md:text-base">{t('contact_company_name_value')}</span>
+                </div>
+                <div className="flex flex-col md:flex-row">
+                  <span className="font-medium text-gray-700 mb-1 md:mb-0 md:mr-2 text-sm md:text-base">{t('contact_business_number')}:</span>
+                  <span className="text-sm md:text-base">{t('contact_business_number_value')}</span>
+                </div>
+                <div className="flex flex-col md:flex-row">
+                  <span className="font-medium text-gray-700 mb-1 md:mb-0 md:mr-2 text-sm md:text-base">{t('contact_ceo')}:</span>
+                  <span className="text-sm md:text-base">{t('contact_ceo_value')}</span>
+                </div>
+              </div>
+            </div>
+
 
             {/* 빠른 연락 버튼 - 모바일 전용 */}
             <div className="block md:hidden">

@@ -53,18 +53,18 @@ const LocationMap: React.FC<LocationMapProps> = ({ className = '' }) => {
     // 마커 팝업 설정
     const popupContent = `
       <div style="text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-        <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #1f2937;">
+        <h3 style="margin: 0 0 6px 0; font-size: 14px; font-weight: bold; color: #1f2937;">
           ${COMPANY_LOCATION.name}
         </h3>
-        <p style="margin: 0 0 8px 0; font-size: 14px; color: #6b7280; line-height: 1.4;">
+        <p style="margin: 0 0 6px 0; font-size: 12px; color: #6b7280; line-height: 1.4;">
           ${t('contact_address_value')}
         </p>
-        <div style="margin-top: 12px;">
+        <div style="margin-top: 10px;">
           <a 
             href="https://www.google.com/maps/place/%EC%9D%B8%EC%B2%9C%EA%B4%91%EC%97%AD%EC%8B%9C+%EC%84%9C%EA%B5%AC+%EB%B0%B1%EB%B2%94%EB%A1%9C+707/data=!3m1!4b1!4m6!3m5!1s0x357b7eb4921092dd:0xf125040b28bebf6b!8m2!3d37.4824189!4d126.6785593!16s%2Fg%2F11bz6y9zf9?entry=ttu"
             target="_blank"
             rel="noopener noreferrer"
-            style="display: inline-block; background: #3b82f6; color: white; padding: 6px 12px; text-decoration: none; border-radius: 6px; font-size: 12px; font-weight: 500;"
+            style="display: inline-block; background: #3b82f6; color: white; padding: 4px 10px; text-decoration: none; border-radius: 5px; font-size: 11px; font-weight: 500;"
           >
             ${language === 'ko' ? '구글 지도에서 보기' :
         language === 'en' ? 'View on Google Maps' :
@@ -75,7 +75,7 @@ const LocationMap: React.FC<LocationMapProps> = ({ className = '' }) => {
     `;
 
     marker.bindPopup(popupContent, {
-      maxWidth: 300,
+      maxWidth: 240,
       className: 'custom-popup'
     });
 
@@ -108,6 +108,7 @@ const LocationMap: React.FC<LocationMapProps> = ({ className = '' }) => {
         .leaflet-popup-content-wrapper {
           border-radius: 8px;
           box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+          background: rgba(255,255,255,0.85) !important;
         }
         
         .leaflet-popup-tip {
