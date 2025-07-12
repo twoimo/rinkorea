@@ -44,6 +44,7 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const chatEndRef = useRef<HTMLDivElement>(null);
     const prevMessagesLength = useRef(0);
+    const lastMessageRef = useRef<HTMLDivElement>(null);
     const { user } = useAuth();
     const { isAdmin } = useUserRole();
 
@@ -209,9 +210,23 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
     }, [onClose, isLoading]);
 
     useEffect(() => {
-        // Scroll to the bottom when new messages are added
-        if (chatEndRef.current && messages.length > prevMessagesLength.current) {
-            chatEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        // Smart scrolling: AI messages scroll to top, user messages scroll to bottom
+        if (messages.length > prevMessagesLength.current) {
+            const newMessage = messages[messages.length - 1];
+
+            if (newMessage?.role === 'assistant' && lastMessageRef.current) {
+                // For AI responses, scroll to show the top of the message
+                setTimeout(() => {
+                    lastMessageRef.current?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                        inline: 'nearest'
+                    });
+                }, 100);
+            } else if (chatEndRef.current) {
+                // For user messages, scroll to bottom as before
+                chatEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
         }
         prevMessagesLength.current = messages.length;
     }, [messages]);
@@ -394,23 +409,23 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
     const modalContent = (
         <div ref={modalRef} onClick={onClose}>
             <div
-                className="bg-white rounded-lg shadow-xl w-full h-full sm:max-w-6xl sm:max-h-[90vh] sm:h-auto overflow-hidden flex flex-col"
+                className="bg-white w-full h-full sm:rounded-lg sm:shadow-xl sm:max-w-6xl sm:max-h-[90vh] sm:h-auto overflow-hidden flex flex-col"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="flex-shrink-0 sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
+                <div className="flex-shrink-0 sticky top-0 bg-white border-b border-gray-200 p-3 sm:p-4 flex items-center justify-between">
+                    <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
                         {selectedFunction && (
                             <button
                                 onClick={() => setSelectedFunction(null)}
-                                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition-colors touch-manipulation"
                             >
-                                <X className="w-5 h-5 rotate-45" />
+                                <X className="w-4 h-4 sm:w-5 sm:h-5 rotate-45" />
                             </button>
                         )}
-                        <div className="flex items-center space-x-2">
-                            <Bot className="w-6 h-6 text-blue-600" />
-                            <h2 className="text-xl font-semibold">
+                        <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0 flex-1">
+                            <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 flex-shrink-0" />
+                            <h2 className="text-lg sm:text-xl font-semibold truncate">
                                 {selectedFunction
                                     ? selectedFunctionInfo?.name
                                     : 'AI 검색 및 지원'}
@@ -419,29 +434,29 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition-colors touch-manipulation flex-shrink-0"
                     >
-                        <X className="w-6 h-6" />
+                        <X className="w-5 h-5 sm:w-6 sm:h-6" />
                     </button>
                 </div>
 
                 {/* Chat Messages */}
-                <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4">
+                <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-3 sm:space-y-4">
                     {messages.length === 0 ? (
-                        <div className="text-center py-8">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                        <div className="text-center py-4 sm:py-8">
+                            <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">
                                 무엇을 도와드릴까요?
                             </h3>
-                            <p className="text-gray-600 mb-8">
+                            <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8 px-2">
                                 질문을 입력하시면 AI가 가장 적절한 기능으로 답변해 드립니다.
                             </p>
                             {/* Static Example Questions */}
-                            <div className="flex flex-wrap justify-center gap-2">
+                            <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
                                 {exampleQuestionsToShow.map((example, index) => (
                                     <button
                                         key={index}
                                         onClick={() => handleExampleQuestionClick(example.text)}
-                                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors text-sm"
+                                        className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 active:bg-gray-300 transition-colors text-sm sm:text-base touch-manipulation"
                                     >
                                         {example.text}
                                     </button>
@@ -458,11 +473,12 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                                 return (
                                     <React.Fragment key={message.id}>
                                         <div
+                                            ref={index === messages.length - 1 ? lastMessageRef : null}
                                             className={cn("flex", message.role === 'user' ? 'justify-end' : 'justify-start')}
                                         >
                                             <div
                                                 className={cn(
-                                                    "max-w-[80%] p-4 rounded-lg",
+                                                    "max-w-[85%] sm:max-w-[80%] p-3 sm:p-4 rounded-lg text-sm sm:text-base",
                                                     message.role === 'user'
                                                         ? 'bg-blue-600 text-white'
                                                         : 'bg-gray-100 text-gray-800'
@@ -471,9 +487,9 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                                                 {message.role === 'assistant' ? (
                                                     <>
                                                         {funcInfo && (
-                                                            <div className="flex items-center space-x-2 mb-2 pb-2 border-b border-gray-200">
-                                                                <funcInfo.icon className={cn("w-5 h-5", funcInfo.color.replace('bg-', 'text-'))} />
-                                                                <span className="text-sm font-semibold text-gray-800">{funcInfo.name}</span>
+                                                            <div className="flex items-center space-x-1.5 sm:space-x-2 mb-2 pb-2 border-b border-gray-200">
+                                                                <funcInfo.icon className={cn("w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0", funcInfo.color.replace('bg-', 'text-'))} />
+                                                                <span className="text-xs sm:text-sm font-semibold text-gray-800 truncate">{funcInfo.name}</span>
                                                             </div>
                                                         )}
                                                         {renderMessageContent(message)}
@@ -482,7 +498,7 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                                                     <p className="whitespace-pre-wrap">{message.content}</p>
                                                 )}
                                                 <p className={cn(
-                                                    "text-xs mt-2",
+                                                    "text-xs mt-1.5 sm:mt-2",
                                                     message.role === 'user'
                                                         ? 'text-blue-200'
                                                         : 'text-gray-500'
@@ -494,12 +510,12 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
 
                                         {/* Render follow-up questions for the last assistant message */}
                                         {message.role === 'assistant' && index === messages.length - 1 && message.followUpQuestions && message.followUpQuestions.length > 0 && (
-                                            <div className="mt-4 flex flex-wrap justify-start gap-2">
+                                            <div className="mt-3 sm:mt-4 flex flex-wrap justify-start gap-2 sm:gap-3">
                                                 {message.followUpQuestions.map((question, qIndex) => (
                                                     <button
                                                         key={qIndex}
                                                         onClick={() => handleSendMessage(question, message.functionType)}
-                                                        className="px-4 py-2 bg-blue-50 text-blue-700 rounded-full hover:bg-blue-100 transition-colors text-sm"
+                                                        className="px-3 py-2 sm:px-4 sm:py-2 bg-blue-50 text-blue-700 rounded-full hover:bg-blue-100 active:bg-blue-200 transition-colors text-sm sm:text-base touch-manipulation"
                                                     >
                                                         {question}
                                                     </button>
@@ -511,10 +527,10 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                             })}
                             {isLoading && (
                                 <div className="flex justify-start">
-                                    <div className="bg-gray-100 p-4 rounded-lg">
+                                    <div className="bg-gray-100 p-3 sm:p-4 rounded-lg max-w-[85%] sm:max-w-[80%]">
                                         <div className="flex items-center space-x-2">
-                                            <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-                                            <span className="text-gray-600">AI가 답변을 생성하고 있습니다...</span>
+                                            <Loader2 className="w-4 h-4 animate-spin text-blue-600 flex-shrink-0" />
+                                            <span className="text-gray-600 text-sm sm:text-base">AI가 답변을 생성하고 있습니다...</span>
                                         </div>
                                     </div>
                                 </div>
@@ -525,24 +541,24 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                 </div>
 
                 {/* Input Area */}
-                <div className="flex-shrink-0 border-t border-gray-200 p-4">
-                    <div className="flex space-x-4">
+                <div className="flex-shrink-0 border-t border-gray-200 p-3 sm:p-4 bg-white">
+                    <div className="flex space-x-2 sm:space-x-4">
                         <textarea
                             value={inputMessage}
                             onChange={(e) => setInputMessage(e.target.value)}
                             onKeyPress={handleInputKeyPress}
                             placeholder="메시지를 입력하세요..."
-                            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 sm:px-4 sm:py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm sm:text-base"
                             rows={2}
                             disabled={isLoading}
                         />
                         <button
                             onClick={() => handleSendMessage()}
                             disabled={!inputMessage.trim() || isLoading}
-                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                            className="px-4 py-2 sm:px-6 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-1 sm:space-x-2 touch-manipulation min-w-0 flex-shrink-0"
                         >
-                            <Send className="w-4 h-4" />
-                            <span>전송</span>
+                            <Send className="w-4 h-4 flex-shrink-0" />
+                            <span className="hidden sm:block">전송</span>
                         </button>
                     </div>
                 </div>
