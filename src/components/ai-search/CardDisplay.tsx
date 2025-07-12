@@ -85,7 +85,7 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
         }
         if (data.type === 'projects') {
             console.log('AI 마커 uuid:', data.ids);
-            console.log('프론트 projects:', projects.map(p => ({ id: p.id, title: p.title })));
+            console.log('프론트 projects:', projects.map(p => p.id));
             const missing = data.ids.filter(id => !projects.some(p => p.id === id));
             if (missing.length > 0) {
                 console.warn('DB에 없는 프로젝트 uuid:', missing);
