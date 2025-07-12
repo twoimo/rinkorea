@@ -16,6 +16,9 @@ interface CardDisplayProps {
     data: CardData;
 }
 
+// 페이지네이션: 한 번에 보여줄 카드 개수
+const PAGE_SIZE = 10;
+
 const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
     const { t, language: _language } = useLanguage();
     const { products } = useProducts();
@@ -24,6 +27,7 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
     const { resources } = useResources();
     const [certificates, setCertificates] = useState<any[]>([]);
     const [shopProducts, setShopProducts] = useState<any[]>([]);
+    const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
     // 이미지 URL 처리 함수
     const getImageUrl = (imagePath: string) => {
@@ -73,6 +77,10 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
         fetchData();
     }, [data.type, data.ids]);
 
+    useEffect(() => {
+        setVisibleCount(PAGE_SIZE); // type/ids 바뀌면 초기화
+    }, [data.type, data.ids]);
+
     // 디버깅: AI 마커 uuid와 프론트 products uuid 비교
     useEffect(() => {
         if (data.type === 'products') {
@@ -111,6 +119,11 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
                 return [];
         }
     }, [data.type, data.ids, products, projects, equipment, resources, certificates, shopProducts]);
+
+    // 실제 보여줄 카드 (페이지네이션 적용)
+    const pagedItems = useMemo(() => {
+        return filteredItems.slice(0, visibleCount);
+    }, [filteredItems, visibleCount]);
 
     const _handleProductEdit = (_product: any) => {
         // AI 검색 모달에서는 편집 기능 비활성화
@@ -252,7 +265,7 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
                     )
                 })}
 
-                {data.type === 'projects' && filteredItems.map((project: any, _index) => (
+                {data.type === 'projects' && pagedItems.map((project: any, _index) => (
                     <div key={project.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                         <div className="flex flex-row h-64">
                             {/* 이미지 섹션 */}
@@ -563,6 +576,17 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
                     </div>
                 ))}
             </div>
+            {/* 더 보기 버튼 */}
+            {filteredItems.length > visibleCount && (
+                <div className="flex justify-center mt-4">
+                    <button
+                        onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+                        className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
+                    >
+                        더 보기 ({visibleCount} / {filteredItems.length})
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

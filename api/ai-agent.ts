@@ -204,10 +204,11 @@ class UnifiedAIAgent {
 - 마커는 반드시 답변의 적절한 위치(설명 후, 또는 관련 문단 아래)에 삽입하세요.
 - 마커가 포함된 답변만 카드로 렌더링됩니다.
 - 각 ID는 반드시 실제 DB의 uuid를 사용하세요.
-- **카드 마커([SHOW_PROJECT:...], [SHOW_PRODUCT:...], [SHOW_EQUIPMENT:...], 등)가 너무 많아 답변이 잘릴 수 있으니, 1회에 10~15개씩 분할하여 여러 마커로 나누어 출력하세요.**
-- 예: [SHOW_PROJECT:uuid1,uuid2,...,uuid10]\n[SHOW_PROJECT:uuid11,uuid12,...,uuid20] 처럼 여러 마커를 연속으로 출력할 수 있습니다.
-- 여러 개의 항목을 보여줄 때는 반드시 모든 uuid를 빠짐없이 포함하되, 한 마커에 10~15개 이하로 제한하세요.
-- 일부만 넣거나 순서를 임의로 바꾸지 마세요. 반드시 전체를 빠짐없이 포함해야 합니다.
+- 여러 개의 항목을 보여줄 때는 반드시 모든 uuid를 쉼표로 구분하여 한 마커에 모두 포함하세요.
+- **uuid가 10개를 초과하면, 10개씩 나눠서 여러 [SHOW_PROJECT:...] 마커로 출력하세요.**
+- 예: [SHOW_PROJECT:uuid1,uuid2,...,uuid10]\n[SHOW_PROJECT:uuid11,uuid12,...,uuid20]
+- '더 보기' 요청이 오면, 이어서 다음 10개 uuid로 마커를 추가 출력하세요.
+- 일부만 넣거나 순서를 임의로 바꾸지 마세요. 반드시 전체 uuid를 빠짐없이 10개씩 나눠서 출력해야 합니다.
 
 ---
 
@@ -217,7 +218,9 @@ class UnifiedAIAgent {
 - 예시 질문: "모든 장비를 카드로 보여줘"
 - 예시 답변: [SHOW_EQUIPMENT:29256648-164f-4a9d-8d9a-4823096ea935,37fe54be-01a2-43bc-876e-58ead5ddfc5c,3d220418-fd14-47f6-a3fc-7d8eade75dbb,4e621b8c-25fc-434e-93bc-893a4879f16f,51efed24-52f6-43f1-b7aa-9057464301ff,5f695782-96bc-462f-801d-39612ccbf0a7,87b099a3-0e0e-4e01-8bcb-17b6367717ae,92b44fcb-a172-4750-83fb-5e1b38f7cc1b,9317465d-3b3c-493f-a4fd-0631b35c3a37,cd8be494-f97a-4a0f-8389-d7b310865fd8,ee89de11-c38b-4847-afcd-8ba23360ee35,ff1aef86-a395-4c4a-8084-9f2b45e2b116]
 - 예시 질문: "모든 프로젝트를 카드로 보여줘"
-- 예시 답변: [SHOW_PROJECT:0846d9d1-6110-4aac-bb4f-bde5c7c68068,084da6f8-7e21-4f2e-9816-fbec630ace5c,091f3e65-04a1-47b1-ac40-a8247a60a753,09aa6d35-d2fa-4e6f-9af2-19f4416ba466,0d07db37-00e4-43ba-b916-37447e6b83ea,119d6642-a58d-475c-a0cb-ce0f2b67d1a4,16d1fb7f-212c-416e-8fd7-d32eb31c729e,21bace28-a664-4e05-85df-fda721f8a984,21e2c0c1-2325-4a9b-a19b-d7e1b41ee456,2201762b-7e6f-45b5-a686-fcf2deb3096a,262bb464-1a0f-4e69-8d69-481e98fdef85,294471ca-4823-4223-8f2d-25683434ede6,2a326516-61df-4bd9-9405-836ba0eaa059,2cbbfddc-565f-4428-b317-ed9da6f31a7f,455eed8b-31ed-40d8-9727-82e5e4f8571a,463972c1-90b0-465d-8c16-92f870f42653,4892a093-6df2-4119-a5b0-10d0a864a1bb,54ed11f8-7767-46a8-94a4-ca5e1c0f1df6,5c8b9263-b931-4a40-911d-726cd43f913f,7d1efda8-e8d1-4997-8ff4-db41157f56ca,8767505d-605c-4ece-8a00-360b90c8ca59,891d7fc5-4bb0-4f3f-a2bb-c84470704fdc,8d387c7d-3158-4771-a7cd-6bbabb1b3dee,8eb875ae-9787-4d17-a3f3-72d398f2fdb6,8fc083a4-9604-462b-930f-35454f767109,9570acd6-aaaa-4f4d-9c2c-db49e2028305,aa0e891a-4fcd-4186-a3ff-45a271e2370b,ab03919c-ddd3-40cf-b3b6-b22fb82adbc2,adb6630b-9f8c-4bbe-948d-22fec04b54e9,b0e4f445-f196-4dce-a81d-a5796cc8743c,b9e99147-3b82-4d4c-8d40-5b9bc73e9bcf,bde8b15a-dff6-4b68-8554-5ab7827da520,c32019ea-c4a9-4124-9c37-3e81c11a84bf,cf13bd2b-b31e-4fe6-bdf9-8bbdfc8af99d,ec3ec987-973b-41c9-b441-d88d5b247d30,f57ab311-2d64-47a6-8030-00ae8d28ec3d,f5823e7b-8d45-4eec-b4f2-3addf1b125a5]
+- 예시 답변:
+- [SHOW_PROJECT:0846d9d1-6110-4aac-bb4f-bde5c7c68068,084da6f8-7e21-4f2e-9816-fbec630ace5c,091f3e65-04a1-47b1-ac40-a8247a60a753,09aa6d35-d2fa-4e6f-9af2-19f4416ba466,0d07db37-00e4-43ba-b916-37447e6b83ea,119d6642-a58d-475c-a0cb-ce0f2b67d1a4,16d1fb7f-212c-416e-8fd7-d32eb31c729e,21bace28-a664-4e05-85df-fda721f8a984,21e2c0c1-2325-4a9b-a19b-d7e1b41ee456,2201762b-7e6f-45b5-a686-fcf2deb3096a]
+- [SHOW_PROJECT:262bb464-1a0f-4e69-8d69-481e98fdef85,294471ca-4823-4223-8f2d-25683434ede6,2a326516-61df-4bd9-9405-836ba0eaa059,2cbbfddc-565f-4428-b317-ed9da6f31a7f,455eed8b-31ed-40d8-9727-82e5e4f8571a,463972c1-90b0-465d-8c16-92f870f42653,4892a093-6df2-4119-a5b0-10d0a864a1bb,54ed11f8-7767-46a8-94a4-ca5e1c0f1df6,5c8b9263-b931-4a40-911d-726cd43f913f,7d1efda8-e8d1-4997-8ff4-db41157f56ca]
 - 예시 질문: "모든 인증서를 카드로 보여줘"
 - 예시 답변: [SHOW_CERTIFICATE:00e53cdd-ae64-4ae6-8c56-e05d9c6ba3d0,3cc59b88-28a8-40a9-9092-8a20ad183dd6,529a9635-dcde-4cc7-b3f8-9e9c58fcb512,5c434f70-1979-407d-a4a2-db1fc7eccd73,5cc9379b-cdd6-4e83-b0bf-b07e75a5f1d1,7fa2c3f6-08fb-467d-9eae-e515f635cc56,86b0c78a-e9f3-4290-b30a-0110ec748ab6,8c169302-a126-42fe-858a-1430d57dcaab,911c7887-1cc4-4f84-a239-9dc26b82aa94,9fcac1b5-6a22-44ef-ab98-29f13e667191,b9f925e7-d1e6-4553-9aa2-f65807f68fee,c2d38489-8c76-4be8-9d46-5b268da5590b,c72eea53-a75f-42f2-bb89-74904f9b5182,e4e084d9-9728-49ca-a164-003e6accf740,e9515911-1a09-4252-ac88-fb2d8109dfec,ec707f31-28cf-4988-b0e3-970addea13b9,fdab0b91-0401-404a-a4a1-549841287e10]
 - 예시 질문: "모든 자료실 자료를 카드로 보여줘"
