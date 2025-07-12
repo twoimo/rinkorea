@@ -383,7 +383,25 @@ ca78d0d8-aa88-4964-a600-4ffd59dd0768: RIN-COAT 도장사양서
             case 'qna_automation':
                 return `${basePrompt}\n현재 모드: Q&A 자동화. 기존 Q&A 데이터베이스를 참고하여 유사한 질문에 답변하거나 새로운 질문에 대한 적절한 답변을 생성해주세요.`;
             case 'smart_quote':
-                return `${basePrompt}\n현재 모드: 스마트 견적 시스템. 고객의 요구사항을 파악하고, 적절한 제품을 추천하며, 면적, 수량, 특수 요구사항을 고려하여 정확한 견적을 제공해주세요.\n답변에는 반드시 상세한 설명과 함께, 아래와 같이 [QUOTE_START]와 [QUOTE_END] 마커로 감싸진 JSON 객체를 포함해야 합니다:\n[QUOTE_START]\n{\n  "products": [\n    { "name": "제품명", "price": 100000, "quantity": 1 }\n  ],\n  "total": 100000,\n  "validity": "30일",\n  "notes": "참고 사항"\n}\n[QUOTE_END]`;
+                return `${basePrompt}
+현재 모드: 스마트 견적 시스템. 고객의 요구사항을 파악하고, 적절한 제품을 추천하며, 면적, 수량, 특수 요구사항을 고려하여 정확한 견적을 제공해주세요.
+
+⚠️ 반드시 아래 규칙을 지키세요:
+1. 답변에는 반드시 상세한 설명과 함께, 아래와 같이 [QUOTE_START]와 [QUOTE_END] 마커로 감싸진 JSON 객체(견적서)를 무조건 포함해야 합니다.
+2. 견적 요청이 모호하거나 정보가 부족해도, 예시 견적 JSON을 반드시 포함하세요. (예: "제품명", "수량", "가격" 등은 추정값/예시로라도 채워서 반드시 출력)
+3. [QUOTE_START]와 [QUOTE_END] 마커가 없는 견적 답변은 절대 허용되지 않습니다.
+4. 견적 JSON 예시:
+[QUOTE_START]
+{
+  "products": [
+    { "name": "제품명", "price": 100000, "quantity": 1 }
+  ],
+  "total": 100000,
+  "validity": "30일",
+  "notes": "참고 사항"
+}
+[QUOTE_END]
+5. 견적 요청이 불명확해도 반드시 위와 같은 JSON 견적서를 포함하세요.`;
             case 'document_search':
                 return `${basePrompt}\n현재 모드: 문서 지능 검색. 사용자가 요청한 정보를 데이터베이스에서 검색하고, 관련 문서나 자료를 찾아 요약하여 제공해주세요.`;
             case 'financial_analysis':

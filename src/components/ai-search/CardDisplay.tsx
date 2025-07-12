@@ -73,6 +73,18 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
         fetchData();
     }, [data.type, data.ids]);
 
+    // 디버깅: AI 마커 uuid와 프론트 products uuid 비교
+    useEffect(() => {
+        if (data.type === 'products') {
+            console.log('AI 마커 uuid:', data.ids);
+            console.log('프론트 products:', products.map(p => p.id));
+            const missing = data.ids.filter(id => !products.some(p => p.id === id));
+            if (missing.length > 0) {
+                console.warn('DB에 없는 uuid:', missing);
+            }
+        }
+    }, [data.type, data.ids, products]);
+
     const filteredItems = useMemo(() => {
         switch (data.type) {
             case 'products':
@@ -167,65 +179,70 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
             </div>
 
             <div className="space-y-4">
-                {data.type === 'products' && filteredItems.map((product: any, _index) => (
-                    <div key={product.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                        <div className="flex flex-row h-64">
-                            {/* 이미지 섹션 */}
-                            <div className="w-48 h-64 flex-shrink-0 relative overflow-hidden bg-gray-50">
-                                <FastImage
-                                    src={getImageUrl(product.image_url)}
-                                    alt={product.name}
-                                    className="w-full h-full object-contain transition-transform duration-300 hover:scale-105"
-                                    loading="lazy"
-                                />
-                                {product.icon && product.icon !== 'none' && product.icon !== 'None' && (
-                                    <div className="absolute top-3 left-3 bg-white p-2 rounded-full">
-                                        <div className="w-6 h-6 text-blue-600" />
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* 내용 섹션 */}
-                            <div className="flex-1 p-4 flex flex-col justify-between">
-                                <div>
-                                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1">
-                                        {product.name}
-                                    </h3>
-                                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                                        {product.description}
-                                    </p>
-
-                                    {/* 특징 리스트 */}
-                                    {product.features && product.features.length > 0 && (
-                                        <div className="mb-3">
-                                            <ul className="flex flex-wrap gap-2">
-                                                {product.features.slice(0, 3).map((feature: string, featureIndex: number) => (
-                                                    <li key={featureIndex} className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full flex items-center">
-                                                        <span className="w-1 h-1 bg-blue-600 rounded-full mr-1 flex-shrink-0"></span>
-                                                        <span className="truncate">{feature}</span>
-                                                    </li>
-                                                ))}
-                                                {product.features.length > 3 && (
-                                                    <li className="text-xs text-blue-600 px-2 py-1 flex items-center">
-                                                        +{product.features.length - 3}개 더
-                                                    </li>
-                                                )}
-                                            </ul>
+                {data.type === 'products' && filteredItems.map((product: any, _index) => {
+                    // 안전 처리: features, image_url
+                    const safeFeatures = Array.isArray(product.features) ? product.features : [];
+                    const safeImageUrl = product.image_url || '/images/placeholder.svg';
+                    return (
+                        <div key={product.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                            <div className="flex flex-row h-64">
+                                {/* 이미지 섹션 */}
+                                <div className="w-48 h-64 flex-shrink-0 relative overflow-hidden bg-gray-50">
+                                    <FastImage
+                                        src={getImageUrl(safeImageUrl)}
+                                        alt={product.name}
+                                        className="w-full h-full object-contain transition-transform duration-300 hover:scale-105"
+                                        loading="lazy"
+                                    />
+                                    {product.icon && product.icon !== 'none' && product.icon !== 'None' && (
+                                        <div className="absolute top-3 left-3 bg-white p-2 rounded-full">
+                                            <div className="w-6 h-6 text-blue-600" />
                                         </div>
                                     )}
                                 </div>
 
-                                {/* 버튼 */}
-                                <button
-                                    onClick={() => handleProductViewDetail(product)}
-                                    className="self-start bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-                                >
-                                    자세히 보기
-                                </button>
+                                {/* 내용 섹션 */}
+                                <div className="flex-1 p-4 flex flex-col justify-between">
+                                    <div>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1">
+                                            {product.name}
+                                        </h3>
+                                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                                            {product.description}
+                                        </p>
+
+                                        {/* 특징 리스트 */}
+                                        {safeFeatures.length > 0 && (
+                                            <div className="mb-3">
+                                                <ul className="flex flex-wrap gap-2">
+                                                    {safeFeatures.slice(0, 3).map((feature: string, featureIndex: number) => (
+                                                        <li key={featureIndex} className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full flex items-center">
+                                                            <span className="w-1 h-1 bg-blue-600 rounded-full mr-1 flex-shrink-0"></span>
+                                                            <span className="truncate">{feature}</span>
+                                                        </li>
+                                                    ))}
+                                                    {safeFeatures.length > 3 && (
+                                                        <li className="text-xs text-blue-600 px-2 py-1 flex items-center">
+                                                            +{safeFeatures.length - 3}개 더
+                                                        </li>
+                                                    )}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* 버튼 */}
+                                    <button
+                                        onClick={() => handleProductViewDetail(product)}
+                                        className="self-start bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+                                    >
+                                        자세히 보기
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    )
+                })}
 
                 {data.type === 'projects' && filteredItems.map((project: any, _index) => (
                     <div key={project.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
