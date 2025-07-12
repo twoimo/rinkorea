@@ -478,10 +478,10 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                                         >
                                             <div
                                                 className={cn(
-                                                    "max-w-[85%] sm:max-w-[80%] p-3 sm:p-4 rounded-lg text-sm sm:text-base",
+                                                    "p-3 sm:p-4 rounded-lg text-sm sm:text-base",
                                                     message.role === 'user'
-                                                        ? 'bg-blue-600 text-white'
-                                                        : 'bg-gray-100 text-gray-800'
+                                                        ? 'bg-blue-600 text-white max-w-[85%] sm:max-w-[70%]'
+                                                        : 'bg-gray-100 text-gray-800 max-w-[90%] sm:max-w-[75%]'
                                                 )}
                                             >
                                                 {message.role === 'assistant' ? (
@@ -527,7 +527,7 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                             })}
                             {isLoading && (
                                 <div className="flex justify-start">
-                                    <div className="bg-gray-100 p-3 sm:p-4 rounded-lg max-w-[85%] sm:max-w-[80%]">
+                                    <div className="bg-gray-100 p-3 sm:p-4 rounded-lg max-w-[90%] sm:max-w-[75%]">
                                         <div className="flex items-center space-x-2">
                                             <Loader2 className="w-4 h-4 animate-spin text-blue-600 flex-shrink-0" />
                                             <span className="text-gray-600 text-sm sm:text-base">AI가 답변을 생성하고 있습니다...</span>
