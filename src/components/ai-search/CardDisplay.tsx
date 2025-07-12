@@ -3,7 +3,6 @@ import { useProducts } from '@/hooks/useProducts';
 import { useProjects } from '@/hooks/useProjects';
 import { useEquipment } from '@/hooks/useEquipment';
 import { useResources } from '@/hooks/useResources';
-import ShopProductGrid from '@/components/shop/ShopProductGrid';
 import { FastImage } from '@/components/ui/fast-image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,7 +17,7 @@ interface CardDisplayProps {
 }
 
 const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
-    const { t, language } = useLanguage();
+    const { t, language: _language } = useLanguage();
     const { products } = useProducts();
     const { projects } = useProjects();
     const { equipment } = useEquipment();
@@ -30,6 +29,12 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
     const getImageUrl = (imagePath: string) => {
         if (!imagePath) return '/images/placeholder.svg';
         if (imagePath.includes('://') || imagePath.startsWith('@')) return imagePath;
+
+        // 이미 /images/로 시작하는 경우는 그대로 사용 (온라인 스토어 제품들)
+        if (imagePath.startsWith('/images/')) {
+            const encodedPath = imagePath.split('/').map(part => encodeURIComponent(part)).join('/');
+            return encodedPath;
+        }
 
         // 이미 images/로 시작하는 경우는 그대로 사용 (인증서 이미지들)
         if (imagePath.startsWith('images/')) {
@@ -87,15 +92,15 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
         }
     }, [data.type, data.ids, products, projects, equipment, resources, certificates, shopProducts]);
 
-    const handleProductEdit = (_product: any) => {
+    const _handleProductEdit = (_product: any) => {
         // AI 검색 모달에서는 편집 기능 비활성화
     };
 
-    const handleProductDelete = (_product: any) => {
+    const _handleProductDelete = (_product: any) => {
         // AI 검색 모달에서는 삭제 기능 비활성화
     };
 
-    const handleProductToggleHide = (_product: any) => {
+    const _handleProductToggleHide = (_product: any) => {
         // AI 검색 모달에서는 숨기기 기능 비활성화
     };
 
@@ -104,40 +109,40 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
         window.open('/products', '_blank');
     };
 
-    const handleProjectEdit = (_project: any) => {
+    const _handleProjectEdit = (_project: any) => {
         // AI 검색 모달에서는 편집 기능 비활성화
     };
 
-    const handleProjectDelete = (_id: string) => {
+    const _handleProjectDelete = (_id: string) => {
         // AI 검색 모달에서는 삭제 기능 비활성화
     };
 
-    const handleProjectToggleHide = (_id: string) => {
+    const _handleProjectToggleHide = (_id: string) => {
         // AI 검색 모달에서는 숨기기 기능 비활성화
     };
 
-    const handleEquipmentEdit = (_equipment: any) => {
+    const _handleEquipmentEdit = (_equipment: any) => {
         // AI 검색 모달에서는 편집 기능 비활성화
     };
 
-    const handleEquipmentDelete = (_equipment: any) => {
+    const _handleEquipmentDelete = (_equipment: any) => {
         // AI 검색 모달에서는 삭제 기능 비활성화
     };
 
-    const handleEquipmentToggleVisibility = (_equipment: any) => {
+    const _handleEquipmentToggleVisibility = (_equipment: any) => {
         // AI 검색 모달에서는 숨기기 기능 비활성화
     };
 
     // 추가 핸들러들
-    const handleResourceEdit = (_resource: any) => { };
-    const handleResourceDelete = (_id: string) => { };
-    const handleResourceToggleStatus = (_id: string, _isActive: boolean) => { };
-    const handleResourceDownload = async (_id: string, _fileName: string, _fileUrl: string) => { };
-    const handleCertificateEdit = (_certificate: any) => { };
-    const handleCertificateDelete = (_certificate: any) => { };
-    const handleCertificateToggleHide = (_certificate: any) => { };
-    const handleCertificateImageClick = (_certificate: any) => { };
-    const handleShopProductClick = (_url: string) => { };
+    const _handleResourceEdit = (_resource: any) => { };
+    const _handleResourceDelete = (_id: string) => { };
+    const _handleResourceToggleStatus = (_id: string, _isActive: boolean) => { };
+    const _handleResourceDownload = async (_id: string, _fileName: string, _fileUrl: string) => { };
+    const _handleCertificateEdit = (_certificate: any) => { };
+    const _handleCertificateDelete = (_certificate: any) => { };
+    const _handleCertificateToggleHide = (_certificate: any) => { };
+    const _handleCertificateImageClick = (_certificate: any) => { };
+    const _handleShopProductClick = (_url: string) => { };
 
     if (filteredItems.length === 0) {
         return (
@@ -439,21 +444,99 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
                     </div>
                 ))}
 
-                {data.type === 'shop' && (
-                    <div className="col-span-full">
-                        <ShopProductGrid
-                            products={filteredItems}
-                            gridCols={3}
-                            hiddenProductIds={[]}
-                            isAdmin={false}
-                            formLoading={false}
-                            onProductClick={handleShopProductClick}
-                            onEditProduct={handleProductEdit}
-                            onDeleteProduct={handleProductDelete}
-                            onToggleHide={handleProductToggleHide}
-                        />
+                {data.type === 'shop' && filteredItems.map((shopProduct: any, _index) => (
+                    <div key={shopProduct.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                        <div className="flex flex-row h-64">
+                            {/* 이미지 섹션 */}
+                            <div className="w-48 h-64 flex-shrink-0 relative overflow-hidden bg-gray-50">
+                                <FastImage
+                                    src={getImageUrl(shopProduct.image_url)}
+                                    alt={shopProduct.name}
+                                    className="w-full h-full object-contain transition-transform duration-300 hover:scale-105"
+                                    loading="lazy"
+                                />
+                                {shopProduct.is_new && (
+                                    <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                                        NEW
+                                    </div>
+                                )}
+                                {shopProduct.is_best && (
+                                    <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
+                                        BEST
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* 내용 섹션 */}
+                            <div className="flex-1 p-4 flex flex-col justify-between">
+                                <div>
+                                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1">
+                                        {shopProduct.name}
+                                    </h3>
+                                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                                        {shopProduct.description}
+                                    </p>
+
+                                    {/* 가격 정보 */}
+                                    <div className="mb-3">
+                                        <div className="flex items-center gap-2">
+                                            {shopProduct.original_price && shopProduct.original_price !== shopProduct.price && (
+                                                <span className="text-sm text-gray-400 line-through">
+                                                    ₩{shopProduct.original_price?.toLocaleString()}
+                                                </span>
+                                            )}
+                                            <span className="text-lg font-bold text-blue-600">
+                                                ₩{shopProduct.price?.toLocaleString() || '문의'}
+                                            </span>
+                                            {shopProduct.discount && (
+                                                <span className="text-sm bg-red-100 text-red-600 px-2 py-1 rounded-full">
+                                                    {shopProduct.discount}% 할인
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* 평점 및 리뷰 */}
+                                        {(shopProduct.rating || shopProduct.reviews) && (
+                                            <div className="flex items-center gap-2 mt-2">
+                                                {shopProduct.rating && (
+                                                    <div className="flex items-center">
+                                                        <span className="text-yellow-400">★</span>
+                                                        <span className="text-sm text-gray-600 ml-1">
+                                                            {shopProduct.rating}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                {shopProduct.reviews && (
+                                                    <span className="text-sm text-gray-500">
+                                                        ({shopProduct.reviews}개 리뷰)
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* 버튼 */}
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => window.open('/shop', '_blank')}
+                                        className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+                                    >
+                                        상품 보기
+                                    </button>
+                                    {shopProduct.naver_url && (
+                                        <button
+                                            onClick={() => window.open(shopProduct.naver_url, '_blank')}
+                                            className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium text-sm"
+                                        >
+                                            구매하기
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                )}
+                ))}
             </div>
         </div>
     );
