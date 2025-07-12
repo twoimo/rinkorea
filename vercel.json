@@ -143,7 +143,7 @@
             "headers": [
                 {
                     "key": "Content-Security-Policy",
-                    "value": "img-src 'self' https://*.pstatic.net data:;"
+                    "value": "img-src 'self' data: https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org;"
                 }
             ]
         }
