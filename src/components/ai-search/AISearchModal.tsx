@@ -333,7 +333,8 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
         const showMarkers = [
             { regex: /\[SHOW_PRODUCT:([^\]]+)\]/g, type: 'products' as const },
             { regex: /\[SHOW_EQUIPMENT:([^\]]+)\]/g, type: 'equipment' as const },
-            { regex: /\[SHOW_PROJECT:([^\]]+)\]/g, type: 'projects' as const },
+            // projects: 닫는 대괄호가 없어도 매칭
+            { regex: /\[SHOW_PROJECT:([a-f0-9-,]+)\]?/gi, type: 'projects' as const },
             { regex: /\[SHOW_CERTIFICATE:([^\]]+)\]/g, type: 'certificates' as const },
             { regex: /\[SHOW_RESOURCES:([^\]]+)\]/g, type: 'resources' as const },
             { regex: /\[SHOW_SHOP:([^\]]+)\]/g, type: 'shop' as const }
