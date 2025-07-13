@@ -16,6 +16,9 @@ interface CardDisplayProps {
     data: CardData;
 }
 
+// 페이지네이션: 한 번에 보여줄 카드 개수
+const PAGE_SIZE = 10;
+
 const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
     const { t, language: _language } = useLanguage();
     const { products } = useProducts();
@@ -24,6 +27,9 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
     const { resources } = useResources();
     const [certificates, setCertificates] = useState<any[]>([]);
     const [shopProducts, setShopProducts] = useState<any[]>([]);
+    const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+    // 여러 마커 그룹 지원
+    const [visibleGroupIndex, setVisibleGroupIndex] = useState(0);
 
     // 이미지 URL 처리 함수
     const getImageUrl = (imagePath: string) => {
@@ -73,24 +79,61 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
         fetchData();
     }, [data.type, data.ids]);
 
+    useEffect(() => {
+        setVisibleCount(PAGE_SIZE); // type/ids 바뀌면 초기화
+        setVisibleGroupIndex(0); // 그룹도 초기화
+    }, [data.type, data.ids]);
+
+    // ids가 배열의 배열(그룹)인지 판별
+    const isGrouped = Array.isArray(data.ids) && Array.isArray(data.ids[0]);
+    const groupCount = isGrouped ? data.ids.length : 1;
+    const currentIds = isGrouped ? data.ids[visibleGroupIndex] : data.ids;
+
+    // 디버깅: AI 마커 uuid와 프론트 products uuid 비교
+    useEffect(() => {
+        if (data.type === 'products') {
+            console.log('AI 마커 uuid:', data.ids);
+            console.log('프론트 products:', products.map(p => p.id));
+            const missing = data.ids.filter(id => !products.some(p => p.id === id));
+            if (missing.length > 0) {
+                console.warn('DB에 없는 uuid:', missing);
+            }
+        }
+        if (data.type === 'projects') {
+            console.log('AI 마커 uuid:', data.ids);
+            console.log('프론트 projects:', projects.map(p => p.id));
+            const missing = data.ids.filter(id => !projects.some(p => p.id === id));
+            if (missing.length > 0) {
+                console.warn('DB에 없는 프로젝트 uuid:', missing);
+            }
+        }
+    }, [data.type, data.ids, products, projects]);
+
     const filteredItems = useMemo(() => {
         switch (data.type) {
             case 'products':
-                return products.filter(product => data.ids.includes(product.id));
+                return products.filter(product => currentIds.includes(product.id));
             case 'projects':
-                return projects.filter(project => data.ids.includes(project.id));
+                return projects.filter(project => currentIds.includes(project.id));
             case 'equipment':
-                return equipment.filter(eq => data.ids.includes(eq.id));
+                return equipment.filter(eq => currentIds.includes(eq.id));
             case 'resources':
-                return resources.filter(resource => data.ids.includes(resource.id));
+                return resources.filter(resource => currentIds.includes(resource.id));
             case 'certificates':
-                return certificates.filter(cert => data.ids.includes(cert.id));
+                return certificates.filter(cert => currentIds.includes(cert.id));
             case 'shop':
-                return shopProducts.filter(product => data.ids.includes(product.id));
+                return shopProducts.filter(product => currentIds.includes(product.id));
             default:
                 return [];
         }
-    }, [data.type, data.ids, products, projects, equipment, resources, certificates, shopProducts]);
+    }, [data.type, currentIds, products, projects, equipment, resources, certificates, shopProducts]);
+
+    // 실제 보여줄 카드 (페이지네이션 적용)
+    // 그룹이 1개일 때만 10개씩 페이지네이션, 그룹이 여러 개면 그룹 단위로만 보여줌
+    const pagedItems = useMemo(() => {
+        if (isGrouped) return filteredItems;
+        return filteredItems.slice(0, visibleCount);
+    }, [filteredItems, visibleCount, isGrouped]);
 
     const _handleProductEdit = (_product: any) => {
         // AI 검색 모달에서는 편집 기능 비활성화
@@ -162,72 +205,77 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
                     {data.type === 'resources' && t('related_resources', '관련 자료')}
                     {data.type === 'certificates' && t('related_certificates', '관련 인증서')}
                     {data.type === 'shop' && t('related_shop_products', '관련 온라인 스토어 제품')}
-                    ({filteredItems.length})
+                    {isGrouped ? `(${visibleGroupIndex + 1} / ${groupCount})` : `(${filteredItems.length})`}
                 </h4>
             </div>
 
             <div className="space-y-4">
-                {data.type === 'products' && filteredItems.map((product: any, _index) => (
-                    <div key={product.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                        <div className="flex flex-row h-64">
-                            {/* 이미지 섹션 */}
-                            <div className="w-48 h-64 flex-shrink-0 relative overflow-hidden bg-gray-50">
-                                <FastImage
-                                    src={getImageUrl(product.image_url)}
-                                    alt={product.name}
-                                    className="w-full h-full object-contain transition-transform duration-300 hover:scale-105"
-                                    loading="lazy"
-                                />
-                                {product.icon && product.icon !== 'none' && product.icon !== 'None' && (
-                                    <div className="absolute top-3 left-3 bg-white p-2 rounded-full">
-                                        <div className="w-6 h-6 text-blue-600" />
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* 내용 섹션 */}
-                            <div className="flex-1 p-4 flex flex-col justify-between">
-                                <div>
-                                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1">
-                                        {product.name}
-                                    </h3>
-                                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                                        {product.description}
-                                    </p>
-
-                                    {/* 특징 리스트 */}
-                                    {product.features && product.features.length > 0 && (
-                                        <div className="mb-3">
-                                            <ul className="flex flex-wrap gap-2">
-                                                {product.features.slice(0, 3).map((feature: string, featureIndex: number) => (
-                                                    <li key={featureIndex} className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full flex items-center">
-                                                        <span className="w-1 h-1 bg-blue-600 rounded-full mr-1 flex-shrink-0"></span>
-                                                        <span className="truncate">{feature}</span>
-                                                    </li>
-                                                ))}
-                                                {product.features.length > 3 && (
-                                                    <li className="text-xs text-blue-600 px-2 py-1 flex items-center">
-                                                        +{product.features.length - 3}개 더
-                                                    </li>
-                                                )}
-                                            </ul>
+                {data.type === 'products' && filteredItems.map((product: any, _index) => {
+                    // 안전 처리: features, image_url
+                    const safeFeatures = Array.isArray(product.features) ? product.features : [];
+                    const safeImageUrl = product.image_url || '/images/placeholder.svg';
+                    return (
+                        <div key={product.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                            <div className="flex flex-row h-64">
+                                {/* 이미지 섹션 */}
+                                <div className="w-48 h-64 flex-shrink-0 relative overflow-hidden bg-gray-50">
+                                    <FastImage
+                                        src={getImageUrl(safeImageUrl)}
+                                        alt={product.name}
+                                        className="w-full h-full object-contain transition-transform duration-300 hover:scale-105"
+                                        loading="lazy"
+                                    />
+                                    {product.icon && product.icon !== 'none' && product.icon !== 'None' && (
+                                        <div className="absolute top-3 left-3 bg-white p-2 rounded-full">
+                                            <div className="w-6 h-6 text-blue-600" />
                                         </div>
                                     )}
                                 </div>
 
-                                {/* 버튼 */}
-                                <button
-                                    onClick={() => handleProductViewDetail(product)}
-                                    className="self-start bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-                                >
-                                    자세히 보기
-                                </button>
+                                {/* 내용 섹션 */}
+                                <div className="flex-1 p-4 flex flex-col justify-between">
+                                    <div>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1">
+                                            {product.name}
+                                        </h3>
+                                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                                            {product.description}
+                                        </p>
+
+                                        {/* 특징 리스트 */}
+                                        {safeFeatures.length > 0 && (
+                                            <div className="mb-3">
+                                                <ul className="flex flex-wrap gap-2">
+                                                    {safeFeatures.slice(0, 3).map((feature: string, featureIndex: number) => (
+                                                        <li key={featureIndex} className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded-full flex items-center">
+                                                            <span className="w-1 h-1 bg-blue-600 rounded-full mr-1 flex-shrink-0"></span>
+                                                            <span className="truncate">{feature}</span>
+                                                        </li>
+                                                    ))}
+                                                    {safeFeatures.length > 3 && (
+                                                        <li className="text-xs text-blue-600 px-2 py-1 flex items-center">
+                                                            +{safeFeatures.length - 3}개 더
+                                                        </li>
+                                                    )}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* 버튼 */}
+                                    <button
+                                        onClick={() => handleProductViewDetail(product)}
+                                        className="self-start bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+                                    >
+                                        자세히 보기
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    )
+                })}
 
-                {data.type === 'projects' && filteredItems.map((project: any, _index) => (
+                {data.type === 'projects' && pagedItems.map((project: any, _index) => (
                     <div key={project.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                         <div className="flex flex-row h-64">
                             {/* 이미지 섹션 */}
@@ -538,6 +586,30 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ data }) => {
                     </div>
                 ))}
             </div>
+            {/* 더 보기 버튼: 그룹이 여러 개면 그룹 단위, 1개면 기존 10개씩 */}
+            {isGrouped ? (
+                visibleGroupIndex < groupCount - 1 && (
+                    <div className="flex justify-center mt-4">
+                        <button
+                            onClick={() => setVisibleGroupIndex(i => i + 1)}
+                            className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
+                        >
+                            더 보기 ({visibleGroupIndex + 1} / {groupCount})
+                        </button>
+                    </div>
+                )
+            ) : (
+                filteredItems.length > visibleCount && (
+                    <div className="flex justify-center mt-4">
+                        <button
+                            onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+                            className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
+                        >
+                            더 보기 ({visibleCount} / {filteredItems.length})
+                        </button>
+                    </div>
+                )
+            )}
         </div>
     );
 };

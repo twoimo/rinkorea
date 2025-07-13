@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import AutoScrollGrid from '@/components/AutoScrollGrid';
 import ProjectCard from './ProjectCard';
 import type { Project } from '@/hooks/useProjects';
@@ -32,13 +32,21 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = ({
   onToggleHide
 }) => {
   const filteredProjects = projects.filter(p => p.category === category);
+  const PAGE_SIZE = 12;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const visibleProjects = filteredProjects.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredProjects.length;
+
+  function handleLoadMore() {
+    setVisibleCount(count => Math.min(count + PAGE_SIZE, filteredProjects.length));
+  }
 
   if (category === 'construction') {
     return (
       <section className="py-12 sm:py-20">
         <div className="w-full">
           <AutoScrollGrid
-            items={filteredProjects}
+            items={visibleProjects}
             itemsPerRow={isMobile ? 1 : 4}
             renderItem={(project) => (
               <ProjectCard
@@ -54,6 +62,16 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = ({
               />
             )}
           />
+          {hasMore && (
+            <div className="flex justify-center mt-8">
+              <button
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-base"
+                onClick={handleLoadMore}
+              >
+                더보기
+              </button>
+            </div>
+          )}
         </div>
       </section>
     );
@@ -68,7 +86,7 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = ({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {filteredProjects.map((project) => (
+          {visibleProjects.map((project) => (
             <ProjectCard
               key={project.id}
               project={project}
@@ -82,6 +100,16 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = ({
             />
           ))}
         </div>
+        {hasMore && (
+          <div className="flex justify-center mt-8">
+            <button
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-base"
+              onClick={handleLoadMore}
+            >
+              더보기
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
