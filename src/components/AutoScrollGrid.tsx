@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import type { Project } from '../hooks/useProjects';
 
@@ -15,7 +16,7 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
     speed = 1,
 }) => {
     const [isHovered, setIsHovered] = useState(false);
-    const [isDragging, setIsDragging] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
     const [currentTranslate, setCurrentTranslate] = useState(0);
     const rowRef = useRef<HTMLDivElement>(null);
