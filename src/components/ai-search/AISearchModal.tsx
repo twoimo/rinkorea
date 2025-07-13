@@ -38,7 +38,7 @@ interface ExampleQuestion {
     adminOnly?: boolean;
 }
 
-const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
+function AISearchModal({ onClose }: AISearchModalProps) {
     const modalRef = useRef<HTMLDivElement>(null);
     const animationFrameRef = useRef<number>();
     const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -87,7 +87,6 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
             examples: [
                 { text: '100제곱미터 면적에 린코트를 시공할 때 예상 비용은?' },
                 { text: '린하드플러스 10통에 대한 견적을 내주세요.' },
-                { text: '대량 구매 시 할인 혜택이 있나요?' },
             ],
         },
         {
@@ -562,12 +561,15 @@ const AISearchModal: React.FC<AISearchModalProps> = ({ onClose }) => {
                             <span className="hidden sm:block">전송</span>
                         </button>
                     </div>
+                    <div className="mt-2 text-xs text-gray-400 text-center select-none">
+                        ※ AI 어시스턴트는 실수를 할 수 있습니다. 중요한 정보는 전화번호(032-571-1023), 이메일(2019@rinkorea.com) 연락을 통해 재차 확인하세요. ※
+                    </div>
                 </div>
             </div>
         </div>
     );
 
     return createPortal(modalContent, document.body);
-};
+}
 
 export default AISearchModal; 
