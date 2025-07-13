@@ -1,7 +1,6 @@
-
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, MessageCircle, HelpCircle, Calculator, Search, TrendingUp, Bot, Send, Loader2 } from 'lucide-react';
+import { X, MessageCircle, HelpCircle, Calculator, Search, TrendingUp, Bot, Send, Loader2, Sparkles, ArrowRight, Zap } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { aiAgent, AIFunctionType } from '@/services/langgraph-agent';
@@ -21,6 +20,7 @@ interface AIFunction {
     description: string;
     icon: React.ElementType;
     color: string;
+    gradient: string;
     adminOnly?: boolean;
 }
 
@@ -36,6 +36,7 @@ interface Message {
 interface ExampleQuestion {
     text: string;
     adminOnly?: boolean;
+    category?: string;
 }
 
 function AISearchModal({ onClose }: AISearchModalProps) {
@@ -53,6 +54,7 @@ function AISearchModal({ onClose }: AISearchModalProps) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputMessage, setInputMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [showWelcome, setShowWelcome] = useState(true);
 
     const aiFunctions: (AIFunction & { examples: ExampleQuestion[] })[] = [
         {
@@ -60,11 +62,12 @@ function AISearchModal({ onClose }: AISearchModalProps) {
             name: 'AI 고객 상담 챗봇',
             description: '제품 문의, 기술 지원, 일반 상담을 위한 AI 어시스턴트',
             icon: MessageCircle,
-            color: 'bg-blue-500',
+            color: 'text-blue-600',
+            gradient: 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200',
             examples: [
-                { text: '린코트 제품을 보여주세요' },
-                { text: '온라인 스토어 제품을 보여주세요' },
-                { text: '모든 제품 라인업을 보여주세요' },
+                { text: '린코트 제품을 보여주세요', category: '제품 문의' },
+                { text: '온라인 스토어 제품을 보여주세요', category: '제품 문의' },
+                { text: '모든 제품 라인업을 보여주세요', category: '제품 문의' },
             ],
         },
         {
@@ -72,11 +75,12 @@ function AISearchModal({ onClose }: AISearchModalProps) {
             name: '지능형 Q&A 자동화',
             description: '자주 묻는 질문에 대한 자동 답변 및 Q&A 관리',
             icon: HelpCircle,
-            color: 'bg-green-500',
+            color: 'text-green-600',
+            gradient: 'bg-gradient-to-br from-green-50 to-green-100 border-green-200',
             examples: [
-                { text: '린코트 시공 방법과 관련 프로젝트를 보여주세요' },
-                { text: '현대건설기계 군산공장 프로젝트를 보여주세요' },
-                { text: '교육시설 적용 사례를 찾아주세요' },
+                { text: '린코트 시공 방법과 관련 프로젝트를 보여주세요', category: '시공 관련' },
+                { text: '현대건설기계 군산공장 프로젝트를 보여주세요', category: '프로젝트 사례' },
+                { text: '교육시설 적용 사례를 찾아주세요', category: '프로젝트 사례' },
             ],
         },
         {
@@ -84,10 +88,11 @@ function AISearchModal({ onClose }: AISearchModalProps) {
             name: '스마트 견적 시스템',
             description: '제품 및 서비스에 대한 자동 견적 생성',
             icon: Calculator,
-            color: 'bg-purple-500',
+            color: 'text-purple-600',
+            gradient: 'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200',
             examples: [
-                { text: '100제곱미터 면적에 린코트를 시공할 때 예상 비용은?' },
-                { text: '린하드플러스 10통에 대한 견적을 내주세요.' },
+                { text: '100제곱미터 면적에 린코트를 시공할 때 예상 비용은?', category: '견적 문의' },
+                { text: '린하드플러스 10통에 대한 견적을 내주세요.', category: '견적 문의' },
             ],
         },
         {
@@ -95,11 +100,12 @@ function AISearchModal({ onClose }: AISearchModalProps) {
             name: '문서 지능 검색',
             description: '회사 문서, 매뉴얼, 자료에서 정보 검색',
             icon: Search,
-            color: 'bg-orange-500',
+            color: 'text-orange-600',
+            gradient: 'bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200',
             examples: [
-                { text: '콘크리트 연삭기 장비를 보여주세요' },
-                { text: '린코트 카탈로그와 도장사양서를 보여주세요' },
-                { text: '시험성적서와 인증서를 보여주세요' },
+                { text: '콘크리트 연삭기 장비를 보여주세요', category: '장비 문의' },
+                { text: '린코트 카탈로그와 도장사양서를 보여주세요', category: '자료 검색' },
+                { text: '시험성적서와 인증서를 보여주세요', category: '자료 검색' },
             ],
         },
         {
@@ -107,12 +113,13 @@ function AISearchModal({ onClose }: AISearchModalProps) {
             name: '금융 AI 분석',
             description: '매출, 수익, 트렌드 분석 및 인사이트 제공',
             icon: TrendingUp,
-            color: 'bg-red-500',
+            color: 'text-red-600',
+            gradient: 'bg-gradient-to-br from-red-50 to-red-100 border-red-200',
             adminOnly: true,
             examples: [
-                { text: '지난 분기 대비 매출 증감률을 알려줘.', adminOnly: true },
-                { text: '가장 수익성이 높은 제품군은 무엇인가?', adminOnly: true },
-                { text: '올해 연말 매출을 예측해줘.', adminOnly: true },
+                { text: '지난 분기 대비 매출 증감률을 알려줘.', adminOnly: true, category: '분석' },
+                { text: '가장 수익성이 높은 제품군은 무엇인가?', adminOnly: true, category: '분석' },
+                { text: '올해 연말 매출을 예측해줘.', adminOnly: true, category: '예측' },
             ],
         },
     ];
@@ -126,7 +133,7 @@ function AISearchModal({ onClose }: AISearchModalProps) {
         if (textarea) {
             textarea.style.height = 'auto';
             const scrollHeight = textarea.scrollHeight;
-            const maxHeight = 120; // Max 5 lines approximately
+            const maxHeight = 120;
             textarea.style.height = `${Math.min(scrollHeight, maxHeight)}px`;
         }
     }, []);
@@ -135,6 +142,7 @@ function AISearchModal({ onClose }: AISearchModalProps) {
         adjustTextareaHeight();
     }, [inputMessage, adjustTextareaHeight]);
 
+    // Modal positioning and scroll prevention
     useEffect(() => {
         const originalBodyOverflow = document.body.style.overflow;
         const originalHtmlOverflow = document.documentElement.style.overflow;
@@ -185,7 +193,8 @@ function AISearchModal({ onClose }: AISearchModalProps) {
             modalElement.style.width = `${viewportWidth}px`;
             modalElement.style.height = `${viewportHeight}px`;
             modalElement.style.zIndex = '2147483647';
-            modalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+            modalElement.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+            modalElement.style.backdropFilter = 'blur(8px)';
             modalElement.style.display = 'flex';
             modalElement.style.alignItems = 'center';
             modalElement.style.justifyContent = 'center';
@@ -224,6 +233,7 @@ function AISearchModal({ onClose }: AISearchModalProps) {
         };
     }, [onClose, isLoading]);
 
+    // Auto-scroll to new messages
     useEffect(() => {
         if (messages.length > prevMessagesLength.current) {
             const newMessage = messages[messages.length - 1];
@@ -245,7 +255,7 @@ function AISearchModal({ onClose }: AISearchModalProps) {
 
     const handleExampleQuestionClick = useCallback((question: string) => {
         setInputMessage(question);
-        // Focus textarea after setting message
+        setShowWelcome(false);
         setTimeout(() => {
             textareaRef.current?.focus();
         }, 100);
@@ -254,6 +264,8 @@ function AISearchModal({ onClose }: AISearchModalProps) {
     const handleSendMessage = useCallback(async (messageContent?: string, funcType?: AIFunctionType) => {
         const content = typeof messageContent === 'string' ? messageContent : inputMessage.trim();
         if (!content || isLoading) return;
+
+        setShowWelcome(false);
 
         let functionToUse = funcType || selectedFunction;
         if (!functionToUse && messages.length > 0) {
@@ -419,66 +431,128 @@ function AISearchModal({ onClose }: AISearchModalProps) {
     };
 
     const modalContent = (
-        <div ref={modalRef} onClick={onClose}>
+        <div ref={modalRef} onClick={onClose} className="animate-fade-in">
             <div
-                className="bg-white w-full h-full sm:rounded-xl sm:shadow-2xl sm:max-w-5xl sm:max-h-[95vh] sm:h-auto overflow-hidden flex flex-col"
+                className="bg-white w-full h-full sm:rounded-2xl sm:shadow-2xl sm:max-w-6xl sm:max-h-[95vh] sm:h-auto overflow-hidden flex flex-col animate-scale-in"
                 onClick={(e) => e.stopPropagation()}
+                style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
             >
-                {/* Header - Mobile Optimized */}
-                <div className="flex-shrink-0 sticky top-0 bg-white border-b border-gray-200 px-3 py-3 sm:px-4 sm:py-4 flex items-center justify-between safe-area-inset-top">
-                    <div className="flex items-center space-x-2 min-w-0 flex-1">
+                {/* Enhanced Header */}
+                <div className="flex-shrink-0 sticky top-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-4 sm:px-6 sm:py-5 flex items-center justify-between safe-area-inset-top">
+                    <div className="flex items-center space-x-3 min-w-0 flex-1">
                         {selectedFunction && (
                             <button
                                 onClick={() => setSelectedFunction(null)}
-                                className="p-1.5 hover:bg-gray-100 rounded-full transition-colors touch-manipulation flex-shrink-0"
+                                className="p-2 hover:bg-white/20 rounded-full transition-all duration-200 touch-manipulation flex-shrink-0"
                                 aria-label="뒤로 가기"
                             >
-                                <X className="w-4 h-4 rotate-45" />
+                                <ArrowRight className="w-5 h-5 rotate-180" />
                             </button>
                         )}
-                        <div className="flex items-center space-x-1.5 min-w-0 flex-1">
-                            <Bot className="w-5 h-5 text-blue-600 flex-shrink-0" />
-                            <h2 className="text-base sm:text-lg font-semibold truncate leading-tight">
-                                {selectedFunction
-                                    ? selectedFunctionInfo?.name
-                                    : 'AI 검색 및 지원'}
-                            </h2>
+                        <div className="flex items-center space-x-2 min-w-0 flex-1">
+                            <div className="relative">
+                                <Bot className="w-6 h-6 flex-shrink-0" />
+                                <Sparkles className="w-3 h-3 absolute -top-1 -right-1 text-yellow-300" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <h2 className="text-lg sm:text-xl font-bold truncate leading-tight">
+                                    {selectedFunction
+                                        ? selectedFunctionInfo?.name
+                                        : 'AI 검색 및 지원'}
+                                </h2>
+                                {selectedFunction && selectedFunctionInfo && (
+                                    <p className="text-sm text-blue-100 truncate">
+                                        {selectedFunctionInfo.description}
+                                    </p>
+                                )}
+                            </div>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-1.5 hover:bg-gray-100 rounded-full transition-colors touch-manipulation flex-shrink-0 ml-2"
+                        className="p-2 hover:bg-white/20 rounded-full transition-all duration-200 touch-manipulation flex-shrink-0 ml-3"
                         aria-label="모달 닫기"
                     >
                         <X className="w-5 h-5" />
                     </button>
                 </div>
 
-                {/* Chat Messages - Mobile Optimized */}
+                {/* Enhanced Chat Messages */}
                 <div 
                     ref={chatContainerRef} 
-                    className="flex-1 overflow-y-auto px-3 py-3 sm:px-4 sm:py-4 space-y-3 overscroll-contain"
+                    className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 space-y-4 overscroll-contain bg-gradient-to-b from-gray-50/50 to-white"
                     style={{ WebkitOverflowScrolling: 'touch' }}
                 >
-                    {messages.length === 0 ? (
-                        <div className="text-center py-4 sm:py-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                                무엇을 도와드릴까요?
-                            </h3>
-                            <p className="text-sm text-gray-600 mb-4 sm:mb-6 px-2">
-                                질문을 입력하시면 AI가 가장 적절한 기능으로 답변해 드립니다.
-                            </p>
-                            {/* Example Questions - Mobile Grid */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 max-w-2xl mx-auto">
-                                {exampleQuestionsToShow.slice(0, 6).map((example, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => handleExampleQuestionClick(example.text)}
-                                        className="px-3 py-2.5 bg-gray-50 hover:bg-gray-100 active:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm text-left touch-manipulation border border-gray-200"
+                    {showWelcome && messages.length === 0 ? (
+                        <div className="text-center py-6 sm:py-8 animate-fade-in">
+                            <div className="mb-6">
+                                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mb-4 shadow-lg">
+                                    <Bot className="w-8 h-8 text-white" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                                    무엇을 도와드릴까요?
+                                </h3>
+                                <p className="text-gray-600 mb-6 px-4 max-w-md mx-auto">
+                                    질문을 입력하시면 AI가 가장 적절한 기능으로 답변해 드립니다.
+                                </p>
+                            </div>
+
+                            {/* AI Function Cards */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 max-w-4xl mx-auto">
+                                {aiFunctions.filter(f => !f.adminOnly || isAdmin).map((func, index) => (
+                                    <div
+                                        key={func.id}
+                                        className={cn(
+                                            "group p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg",
+                                            func.gradient,
+                                            "animate-fade-in"
+                                        )}
+                                        style={{ animationDelay: `${index * 100}ms` }}
+                                        onClick={() => setSelectedFunction(func.id)}
                                     >
-                                        {example.text}
-                                    </button>
+                                        <div className="flex items-start space-x-3">
+                                            <div className={cn("p-2 rounded-lg bg-white/80 group-hover:bg-white transition-colors", func.color)}>
+                                                <func.icon className="w-5 h-5" />
+                                            </div>
+                                            <div className="flex-1 text-left">
+                                                <h4 className="font-semibold text-gray-900 text-sm mb-1 group-hover:text-gray-800">
+                                                    {func.name}
+                                                </h4>
+                                                <p className="text-xs text-gray-600 leading-relaxed">
+                                                    {func.description}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 ))}
+                            </div>
+
+                            {/* Enhanced Example Questions */}
+                            <div className="max-w-3xl mx-auto">
+                                <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center justify-center space-x-2">
+                                    <Zap className="w-5 h-5 text-yellow-500" />
+                                    <span>인기 질문</span>
+                                </h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {exampleQuestionsToShow.slice(0, 6).map((example, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => handleExampleQuestionClick(example.text)}
+                                            className="group px-4 py-3 bg-white hover:bg-blue-50 active:bg-blue-100 text-gray-700 hover:text-blue-800 rounded-xl transition-all duration-200 text-sm text-left touch-manipulation border border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md animate-fade-in"
+                                            style={{ animationDelay: `${(index + 3) * 100}ms` }}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <span className="flex-1 font-medium">{example.text}</span>
+                                                <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-blue-600" />
+                                            </div>
+                                            {example.category && (
+                                                <span className="text-xs text-gray-500 mt-1 block">
+                                                    {example.category}
+                                                </span>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     ) : (
@@ -492,50 +566,59 @@ function AISearchModal({ onClose }: AISearchModalProps) {
                                     <React.Fragment key={message.id}>
                                         <div
                                             ref={index === messages.length - 1 ? lastMessageRef : null}
-                                            className={cn("flex", message.role === 'user' ? 'justify-end' : 'justify-start')}
+                                            className={cn(
+                                                "flex animate-fade-in",
+                                                message.role === 'user' ? 'justify-end' : 'justify-start'
+                                            )}
                                         >
                                             <div
                                                 className={cn(
-                                                    "p-3 rounded-lg text-sm leading-relaxed",
+                                                    "p-4 rounded-2xl text-sm leading-relaxed shadow-sm",
                                                     message.role === 'user'
-                                                        ? 'bg-blue-600 text-white max-w-[85%] rounded-br-md'
-                                                        : 'bg-gray-100 text-gray-800 max-w-[90%] rounded-bl-md'
+                                                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white max-w-[85%] rounded-br-lg'
+                                                        : 'bg-white text-gray-800 max-w-[90%] rounded-bl-lg border border-gray-100'
                                                 )}
                                             >
                                                 {message.role === 'assistant' ? (
                                                     <>
                                                         {funcInfo && (
-                                                            <div className="flex items-center space-x-1.5 mb-2 pb-2 border-b border-gray-200">
-                                                                <funcInfo.icon className={cn("w-4 h-4 flex-shrink-0", funcInfo.color.replace('bg-', 'text-'))} />
-                                                                <span className="text-xs font-semibold text-gray-800 truncate">{funcInfo.name}</span>
+                                                            <div className="flex items-center space-x-2 mb-3 pb-2 border-b border-gray-100">
+                                                                <div className={cn("p-1.5 rounded-lg", funcInfo.gradient)}>
+                                                                    <funcInfo.icon className={cn("w-4 h-4", funcInfo.color)} />
+                                                                </div>
+                                                                <span className="text-xs font-semibold text-gray-700">
+                                                                    {funcInfo.name}
+                                                                </span>
                                                             </div>
                                                         )}
                                                         {renderMessageContent(message)}
                                                     </>
                                                 ) : (
-                                                    <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                                                    <p className="whitespace-pre-wrap break-words font-medium">{message.content}</p>
                                                 )}
                                                 <p className={cn(
-                                                    "text-xs mt-2 opacity-75",
+                                                    "text-xs mt-3 opacity-75 flex items-center space-x-1",
                                                     message.role === 'user'
                                                         ? 'text-blue-200'
                                                         : 'text-gray-500'
                                                 )}>
-                                                    {message.timestamp.toLocaleTimeString()}
+                                                    <span>{message.timestamp.toLocaleTimeString()}</span>
                                                 </p>
                                             </div>
                                         </div>
 
-                                        {/* Follow-up Questions - Mobile Optimized */}
+                                        {/* Enhanced Follow-up Questions */}
                                         {message.role === 'assistant' && index === messages.length - 1 && message.followUpQuestions && message.followUpQuestions.length > 0 && (
-                                            <div className="mt-3 space-y-2">
+                                            <div className="mt-4 space-y-2 animate-fade-in">
+                                                <p className="text-sm font-medium text-gray-600 mb-2">💡 추천 질문:</p>
                                                 {message.followUpQuestions.map((question, qIndex) => (
                                                     <button
                                                         key={qIndex}
                                                         onClick={() => handleSendMessage(question, message.functionType)}
-                                                        className="block w-full px-3 py-2.5 bg-blue-50 hover:bg-blue-100 active:bg-blue-200 text-blue-700 rounded-lg transition-colors text-sm text-left touch-manipulation border border-blue-200"
+                                                        className="group flex items-center justify-between w-full px-4 py-3 bg-blue-50 hover:bg-blue-100 active:bg-blue-200 text-blue-800 rounded-xl transition-all duration-200 text-sm text-left touch-manipulation border border-blue-200 hover:border-blue-300 shadow-sm hover:shadow-md"
                                                     >
-                                                        {question}
+                                                        <span className="flex-1 font-medium">{question}</span>
+                                                        <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                                                     </button>
                                                 ))}
                                             </div>
@@ -544,11 +627,14 @@ function AISearchModal({ onClose }: AISearchModalProps) {
                                 )
                             })}
                             {isLoading && (
-                                <div className="flex justify-start">
-                                    <div className="bg-gray-100 p-3 rounded-lg max-w-[90%] rounded-bl-md">
-                                        <div className="flex items-center space-x-2">
-                                            <Loader2 className="w-4 h-4 animate-spin text-blue-600 flex-shrink-0" />
-                                            <span className="text-gray-600 text-sm">AI가 답변을 생성하고 있습니다...</span>
+                                <div className="flex justify-start animate-fade-in">
+                                    <div className="bg-white p-4 rounded-2xl max-w-[90%] rounded-bl-lg border border-gray-100 shadow-sm">
+                                        <div className="flex items-center space-x-3">
+                                            <div className="relative">
+                                                <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                                                <div className="absolute inset-0 w-5 h-5 border-2 border-blue-200 rounded-full animate-pulse"></div>
+                                            </div>
+                                            <span className="text-gray-700 text-sm font-medium">AI가 답변을 생성하고 있습니다...</span>
                                         </div>
                                     </div>
                                 </div>
@@ -558,9 +644,9 @@ function AISearchModal({ onClose }: AISearchModalProps) {
                     <div ref={chatEndRef} />
                 </div>
 
-                {/* Input Area - Mobile Optimized */}
-                <div className="flex-shrink-0 border-t border-gray-200 p-3 sm:p-4 bg-white safe-area-inset-bottom">
-                    <div className="flex space-x-2 items-end">
+                {/* Enhanced Input Area */}
+                <div className="flex-shrink-0 border-t border-gray-200 p-4 sm:p-6 bg-white safe-area-inset-bottom">
+                    <div className="flex space-x-3 items-end">
                         <div className="flex-1 relative">
                             <textarea
                                 ref={textareaRef}
@@ -568,22 +654,24 @@ function AISearchModal({ onClose }: AISearchModalProps) {
                                 onChange={(e) => setInputMessage(e.target.value)}
                                 onKeyPress={handleInputKeyPress}
                                 placeholder="메시지를 입력하세요..."
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm leading-relaxed min-h-[44px] max-h-[120px] touch-manipulation"
+                                className="w-full border-2 border-gray-200 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm leading-relaxed min-h-[48px] max-h-[120px] touch-manipulation transition-all duration-200 shadow-sm hover:shadow-md"
                                 disabled={isLoading}
-                                style={{ height: '44px' }}
+                                style={{ height: '48px' }}
                             />
                         </div>
                         <button
                             onClick={() => handleSendMessage()}
                             disabled={!inputMessage.trim() || isLoading}
-                            className="px-3 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center touch-manipulation min-w-[44px] h-[44px] flex-shrink-0"
+                            className="group px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 active:from-blue-800 active:to-blue-900 text-white rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center touch-manipulation min-w-[48px] h-[48px] flex-shrink-0 shadow-lg hover:shadow-xl disabled:shadow-md"
                             aria-label="메시지 전송"
                         >
-                            <Send className="w-4 h-4" />
+                            <Send className="w-5 h-5 group-hover:scale-110 transition-transform" />
                         </button>
                     </div>
-                    <div className="mt-2 text-xs text-gray-400 text-center leading-tight px-2">
-                        ※ AI 어시스턴트는 실수를 할 수 있습니다. 중요한 정보는 전화번호(032-571-1023), 이메일(2019@rinkorea.com) 연락을 통해 재차 확인하세요. ※
+                    <div className="mt-3 text-xs text-gray-500 text-center leading-tight px-2 bg-gray-50 rounded-lg py-2">
+                        <span className="font-medium">💡 팁:</span> AI 어시스턴트는 실수를 할 수 있습니다. 중요한 정보는{' '}
+                        <span className="text-blue-600 font-semibold">전화(032-571-1023)</span> 또는{' '}
+                        <span className="text-blue-600 font-semibold">이메일(2019@rinkorea.com)</span>로 재확인하세요.
                     </div>
                 </div>
             </div>
