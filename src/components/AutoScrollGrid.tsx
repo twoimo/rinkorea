@@ -15,7 +15,7 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
     speed = 1,
 }) => {
     const [isHovered, setIsHovered] = useState(false);
-    const [isDragging, setIsDragging] = useState(false);
+    const [isDragging, setIsDragging] = useState(0);
     const [startX, setStartX] = useState(0);
     const [currentTranslate, setCurrentTranslate] = useState(0);
     const rowRef = useRef<HTMLDivElement>(null);
@@ -23,9 +23,9 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
     const positionRef = useRef(0);
     const lastTimeRef = useRef(performance.now());
 
-    const _itemsPerRow = Math.floor(window.innerWidth / 300);
+    // Remove the itemsPerRow calculation since it's not used in the interface
+    // const _itemsPerRow = Math.floor(window.innerWidth / 300);
 
-    // Memoize repeated items to prevent unnecessary recalculations
     const repeatedItems = useMemo(() => {
         const repeated: Project[] = [];
         for (let i = 0; i < 8; i++) {
@@ -170,4 +170,4 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
     );
 };
 
-export default React.memo(AutoScrollGrid); 
+export default React.memo(AutoScrollGrid);

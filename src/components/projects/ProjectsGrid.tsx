@@ -47,14 +47,13 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = ({
         <div className="w-full">
           <AutoScrollGrid
             items={visibleProjects}
-            itemsPerRow={isMobile ? 1 : 4}
             renderItem={(project) => (
               <ProjectCard
                 key={project.id}
                 project={project}
                 isAdmin={isAdmin}
                 isHidden={hiddenProjectIds.includes(project.id)}
-                isMobile={isMobile}
+                _isMobile={isMobile}
                 formLoading={formLoading}
                 onEdit={onEditProject}
                 onDelete={onDeleteProject}
@@ -92,7 +91,7 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = ({
               project={project}
               isAdmin={isAdmin}
               isHidden={hiddenProjectIds.includes(project.id)}
-              isMobile={isMobile}
+              _isMobile={isMobile}
               formLoading={formLoading}
               onEdit={onEditProject}
               onDelete={onDeleteProject}

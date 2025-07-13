@@ -28,6 +28,7 @@ export interface Project {
     features_ko?: string[];
     features_en?: string[];
     features_zh?: string[];
+    [key: string]: unknown;
 }
 
 const SELECT_COLUMNS = `*`;
@@ -252,4 +253,4 @@ export const useProjects = () => {
         deleteProject,
         refetch: fetchProjects
     };
-}; 
+};
