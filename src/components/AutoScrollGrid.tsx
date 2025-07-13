@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import type { Project } from '../hooks/useProjects';
 
@@ -24,9 +23,9 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
     const positionRef = useRef(0);
     const lastTimeRef = useRef(performance.now());
 
-    // Remove the itemsPerRow calculation since it's not used in the interface
-    // const _itemsPerRow = Math.floor(window.innerWidth / 300);
+    const _itemsPerRow = Math.floor(window.innerWidth / 300);
 
+    // Memoize repeated items to prevent unnecessary recalculations
     const repeatedItems = useMemo(() => {
         const repeated: Project[] = [];
         for (let i = 0; i < 8; i++) {
@@ -171,4 +170,4 @@ const AutoScrollGrid: React.FC<AutoScrollGridProps> = ({
     );
 };
 
-export default React.memo(AutoScrollGrid);
+export default React.memo(AutoScrollGrid); 
