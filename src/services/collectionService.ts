@@ -1,5 +1,6 @@
 // 컬렉션 관리 서비스
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 import type {
   Collection,
   CreateCollectionData,
@@ -8,9 +9,29 @@ import type {
   CollectionFilters
 } from '@/types/vector';
 
-// Supabase 타입이 업데이트되기 전까지 임시로 사용할 타입 단언 함수
-const queryCollections = () => supabase.from('collections' as any);
-const queryDocuments = () => supabase.from('documents' as any);
+// Supabase 데이터베이스 타입 정의
+type DbCollection = Database['public']['Tables']['collections']['Row'];
+type DbCollectionInsert = Database['public']['Tables']['collections']['Insert'];
+type DbCollectionUpdate = Database['public']['Tables']['collections']['Update'];
+type DbDocument = Database['public']['Tables']['documents']['Row'];
+
+// 타입 안전한 쿼리 함수
+const queryCollections = () => supabase.from('collections');
+const queryDocuments = () => supabase.from('documents');
+
+// 타입 변환 함수
+const dbCollectionToCollection = (dbCollection: DbCollection): Collection => ({
+  id: dbCollection.id,
+  name: dbCollection.name,
+  description: dbCollection.description,
+  metadata: dbCollection.metadata as Record<string, any>,
+  created_by: dbCollection.created_by,
+  created_at: dbCollection.created_at,
+  updated_at: dbCollection.updated_at,
+  is_active: dbCollection.is_active,
+  document_count: dbCollection.document_count,
+  total_chunks: dbCollection.total_chunks
+});
 
 /**
  * 컬렉션 생성
@@ -31,7 +52,7 @@ export const createCollection = async (data: CreateCollectionData): Promise<Coll
       throw new Error(`컬렉션 생성 실패: ${error.message}`);
     }
 
-    return result as Collection;
+    return dbCollectionToCollection(result);
   } catch (error) {
     console.error('컬렉션 생성 오류:', error);
     throw error;
@@ -70,7 +91,7 @@ export const getCollections = async (filters?: CollectionFilters): Promise<Colle
       throw new Error(`컬렉션 조회 실패: ${error.message}`);
     }
 
-    return (data || []) as Collection[];
+    return (data || []).map(dbCollectionToCollection);
   } catch (error) {
     console.error('컬렉션 조회 오류:', error);
     throw error;
@@ -95,7 +116,7 @@ export const getCollectionById = async (id: string): Promise<Collection> => {
       throw new Error('컬렉션을 찾을 수 없습니다');
     }
 
-    return data as Collection;
+    return dbCollectionToCollection(data);
   } catch (error) {
     console.error('컬렉션 조회 오류:', error);
     throw error;
@@ -110,7 +131,7 @@ export const updateCollection = async (
   data: UpdateCollectionData
 ): Promise<Collection> => {
   try {
-    const updateData: any = {};
+    const updateData: DbCollectionUpdate = {};
 
     if (data.name !== undefined) {
       updateData.name = data.name.trim();
@@ -135,7 +156,7 @@ export const updateCollection = async (
       throw new Error(`컬렉션 수정 실패: ${error.message}`);
     }
 
-    return result as Collection;
+    return dbCollectionToCollection(result);
   } catch (error) {
     console.error('컬렉션 수정 오류:', error);
     throw error;
@@ -232,9 +253,9 @@ export const getCollectionStats = async (id: string): Promise<CollectionStats> =
     }
 
     // 통계 계산
-    const totalSize = documentStats?.reduce((sum: number, doc: any) => sum + (doc.file_size || 0), 0) || 0;
-    const processingDocuments = documentStats?.filter((doc: any) => doc.processing_status === 'processing').length || 0;
-    const failedDocuments = documentStats?.filter((doc: any) => doc.processing_status === 'failed').length || 0;
+    const totalSize = documentStats?.reduce((sum: number, doc: DbDocument) => sum + (doc.file_size || 0), 0) || 0;
+    const processingDocuments = documentStats?.filter((doc: DbDocument) => doc.processing_status === 'processing').length || 0;
+    const failedDocuments = documentStats?.filter((doc: DbDocument) => doc.processing_status === 'failed').length || 0;
 
     // 최근 업데이트 시간 조회
     const { data: lastDocument } = await queryDocuments()
@@ -244,7 +265,7 @@ export const getCollectionStats = async (id: string): Promise<CollectionStats> =
       .limit(1)
       .single();
 
-    const collectionData = collection as any;
+    const collectionData = collection as DbCollection;
     return {
       id: collectionData.id,
       name: collectionData.name,
@@ -425,7 +446,7 @@ export const recalculateCollectionStats = async (collectionId: string): Promise<
     }
 
     const documentCount = documents?.length || 0;
-    const totalChunks = documents?.reduce((sum: number, doc: any) => sum + (doc.chunk_count || 0), 0) || 0;
+    const totalChunks = documents?.reduce((sum: number, doc: DbDocument) => sum + (doc.chunk_count || 0), 0) || 0;
 
     // 컬렉션 통계 업데이트
     const { error: updateError } = await queryCollections()

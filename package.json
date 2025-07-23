@@ -15,7 +15,11 @@
     "optimize-images": "node scripts/optimize-images.js",
     "analyze-bundle": "npx vite-bundle-analyzer dist",
     "size-check": "node scripts/bundle-size-check.js",
-    "performance-test": "node scripts/performance-test.js"
+    "performance-test": "node scripts/performance-test.js",
+    "security:check-keys": "node scripts/check-hardcoded-keys.js",
+    "security:full": "npm run security:check-keys",
+    "test": "vitest",
+    "test:security": "npm run security:check-keys && npm run test"
   },
   "dependencies": {
     "@channel.io/channel-web-sdk-loader": "^2.0.0",

@@ -35,6 +35,157 @@ export type Database = {
           },
         ]
       }
+      collections: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          metadata: Json
+          created_by: string | null
+          created_at: string
+          updated_at: string
+          is_active: boolean
+          document_count: number
+          total_chunks: number
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          metadata?: Json
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+          is_active?: boolean
+          document_count?: number
+          total_chunks?: number
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          metadata?: Json
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+          is_active?: boolean
+          document_count?: number
+          total_chunks?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collections_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_chunks: {
+        Row: {
+          id: string
+          document_id: string
+          chunk_index: number
+          content: string
+          embedding: number[] | null
+          metadata: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          document_id: string
+          chunk_index: number
+          content: string
+          embedding?: number[] | null
+          metadata?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          document_id?: string
+          chunk_index?: number
+          content?: string
+          embedding?: number[] | null
+          metadata?: Json
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_chunks_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documents: {
+        Row: {
+          id: string
+          collection_id: string
+          filename: string
+          original_filename: string
+          file_type: string
+          file_size: number
+          content: string | null
+          metadata: Json
+          processing_status: string
+          error_message: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+          chunk_count: number
+        }
+        Insert: {
+          id?: string
+          collection_id: string
+          filename: string
+          original_filename: string
+          file_type: string
+          file_size: number
+          content?: string | null
+          metadata?: Json
+          processing_status?: string
+          error_message?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+          chunk_count?: number
+        }
+        Update: {
+          id?: string
+          collection_id?: string
+          filename?: string
+          original_filename?: string
+          file_type?: string
+          file_size?: number
+          content?: string | null
+          metadata?: Json
+          processing_status?: string
+          error_message?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+          chunk_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       certificates: {
         Row: {
           category: string
@@ -570,6 +721,44 @@ export type Database = {
         }
         Relationships: []
       }
+      search_logs: {
+        Row: {
+          id: string
+          user_id: string | null
+          query: string
+          search_type: string
+          results_count: number
+          execution_time_ms: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          query: string
+          search_type: string
+          results_count?: number
+          execution_time_ms?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          query?: string
+          search_type?: string
+          results_count?: number
+          execution_time_ms?: number | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "search_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_settings: {
         Row: {
           created_at: string
@@ -638,6 +827,41 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
         }
         Returns: boolean
+      }
+      search_chunks_by_keyword: {
+        Args: {
+          search_query: string
+          match_count?: number
+          collection_ids?: string[] | null
+        }
+        Returns: {
+          chunk_id: string
+          document_id: string
+          collection_id: string
+          content: string
+          rank: number
+          document_name: string
+          collection_name: string
+          metadata: Json
+        }[]
+      }
+      search_similar_chunks: {
+        Args: {
+          query_embedding: number[]
+          match_threshold?: number
+          match_count?: number
+          collection_ids?: string[] | null
+        }
+        Returns: {
+          chunk_id: string
+          document_id: string
+          collection_id: string
+          content: string
+          similarity: number
+          document_name: string
+          collection_name: string
+          metadata: Json
+        }[]
       }
     }
     Enums: {

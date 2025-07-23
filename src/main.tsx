@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import { initImagePreloader } from './utils/image-preloader';
+import { validateStartupKeys } from './lib/env';
 
 // Service Worker temporarily disabled for debugging NO_FCP
 // TODO: Re-enable after confirming basic rendering works
@@ -19,6 +20,17 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
     });
 }
 */
+
+// API 키 검증 실행
+try {
+  validateStartupKeys();
+} catch (error) {
+  console.error('API 키 검증 실패:', error);
+  // 프로덕션에서는 앱 실행을 중단하지만, 개발에서는 계속 진행
+  if (import.meta.env.PROD) {
+    throw error;
+  }
+}
 
 // Render React app with image optimization
 const rootElement = document.getElementById('root');

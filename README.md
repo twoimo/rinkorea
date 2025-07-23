@@ -107,24 +107,43 @@ npm install
 
 ### 2. 환경 변수 설정
 
-`.env.local` 파일을 생성하고 다음 내용을 추가하세요:
+프로젝트 루트에 `.env` 파일을 생성하고 필요한 API 키를 설정하세요:
+
+```bash
+# .env.example 파일을 복사하여 시작
+cp .env.example .env
+```
+
+`.env` 파일에 다음 내용을 추가하세요:
 
 ```env
-# Supabase 설정
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+# AI API Keys (필수)
+VITE_MISTRAL_API_KEY=your_mistral_api_key_here
+VITE_CLAUDE_API_KEY=your_claude_api_key_here
+VITE_VOYAGE_API_KEY=your_voyage_api_key_here
 
-# 앱 설정
+# Supabase 설정 (필수)
+VITE_SUPABASE_URL=your_supabase_project_url_here
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+
+# 앱 설정 (선택사항)
 VITE_APP_ENV=development
 VITE_APP_VERSION=1.0.0
-VITE_APP_NAME=RIN Korea
-
-# AI 서비스 환경 변수
-MISTRAL_API_KEY=your_mistral_api_key
-CLAUDE_API_KEY=your_claude_api_key
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_APP_NAME=RinKorea
 ```
+
+#### 🔑 API 키 발급 방법
+
+1. **Voyage AI** (임베딩 서비스): [Voyage AI 웹사이트](https://www.voyageai.com/)에서 계정 생성 후 API 키 발급
+2. **Claude API**: [Anthropic Console](https://console.anthropic.com/)에서 API 키 발급
+3. **Mistral AI**: [Mistral AI Platform](https://console.mistral.ai/)에서 API 키 발급
+4. **Supabase**: [Supabase Dashboard](https://supabase.com/dashboard)에서 프로젝트 생성 후 URL과 anon key 확인
+
+#### ⚠️ 보안 주의사항
+
+- `.env` 파일은 절대 Git에 커밋하지 마세요 (이미 .gitignore에 포함됨)
+- API 키는 안전한 곳에 보관하세요
+- 프로덕션 환경에서는 환경 변수로 직접 설정하세요
 
 ### 3. 개발 서버 실행
 

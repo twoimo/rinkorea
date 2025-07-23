@@ -1,5 +1,6 @@
 // 문서 관리 서비스
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 import type {
   Document,
   DocumentChunk,
@@ -9,6 +10,42 @@ import type {
   UploadProgress
 } from '@/types/vector';
 import { SUPPORTED_FILE_TYPES } from '@/types/vector';
+
+// Supabase 데이터베이스 타입 정의
+type DbDocument = Database['public']['Tables']['documents']['Row'];
+type DbDocumentInsert = Database['public']['Tables']['documents']['Insert'];
+type DbDocumentUpdate = Database['public']['Tables']['documents']['Update'];
+type DbDocumentChunk = Database['public']['Tables']['document_chunks']['Row'];
+type DbDocumentChunkInsert = Database['public']['Tables']['document_chunks']['Insert'];
+type DbDocumentChunkUpdate = Database['public']['Tables']['document_chunks']['Update'];
+
+// 타입 변환 함수
+const dbDocumentToDocument = (dbDocument: DbDocument): Document => ({
+  id: dbDocument.id,
+  collection_id: dbDocument.collection_id,
+  filename: dbDocument.filename,
+  original_filename: dbDocument.original_filename,
+  file_type: dbDocument.file_type,
+  file_size: dbDocument.file_size,
+  content: dbDocument.content,
+  metadata: dbDocument.metadata as Record<string, any>,
+  processing_status: dbDocument.processing_status as Document['processing_status'],
+  error_message: dbDocument.error_message,
+  created_by: dbDocument.created_by,
+  created_at: dbDocument.created_at,
+  updated_at: dbDocument.updated_at,
+  chunk_count: dbDocument.chunk_count
+});
+
+const dbDocumentChunkToDocumentChunk = (dbChunk: DbDocumentChunk): DocumentChunk => ({
+  id: dbChunk.id,
+  document_id: dbChunk.document_id,
+  chunk_index: dbChunk.chunk_index,
+  content: dbChunk.content,
+  embedding: dbChunk.embedding,
+  metadata: dbChunk.metadata as Record<string, any>,
+  created_at: dbChunk.created_at
+});
 
 /**
  * 파일 타입 검증
@@ -589,20 +626,26 @@ export const getDocumentChunks = async (documentId: string): Promise<DocumentChu
 };
 
 /**
- * 청크 내용 수정
+ * 청크 내용 및 메타데이터 수정
  */
-export const updateChunk = async (chunkId: string, content: string): Promise<void> => {
+export const updateDocumentChunk = async (
+  chunkId: string, 
+  content: string, 
+  metadata: Record<string, any> = {}
+): Promise<void> => {
   try {
+    const updateData: DbDocumentChunkUpdate = {
+      content: content.trim(),
+      metadata: {
+        ...metadata,
+        modified_at: new Date().toISOString(),
+        length: content.trim().length
+      }
+    };
+
     const { error } = await supabase
       .from('document_chunks')
-      .update({
-        content: content.trim(),
-        metadata: {
-          ...{}, // 기존 메타데이터 유지
-          modified_at: new Date().toISOString(),
-          length: content.trim().length
-        }
-      })
+      .update(updateData)
       .eq('id', chunkId);
 
     if (error) {
@@ -612,6 +655,32 @@ export const updateChunk = async (chunkId: string, content: string): Promise<voi
     console.error('청크 수정 오류:', error);
     throw error;
   }
+};
+
+/**
+ * 청크 삭제
+ */
+export const deleteDocumentChunk = async (chunkId: string): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('document_chunks')
+      .delete()
+      .eq('id', chunkId);
+
+    if (error) {
+      throw new Error(`청크 삭제 실패: ${error.message}`);
+    }
+  } catch (error) {
+    console.error('청크 삭제 오류:', error);
+    throw error;
+  }
+};
+
+/**
+ * 청크 내용 수정 (기존 함수 - 호환성 유지)
+ */
+export const updateChunk = async (chunkId: string, content: string): Promise<void> => {
+  return updateDocumentChunk(chunkId, content);
 };
 
 /**
@@ -783,7 +852,7 @@ const updateDocumentStatus = async (
   additionalData?: Partial<Document>
 ): Promise<void> => {
   try {
-    const updateData: any = {
+    const updateData: DbDocumentUpdate = {
       processing_status: status,
       updated_at: new Date().toISOString(),
       ...additionalData

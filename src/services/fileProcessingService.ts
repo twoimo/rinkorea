@@ -1,5 +1,6 @@
 // 파일 업로드 및 텍스트 추출 서비스
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 import type {
   Document,
   UploadResult,
@@ -9,6 +10,11 @@ import type {
 } from '@/types/vector';
 import { SUPPORTED_FILE_TYPES } from '@/types/vector';
 import { generateAndStoreDocumentVectors, type VectorGenerationOptions } from './vectorGenerationService';
+
+// Supabase 데이터베이스 타입 정의
+type DbDocument = Database['public']['Tables']['documents']['Row'];
+type DbDocumentInsert = Database['public']['Tables']['documents']['Insert'];
+type DbDocumentUpdate = Database['public']['Tables']['documents']['Update'];
 
 /**
  * 파일 타입 검증 (확장된 검증)
@@ -708,7 +714,7 @@ export class FileProcessingService {
   private async updateDocumentStatus(
     documentId: string,
     status: 'pending' | 'processing' | 'completed' | 'failed',
-    additionalData?: any
+    additionalData?: Partial<DbDocumentUpdate>
   ): Promise<void> {
     try {
       const updateData = {
