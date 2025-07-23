@@ -186,6 +186,14 @@ const Header = () => {
                           {t('revenue_management')}
                         </Link>
                         <Link
+                          to="/admin/vector-management"
+                          className="flex items-center px-4 py-2 text-sm text-purple-700 hover:bg-purple-50 transition-colors font-semibold border-b border-gray-100"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          <Search className="w-4 h-4 mr-3" />
+                          벡터 DB 관리
+                        </Link>
+                        <Link
                           to="/admin/danger"
                           className="flex items-center px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors font-semibold border-b border-gray-100"
                           onClick={() => setIsUserMenuOpen(false)}
@@ -312,6 +320,14 @@ const Header = () => {
                         >
                           <BarChart3 className="w-5 h-5 mr-3" />
                           {t('revenue_management')}
+                        </Link>
+                        <Link
+                          to="/admin/vector-management"
+                          className="flex items-center px-4 py-3 text-base text-purple-700 rounded-lg transition-colors touch-manipulation touch-feedback hover-desktop-only hover:text-purple-900 hover:bg-purple-50"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <Search className="w-5 h-5 mr-3" />
+                          벡터 DB 관리
                         </Link>
                         <Link
                           to="/admin/danger"
