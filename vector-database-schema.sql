@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS public.document_chunks (
     document_id UUID NOT NULL REFERENCES public.documents(id) ON DELETE CASCADE,
     chunk_index INTEGER NOT NULL,
     content TEXT NOT NULL,
-    embedding VECTOR(1536), -- OpenAI embedding dimension
+    embedding VECTOR(1536), -- Claude embedding dimension
     metadata JSONB DEFAULT '{}',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     
@@ -319,5 +319,5 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 DO $$
 BEGIN
     RAISE NOTICE '벡터 데이터베이스 스키마가 성공적으로 생성되었습니다!';
-    RAISE NOTICE '다음 단계: OpenAI API 키를 환경 변수에 설정하고 애플리케이션을 시작하세요.';
+    RAISE NOTICE '다음 단계: Claude API 키를 환경 변수에 설정하고 애플리케이션을 시작하세요.';
 END $$;

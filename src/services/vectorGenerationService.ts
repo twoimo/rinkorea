@@ -1,12 +1,12 @@
 // 통합 벡터 생성 서비스
 import { chunkText, type ChunkingOptions, type ChunkingResult } from './textChunkingService';
-import { generateBatchEmbeddings, type VectorStorageResult } from './embeddingService';
+import { type VectorStorageResult } from './embeddingService';
 import { generateClaudeBatchEmbeddings } from './claudeEmbeddingService';
 
 /**
  * 벡터 생성 제공자
  */
-export type VectorProvider = 'openai' | 'claude' | 'auto';
+export type VectorProvider = 'claude' | 'auto';
 
 /**
  * 벡터 생성 옵션
@@ -93,8 +93,8 @@ export const generateAndStoreDocumentVectors = async (
     let selectedProvider = provider;
     let embeddingResult;
 
-    if (provider === 'auto') {
-      // 자동 선택: Claude 우선, 실패 시 OpenAI
+    if (provider === 'auto' || provider === 'claude') {
+      // Claude 사용 (auto는 이제 Claude만 사용)
       selectedProvider = 'claude';
       embeddingResult = await generateClaudeBatchEmbeddings(
         chunkingResult.chunks,
@@ -103,37 +103,8 @@ export const generateAndStoreDocumentVectors = async (
           onProgress?.('Claude 벡터 생성 중', progress, 100);
         }
       );
-
-      // Claude 실패 시 OpenAI로 폴백
-      if (!embeddingResult.success && enableFallback) {
-        console.warn('Claude 임베딩 실패, OpenAI로 폴백합니다:', embeddingResult.errors);
-        warnings.push('Claude 임베딩 실패로 OpenAI를 사용했습니다');
-        
-        selectedProvider = 'openai';
-        embeddingResult = await generateBatchEmbeddings(
-          chunkingResult.chunks,
-          (completed, total) => {
-            const progress = 25 + Math.floor((completed / total) * 50);
-            onProgress?.('OpenAI 벡터 생성 중', progress, 100);
-          }
-        );
-      }
-    } else if (provider === 'claude') {
-      embeddingResult = await generateClaudeBatchEmbeddings(
-        chunkingResult.chunks,
-        (completed, total) => {
-          const progress = 25 + Math.floor((completed / total) * 50);
-          onProgress?.('Claude 벡터 생성 중', progress, 100);
-        }
-      );
     } else {
-      embeddingResult = await generateBatchEmbeddings(
-        chunkingResult.chunks,
-        (completed, total) => {
-          const progress = 25 + Math.floor((completed / total) * 50);
-          onProgress?.('OpenAI 벡터 생성 중', progress, 100);
-        }
-      );
+      throw new Error(`지원되지 않는 벡터 제공자: ${provider}`);
     }
 
     if (!embeddingResult.success && embeddingResult.embeddings.length === 0) {
@@ -322,7 +293,6 @@ export const getVectorGenerationStats = async (): Promise<VectorGenerationStats>
       successRate: 0,
       averageProcessingTime: 0,
       providerUsage: {
-        openai: 0,
         claude: 0,
         auto: 0
       },
@@ -371,20 +341,11 @@ export const checkVectorGenerationServiceHealth = async (): Promise<{
 }> => {
   const errors: string[] = [];
   const providers: Record<VectorProvider, boolean> = {
-    openai: false,
     claude: false,
     auto: false
   };
 
   try {
-    // OpenAI 상태 확인
-    const { checkEmbeddingServiceHealth } = await import('./embeddingService');
-    const openaiHealth = await checkEmbeddingServiceHealth();
-    providers.openai = openaiHealth.available;
-    if (!openaiHealth.available) {
-      errors.push(`OpenAI: ${openaiHealth.error}`);
-    }
-
     // Claude 상태 확인
     const { checkClaudeEmbeddingServiceHealth } = await import('./claudeEmbeddingService');
     const claudeHealth = await checkClaudeEmbeddingServiceHealth();
@@ -393,8 +354,8 @@ export const checkVectorGenerationServiceHealth = async (): Promise<{
       errors.push(`Claude: ${claudeHealth.error}`);
     }
 
-    // Auto는 둘 중 하나라도 사용 가능하면 OK
-    providers.auto = providers.openai || providers.claude;
+    // Auto는 Claude와 동일
+    providers.auto = providers.claude;
 
     const overall = providers.auto;
 

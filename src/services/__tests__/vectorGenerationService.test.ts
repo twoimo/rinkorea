@@ -96,15 +96,15 @@ describe('VectorGenerationService', () => {
       expect(result.provider).toBe('claude');
     });
 
-    it('OpenAI 제공자를 사용해야 함', async () => {
+    it('지원되지 않는 제공자에 대해 오류를 반환해야 함', async () => {
       const options: VectorGenerationOptions = {
-        provider: 'openai'
+        provider: 'unsupported' as any
       };
 
       const result = await generateAndStoreDocumentVectors('doc-123', sampleText, options);
 
-      expect(result.success).toBe(true);
-      expect(result.provider).toBe('openai');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('지원되지 않는 벡터 제공자');
     });
 
     it('진행률 콜백을 호출해야 함', async () => {
@@ -138,7 +138,7 @@ describe('VectorGenerationService', () => {
       expect(result.error).toContain('청크를 생성할 수 없습니다');
     });
 
-    it('Claude 실패 시 OpenAI로 폴백해야 함', async () => {
+    it('Claude 실패 시 적절히 처리해야 함', async () => {
       const { generateClaudeBatchEmbeddings } = await import('../claudeEmbeddingService');
       vi.mocked(generateClaudeBatchEmbeddings).mockResolvedValueOnce({
         success: false,
@@ -155,9 +155,8 @@ describe('VectorGenerationService', () => {
 
       const result = await generateAndStoreDocumentVectors('doc-123', sampleText, options);
 
-      expect(result.success).toBe(true);
-      expect(result.provider).toBe('openai');
-      expect(result.warnings).toContain('Claude 임베딩 실패로 OpenAI를 사용했습니다');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('모든 청크의 벡터 생성에 실패했습니다');
     });
 
     it('폴백이 비활성화된 경우 실패해야 함', async () => {
@@ -220,7 +219,6 @@ describe('VectorGenerationService', () => {
 
       expect(typeof stats.totalDocuments).toBe('number');
       expect(typeof stats.successRate).toBe('number');
-      expect(stats.providerUsage).toHaveProperty('openai');
       expect(stats.providerUsage).toHaveProperty('claude');
       expect(stats.providerUsage).toHaveProperty('auto');
     });
@@ -255,7 +253,6 @@ describe('VectorGenerationService', () => {
       expect(health).toHaveProperty('providers');
       expect(health).toHaveProperty('errors');
 
-      expect(health.providers).toHaveProperty('openai');
       expect(health.providers).toHaveProperty('claude');
       expect(health.providers).toHaveProperty('auto');
 
@@ -263,18 +260,14 @@ describe('VectorGenerationService', () => {
       expect(Array.isArray(health.errors)).toBe(true);
     });
 
-    it('OpenAI가 사용 불가능할 때 적절히 처리해야 함', async () => {
-      const { checkEmbeddingServiceHealth } = await import('../embeddingService');
-      vi.mocked(checkEmbeddingServiceHealth).mockResolvedValueOnce({
-        available: false,
-        model: 'text-embedding-3-small',
-        error: 'API 키 오류'
-      });
+    it('서비스 상태 확인 중 오류가 발생할 때 적절히 처리해야 함', async () => {
+      const { checkClaudeEmbeddingServiceHealth } = await import('../claudeEmbeddingService');
+      vi.mocked(checkClaudeEmbeddingServiceHealth).mockRejectedValueOnce(new Error('서비스 연결 실패'));
 
       const health = await checkVectorGenerationServiceHealth();
 
-      expect(health.providers.openai).toBe(false);
-      expect(health.errors.some(error => error.includes('OpenAI'))).toBe(true);
+      expect(health.overall).toBe(false);
+      expect(health.errors.some(error => error.includes('서비스 상태 확인 실패'))).toBe(true);
     });
 
     it('Claude가 사용 불가능할 때 적절히 처리해야 함', async () => {
@@ -291,19 +284,18 @@ describe('VectorGenerationService', () => {
       expect(health.errors.some(error => error.includes('Claude'))).toBe(true);
     });
 
-    it('둘 중 하나라도 사용 가능하면 auto가 true여야 함', async () => {
+    it('Claude가 사용 가능하면 auto가 true여야 함', async () => {
       const { checkClaudeEmbeddingServiceHealth } = await import('../claudeEmbeddingService');
       vi.mocked(checkClaudeEmbeddingServiceHealth).mockResolvedValueOnce({
-        available: false,
+        available: true,
         model: 'claude-3-haiku-20240307',
-        error: 'API 키 오류'
+        error: undefined
       });
 
       const health = await checkVectorGenerationServiceHealth();
 
-      expect(health.providers.openai).toBe(true);
-      expect(health.providers.claude).toBe(false);
-      expect(health.providers.auto).toBe(true); // OpenAI가 사용 가능하므로
+      expect(health.providers.claude).toBe(true);
+      expect(health.providers.auto).toBe(true); // Claude가 사용 가능하므로
     });
   });
 
@@ -332,14 +324,14 @@ describe('VectorGenerationService', () => {
       });
 
       const options: VectorGenerationOptions = {
-        provider: 'openai',
+        provider: 'claude',
         enableFallback: false
       };
 
       const result = await generateAndStoreDocumentVectors('doc-123', sampleText, options);
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain('모든 청크의 벡터 생성에 실패했습니다');
+      expect(result.error).toContain('지원되지 않는 벡터 제공자');
     });
   });
 

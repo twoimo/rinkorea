@@ -30,7 +30,7 @@ graph TB
         K[(Supabase PostgreSQL)]
         L[(Vector Store)]
         M[File Storage]
-        N[OpenAI API]
+        N[Claude API]
     end
     
     A --> F
@@ -55,7 +55,7 @@ graph TB
 - **Frontend**: React 18 + TypeScript + Tailwind CSS + Shadcn UI
 - **Backend**: Supabase (PostgreSQL + Auth + Storage)
 - **Vector Database**: PostgreSQL with pgvector extension
-- **AI/ML**: OpenAI Embeddings API
+- **AI/ML**: Claude Embeddings API
 - **File Processing**: 브라우저 기반 텍스트 추출
 - **State Management**: TanStack React Query
 
@@ -106,7 +106,7 @@ CREATE TABLE document_chunks (
   document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
   chunk_index INTEGER NOT NULL,
   content TEXT NOT NULL,
-  embedding VECTOR(1536), -- OpenAI embedding dimension
+  embedding VECTOR(1024), -- Claude embedding dimension
   metadata JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   
@@ -315,7 +315,7 @@ interface SearchResult {
    - 인코딩 문제
 
 3. **벡터 생성 오류**
-   - OpenAI API 한도 초과
+   - Claude API 한도 초과
    - 네트워크 타임아웃
    - 텍스트 길이 제한
 

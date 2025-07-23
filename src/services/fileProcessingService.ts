@@ -598,7 +598,7 @@ export class FileProcessingService {
       });
 
       const vectorOptions: VectorGenerationOptions = {
-        provider: 'auto', // Claude 우선, 실패 시 OpenAI
+        provider: 'auto', // Claude 사용
         enableFallback: true,
         validateResults: true,
         onProgress: (step, progress, total) => {

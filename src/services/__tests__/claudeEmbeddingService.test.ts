@@ -343,7 +343,7 @@ describe('ClaudeEmbeddingService', () => {
       const result = await compareEmbeddingModels('테스트 텍스트');
 
       expect(result.claude_result).toBeDefined();
-      expect(result.recommendation).toBeOneOf(['openai', 'claude', 'both']);
+      expect(result.recommendation).toBeOneOf(['claude', 'both']);
       expect(result.reason).toBeDefined();
     });
   });
