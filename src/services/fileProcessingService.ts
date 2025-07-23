@@ -8,6 +8,7 @@ import type {
   FileType
 } from '@/types/vector';
 import { SUPPORTED_FILE_TYPES } from '@/types/vector';
+import { generateAndStoreDocumentVectors, type VectorGenerationOptions } from './vectorGenerationService';
 
 /**
  * 파일 타입 검증 (확장된 검증)
@@ -589,49 +590,63 @@ export class FileProcessingService {
         throw new Error('파일에서 텍스트를 추출할 수 없습니다');
       }
 
-      // 텍스트 청킹
+      // 벡터 생성 및 저장 (새로운 통합 서비스 사용)
       this.updateProgress(progressId, {
         file_name: file.name,
         status: 'processing',
         progress: calculateProcessingProgress('chunking')
       });
 
-      const chunks = splitTextIntoChunks(text);
+      const vectorOptions: VectorGenerationOptions = {
+        provider: 'auto', // Claude 우선, 실패 시 OpenAI
+        enableFallback: true,
+        validateResults: true,
+        onProgress: (step, progress, total) => {
+          const overallProgress = 50 + Math.floor((progress / total) * 40);
+          this.updateProgress(progressId, {
+            file_name: file.name,
+            status: 'processing',
+            progress: overallProgress
+          });
+        }
+      };
 
-      if (chunks.length === 0) {
-        throw new Error('텍스트를 청크로 분할할 수 없습니다');
+      const vectorResult = await generateAndStoreDocumentVectors(
+        documentId,
+        text,
+        vectorOptions
+      );
+
+      if (!vectorResult.success) {
+        throw new Error(vectorResult.error || '벡터 생성에 실패했습니다');
       }
 
-      // 문서 내용 업데이트
+      // 문서 내용 및 메타데이터 업데이트
       await supabase
         .from('documents')
         .update({
           content: text.substring(0, 50000), // 내용 미리보기 (50KB 제한)
-          chunk_count: chunks.length,
+          chunk_count: vectorResult.chunking.metadata.totalChunks,
           processing_status: 'completed',
           metadata: {
             text_length: text.length,
-            chunk_count: chunks.length,
-            processing_completed_at: new Date().toISOString()
+            chunk_count: vectorResult.chunking.metadata.totalChunks,
+            vectors_generated: vectorResult.vectorsGenerated,
+            vectors_stored: vectorResult.vectorsStored,
+            chunking_strategy: vectorResult.chunking.metadata.strategy,
+            embedding_provider: vectorResult.provider,
+            processing_completed_at: new Date().toISOString(),
+            warnings: vectorResult.warnings
           }
         })
         .eq('id', documentId);
-
-      // 청크 저장
-      this.updateProgress(progressId, {
-        file_name: file.name,
-        status: 'processing',
-        progress: calculateProcessingProgress('storage')
-      });
-
-      await this.saveChunksInBatches(documentId, chunks);
 
       const processingTime = Date.now() - startTime;
 
       return {
         document_id: documentId,
         success: true,
-        chunks_created: chunks.length,
+        chunks_created: vectorResult.chunking.metadata.totalChunks,
         processing_time_ms: processingTime
       };
 
