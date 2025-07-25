@@ -314,8 +314,8 @@ describe('VectorGenerationService', () => {
     });
 
     it('임베딩 생성 실패를 처리해야 함', async () => {
-      const { generateBatchEmbeddings } = await import('../embeddingService');
-      vi.mocked(generateBatchEmbeddings).mockResolvedValueOnce({
+      const { generateEmbeddings } = await import('../claudeEmbeddingService');
+      vi.mocked(generateEmbeddings).mockResolvedValueOnce({
         success: false,
         embeddings: [],
         total_tokens: 0,

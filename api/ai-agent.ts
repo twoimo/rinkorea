@@ -2,6 +2,12 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { VercelRequest, VercelResponse } from '@vercel/node';
 
+// RAG 서비스 import (서버리스 환경에서 동적 import 사용)
+type RAGServices = {
+  performAIAgentRAGSearch: (request: any) => Promise<any>;
+  analyzeQuestionAndSuggestStrategy: (question: string) => any;
+};
+
 // 환경 변수 (Vercel 서버리스 환경용)
 const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
 const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY;
@@ -21,10 +27,14 @@ export interface AIRequest {
     message: string;
     context?: any;
     is_admin?: boolean;
+    enable_rag?: boolean;
+    preferred_collections?: string[];
+    conversation_id?: string;
 }
 
 class UnifiedAIAgent {
     private supabase: SupabaseClient | null = null;
+    private ragServices: RAGServices | null = null;
 
     private getSupabase(): SupabaseClient {
         if (!this.supabase) {
@@ -34,6 +44,23 @@ class UnifiedAIAgent {
             this.supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         }
         return this.supabase;
+    }
+
+    private async getRagServices(): Promise<RAGServices> {
+        if (!this.ragServices) {
+            try {
+                // 서버리스 환경에서 동적 import
+                const ragIntegrationModule = await import('../src/services/ragIntegrationService');
+                this.ragServices = {
+                    performAIAgentRAGSearch: ragIntegrationModule.performAIAgentRAGSearch,
+                    analyzeQuestionAndSuggestStrategy: ragIntegrationModule.analyzeQuestionAndSuggestStrategy
+                };
+            } catch (error) {
+                console.error('RAG 서비스 로드 실패:', error);
+                throw new Error('RAG 서비스를 사용할 수 없습니다.');
+            }
+        }
+        return this.ragServices;
     }
 
     private async route(query: string): Promise<AIFunctionType> {
@@ -69,7 +96,14 @@ class UnifiedAIAgent {
     }
 
     public async processRequest(request: AIRequest) {
-        const { message, context = {}, is_admin = false } = request;
+        const { 
+            message, 
+            context = {}, 
+            is_admin = false, 
+            enable_rag = false,
+            preferred_collections = [],
+            conversation_id
+        } = request;
         let function_type = request.function_type;
 
         if (!function_type) {
@@ -78,8 +112,65 @@ class UnifiedAIAgent {
 
         const typed_function_type = function_type as AIFunctionType;
 
+        // RAG 검색이 활성화된 경우
+        if (enable_rag && (typed_function_type === 'document_search' || typed_function_type === 'qna_automation')) {
+            try {
+                const ragServices = await this.getRagServices();
+                
+                // RAG 검색 실행
+                const ragResponse = await ragServices.performAIAgentRAGSearch({
+                    userQuery: message,
+                    conversationContext: context.history?.map((h: any) => h.content) || [],
+                    preferredCollections: preferred_collections,
+                    responseFormat: 'detailed',
+                    includeSourceCitations: true
+                });
+
+                if (ragResponse.success && ragResponse.ragContext.results.length > 0) {
+                    // RAG 컨텍스트를 포함한 프롬프트로 AI 호출
+                    const enhancedMessage = ragResponse.promptContext.userQuery;
+                    const enhancedSystemPrompt = ragResponse.promptContext.systemPrompt;
+                    
+                    try {
+                        const llmResponse = await this.callMistralAPIWithRAG(
+                            enhancedSystemPrompt, 
+                            enhancedMessage, 
+                            is_admin, 
+                            context.history,
+                            ragResponse.ragContext
+                        );
+                        return { 
+                            ...llmResponse, 
+                            function_type: typed_function_type,
+                            rag_context: ragResponse.ragContext,
+                            quality_score: ragResponse.qualityScore
+                        };
+                    } catch (error) {
+                        console.error('RAG Mistral API 오류:', error);
+                        // Claude로 폴백
+                        const llmResponse = await this.callClaudeAPIWithRAG(
+                            enhancedSystemPrompt,
+                            enhancedMessage,
+                            is_admin,
+                            context.history,
+                            ragResponse.ragContext
+                        );
+                        return { 
+                            ...llmResponse, 
+                            function_type: typed_function_type,
+                            rag_context: ragResponse.ragContext,
+                            quality_score: ragResponse.qualityScore
+                        };
+                    }
+                }
+            } catch (ragError) {
+                console.error('RAG 검색 오류:', ragError);
+                // RAG 실패 시 일반 모드로 폴백
+            }
+        }
+
         try {
-            // Mistral API 우선 호출
+            // 일반 Mistral API 호출
             const llmResponse = await this.callMistralAPI(typed_function_type, message, is_admin, false, context.history);
             return { ...llmResponse, function_type: typed_function_type };
         } catch (error) {
@@ -90,13 +181,442 @@ class UnifiedAIAgent {
                 return { ...llmResponse, function_type: typed_function_type };
             } catch (fallbackError) {
                 console.error('Unified AI Agent fallback error:', fallbackError);
-                // 최종 실패 처리
                 throw new Error('Both AI services failed.');
             }
         }
     }
 
+    // 스트리밍 응답 처리
+    public async processStreamRequest(request: AIRequest, res: VercelResponse) {
+        const { 
+            message, 
+            context = {}, 
+            is_admin = false, 
+            enable_rag = false,
+            preferred_collections = [],
+            conversation_id
+        } = request;
+        let function_type = request.function_type;
+
+        // 스트리밍 헤더 설정
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+
+        try {
+            if (!function_type) {
+                res.write('data: {"type": "status", "message": "라우팅 중..."}\n\n');
+                function_type = await this.route(message);
+            }
+
+            const typed_function_type = function_type as AIFunctionType;
+            res.write(`data: {"type": "function_type", "value": "${typed_function_type}"}\n\n`);
+
+            // RAG 검색이 활성화된 경우
+            if (enable_rag && (typed_function_type === 'document_search' || typed_function_type === 'qna_automation')) {
+                try {
+                    res.write('data: {"type": "status", "message": "관련 문서 검색 중..."}\n\n');
+                    
+                    const ragServices = await this.getRagServices();
+                    const ragResponse = await ragServices.performAIAgentRAGSearch({
+                        userQuery: message,
+                        conversationContext: context.history?.map((h: any) => h.content) || [],
+                        preferredCollections: preferred_collections,
+                        responseFormat: 'detailed',
+                        includeSourceCitations: true
+                    });
+
+                    if (ragResponse.success && ragResponse.ragContext.results.length > 0) {
+                        res.write(`data: {"type": "rag_results", "count": ${ragResponse.ragContext.results.length}, "quality": ${ragResponse.qualityScore}}\n\n`);
+                        res.write('data: {"type": "status", "message": "AI 응답 생성 중..."}\n\n');
+
+                        const enhancedMessage = ragResponse.promptContext.userQuery;
+                        const enhancedSystemPrompt = ragResponse.promptContext.systemPrompt;
+                        
+                        try {
+                            await this.streamMistralAPIWithRAG(
+                                enhancedSystemPrompt, 
+                                enhancedMessage, 
+                                is_admin, 
+                                context.history,
+                                ragResponse.ragContext,
+                                res
+                            );
+                        } catch (error) {
+                            console.error('RAG Mistral 스트리밍 오류:', error);
+                            res.write('data: {"type": "status", "message": "Claude로 전환 중..."}\n\n');
+                            await this.streamClaudeAPIWithRAG(
+                                enhancedSystemPrompt,
+                                enhancedMessage,
+                                is_admin,
+                                context.history,
+                                ragResponse.ragContext,
+                                res
+                            );
+                        }
+                        
+                        res.write(`data: {"type": "rag_context", "value": ${JSON.stringify(ragResponse.ragContext)}}\n\n`);
+                        res.write('data: {"type": "done"}\n\n');
+                        return;
+                    } else {
+                        res.write('data: {"type": "status", "message": "관련 문서를 찾지 못했습니다. 일반 모드로 전환..."}\n\n');
+                    }
+                } catch (ragError) {
+                    console.error('RAG 검색 오류:', ragError);
+                    res.write('data: {"type": "status", "message": "문서 검색 실패. 일반 모드로 전환..."}\n\n');
+                }
+            }
+
+            // 일반 스트리밍 응답
+            res.write('data: {"type": "status", "message": "AI 응답 생성 중..."}\n\n');
+            
+            try {
+                await this.streamMistralAPI(typed_function_type, message, is_admin, false, context.history, res);
+            } catch (error) {
+                console.error('Mistral 스트리밍 오류:', error);
+                res.write('data: {"type": "status", "message": "Claude로 전환 중..."}\n\n');
+                await this.streamClaudeAPI(typed_function_type, message, is_admin, context.history, res);
+            }
+
+            res.write('data: {"type": "done"}\n\n');
+
+        } catch (error) {
+            console.error('스트리밍 처리 오류:', error);
+            res.write(`data: {"type": "error", "message": "${error instanceof Error ? error.message : '알 수 없는 오류'}"}\n\n`);
+        } finally {
+            res.end();
+        }
+    }
+
     // ... (callMistralAPI, callClaudeAPI, getSystemPrompt 등 local-ai-server.ts의 나머지 메소드들)
+    // RAG와 함께 사용하는 Mistral API 호출
+    private async callMistralAPIWithRAG(systemPrompt: string, message: string, isAdmin: boolean, history: any[] = [], ragContext: any): Promise<{ response: string, follow_up_questions: string[] }> {
+        const formattedHistory = history.map(h => ({ role: h.role, content: h.content }));
+
+        const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${MISTRAL_API_KEY}` },
+            body: JSON.stringify({
+                model: 'mistral-small-latest',
+                messages: [{ role: 'system', content: systemPrompt }, ...formattedHistory, { role: 'user', content: message }],
+                temperature: 0.15,
+                max_tokens: 1500,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.json().catch(() => response.text());
+            console.error('Mistral API Error Body:', errorBody);
+            const errorMessage = typeof errorBody === 'string' ? errorBody : (errorBody?.error?.message || JSON.stringify(errorBody));
+            throw new Error(`Mistral API error: ${response.status} - ${errorMessage}`);
+        }
+
+        const data = await response.json();
+        const content = data.choices[0]?.message?.content || 'AI 응답을 받을 수 없습니다.';
+        return this.extractFollowUpQuestions(content);
+    }
+
+    // RAG와 함께 사용하는 Claude API 호출
+    private async callClaudeAPIWithRAG(systemPrompt: string, message: string, isAdmin: boolean, history: any[] = [], ragContext: any): Promise<{ response: string, follow_up_questions: string[] }> {
+        if (!CLAUDE_API_KEY) {
+            throw new Error("Claude API key is not configured.");
+        }
+
+        const formattedHistory = history.map(h => ({ role: h.role, content: h.content }));
+
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-version': '2023-06-01' },
+            body: JSON.stringify({
+                model: 'claude-sonnet-4-20250514',
+                max_tokens: 1500,
+                system: systemPrompt,
+                messages: [...formattedHistory, { role: 'user', content: message }],
+                temperature: 0.2,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.json().catch(() => response.text());
+            console.error('Claude API Error Body:', errorBody);
+            const errorMessage = typeof errorBody === 'string' ? errorBody : (errorBody?.error?.message || JSON.stringify(errorBody));
+            throw new Error(`Claude API error: ${response.status} - ${errorMessage}`);
+        }
+
+        const data = await response.json();
+        const content = data.content[0]?.text || 'AI 응답을 받을 수 없습니다.';
+        return this.extractFollowUpQuestions(content);
+    }
+
+    // 스트리밍 Mistral API 호출
+    private async streamMistralAPI(functionTypeOrPrompt: AIFunctionType | string, message: string, isAdmin: boolean, isRouting: boolean = false, history: any[] = [], res: VercelResponse): Promise<void> {
+        const systemPrompt = isRouting ? functionTypeOrPrompt : this.getSystemPrompt(functionTypeOrPrompt as AIFunctionType, isAdmin);
+        const formattedHistory = history.map(h => ({ role: h.role, content: h.content }));
+
+        const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${MISTRAL_API_KEY}` },
+            body: JSON.stringify({
+                model: 'mistral-small-latest',
+                messages: [{ role: 'system', content: systemPrompt }, ...formattedHistory, { role: 'user', content: message }],
+                temperature: 0.15,
+                max_tokens: isRouting ? 20 : 1500,
+                stream: true,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.json().catch(() => response.text());
+            console.error('Mistral API Error Body:', errorBody);
+            const errorMessage = typeof errorBody === 'string' ? errorBody : (errorBody?.error?.message || JSON.stringify(errorBody));
+            throw new Error(`Mistral API error: ${response.status} - ${errorMessage}`);
+        }
+
+        const reader = response.body?.getReader();
+        if (!reader) {
+            throw new Error('스트림을 읽을 수 없습니다.');
+        }
+
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        try {
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop() || '';
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6);
+                        if (data === '[DONE]') {
+                            return;
+                        }
+
+                        try {
+                            const parsed = JSON.parse(data);
+                            const content = parsed.choices?.[0]?.delta?.content;
+                            if (content) {
+                                res.write(`data: {"type": "content", "content": ${JSON.stringify(content)}}\n\n`);
+                            }
+                        } catch (parseError) {
+                            // JSON 파싱 오류 무시
+                        }
+                    }
+                }
+            }
+        } finally {
+            reader.releaseLock();
+        }
+    }
+
+    // 스트리밍 Claude API 호출
+    private async streamClaudeAPI(functionTypeOrPrompt: AIFunctionType | string, message: string, isAdmin: boolean, history: any[] = [], res: VercelResponse): Promise<void> {
+        if (!CLAUDE_API_KEY) {
+            throw new Error("Claude API key is not configured.");
+        }
+
+        const systemPrompt = this.getSystemPrompt(functionTypeOrPrompt as AIFunctionType, isAdmin);
+        const formattedHistory = history.map(h => ({ role: h.role, content: h.content }));
+
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-version': '2023-06-01' },
+            body: JSON.stringify({
+                model: 'claude-sonnet-4-20250514',
+                max_tokens: 1500,
+                system: systemPrompt,
+                messages: [...formattedHistory, { role: 'user', content: message }],
+                temperature: 0.2,
+                stream: true,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.json().catch(() => response.text());
+            console.error('Claude API Error Body:', errorBody);
+            const errorMessage = typeof errorBody === 'string' ? errorBody : (errorBody?.error?.message || JSON.stringify(errorBody));
+            throw new Error(`Claude API error: ${response.status} - ${errorMessage}`);
+        }
+
+        const reader = response.body?.getReader();
+        if (!reader) {
+            throw new Error('스트림을 읽을 수 없습니다.');
+        }
+
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        try {
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop() || '';
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6);
+                        if (data === '[DONE]') {
+                            return;
+                        }
+
+                        try {
+                            const parsed = JSON.parse(data);
+                            const content = parsed.delta?.text;
+                            if (content) {
+                                res.write(`data: {"type": "content", "content": ${JSON.stringify(content)}}\n\n`);
+                            }
+                        } catch (parseError) {
+                            // JSON 파싱 오류 무시
+                        }
+                    }
+                }
+            }
+        } finally {
+            reader.releaseLock();
+        }
+    }
+
+    // RAG와 함께 사용하는 스트리밍 Mistral API 호출
+    private async streamMistralAPIWithRAG(systemPrompt: string, message: string, isAdmin: boolean, history: any[] = [], ragContext: any, res: VercelResponse): Promise<void> {
+        const formattedHistory = history.map(h => ({ role: h.role, content: h.content }));
+
+        const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${MISTRAL_API_KEY}` },
+            body: JSON.stringify({
+                model: 'mistral-small-latest',
+                messages: [{ role: 'system', content: systemPrompt }, ...formattedHistory, { role: 'user', content: message }],
+                temperature: 0.15,
+                max_tokens: 1500,
+                stream: true,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.json().catch(() => response.text());
+            console.error('Mistral API Error Body:', errorBody);
+            const errorMessage = typeof errorBody === 'string' ? errorBody : (errorBody?.error?.message || JSON.stringify(errorBody));
+            throw new Error(`Mistral API error: ${response.status} - ${errorMessage}`);
+        }
+
+        const reader = response.body?.getReader();
+        if (!reader) {
+            throw new Error('스트림을 읽을 수 없습니다.');
+        }
+
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        try {
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop() || '';
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6);
+                        if (data === '[DONE]') {
+                            return;
+                        }
+
+                        try {
+                            const parsed = JSON.parse(data);
+                            const content = parsed.choices?.[0]?.delta?.content;
+                            if (content) {
+                                res.write(`data: {"type": "content", "content": ${JSON.stringify(content)}}\n\n`);
+                            }
+                        } catch (parseError) {
+                            // JSON 파싱 오류 무시
+                        }
+                    }
+                }
+            }
+        } finally {
+            reader.releaseLock();
+        }
+    }
+
+    // RAG와 함께 사용하는 스트리밍 Claude API 호출
+    private async streamClaudeAPIWithRAG(systemPrompt: string, message: string, isAdmin: boolean, history: any[] = [], ragContext: any, res: VercelResponse): Promise<void> {
+        if (!CLAUDE_API_KEY) {
+            throw new Error("Claude API key is not configured.");
+        }
+
+        const formattedHistory = history.map(h => ({ role: h.role, content: h.content }));
+
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': CLAUDE_API_KEY, 'anthropic-version': '2023-06-01' },
+            body: JSON.stringify({
+                model: 'claude-sonnet-4-20250514',
+                max_tokens: 1500,
+                system: systemPrompt,
+                messages: [...formattedHistory, { role: 'user', content: message }],
+                temperature: 0.2,
+                stream: true,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.json().catch(() => response.text());
+            console.error('Claude API Error Body:', errorBody);
+            const errorMessage = typeof errorBody === 'string' ? errorBody : (errorBody?.error?.message || JSON.stringify(errorBody));
+            throw new Error(`Claude API error: ${response.status} - ${errorMessage}`);
+        }
+
+        const reader = response.body?.getReader();
+        if (!reader) {
+            throw new Error('스트림을 읽을 수 없습니다.');
+        }
+
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        try {
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop() || '';
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6);
+                        if (data === '[DONE]') {
+                            return;
+                        }
+
+                        try {
+                            const parsed = JSON.parse(data);
+                            const content = parsed.delta?.text;
+                            if (content) {
+                                res.write(`data: {"type": "content", "content": ${JSON.stringify(content)}}\n\n`);
+                            }
+                        } catch (parseError) {
+                            // JSON 파싱 오류 무시
+                        }
+                    }
+                }
+            }
+        } finally {
+            reader.releaseLock();
+        }
+    }
+
     private async callMistralAPI(functionTypeOrPrompt: AIFunctionType | string, message: string, isAdmin: boolean, isRouting: boolean = false, history: any[] = []): Promise<{ response: string, follow_up_questions: string[] }> {
         const systemPrompt = isRouting ? functionTypeOrPrompt : this.getSystemPrompt(functionTypeOrPrompt as AIFunctionType, isAdmin);
         const formattedHistory = history.map(h => ({ role: h.role, content: h.content }));
@@ -459,10 +979,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     try {
-        const result = await agent.processRequest(req.body);
-        return res.status(200).json(result);
+        const { stream = false, ...requestBody } = req.body;
+
+        if (stream) {
+            // 스트리밍 모드
+            await agent.processStreamRequest(requestBody, res);
+        } else {
+            // 일반 모드 (기존 호환성 유지)
+            const result = await agent.processRequest(requestBody);
+            return res.status(200).json(result);
+        }
     } catch (error) {
         console.error('Error in AI agent handler:', error);
-        return res.status(500).json({ error: 'An internal server error occurred.' });
+        if (req.body.stream) {
+            res.write(`data: {"type": "error", "message": "서버 오류가 발생했습니다."}\n\n`);
+            res.end();
+        } else {
+            return res.status(500).json({ error: 'An internal server error occurred.' });
+        }
     }
 }

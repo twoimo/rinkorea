@@ -1,4 +1,4 @@
-const { describe, it, expect, beforeEach, afterEach } = require('@jest/globals');
+const { describe, it, expect, beforeEach, afterEach, vi } = require('vitest');
 const fs = require('fs');
 const path = require('path');
 const { scanFile, getAllFiles, DANGEROUS_PATTERNS, EXCLUDE_PATTERNS } = require('../check-hardcoded-keys');

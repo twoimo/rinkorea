@@ -123,7 +123,9 @@ describe('CollectionList', () => {
   it('전체 선택 체크박스가 작동한다', () => {
     render(<CollectionList {...defaultProps} />);
     
-    const selectAllCheckbox = screen.getByRole('checkbox', { name: /전체 선택/i });
+    // 전체 선택 체크박스는 "전체 선택" 텍스트 옆에 있는 첫 번째 체크박스
+    const checkboxes = screen.getAllByRole('checkbox');
+    const selectAllCheckbox = checkboxes[0]; // 첫 번째 체크박스가 전체 선택
     fireEvent.click(selectAllCheckbox);
     
     // 일괄 작업 바가 표시되어야 함
@@ -134,7 +136,8 @@ describe('CollectionList', () => {
     render(<CollectionList {...defaultProps} />);
     
     // 전체 선택
-    const selectAllCheckbox = screen.getByRole('checkbox', { name: /전체 선택/i });
+    const checkboxes = screen.getAllByRole('checkbox');
+    const selectAllCheckbox = checkboxes[0]; // 첫 번째 체크박스가 전체 선택
     fireEvent.click(selectAllCheckbox);
     
     // 삭제 버튼 클릭

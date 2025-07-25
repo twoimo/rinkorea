@@ -84,7 +84,7 @@ describe('documentService', () => {
     });
 
     it('큰 파일에 대해 경고를 제공해야 함', () => {
-      const largeFile = createMockFile('large.txt', 'content', 'text/plain', 15 * 1024 * 1024); // 15MB
+      const largeFile = createMockFile('large.pdf', 'content', 'application/pdf', 15 * 1024 * 1024); // 15MB PDF (maxSize 50MB)
       const result = validateFileExtended(largeFile);
       expect(result.valid).toBe(true);
       expect(result.warnings).toContain('큰 파일은 처리 시간이 오래 걸릴 수 있습니다');

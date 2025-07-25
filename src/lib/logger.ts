@@ -89,7 +89,18 @@ function sanitizeObject(obj: any, depth = 0): any {
       
       // 키 이름이 민감한 정보를 나타내는 경우
       if (SENSITIVE_KEYS.some(sensitiveKey => lowerKey.includes(sensitiveKey))) {
-        sanitized[key] = '[REDACTED]';
+        // 값이 문자열이고 특정 패턴인 경우 특별한 마스킹 적용
+        if (typeof value === 'string') {
+          if (value.startsWith('sk-')) {
+            sanitized[key] = `${value.substring(0, 4)}***${value.substring(value.length - 4)}`;
+          } else if (value.startsWith('eyJ')) {
+            sanitized[key] = `${value.substring(0, 4)}***${value.substring(value.length - 3)}`;
+          } else {
+            sanitized[key] = '[REDACTED]';
+          }
+        } else {
+          sanitized[key] = '[REDACTED]';
+        }
       } else {
         sanitized[key] = sanitizeObject(value, depth + 1);
       }
@@ -109,13 +120,27 @@ function sanitizeString(str: string): string {
   
   SENSITIVE_VALUE_PATTERNS.forEach(pattern => {
     sanitized = sanitized.replace(pattern, (match) => {
-      // 처음 4자와 마지막 4자만 보여주고 나머지는 마스킹
-      if (match.length <= 8) {
+      // API 키나 JWT 토큰의 경우 특별한 마스킹 형태 사용
+      if (match.startsWith('sk-')) {
+        // OpenAI/Anthropic API 키: sk-a***3456 형태
+        return `${match.substring(0, 4)}***${match.substring(match.length - 4)}`;
+      } else if (match.startsWith('eyJ')) {
+        // JWT 토큰: eyJh***w5c 형태
+        return `${match.substring(0, 4)}***${match.substring(match.length - 3)}`;
+      } else if (match.length <= 8) {
         return '[REDACTED]';
+      } else {
+        // 일반적인 경우: 처음 4자와 마지막 4자만 보여주고 나머지는 마스킹
+        return `${match.substring(0, 4)}${'*'.repeat(Math.min(match.length - 8, 20))}${match.substring(match.length - 4)}`;
       }
-      return `${match.substring(0, 4)}${'*'.repeat(match.length - 8)}${match.substring(match.length - 4)}`;
     });
   });
+  
+  // 데이터베이스 URL에서 비밀번호 마스킹
+  sanitized = sanitized.replace(
+    /(postgresql:\/\/[^:]+:)([^@]+)(@[^\/]+)/g,
+    '$1[REDACTED]$3'
+  );
   
   return sanitized;
 }

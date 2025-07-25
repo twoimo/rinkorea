@@ -49,7 +49,7 @@ CREATE POLICY "관리자는 벡터 문서를 삭제할 수 있음" ON storage.ob
   );
 
 -- 완료 메시지
-DO $
+DO $$
 BEGIN
     RAISE NOTICE '벡터 문서 스토리지 버킷이 성공적으로 설정되었습니다!';
-END $;
+END $$;

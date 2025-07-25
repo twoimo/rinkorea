@@ -76,7 +76,7 @@ const getStatusBadge = (status: Document['processing_status']) => {
   const variants = {
     pending: 'secondary',
     processing: 'default',
-    completed: 'success',
+    completed: 'default',
     failed: 'destructive'
   } as const;
 
@@ -88,7 +88,10 @@ const getStatusBadge = (status: Document['processing_status']) => {
   };
 
   return (
-    <Badge variant={variants[status] || 'secondary'} className="flex items-center gap-1">
+    <Badge 
+      variant={variants[status] || 'secondary'} 
+      className={`flex items-center gap-1 ${status === 'completed' ? 'bg-green-500 hover:bg-green-600 text-white' : ''}`}
+    >
       {getStatusIcon(status)}
       {labels[status]}
     </Badge>

@@ -2,6 +2,7 @@
 import { chunkText, type ChunkingOptions, type ChunkingResult } from './textChunkingService';
 import { type VectorStorageResult } from './embeddingService';
 import { generateClaudeBatchEmbeddings } from './claudeEmbeddingService';
+import { errorHandler, ErrorType, ErrorSeverity, executeWithRetry } from '@/lib/errorHandler';
 
 /**
  * 벡터 생성 제공자

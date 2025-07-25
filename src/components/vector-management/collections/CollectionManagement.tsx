@@ -17,7 +17,13 @@ import { CollectionStats } from './CollectionStats';
 import { useCollections, useCollectionStats } from '@/hooks/useCollections';
 import type { Collection, CreateCollectionData, UpdateCollectionData } from '@/types/vector';
 
-export const CollectionManagement: React.FC = () => {
+interface CollectionManagementProps {
+  onSelectCollection?: (collection: Collection) => void;
+}
+
+export const CollectionManagement: React.FC<CollectionManagementProps> = ({
+  onSelectCollection
+}) => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCollection, setEditingCollection] = useState<Collection | null>(null);
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null);
@@ -216,6 +222,7 @@ export const CollectionManagement: React.FC = () => {
             onToggleStatus={handleToggleStatus}
             onBulkAction={handleBulkAction}
             onCreate={handleCreateClick}
+            onManageDocuments={onSelectCollection}
           />
         </TabsContent>
 

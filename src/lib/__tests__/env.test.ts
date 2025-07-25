@@ -210,15 +210,15 @@ describe('환경 변수 검증 시스템', () => {
     });
 
     it('일부 API 키가 유효하지 않을 때 오류를 반환해야 함', () => {
-      mockEnv({
-        VITE_VOYAGE_API_KEY: 'invalid-key',
+      const mockEnv = {
+        VITE_VOYAGE_API_KEY: 'invalid-key', // 잘못된 형식
         VITE_CLAUDE_API_KEY: 'sk-ant-valid-claude-key-123456789012345678901234567890',
         VITE_MISTRAL_API_KEY: 'valid-mistral-key-12345678901234567890',
         VITE_SUPABASE_URL: 'https://myproject.supabase.co',
         VITE_SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlc3QiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTY0NjA2ODQwMCwiZXhwIjoxOTYxNjQ0NDAwfQ.test-signature-here-with-enough-length-to-pass-validation'
-      });
+      };
 
-      const result = validateAllApiKeys();
+      const result = validateAllApiKeys(mockEnv);
       
       expect(result.valid).toBe(false);
       expect(result.errors.length).toBeGreaterThan(0);
@@ -228,31 +228,31 @@ describe('환경 변수 검증 시스템', () => {
 
   describe('validateStartupKeys', () => {
     it('개발 환경에서 유효하지 않은 키가 있어도 예외를 던지지 않아야 함', () => {
-      mockEnv({
+      const mockEnvVars = {
         VITE_APP_ENV: 'development',
         VITE_VOYAGE_API_KEY: 'invalid-key',
         VITE_CLAUDE_API_KEY: 'invalid-key',
         VITE_MISTRAL_API_KEY: 'invalid-key',
         VITE_SUPABASE_URL: 'invalid-url',
         VITE_SUPABASE_ANON_KEY: 'invalid-key'
-      });
+      };
 
-      expect(() => validateStartupKeys()).not.toThrow();
+      expect(() => validateStartupKeys(mockEnvVars)).not.toThrow();
       expect(console.error).toHaveBeenCalled();
       expect(console.warn).toHaveBeenCalled();
     });
 
     it('프로덕션 환경에서 유효하지 않은 키가 있으면 예외를 던져야 함', () => {
-      mockEnv({
+      const mockEnvVars = {
         VITE_APP_ENV: 'production',
         VITE_VOYAGE_API_KEY: 'invalid-key',
         VITE_CLAUDE_API_KEY: 'invalid-key',
         VITE_MISTRAL_API_KEY: 'invalid-key',
         VITE_SUPABASE_URL: 'invalid-url',
         VITE_SUPABASE_ANON_KEY: 'invalid-key'
-      });
+      };
 
-      expect(() => validateStartupKeys()).toThrow('프로덕션 환경에서는 모든 API 키가 올바르게 설정되어야 합니다');
+      expect(() => validateStartupKeys(mockEnvVars)).toThrow('프로덕션 환경에서는 모든 API 키가 올바르게 설정되어야 합니다');
     });
 
     it('모든 키가 유효할 때 성공 메시지를 출력해야 함', () => {

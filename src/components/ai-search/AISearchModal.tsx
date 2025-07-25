@@ -411,6 +411,7 @@ function AISearchModal({ onClose }: AISearchModalProps) {
             <div
                 className="bg-white w-full h-full sm:rounded-lg sm:shadow-xl sm:max-w-6xl sm:max-h-[90vh] sm:h-auto overflow-hidden flex flex-col"
                 onClick={(e) => e.stopPropagation()}
+                data-testid="ai-chat-interface"
             >
                 {/* Header */}
                 <div className="flex-shrink-0 sticky top-0 bg-white border-b border-gray-200 p-3 sm:p-4 flex items-center justify-between">

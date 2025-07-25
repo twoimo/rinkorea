@@ -2,25 +2,74 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
 import type {
-  Document,
   UploadResult,
   ProcessingResult,
-  UploadProgress,
-  FileType
+  UploadProgress
 } from '@/types/vector';
 import { SUPPORTED_FILE_TYPES } from '@/types/vector';
 import { generateAndStoreDocumentVectors, type VectorGenerationOptions } from './vectorGenerationService';
+import { processUploadedDocument, type ProcessingProgress } from './documentProcessingService';
+import { ErrorType, executeWithRetry } from '@/lib/errorHandler';
+import {
+  handleUserError,
+  collectUserFeedback
+} from './common/userFeedback';
 
 // Supabase 데이터베이스 타입 정의
-type DbDocument = Database['public']['Tables']['documents']['Row'];
-type DbDocumentInsert = Database['public']['Tables']['documents']['Insert'];
 type DbDocumentUpdate = Database['public']['Tables']['documents']['Update'];
+
+// 타입 가드 함수들
+const isValidMetadata = (metadata: unknown): metadata is Record<string, any> => {
+  return metadata !== null && typeof metadata === 'object' && !Array.isArray(metadata);
+};
+
+const safeParseMetadata = (metadata: unknown): Record<string, any> => {
+  if (isValidMetadata(metadata)) {
+    return metadata;
+  }
+  return {};
+};
+
+// 런타임 타입 검증 함수들
+const validateFileSize = (size: number): boolean => {
+  return typeof size === 'number' && size >= 0 && size <= 60 * 1024 * 1024; // 60MB 제한
+};
+
+const validateFileName = (name: string): boolean => {
+  return typeof name === 'string' && name.length > 0 && name.length <= 255;
+};
+
+const validateFileType = (type: string): boolean => {
+  return typeof type === 'string' && type.length > 0;
+};
 
 /**
  * 파일 타입 검증 (확장된 검증)
  */
 export const validateFileExtended = (file: File): { valid: boolean; error?: string; warnings?: string[] } => {
   const warnings: string[] = [];
+  
+  // 런타임 타입 검증
+  if (!validateFileName(file.name)) {
+    return {
+      valid: false,
+      error: '유효하지 않은 파일명입니다'
+    };
+  }
+
+  if (!validateFileSize(file.size)) {
+    return {
+      valid: false,
+      error: '파일 크기가 유효하지 않습니다 (최대 60MB)'
+    };
+  }
+
+  if (!validateFileType(file.type)) {
+    return {
+      valid: false,
+      error: '유효하지 않은 파일 타입입니다'
+    };
+  }
   
   // 기본 파일 타입 검증
   const extension = '.' + file.name.split('.').pop()?.toLowerCase();
@@ -35,7 +84,7 @@ export const validateFileExtended = (file: File): { valid: boolean; error?: stri
     };
   }
 
-  const [type, config] = fileType;
+  const [, config] = fileType;
   if (file.size > config.maxSize) {
     return {
       valid: false,
@@ -73,201 +122,12 @@ export const validateFileExtended = (file: File): { valid: boolean; error?: stri
     warnings.push('큰 파일은 처리 시간이 오래 걸릴 수 있습니다');
   }
 
-  if (extension === '.pdf' && file.size > 25 * 1024 * 1024) { // PDF 25MB 이상
+  const ext = '.' + file.name.split('.').pop()?.toLowerCase();
+  if (ext === '.pdf' && file.size > 25 * 1024 * 1024) { // PDF 25MB 이상
     warnings.push('큰 PDF 파일은 텍스트 추출에 시간이 오래 걸릴 수 있습니다');
   }
 
   return { valid: true, warnings };
-};
-
-/**
- * PDF 텍스트 추출
- */
-const extractTextFromPDF = async (file: File): Promise<string> => {
-  try {
-    const pdfParse = (await import('pdf-parse')).default;
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = new Uint8Array(arrayBuffer);
-    const data = await pdfParse(buffer);
-    return data.text;
-  } catch (error) {
-    console.error('PDF 텍스트 추출 오류:', error);
-    throw new Error('PDF 파일에서 텍스트를 추출할 수 없습니다');
-  }
-};
-
-/**
- * DOCX 텍스트 추출
- */
-const extractTextFromDOCX = async (file: File): Promise<string> => {
-  try {
-    const mammoth = await import('mammoth');
-    const arrayBuffer = await file.arrayBuffer();
-    const result = await mammoth.extractRawText({ arrayBuffer });
-    return result.value;
-  } catch (error) {
-    console.error('DOCX 텍스트 추출 오류:', error);
-    throw new Error('DOCX 파일에서 텍스트를 추출할 수 없습니다');
-  }
-};
-
-/**
- * HTML 텍스트 추출
- */
-const extractTextFromHTML = (htmlContent: string): string => {
-  try {
-    // DOM 파서를 사용하여 HTML 태그 제거
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlContent, 'text/html');
-    
-    // 스크립트와 스타일 태그 제거
-    const scripts = doc.querySelectorAll('script, style');
-    scripts.forEach(el => el.remove());
-    
-    // 텍스트 내용만 추출
-    const textContent = doc.body?.textContent || doc.textContent || '';
-    
-    // 여러 공백을 하나로 정리하고 줄바꿈 정리
-    return textContent
-      .replace(/\s+/g, ' ')
-      .replace(/\n\s*\n/g, '\n')
-      .trim();
-  } catch (error) {
-    console.error('HTML 텍스트 추출 오류:', error);
-    throw new Error('HTML 파일에서 텍스트를 추출할 수 없습니다');
-  }
-};
-
-/**
- * 텍스트 추출 (브라우저 기반)
- */
-export const extractTextFromFile = async (file: File): Promise<string> => {
-  const extension = '.' + file.name.split('.').pop()?.toLowerCase();
-  
-  try {
-    switch (extension) {
-      case '.txt':
-      case '.md':
-        const textContent = await file.text();
-        return textContent.trim();
-      
-      case '.html':
-        const htmlText = await file.text();
-        return extractTextFromHTML(htmlText);
-      
-      case '.pdf':
-        return await extractTextFromPDF(file);
-      
-      case '.docx':
-        return await extractTextFromDOCX(file);
-      
-      default:
-        throw new Error(`지원되지 않는 파일 형식: ${extension}`);
-    }
-  } catch (error) {
-    console.error('텍스트 추출 오류:', error);
-    throw new Error(`텍스트 추출 실패: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
-  }
-};
-
-/**
- * 안전한 텍스트 추출 (재시도 포함)
- */
-export const extractTextFromFileSafe = async (file: File): Promise<string> => {
-  return retryWithBackoff(async () => {
-    try {
-      const text = await extractTextFromFile(file);
-      
-      // 추출된 텍스트 검증
-      if (!text || text.trim().length === 0) {
-        throw new Error('파일에서 텍스트를 추출할 수 없습니다');
-      }
-
-      // 텍스트 길이 제한 (1MB = 약 1,000,000자)
-      if (text.length > 1000000) {
-        console.warn('텍스트가 매우 큽니다. 처리 시간이 오래 걸릴 수 있습니다.');
-      }
-
-      return text;
-    } catch (error) {
-      console.error('텍스트 추출 실패:', error);
-      throw error;
-    }
-  }, 2, 2000); // 최대 2번 재시도, 2초 간격
-};
-
-/**
- * 텍스트를 청크로 분할
- */
-export const splitTextIntoChunks = (
-  text: string,
-  chunkSize: number = 1000,
-  overlap: number = 200
-): string[] => {
-  if (!text || text.trim().length === 0) {
-    return [];
-  }
-
-  const chunks: string[] = [];
-  let start = 0;
-
-  while (start < text.length) {
-    let end = start + chunkSize;
-    
-    // 문장 경계에서 자르기 시도
-    if (end < text.length) {
-      const sentenceEnd = text.lastIndexOf('.', end);
-      const questionEnd = text.lastIndexOf('?', end);
-      const exclamationEnd = text.lastIndexOf('!', end);
-      
-      const bestEnd = Math.max(sentenceEnd, questionEnd, exclamationEnd);
-      if (bestEnd > start + chunkSize * 0.5) {
-        end = bestEnd + 1;
-      }
-    }
-
-    const chunk = text.slice(start, end).trim();
-    if (chunk.length > 0) {
-      chunks.push(chunk);
-    }
-
-    // 다음 청크 시작점 계산 (오버랩 고려)
-    start = Math.max(start + chunkSize - overlap, end);
-    
-    // 무한 루프 방지
-    if (start >= text.length) {
-      break;
-    }
-  }
-
-  return chunks;
-};
-
-/**
- * Supabase Storage에 파일 업로드
- */
-const uploadFileToStorage = async (file: File, documentId: string): Promise<string> => {
-  try {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${documentId}.${fileExt}`;
-    const filePath = `documents/${fileName}`;
-
-    const { data, error } = await supabase.storage
-      .from('vector-documents')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false
-      });
-
-    if (error) {
-      throw new Error(`파일 저장 실패: ${error.message}`);
-    }
-
-    return data.path;
-  } catch (error) {
-    console.error('파일 저장 오류:', error);
-    throw error;
-  }
 };
 
 /**
@@ -281,11 +141,25 @@ export const uploadDocument = async (
     // 파일 검증
     const validation = validateFileExtended(file);
     if (!validation.valid) {
+      handleUserError(validation.error || '파일 검증 실패');
+      collectUserFeedback('file_validation', false, { 
+        fileName: file.name, 
+        fileSize: file.size,
+        error: validation.error 
+      });
+      
       return {
         file,
         success: false,
         error: validation.error
       };
+    }
+
+    // 검증 성공 시 경고사항 표시
+    if (validation.warnings && validation.warnings.length > 0) {
+      validation.warnings.forEach(warning => {
+        console.warn(`파일 ${file.name}: ${warning}`);
+      });
     }
 
     // 현재 사용자 정보 가져오기
@@ -321,31 +195,6 @@ export const uploadDocument = async (
       throw new Error(`문서 레코드 생성 실패: ${docError.message}`);
     }
 
-    // Supabase Storage에 파일 업로드
-    try {
-      const storagePath = await uploadFileToStorage(file, document.id);
-      
-      // 문서 레코드에 저장 경로 업데이트
-      await supabase
-        .from('documents')
-        .update({
-          metadata: {
-            ...document.metadata,
-            storage_path: storagePath
-          }
-        })
-        .eq('id', document.id);
-
-    } catch (storageError) {
-      // 스토리지 업로드 실패 시 문서 레코드 삭제
-      await supabase
-        .from('documents')
-        .delete()
-        .eq('id', document.id);
-      
-      throw storageError;
-    }
-
     return {
       file,
       success: true,
@@ -362,61 +211,79 @@ export const uploadDocument = async (
 };
 
 /**
- * 문서 처리 진행률 계산
- */
-export const calculateProcessingProgress = (
-  currentStep: 'upload' | 'text_extraction' | 'chunking' | 'storage',
-  totalSteps: number = 4
-): number => {
-  const stepProgress = {
-    upload: 25,
-    text_extraction: 50,
-    chunking: 75,
-    storage: 100
-  };
-
-  return stepProgress[currentStep] || 0;
-};
-
-/**
- * 재시도 로직 (백오프 전략 포함)
- */
-const retryWithBackoff = async <T>(
-  operation: () => Promise<T>,
-  maxRetries: number = 3,
-  baseDelayMs: number = 1000
-): Promise<T> => {
-  let lastError: Error;
-
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      return await operation();
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error('알 수 없는 오류');
-      
-      if (attempt === maxRetries) {
-        break;
-      }
-
-      // 지수 백오프: 1초, 2초, 4초, 8초...
-      const delay = baseDelayMs * Math.pow(2, attempt);
-      console.warn(`작업 실패 (시도 ${attempt + 1}/${maxRetries + 1}), ${delay}ms 후 재시도:`, lastError.message);
-      
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-  }
-
-  throw new Error(`${maxRetries + 1}번 시도 후 실패: ${lastError.message}`);
-};
-
-/**
- * 파일 처리 통합 서비스 클래스
+ * 파일 처리 통합 서비스 클래스 (메모리 최적화)
  */
 export class FileProcessingService {
   private progressCallbacks: Map<string, (progress: UploadProgress) => void> = new Map();
+  private processingQueue: Map<string, AbortController> = new Map();
+  private memoryMonitor = {
+    maxMemoryMB: 100,
+    currentUsageMB: 0,
+    activeProcesses: 0
+  };
+  private lastProgressUpdate: Map<string, number> = new Map();
 
   /**
-   * 단일 파일 업로드 및 처리
+   * 메모리 사용량 모니터링
+   */
+  private updateMemoryUsage(delta: number): void {
+    this.memoryMonitor.currentUsageMB += delta;
+    
+    if (this.memoryMonitor.currentUsageMB > this.memoryMonitor.maxMemoryMB) {
+      console.warn(`메모리 사용량 초과: ${this.memoryMonitor.currentUsageMB}MB / ${this.memoryMonitor.maxMemoryMB}MB`);
+    }
+  }
+
+  /**
+   * 리소스 정리
+   */
+  private cleanupResources(progressId: string): void {
+    this.progressCallbacks.delete(progressId);
+    
+    const abortController = this.processingQueue.get(progressId);
+    if (abortController) {
+      abortController.abort();
+      this.processingQueue.delete(progressId);
+    }
+    
+    this.memoryMonitor.activeProcesses = Math.max(0, this.memoryMonitor.activeProcesses - 1);
+    
+    // 가비지 컬렉션 힌트
+    if ((global as any).gc && this.memoryMonitor.activeProcesses === 0) {
+      (global as any).gc();
+    }
+  }
+
+  /**
+   * 처리 대기열 관리
+   */
+  private async waitForAvailableSlot(): Promise<void> {
+    const maxConcurrentProcesses = 3;
+    
+    while (this.memoryMonitor.activeProcesses >= maxConcurrentProcesses) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+
+  /**
+   * 진행률 업데이트 (스로틀링 적용)
+   */
+  private updateProgress(progressId: string, progress: UploadProgress): void {
+    const callback = this.progressCallbacks.get(progressId);
+    if (callback) {
+      // 진행률 업데이트 스로틀링 (100ms 간격)
+      const now = Date.now();
+      const lastUpdate = this.lastProgressUpdate.get(progressId) || 0;
+      
+      if (now - lastUpdate >= 100 || progress.status === 'completed' || progress.status === 'failed') {
+        callback(progress);
+        this.lastProgressUpdate.set(progressId, now);
+      }
+    }
+  }
+
+  /**
+   * 단일 파일 업로드 및 처리 (메모리 최적화)
    */
   async uploadAndProcessFile(
     file: File,
@@ -424,12 +291,22 @@ export class FileProcessingService {
     onProgress?: (progress: UploadProgress) => void
   ): Promise<{ uploadResult: UploadResult; processingResult?: ProcessingResult }> {
     const progressId = `${file.name}_${Date.now()}`;
+    const abortController = new AbortController();
+    
+    // 처리 대기열에 추가
+    await this.waitForAvailableSlot();
+    this.processingQueue.set(progressId, abortController);
+    this.memoryMonitor.activeProcesses++;
     
     if (onProgress) {
       this.progressCallbacks.set(progressId, onProgress);
     }
 
     try {
+      // 파일 크기 기반 메모리 사용량 추정
+      const estimatedMemoryMB = Math.ceil(file.size / (1024 * 1024)) * 2; // 파일 크기의 2배로 추정
+      this.updateMemoryUsage(estimatedMemoryMB);
+
       // 1단계: 파일 검증
       this.updateProgress(progressId, {
         file_name: file.name,
@@ -484,10 +361,28 @@ export class FileProcessingService {
         progress: 50
       });
 
-      const processingResult = await this.processUploadedDocument(
-        uploadResult.document_id,
-        file,
-        progressId
+      const processingResult = await executeWithRetry(
+        () => processUploadedDocument(
+          uploadResult.document_id,
+          file,
+          {
+            enableVectorGeneration: true,
+            onProgress: (progress: ProcessingProgress) => {
+              this.updateProgress(progressId, {
+                file_name: file.name,
+                status: 'processing',
+                progress: 50 + (progress.progress * 0.5), // 50-100% 범위로 매핑
+                error: progress.stage === 'failed' ? progress.message : undefined
+              });
+            }
+          }
+        ),
+        {
+          operationName: 'processUploadedDocument',
+          errorType: ErrorType.FILE_PROCESSING,
+          userMessage: `"${file.name}" 파일 처리 중 오류가 발생했습니다.`,
+          metadata: { fileName: file.name, fileSize: file.size }
+        }
       );
 
       // 최종 상태 업데이트
@@ -518,13 +413,17 @@ export class FileProcessingService {
         }
       };
     } finally {
-      // 콜백 정리
-      this.progressCallbacks.delete(progressId);
+      // 메모리 사용량 복원
+      const estimatedMemoryMB = Math.ceil(file.size / (1024 * 1024)) * 2;
+      this.updateMemoryUsage(-estimatedMemoryMB);
+      
+      // 리소스 정리
+      this.cleanupResources(progressId);
     }
   }
 
   /**
-   * 여러 파일 일괄 업로드 및 처리
+   * 여러 파일 일괄 업로드 및 처리 (동적 배치 크기)
    */
   async uploadAndProcessFiles(
     files: File[],
@@ -538,339 +437,76 @@ export class FileProcessingService {
       progress: 0
     }));
 
-    // 동시 처리 제한 (최대 3개 파일 동시 처리)
-    const concurrencyLimit = 3;
-    const batches: File[][] = [];
+    // 파일 크기 기반 동적 배치 크기 계산
+    const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+    const avgFileSize = totalSize / files.length;
+    const concurrencyLimit = this.calculateOptimalConcurrency(avgFileSize);
     
+    console.log(`파일 ${files.length}개 처리 시작 (동시 처리: ${concurrencyLimit}개)`);
+
+    // 파일을 배치로 분할
+    const batches: File[][] = [];
     for (let i = 0; i < files.length; i += concurrencyLimit) {
       batches.push(files.slice(i, i + concurrencyLimit));
     }
 
-    for (const batch of batches) {
-      const batchPromises = batch.map(async (file, batchIndex) => {
-        const globalIndex = results.length + batchIndex;
+    for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+      const batch = batches[batchIndex];
+      
+      console.log(`배치 ${batchIndex + 1}/${batches.length} 처리 중... (${batch.length}개 파일)`);
+      
+      const batchPromises = batch.map(async (file, fileIndex) => {
+        const globalIndex = results.length + fileIndex;
         
-        const result = await this.uploadAndProcessFile(
-          file,
-          collectionId,
-          (progress) => {
-            progressList[globalIndex] = progress;
-            onProgress?.(progressList);
-          }
-        );
+        try {
+          const result = await this.uploadAndProcessFile(
+            file,
+            collectionId,
+            (progress) => {
+              progressList[globalIndex] = progress;
+              onProgress?.(progressList);
+            }
+          );
 
-        return result;
+          return result;
+        } catch (error) {
+          console.error(`파일 ${file.name} 처리 실패:`, error);
+          return {
+            uploadResult: {
+              file,
+              success: false,
+              error: error instanceof Error ? error.message : '알 수 없는 오류'
+            }
+          };
+        }
       });
 
       const batchResults = await Promise.all(batchPromises);
       results.push(...batchResults);
+      
+      // 배치 간 메모리 정리를 위한 짧은 대기
+      if (batchIndex < batches.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
     }
 
+    console.log(`전체 파일 처리 완료: ${results.length}개`);
     return results;
   }
 
   /**
-   * 업로드된 문서 처리
+   * 파일 크기 기반 최적 동시 처리 수 계산
    */
-  private async processUploadedDocument(
-    documentId: string,
-    file: File,
-    progressId: string
-  ): Promise<ProcessingResult> {
-    const startTime = Date.now();
-
-    try {
-      // 문서 상태를 처리 중으로 변경
-      await this.updateDocumentStatus(documentId, 'processing');
-
-      // 텍스트 추출
-      this.updateProgress(progressId, {
-        file_name: file.name,
-        status: 'processing',
-        progress: calculateProcessingProgress('text_extraction')
-      });
-
-      const text = await extractTextFromFileSafe(file);
-      
-      if (!text || text.trim().length === 0) {
-        throw new Error('파일에서 텍스트를 추출할 수 없습니다');
-      }
-
-      // 벡터 생성 및 저장 (새로운 통합 서비스 사용)
-      this.updateProgress(progressId, {
-        file_name: file.name,
-        status: 'processing',
-        progress: calculateProcessingProgress('chunking')
-      });
-
-      const vectorOptions: VectorGenerationOptions = {
-        provider: 'auto', // Claude 사용
-        enableFallback: true,
-        validateResults: true,
-        onProgress: (step, progress, total) => {
-          const overallProgress = 50 + Math.floor((progress / total) * 40);
-          this.updateProgress(progressId, {
-            file_name: file.name,
-            status: 'processing',
-            progress: overallProgress
-          });
-        }
-      };
-
-      const vectorResult = await generateAndStoreDocumentVectors(
-        documentId,
-        text,
-        vectorOptions
-      );
-
-      if (!vectorResult.success) {
-        throw new Error(vectorResult.error || '벡터 생성에 실패했습니다');
-      }
-
-      // 문서 내용 및 메타데이터 업데이트
-      await supabase
-        .from('documents')
-        .update({
-          content: text.substring(0, 50000), // 내용 미리보기 (50KB 제한)
-          chunk_count: vectorResult.chunking.metadata.totalChunks,
-          processing_status: 'completed',
-          metadata: {
-            text_length: text.length,
-            chunk_count: vectorResult.chunking.metadata.totalChunks,
-            vectors_generated: vectorResult.vectorsGenerated,
-            vectors_stored: vectorResult.vectorsStored,
-            chunking_strategy: vectorResult.chunking.metadata.strategy,
-            embedding_provider: vectorResult.provider,
-            processing_completed_at: new Date().toISOString(),
-            warnings: vectorResult.warnings
-          }
-        })
-        .eq('id', documentId);
-
-      const processingTime = Date.now() - startTime;
-
-      return {
-        document_id: documentId,
-        success: true,
-        chunks_created: vectorResult.chunking.metadata.totalChunks,
-        processing_time_ms: processingTime
-      };
-
-    } catch (error) {
-      console.error('문서 처리 오류:', error);
-      
-      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류';
-      
-      // 오류 상태로 업데이트
-      await this.updateDocumentStatus(documentId, 'failed', {
-        error_message: errorMessage
-      });
-
-      return {
-        document_id: documentId,
-        success: false,
-        chunks_created: 0,
-        error: errorMessage,
-        processing_time_ms: Date.now() - startTime
-      };
-    }
-  }
-
-  /**
-   * 청크를 배치로 저장 (메모리 효율성)
-   */
-  private async saveChunksInBatches(
-    documentId: string,
-    chunks: string[],
-    batchSize: number = 50
-  ): Promise<void> {
-    for (let i = 0; i < chunks.length; i += batchSize) {
-      const batch = chunks.slice(i, i + batchSize);
-      
-      const chunkInserts = batch.map((content, batchIndex) => ({
-        document_id: documentId,
-        chunk_index: i + batchIndex,
-        content,
-        metadata: {
-          length: content.length,
-          created_at: new Date().toISOString(),
-          batch_number: Math.floor(i / batchSize)
-        }
-      }));
-
-      const { error } = await supabase
-        .from('document_chunks')
-        .insert(chunkInserts);
-
-      if (error) {
-        throw new Error(`청크 배치 저장 실패 (배치 ${Math.floor(i / batchSize)}): ${error.message}`);
-      }
-    }
-  }
-
-  /**
-   * 문서 상태 업데이트
-   */
-  private async updateDocumentStatus(
-    documentId: string,
-    status: 'pending' | 'processing' | 'completed' | 'failed',
-    additionalData?: Partial<DbDocumentUpdate>
-  ): Promise<void> {
-    try {
-      const updateData = {
-        processing_status: status,
-        updated_at: new Date().toISOString(),
-        ...additionalData
-      };
-
-      await supabase
-        .from('documents')
-        .update(updateData)
-        .eq('id', documentId);
-    } catch (error) {
-      console.error('문서 상태 업데이트 실패:', error);
-    }
-  }
-
-  /**
-   * 진행률 업데이트
-   */
-  private updateProgress(progressId: string, progress: UploadProgress): void {
-    const callback = this.progressCallbacks.get(progressId);
-    if (callback) {
-      callback(progress);
-    }
-  }
-
-  /**
-   * 실패한 문서 재처리
-   */
-  async reprocessFailedDocument(documentId: string): Promise<ProcessingResult> {
-    try {
-      // 문서 정보 조회
-      const { data: document, error } = await supabase
-        .from('documents')
-        .select('*')
-        .eq('id', documentId)
-        .single();
-
-      if (error || !document) {
-        throw new Error('문서를 찾을 수 없습니다');
-      }
-
-      // 스토리지에서 파일 다운로드
-      const storagePath = document.metadata?.storage_path;
-      if (!storagePath) {
-        throw new Error('저장된 파일을 찾을 수 없습니다');
-      }
-
-      const { data: fileData, error: downloadError } = await supabase.storage
-        .from('vector-documents')
-        .download(storagePath);
-
-      if (downloadError || !fileData) {
-        throw new Error('파일 다운로드 실패');
-      }
-
-      // File 객체 재생성
-      const file = new File([fileData], document.original_filename, {
-        type: document.file_type
-      });
-
-      // 기존 청크 삭제
-      await supabase
-        .from('document_chunks')
-        .delete()
-        .eq('document_id', documentId);
-
-      // 재처리
-      return await this.processUploadedDocument(documentId, file, `reprocess_${documentId}`);
-
-    } catch (error) {
-      console.error('문서 재처리 오류:', error);
-      
-      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류';
-      
-      await this.updateDocumentStatus(documentId, 'failed', {
-        error_message: errorMessage
-      });
-
-      return {
-        document_id: documentId,
-        success: false,
-        chunks_created: 0,
-        error: errorMessage,
-        processing_time_ms: 0
-      };
-    }
-  }
-
-  /**
-   * 처리 통계 조회
-   */
-  async getProcessingStats(): Promise<{
-    total_documents: number;
-    pending_documents: number;
-    processing_documents: number;
-    completed_documents: number;
-    failed_documents: number;
-    total_chunks: number;
-    avg_processing_time: number;
-  }> {
-    try {
-      const { data: documents, error } = await supabase
-        .from('documents')
-        .select('processing_status, chunk_count, metadata');
-
-      if (error) {
-        throw new Error(`통계 조회 실패: ${error.message}`);
-      }
-
-      const stats = {
-        total_documents: documents.length,
-        pending_documents: 0,
-        processing_documents: 0,
-        completed_documents: 0,
-        failed_documents: 0,
-        total_chunks: 0,
-        avg_processing_time: 0
-      };
-
-      let totalProcessingTime = 0;
-      let processedCount = 0;
-
-      documents.forEach(doc => {
-        switch (doc.processing_status) {
-          case 'pending':
-            stats.pending_documents++;
-            break;
-          case 'processing':
-            stats.processing_documents++;
-            break;
-          case 'completed':
-            stats.completed_documents++;
-            stats.total_chunks += doc.chunk_count || 0;
-            break;
-          case 'failed':
-            stats.failed_documents++;
-            break;
-        }
-
-        // 처리 시간 계산 (메타데이터에서)
-        if (doc.metadata?.processing_time_ms) {
-          totalProcessingTime += doc.metadata.processing_time_ms;
-          processedCount++;
-        }
-      });
-
-      if (processedCount > 0) {
-        stats.avg_processing_time = Math.round(totalProcessingTime / processedCount);
-      }
-
-      return stats;
-    } catch (error) {
-      console.error('처리 통계 조회 오류:', error);
-      throw error;
+  private calculateOptimalConcurrency(avgFileSize: number): number {
+    // 파일 크기에 따른 동시 처리 수 조정
+    if (avgFileSize > 20 * 1024 * 1024) { // 20MB 이상
+      return 1;
+    } else if (avgFileSize > 10 * 1024 * 1024) { // 10MB 이상
+      return 2;
+    } else if (avgFileSize > 5 * 1024 * 1024) { // 5MB 이상
+      return 3;
+    } else {
+      return 4; // 작은 파일들
     }
   }
 }

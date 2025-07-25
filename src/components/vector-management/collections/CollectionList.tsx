@@ -44,6 +44,7 @@ interface CollectionListProps {
   onToggleStatus: (id: string, isActive: boolean) => void;
   onBulkAction: (action: 'delete' | 'activate' | 'deactivate', ids: string[]) => void;
   onCreate: () => void;
+  onManageDocuments?: (collection: Collection) => void;
 }
 
 export const CollectionList: React.FC<CollectionListProps> = ({
@@ -53,7 +54,8 @@ export const CollectionList: React.FC<CollectionListProps> = ({
   onDelete,
   onToggleStatus,
   onBulkAction,
-  onCreate
+  onCreate,
+  onManageDocuments
 }) => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -251,6 +253,12 @@ export const CollectionList: React.FC<CollectionListProps> = ({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        {onManageDocuments && (
+                          <DropdownMenuItem onClick={() => onManageDocuments(collection)}>
+                            <FileText className="h-4 w-4 mr-2" />
+                            문서 관리
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem onClick={() => onEdit(collection)}>
                           <Edit className="h-4 w-4 mr-2" />
                           수정

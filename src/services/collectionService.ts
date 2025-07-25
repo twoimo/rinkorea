@@ -8,6 +8,29 @@ import type {
   CollectionStats,
   CollectionFilters
 } from '@/types/vector';
+import {
+  ServiceError,
+  handleServiceError,
+  retryWithBackoff,
+  createSupabaseQuery,
+  applySorting,
+  getCurrentUser,
+  logServiceOperation,
+  measurePerformance,
+  validateRequired,
+  validateStringLength,
+  safeParseMetadata
+} from './common/serviceUtils';
+import {
+  handleServiceError,
+  retryWithBackoff,
+  createSupabaseQuery,
+  applySorting,
+  getCurrentUser,
+  logServiceOperation,
+  measurePerformance,
+  isValidMetadata
+} from './common/serviceUtils';
 
 // Supabase 데이터베이스 타입 정의
 type DbCollection = Database['public']['Tables']['collections']['Row'];
@@ -37,26 +60,48 @@ const dbCollectionToCollection = (dbCollection: DbCollection): Collection => ({
  * 컬렉션 생성
  */
 export const createCollection = async (data: CreateCollectionData): Promise<Collection> => {
-  try {
-    const { data: result, error } = await queryCollections()
-      .insert({
-        name: data.name.trim(),
-        description: data.description?.trim() || null,
-        metadata: data.metadata || {},
-        created_by: (await supabase.auth.getUser()).data.user?.id
-      })
-      .select()
-      .single();
+  return measurePerformance(async () => {
+    try {
+      // 입력 검증
+      validateRequired(data.name, '컬렉션 이름');
+      validateStringLength(data.name.trim(), '컬렉션 이름', 1, 100);
+      
+      if (data.description) {
+        validateStringLength(data.description.trim(), '설명', 0, 500);
+      }
 
-    if (error) {
-      throw new Error(`컬렉션 생성 실패: ${error.message}`);
+      const user = await getCurrentUser();
+      
+      const { data: result, error } = await retryWithBackoff(
+        () => queryCollections()
+          .insert({
+            name: data.name.trim(),
+            description: data.description?.trim() || null,
+            metadata: data.metadata || {},
+            created_by: user.id
+          })
+          .select()
+          .single(),
+        2,
+        1000,
+        '컬렉션 생성'
+      );
+
+      if (error) {
+        throw new ServiceError(`컬렉션 생성 실패: ${error.message}`, 'CREATE_FAILED', error);
+      }
+
+      logServiceOperation('컬렉션 생성', { 
+        collectionId: result.id, 
+        name: data.name,
+        userId: user.id 
+      });
+
+      return dbCollectionToCollection(result);
+    } catch (error) {
+      throw handleServiceError(error, '컬렉션 생성');
     }
-
-    return dbCollectionToCollection(result);
-  } catch (error) {
-    console.error('컬렉션 생성 오류:', error);
-    throw error;
-  }
+  }, 'createCollection');
 };
 
 /**

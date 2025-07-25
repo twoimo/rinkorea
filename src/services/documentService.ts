@@ -10,6 +10,16 @@ import type {
   UploadProgress
 } from '@/types/vector';
 import { SUPPORTED_FILE_TYPES } from '@/types/vector';
+import {
+  ServiceError,
+  handleServiceError,
+  retryWithBackoff,
+  getCurrentUser,
+  logServiceOperation,
+  measurePerformance,
+  validateRequired,
+  safeParseMetadata
+} from './common/serviceUtils';
 
 // Supabase 데이터베이스 타입 정의
 type DbDocument = Database['public']['Tables']['documents']['Row'];
@@ -903,10 +913,10 @@ export const formatFileSize = (bytes: number): string => {
  */
 export const getFileTypeIcon = (fileType: string): string => {
   if (fileType.includes('pdf')) return '📄';
-  if (fileType.includes('text')) return '📝';
-  if (fileType.includes('html')) return '🌐';
-  if (fileType.includes('word') || fileType.includes('docx')) return '📘';
+  if (fileType.includes('html')) return '🌐'; // html을 text보다 먼저 체크
   if (fileType.includes('markdown')) return '📋';
+  if (fileType.includes('word') || fileType.includes('docx')) return '📘';
+  if (fileType.includes('text')) return '📝';
   return '📄';
 };
 

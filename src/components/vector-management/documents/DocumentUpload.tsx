@@ -15,7 +15,17 @@ import {
 } from 'lucide-react';
 import type { UploadProgress, UploadResult } from '@/types/vector';
 import { SUPPORTED_FILE_TYPES } from '@/types/vector';
-import { validateFileExtended, formatFileSize, getFileTypeIcon } from '@/services/documentService';
+import { 
+  uploadDocuments, 
+  validateFileExtended, 
+  formatFileSize, 
+  getFileTypeIcon 
+} from '@/services/documentService';
+import { 
+  processMultipleDocuments, 
+  type ProcessingProgress 
+} from '@/services/documentProcessingService';
+import { fileProcessingService } from '@/services/fileProcessingService';
 
 interface DocumentUploadProps {
   collectionId: string;
@@ -142,9 +152,6 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
     setUploadResults([]);
 
     try {
-      // 동적 import로 서비스 로드
-      const { fileProcessingService } = await import('@/services/fileProcessingService');
-      
       const results = await fileProcessingService.uploadAndProcessFiles(
         selectedFiles,
         collectionId,
@@ -166,7 +173,17 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
 
     } catch (error) {
       console.error('업로드 오류:', error);
-      alert('업로드 중 오류가 발생했습니다.');
+      
+      // 구체적인 오류 메시지 표시
+      const errorMessage = error instanceof Error ? error.message : '업로드 중 알 수 없는 오류가 발생했습니다.';
+      
+      if (errorMessage.includes('Bucket not found') || errorMessage.includes('스토리지 버킷')) {
+        alert(`스토리지 설정 오류\n\n${errorMessage}\n\n관리자에게 문의하거나 vector-database-setup.sql 스크립트를 실행해주세요.`);
+      } else if (errorMessage.includes('File size too large') || errorMessage.includes('파일 크기')) {
+        alert(`파일 크기 오류\n\n${errorMessage}\n\n더 작은 파일을 선택하거나 파일을 분할해주세요.`);
+      } else {
+        alert(`업로드 오류\n\n${errorMessage}`);
+      }
     } finally {
       setIsUploading(false);
     }
@@ -210,7 +227,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({
                 지원 형식: {supportedExtensions}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                최대 {maxFiles}개 파일, 파일당 최대 50MB
+                최대 {maxFiles}개 파일, 파일당 최대 55MB
               </p>
             </div>
             <Button variant="outline" disabled={disabled}>

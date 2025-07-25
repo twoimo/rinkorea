@@ -4,6 +4,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "vite",
+    "dev:api": "node api/server.js",
+    "dev:full": "concurrently \"npm run dev:api\" \"npm run dev\"",
     "dev:vercel": "vercel dev",
     "build": "tsc && vite build",
     "build:dev": "vite build --mode development",
@@ -19,7 +21,18 @@
     "security:check-keys": "node scripts/check-hardcoded-keys.js",
     "security:full": "npm run security:check-keys",
     "test": "vitest",
-    "test:security": "npm run security:check-keys && npm run test"
+    "test:security": "npm run security:check-keys && npm run test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:final": "playwright test e2e/vector-management-final.spec.ts",
+    "test:e2e:search": "playwright test e2e/search-functionality.spec.ts",
+    "test:e2e:performance": "playwright test e2e/performance-load.spec.ts",
+    "test:e2e:security": "playwright test e2e/security-tests.spec.ts",
+    "test:e2e:rag": "playwright test e2e/ai-agent-rag.spec.ts",
+    "test:e2e:all-new": "playwright test e2e/search-functionality.spec.ts e2e/performance-load.spec.ts e2e/security-tests.spec.ts e2e/ai-agent-rag.spec.ts",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@channel.io/channel-web-sdk-loader": "^2.0.0",
@@ -68,8 +81,10 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
+    "cors": "^2.8.5",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.3.0",
+    "express": "^4.21.2",
     "framer-motion": "^12.18.1",
     "i18next": "^25.2.1",
     "i18next-browser-languagedetector": "^8.1.0",
@@ -101,6 +116,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
+    "@playwright/test": "^1.54.1",
     "@tailwindcss/typography": "^0.5.15",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",

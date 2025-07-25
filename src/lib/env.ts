@@ -212,34 +212,35 @@ export const validateApiKeys = {
 /**
  * 모든 필수 API 키 검증
  */
-export function validateAllApiKeys(): { valid: boolean; errors: string[] } {
+export function validateAllApiKeys(envVars?: any): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
+    const currentEnv = envVars || import.meta.env;
     
     // Voyage AI 키 검증
-    const voyageResult = validateApiKeys.voyage(env.VITE_VOYAGE_API_KEY);
+    const voyageResult = validateApiKeys.voyage(currentEnv.VITE_VOYAGE_API_KEY);
     if (!voyageResult.valid && voyageResult.error) {
         errors.push(voyageResult.error);
     }
     
     // Claude 키 검증
-    const claudeResult = validateApiKeys.claude(env.VITE_CLAUDE_API_KEY);
+    const claudeResult = validateApiKeys.claude(currentEnv.VITE_CLAUDE_API_KEY);
     if (!claudeResult.valid && claudeResult.error) {
         errors.push(claudeResult.error);
     }
     
     // Mistral 키 검증
-    const mistralResult = validateApiKeys.mistral(env.VITE_MISTRAL_API_KEY);
+    const mistralResult = validateApiKeys.mistral(currentEnv.VITE_MISTRAL_API_KEY);
     if (!mistralResult.valid && mistralResult.error) {
         errors.push(mistralResult.error);
     }
     
     // Supabase 설정 검증
-    const supabaseUrlResult = validateApiKeys.supabaseUrl(env.VITE_SUPABASE_URL);
+    const supabaseUrlResult = validateApiKeys.supabaseUrl(currentEnv.VITE_SUPABASE_URL);
     if (!supabaseUrlResult.valid && supabaseUrlResult.error) {
         errors.push(supabaseUrlResult.error);
     }
     
-    const supabaseKeyResult = validateApiKeys.supabaseAnonKey(env.VITE_SUPABASE_ANON_KEY);
+    const supabaseKeyResult = validateApiKeys.supabaseAnonKey(currentEnv.VITE_SUPABASE_ANON_KEY);
     if (!supabaseKeyResult.valid && supabaseKeyResult.error) {
         errors.push(supabaseKeyResult.error);
     }
@@ -253,8 +254,9 @@ export function validateAllApiKeys(): { valid: boolean; errors: string[] } {
 /**
  * 개발 서버 시작 시 API 키 검증
  */
-export function validateStartupKeys(): void {
-    const validation = validateAllApiKeys();
+export function validateStartupKeys(envVars?: any): void {
+    const currentEnv = envVars || import.meta.env;
+    const validation = validateAllApiKeys(currentEnv);
     
     if (!validation.valid) {
         console.error('\n🚨 API 키 설정 오류가 발견되었습니다:\n');
@@ -264,7 +266,7 @@ export function validateStartupKeys(): void {
         console.error('\n📖 자세한 설정 방법은 README.md 파일을 참고해주세요.\n');
         
         // 개발 환경에서는 경고만 표시하고 계속 진행
-        if (env.VITE_APP_ENV !== 'production') {
+        if (currentEnv.VITE_APP_ENV !== 'production') {
             console.warn('⚠️  개발 환경에서 실행 중이므로 계속 진행합니다.\n');
         } else {
             // 프로덕션 환경에서는 실행 중단

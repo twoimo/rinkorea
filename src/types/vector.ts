@@ -321,37 +321,37 @@ export const SUPPORTED_FILE_TYPES: Record<FileType, SupportedFileType> = {
   pdf: {
     extension: '.pdf',
     mimeType: 'application/pdf',
-    maxSize: 50 * 1024 * 1024, // 50MB
+    maxSize: 55 * 1024 * 1024, // 55MB
     processor: 'pdf-parse'
   },
   txt: {
     extension: '.txt',
     mimeType: 'text/plain',
-    maxSize: 10 * 1024 * 1024, // 10MB
+    maxSize: 55 * 1024 * 1024, // 55MB
     processor: 'text'
   },
   md: {
     extension: '.md',
     mimeType: 'text/markdown',
-    maxSize: 10 * 1024 * 1024, // 10MB
+    maxSize: 55 * 1024 * 1024, // 55MB
     processor: 'markdown'
   },
   docx: {
     extension: '.docx',
     mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    maxSize: 25 * 1024 * 1024, // 25MB
+    maxSize: 55 * 1024 * 1024, // 55MB
     processor: 'mammoth'
   },
   html: {
     extension: '.html',
     mimeType: 'text/html',
-    maxSize: 10 * 1024 * 1024, // 10MB
+    maxSize: 55 * 1024 * 1024, // 55MB
     processor: 'html-parser'
   }
 };
 
 export const DEFAULT_CONFIG: VectorConfig = {
-  max_file_size: 50 * 1024 * 1024, // 50MB
+  max_file_size: 55 * 1024 * 1024, // 55MB
   supported_file_types: Object.keys(SUPPORTED_FILE_TYPES),
   chunk_size: 1000,
   chunk_overlap: 200,
